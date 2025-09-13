@@ -10,9 +10,16 @@ Inventory::Inventory() {
 }
 
 void Inventory::OpenInventory() {
-    SetState(InventoryState::ITEM_VIEW_SCREEN);
+    GoToMainScreen();
+}
+
+void Inventory::GoToMainScreen() {
+    SetState(InventoryState::MAIN_SCREEN);
     m_selectedCellX = 0;
     m_selectedCellY = 0;
+    m_examineRotationX = 0.0f;
+    m_examineRotationY = 0.0f;
+    m_examineZoom = 0.0f;
 }
 
 void Inventory::CloseInventory() {
@@ -23,10 +30,10 @@ void Inventory::AddItem(const std::string& name) {
     InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(name);
     if (!itemInfo) return;
 
-    std::cout << "\n";
-    std::cout << "Adding: " << name << "\n";
-    std::cout << "- cell size: " << itemInfo->m_cellSize << "\n";
-;   PrintGridOccupiedStateToConsole();
+    //std::cout << "\n";
+    //std::cout << "Adding: " << name << "\n";
+    //std::cout << "- cell size: " << itemInfo->m_cellSize << "\n";
+;   //PrintGridOccupiedStateToConsole();
 
     // Find the next free location
     glm::ivec2 nextFreeLocation = GetNextFreeLocation(itemInfo->m_cellSize);
@@ -36,7 +43,7 @@ void Inventory::AddItem(const std::string& name) {
         std::cout << "NO FREE SPACE FOR ITEM '" << name << "'\n";
     }
 
-    std::cout << "- next free location: " << nextFreeLocation.x << ", " << nextFreeLocation.y << "\n";
+    //std::cout << "- next free location: " << nextFreeLocation.x << ", " << nextFreeLocation.y << "\n";
 
 
     // Yay, there was, insert it!
@@ -63,6 +70,16 @@ void Inventory::ClearInventory() {
 
 int Inventory::GetSelectedItemIndex() {
     return m_itemIndex2DArray[m_selectedCellX][m_selectedCellY];
+}
+
+
+const std::string& Inventory::GetSelectedItemName() {
+    static std::string noItem = "NO_ITEM";
+
+    InventoryItem* selectedItem = GetItemAtIndex(GetSelectedItemIndex());
+    if (!selectedItem) return noItem;
+
+    return selectedItem->m_name;
 }
 
 InventoryItem* Inventory::GetItemAtIndex(int index) {

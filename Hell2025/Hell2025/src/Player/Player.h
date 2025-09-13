@@ -174,6 +174,9 @@ struct Player {
     bool PressedRight();
     bool PressedInventoryExamine();
 
+    const InventoryState& GetInvetoryState() { return m_inventory.GetInventoryState(); }
+    Inventory& GetInventory() { return m_inventory; }
+
     void DisplayInfoText(const std::string& text);
     std::string m_infoText = "";
     float m_infoTextTimer = 0;
@@ -184,6 +187,8 @@ struct Player {
     bool PressedTwo();
     bool PressedThree();
     bool PressedFour();
+
+    bool ShouldRenderViewWeapon();
 
     const float GetFov();
     const void SetName(const std::string& name);
@@ -313,6 +318,8 @@ private:
         glm::mat4 m_weaponSwayMatrix = glm::mat4(1);
         int m_mouseIndex = -1;
         int m_keyboardIndex = -1;
+
+        glm::mat4 GetItemExamineModelMatrix() { return m_inventory.GetItemExamineModelMatrix(); }
 
 
         float m_weaponAudioFrequency = 1.0f;

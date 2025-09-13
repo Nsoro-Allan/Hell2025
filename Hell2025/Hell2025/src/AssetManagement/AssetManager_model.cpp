@@ -7,6 +7,10 @@
 namespace AssetManager {
 
     void PrintModelMeshNames(Model* model) {
+        if (!model) {
+            std::cout << "AssetManager::PrintModelMeshNames() failed coz model param was nullptr\n";
+        }
+
         std::cout << model->GetName() << "\n";
         for (const uint32_t& meshIndex : model->GetMeshIndices()) {
             Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);

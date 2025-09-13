@@ -54,7 +54,7 @@ void main() {
     // Blocking mask
     vec4 rma = texture(GBufferRMATexture, uv);
     if (rma.a == 0.0) {
-        return;
+       return;
     }
 
     vec3 worldPos  = texture(WorldPositionTexture, uv).rgb;

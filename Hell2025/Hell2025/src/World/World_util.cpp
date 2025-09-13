@@ -2,6 +2,10 @@
 
 namespace World {
 
+    // this whole is fucked and wastes you so much time in confusion,
+    // abstract it all away with your new manager thing, and most importantly always return true
+    // unless a min ray distance is enforced
+
     bool ObjectTypeIsInteractable(ObjectType objectType, uint64_t objectId, glm::vec3 playerCameraPosition, glm::vec3 rayHitPosition) {
         float doorInteractDistance = 1.875f;
         float pickupInteractDistance = 2.0f;
@@ -37,6 +41,11 @@ namespace World {
         }
         if (objectType == ObjectType::TOILET_SEAT) {
             return (glm::distance(rayHitPosition, playerCameraPosition) < 2.0f);
+        }
+
+
+        if (objectType == ObjectType::DRAWER) {
+            return true;
         }
 
         return false;

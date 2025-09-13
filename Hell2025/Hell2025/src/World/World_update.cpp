@@ -92,6 +92,10 @@ namespace World {
             door.Update(deltaTime);
         }
 
+        for (Drawers& drawers : GetDrawers()) {
+            drawers.Update(deltaTime);
+        }
+
         for (GameObject& gameObject : gameObjects) {
             gameObject.Update(deltaTime);
         }

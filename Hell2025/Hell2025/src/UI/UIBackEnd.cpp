@@ -58,37 +58,6 @@ without drama. Dependable at short range,
 underwhelming at a distance. A proper piece 
 of shit.)";
 
-        name = "TOKAREV";
-        description = R"(Soviet semi-automatic pistol developed in the
-1920s. This baby runs hot and she got no frills, 
-just prints pretty little holes. Straight out 
-of Ourumov's briefcase.)";
-
-        name = "REMINGTON 870";
-        description = R"(American pump-action built like a fence post. 
-This twelve-gauge thunder will clear every 
-damn room and barn in time for Judgement 
-Day supper. )";
-
-        name = "SPAS 12";
-        description = 
-R"(Dual modal, Italian menace. If killing is a sport, 
-then Franchi's Special Purpose Automatic 
-Shotgun will put you on the podium with the 
-cadence of a fucking riot.
-)";
-
-        name = "GOLDEN GLOCK 22";
-        description = R"(Shaken naked, not stirred. Pierce Brosnan's 
-wet dream, wedding gift dipped in drip and 
-glitter. Natalia gonna be in the good books 
-for this one.)";
-
-        name = "KNIFE";
-        description = R"(From fish to pharynx, this rusty little dagger 
-takes the same short and messy path. Might
-wanna bring a cloth.
-)";
 
 
         name = "9 X 19MM";
@@ -101,10 +70,6 @@ stack.
         description = R"(Long, bottleneck case; hot, flat, and loud. 
 Punches deep, too deep, through coats, doors, 
 and sometimes sense.
-)";
-
-        name = "BLACK SKULL";
-        description = R"(Worth little to you, worth everything to them.
 )";
 
         name = "AKS74U";
@@ -124,7 +89,7 @@ shoulder, honest in the work.
 aim into point, and point into a bloody mess.
 )";
 
-        name = "SILENCER";
+        name = "SUPPRESSOR";
         /*description = R"(A metal hush that threads onto bad intentions.
 You'll hear the brass breathe before it even hits 
 the floor.
@@ -133,11 +98,6 @@ the floor.
 hits the floor.
 )";
 
-
-        name = "SMALL KEY";
-        description = R"(Smells of dust and secrets. One turn, one less 
-mystery.
-)";
 
 
 
@@ -157,8 +117,8 @@ mystery.
     void Update() {
         
         if (Debug::GetDebugTextMode() == DebugTextMode::GLOBAL) {
-            //std::string text = Debug::GetText();
-            std::string text = "Global debug text\n... apparently it's broken right now.";
+            std::string text = Debug::GetText();
+            //std::string text = "Global debug text\n... apparently it's broken right now.";
             BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
         }
 

@@ -109,6 +109,18 @@ namespace World {
         toiletCreateInfo.rotation.y = HELL_PI * 0.5f;
         World::AddToilet(toiletCreateInfo, spawnOffset);
 
+        DrawersCreateInfo drawersCreateInfo;
+        drawersCreateInfo.position = glm::vec3(8.65f, 0.0f, -0.6f);
+        drawersCreateInfo.rotation.y = HELL_PI * 1.5f;
+        drawersCreateInfo.type = DrawersType::LARGE;
+        World::AddDrawers(drawersCreateInfo, spawnOffset);
+
+        drawersCreateInfo.position = glm::vec3(4.50f, 0.0f, -0.85f);
+        drawersCreateInfo.rotation.y = HELL_PI * 0.5f;
+        drawersCreateInfo.type = DrawersType::SMALL;
+        World::AddDrawers(drawersCreateInfo, spawnOffset);
+
+
    //  ToiletCreateInfo toiletCreateInfo2;
    //  toiletCreateInfo2.position = glm::vec3(0.1f, 0.0f, 4.5f);
    //  toiletCreateInfo2.rotation.y = HELL_PI * 1.5f;

@@ -100,6 +100,13 @@ namespace World {
                 }
             }
 
+            for (Drawers& drawers: GetDrawers()) {
+                const std::vector<RenderItem>& renderItems = drawers.GetRenderItems();
+                for (const RenderItem& renderItem : renderItems) {
+                    CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
+                }
+            }
+
             if (Editor::IsOpen()) {
                 for (Tree& tree : GetTrees()) {
                     const std::vector<RenderItem>& renderItems = tree.GetRenderItems();

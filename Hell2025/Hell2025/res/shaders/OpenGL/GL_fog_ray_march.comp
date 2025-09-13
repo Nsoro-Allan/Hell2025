@@ -211,6 +211,8 @@ void main() {
 
     // Tone it down a bit
     //accCol *= 0.75;
+    
+    //accCol *= 0.0;
 
     //accCol *= 20;
     

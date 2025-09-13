@@ -13,6 +13,7 @@
 #include "Audio/Synth.h"
 #include "Core/Bible.h"
 #include "Core/Debug.h"
+#include "Core/OpenStateHandlerManager.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "Editor/Gizmo.h"
@@ -122,6 +123,7 @@ namespace BackEnd {
         Editor::Update(deltaTime);
         AStarMap::Update();
         Game::Update();
+        OpenStateHandlerManager::Update(deltaTime);
 
         Physics::UpdateAllRigidDynamics(deltaTime);
         Physics::UpdateActiveRigidDynamicAABBList();

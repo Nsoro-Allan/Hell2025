@@ -105,11 +105,11 @@ void Player::SubmitRenderItems() {
     if (!viewport) return;
     if (!viewport->IsVisible()) return;
 
-    if (weaponState->hasSilencer) {
+    if (ShouldRenderViewWeapon() && weaponState->hasSilencer) {
         SubmitAttachmentRenderItem(weaponInfo->silencerName);
     }
 
-    if (weaponState->hasSight) {
+    if (ShouldRenderViewWeapon() && weaponState->hasSight) {
         SubmitAttachmentRenderItem(weaponInfo->sightName);
     }       
 }

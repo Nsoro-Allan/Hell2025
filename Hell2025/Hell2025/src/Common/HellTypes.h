@@ -5,6 +5,7 @@
 #include "HellEnums.h"
 #include "HellGlm.h"
 #include "Input/keycodes.h"
+#include <unordered_map>
 
 struct BlitRegion {
     int32_t originX = 0;
@@ -656,9 +657,14 @@ struct InventoryItemInfo {
     std::string m_name = UNDEFINED_STRING;
     std::string m_itemHeading = UNDEFINED_STRING;
     std::string m_description = UNDEFINED_STRING;
+    std::string m_examineModelName = UNDEFINED_STRING;
+    Transform m_initialExamineItemTransform;
     InventoryItemType m_itemType = InventoryItemType::UESLESS;
     int m_cellSize = 1;
     bool m_combineable = false;
     bool m_discardable = true;
     bool m_equipable = true;
+    bool m_isGold = false;
+    std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
+    std::vector<std::string> m_supportedAttachments;
 };

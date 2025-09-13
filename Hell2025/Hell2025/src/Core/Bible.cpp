@@ -19,6 +19,8 @@ namespace Bible {
 
         InventoryItemInfo& glock = m_inventoryItems["Glock"];
         glock.m_name = "Glock"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key 
+        glock.m_examineModelName = "World_Glock";
+        glock.m_meshMaterialNames["Glock"] = "Glock";
         glock.m_cellSize = 1;
         glock.m_combineable = true;
         glock.m_discardable = true;
@@ -32,6 +34,9 @@ of shit.)";
 
         InventoryItemInfo& goldenGlock = m_inventoryItems["GoldenGlock"];
         goldenGlock.m_name = "GoldenGlock"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key
+        goldenGlock.m_examineModelName = "World_Glock";
+        goldenGlock.m_meshMaterialNames["Glock"] = "Glock";
+        goldenGlock.m_isGold = true;
         goldenGlock.m_cellSize = 1;
         goldenGlock.m_combineable = true;
         goldenGlock.m_discardable = true;
@@ -44,8 +49,11 @@ for this one.)";
 
         InventoryItemInfo& tokarev = m_inventoryItems["Tokarev"];
         tokarev.m_name = "Tokarev"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key 
+        tokarev.m_examineModelName = "World_Tokarev";
+        tokarev.m_meshMaterialNames["TokarevBody"] = "Tokarev";
+        tokarev.m_meshMaterialNames["TokarevGripPolymer"] = "TokarevGrip";
         tokarev.m_cellSize = 1;
-        tokarev.m_combineable = true;
+        tokarev.m_combineable = false;
         tokarev.m_discardable = true;
         tokarev.m_equipable = true;
         tokarev.m_itemHeading = "TOKAREV";
@@ -56,9 +64,13 @@ of Ourumov's briefcase.)";
 
         InventoryItemInfo& knife = m_inventoryItems["Knife"];
         knife.m_name = "Knife"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key
+        knife.m_examineModelName = "World_Knife";
+        knife.m_initialExamineItemTransform.rotation.y = -0.2f;
+        knife.m_initialExamineItemTransform.rotation.z = -0.6f;
+        knife.m_meshMaterialNames["Knife"] = "Knife";
         knife.m_cellSize = 1;
         knife.m_combineable = true;
-        knife.m_discardable = true;
+        knife.m_discardable = false;
         knife.m_equipable = true;
         knife.m_itemHeading = "KNIFE";
         knife.m_description = R"(From fish to pharynx, this rusty little dagger 
@@ -67,6 +79,8 @@ wanna bring a cloth.)";
 
         InventoryItemInfo& remington870 = m_inventoryItems["Remington870"];
         remington870.m_name = "Remington870"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key
+        remington870.m_examineModelName = "World_Remington870";
+        remington870.m_meshMaterialNames["Remington870"] = "Shotgun";
         remington870.m_cellSize = 3;
         remington870.m_combineable = false;
         remington870.m_discardable = true;
@@ -77,10 +91,13 @@ This twelve-gauge thunder will clear every
 damn room and barn in time for Judgment 
 Day supper.)";
 
-
         InventoryItemInfo& spas = m_inventoryItems["SPAS"];
         spas.m_name = "SPAS"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key
+        spas.m_examineModelName = "World_SPAS";
         spas.m_cellSize = 3;
+        spas.m_meshMaterialNames["SPAS12_Main"] = "SPAS2_Main";
+        spas.m_meshMaterialNames["SPAS12_Moving"] = "SPAS2_Moving";
+        spas.m_meshMaterialNames["SPAS12_Stamped"] = "SPAS2_Stamped";
         spas.m_combineable = false;
         spas.m_discardable = true;
         spas.m_equipable = true;
@@ -88,8 +105,43 @@ Day supper.)";
         spas.m_description = R"(Dual modal, Italian menace. If killing is a sport, 
 then Franchi's Special Purpose Automatic 
 Shotgun will put you on the podium with the 
-cadence of a fucking riot.
-)";
+cadence of a fucking riot.)";
+
+
+
+
+
+
+
+
+        // Below you need to swap out the models for the original World_ versions and add an offset to get the angle you want
+        // rather than baking into a second export of the model.
+
+
+        //. !!!!!
+
+        InventoryItemInfo& blackSkull = m_inventoryItems["BlackSkull"];
+        blackSkull.m_name = "BlackSkull"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key 
+        blackSkull.m_cellSize = 1;
+        blackSkull.m_examineModelName = "BlackSkull2";
+        blackSkull.m_meshMaterialNames["BlackSkullExamine"] = "BlackSkull";
+        blackSkull.m_combineable = false;
+        blackSkull.m_discardable = true;
+        blackSkull.m_equipable = false;
+        blackSkull.m_itemHeading = "BLACK SKULL";
+        blackSkull.m_description = R"(Worth little to you, worth everything to them.)";
+
+        InventoryItemInfo& smallKey = m_inventoryItems["SmallKey"];
+        smallKey.m_name = "SmallKey"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key 
+        smallKey.m_cellSize = 1;
+        smallKey.m_examineModelName = "SmallKey";
+        smallKey.m_meshMaterialNames["SmallKeyExamine"] = "SmallKey";
+        smallKey.m_combineable = false;
+        smallKey.m_discardable = true;
+        smallKey.m_equipable = false;
+        smallKey.m_itemHeading = "SMALL KEY";
+        smallKey.m_description = R"(Smells of dust and secrets. One turn, one less 
+mystery.)";
 
 
     }

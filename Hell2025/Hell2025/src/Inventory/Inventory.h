@@ -2,6 +2,7 @@
 #include "HellDefines.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
+#include "Types/Renderer/MeshNodes.h"
 #include <string>
 #include <vector>
 
@@ -22,31 +23,35 @@ struct Inventory {
     void CloseInventory();
     void SubmitRenderItems();
     void PrintGridOccupiedStateToConsole();
+    void GoToMainScreen();
     void SetLocalPlayerIndex(int localPlayerIndex);
-    void SetState(InventoryState state);
-
-    const InventoryState& GetInventoryState()    { return m_state; }
-    const std::vector<InventoryItem>& GetItems() { return m_items; }
-    const bool IsClosed()                        { return m_state == InventoryState::CLOSED; }
-    const bool IsOpen()                          { return m_state != InventoryState::CLOSED; }
+    
+    const glm::mat4 GetItemExamineModelMatrix()     { return m_examineModelMatrix; }
+    const InventoryState& GetInventoryState()       { return m_state; }
+    const std::vector<InventoryItem>& GetItems()    { return m_items; }
+    const std::vector<RenderItem>& GetRenderItems() { return m_examineItemMeshNodes.GetRenderItems(); }
+    const bool IsClosed()                           { return m_state == InventoryState::CLOSED; }
+    const bool IsOpen()                             { return m_state != InventoryState::CLOSED; }
 
 private:
     glm::ivec2 GetNextFreeLocation(int itemCellSize);
-    void UpdateOccupiedSlotsArray(); // rename thsi to reflect the acutal name of the array: m_itemIndex2DArray
+    void UpdateOccupiedSlotsArray(); // rename this to reflect the actual name of the array: m_itemIndex2DArray
     void RenderButton(glm::ivec2 location, const std::string& letter, const std::string& description);
+    void SetState(InventoryState state);
 
     // Render submits
     void SubmitItemViewScreenRenderItems();
     void SubmitItemExamineRenderItems();
     
     // Updates
-    void UpdateItemViewScreen();
-    void UpdateExamineScreen();
+    void UpdateItemViewScreen(float deltaTime);
+    void UpdateExamineScreen(float deltaTime);
 
     // Getters
     InventoryItemInfo* GetSelectedItemInfo();
     InventoryItem* GetItemAtIndex(int index);
     int GetSelectedItemIndex();
+    const std::string& GetSelectedItemName();
     const std::string& GetItemNameAtLocation(int x, int y);
     int GetItemSizeAtLocation(int x, int y);
     bool IsCellOccupied(int x, int y);
@@ -58,4 +63,9 @@ private:
     int m_localPlayerIndex = 0;
     std::vector<InventoryItem> m_items;
     InventoryState m_state = InventoryState::CLOSED;
+    float m_examineRotationX = 0.0f;
+    float m_examineRotationY = 0.0f;
+    float m_examineZoom = 0.0f;
+    glm::mat4 m_examineModelMatrix;
+    MeshNodes m_examineItemMeshNodes;
 };

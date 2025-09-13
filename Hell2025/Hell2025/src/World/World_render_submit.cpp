@@ -83,8 +83,16 @@ namespace World {
         }
 
         // Toilets
-        for (Toilet& toilet: GetToilets()) {
+        for (Toilet& toilet : GetToilets()) {
             RenderDataManager::SubmitRenderItems(toilet.GetRenderItems());
+            // TODO: if (Editor::GetSelectedObjectId() == toilet.GetObjectId()) {
+            // TODO:     RenderDataManager::SubmitOutlineRenderItems(toilet.GetRenderItems());
+            // TODO: }
+        }
+
+        // Drawers
+        for (Drawers& drawers : GetDrawers()) {
+            RenderDataManager::SubmitRenderItems(drawers.GetRenderItems());
             // TODO: if (Editor::GetSelectedObjectId() == toilet.GetObjectId()) {
             // TODO:     RenderDataManager::SubmitOutlineRenderItems(toilet.GetRenderItems());
             // TODO: }
@@ -170,8 +178,12 @@ namespace World {
             Player* player = Game::GetLocalPlayerByIndex(i);
             AnimatedGameObject* viewWeapon = player->GetViewWeaponAnimatedGameObject();
             AnimatedGameObject* characterModel = player->GetCharacterModelAnimatedGameObject();
-            viewWeapon->UpdateRenderItems();
-            viewWeapon->SubmitForSkinning();
+
+            if (player->ShouldRenderViewWeapon()) {
+                viewWeapon->UpdateRenderItems();
+                viewWeapon->SubmitForSkinning();
+            }
+
             characterModel->UpdateRenderItems();
             characterModel->SubmitForSkinning();
             g_skinnedRenderItems.insert(g_skinnedRenderItems.end(), viewWeapon->GetRenderItems().begin(), viewWeapon->GetRenderItems().end());

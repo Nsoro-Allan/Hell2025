@@ -7,13 +7,12 @@
 
 
 void Inventory::SubmitRenderItems() {
-    if (m_state == InventoryState::ITEM_VIEW_SCREEN) SubmitItemViewScreenRenderItems();
-    if (m_state == InventoryState::ITEM_EXAMINE) SubmitItemExamineRenderItems();
+    if (m_state == InventoryState::MAIN_SCREEN) SubmitItemViewScreenRenderItems();
+    if (m_state == InventoryState::EXAMINE_ITEM) SubmitItemExamineRenderItems();
 }
 
 void Inventory::SubmitItemExamineRenderItems() {
     // Render item inspect item
-
 }
 
 void Inventory::SubmitItemViewScreenRenderItems() {
@@ -308,22 +307,30 @@ void Inventory::SubmitItemViewScreenRenderItems() {
         int buttonOriginY = descriptionY + descriptonSize.y + buttonPaddingY;
         int buttonLineHeight = 31;
 
+        if (itemInfo->m_equipable) {
+            RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "E", "Equip");
+            buttonOriginY += buttonLineHeight;
+        }
 
-        RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "E", "Equip");
-        buttonOriginY += buttonLineHeight;
+        if (itemInfo->m_combineable) {
+            RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "C", "Combine");
+            buttonOriginY += buttonLineHeight;
+        }
 
-        RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "C", "Combine");
-        buttonOriginY += buttonLineHeight;
+        if (true) { // Everything is examinable
+            RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "F", "Examine");
+            buttonOriginY += buttonLineHeight;
+        }
 
-        RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "F", "Examine");
-        buttonOriginY += buttonLineHeight;
+        if (true) { // Everything is examinable
+            RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "M", "Move");
+            buttonOriginY += buttonLineHeight;
+        }
 
-        RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "M", "Move");
-        buttonOriginY += buttonLineHeight;
-
-        RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "G", "Discard");
-        buttonOriginY += buttonLineHeight;
-
+        if (itemInfo->m_discardable) {
+            RenderButton(glm::ivec2(buttonMarginX, buttonOriginY), "G", "Discard");
+            buttonOriginY += buttonLineHeight;
+        }
     }
     
 

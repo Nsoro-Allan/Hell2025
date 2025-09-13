@@ -4,6 +4,17 @@
 #include "HellDefines.h"
 #include <map>
 
+enum class DrawersType {
+    SMALL,
+    LARGE
+};
+
+struct DrawersCreateInfo {
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    DrawersType type = DrawersType::LARGE;
+};
+
 struct ToiletCreateInfo {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);

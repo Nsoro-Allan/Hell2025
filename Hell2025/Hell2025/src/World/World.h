@@ -18,6 +18,7 @@
 #include "Types/Generics/GenericStatic.h"
 #include "Types/Effects/VolumetricBloodSplatter.h"
 #include "Types/Effects/ScreenSpaceBloodDecal.h"
+#include "Types/Interior/Drawers.h"
 #include "Types/Interior/Toilet.h"
 #include "Types/House/Door.h"
 #include "Types/House/Plane.h"
@@ -78,6 +79,7 @@ namespace World {
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddDecal(const DecalCreateInfo& createInfo);
+    void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -182,6 +184,7 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees();
     std::vector<ClippingCube>& GetClippingCubes();
     std::vector<Decal>& GetDecals();
+    std::vector<Drawers>& GetDrawers();
     std::vector<Door>& GetDoors();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();

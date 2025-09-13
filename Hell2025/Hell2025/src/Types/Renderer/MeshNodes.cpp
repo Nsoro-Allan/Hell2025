@@ -1,5 +1,6 @@
 #include "MeshNodes.h"
 #include "AssetManagement/AssetManager.h"
+#include "Core/OpenStateHandlerManager.h"
 #include "Renderer/RenderDataManager.h"
 #include "Input/Input.h"
 #include "Util.h"
@@ -10,6 +11,7 @@ void MeshNodes::InitFromModel(const std::string & modelName) {
         InitFromModel(model);
     }
     else {
+        CleanUp();
         std::cout << "MeshNodes::InitFromModel() failed: '" << modelName << "' does not exist!\n";
     }
 }
@@ -32,6 +34,7 @@ void MeshNodes::InitFromModel(Model* model) {
     m_modelMatrices.resize(m_nodeCount, glm::mat4(1.0f));
     m_objectTypes.resize(m_nodeCount, ObjectType::UNDEFINED);
     m_objectIds.resize(m_nodeCount, 0);
+    m_openHandlerStateIds.resize(m_nodeCount, 0);
 
     // Map mesh names to their local index and extra parent index and transforms
     for (int i = 0; i < m_nodeCount; i++) {
@@ -76,6 +79,10 @@ void MeshNodes::PrintMeshNames() {
     }
 }
 
+void MeshNodes::SetGoldFlag(bool flag) {
+    m_isGold = flag;
+}
+
 bool MeshNodes::HasNodeWithObjectId(uint64_t objectId) const {
     for (uint64_t queryId : m_objectIds) {
         if (queryId == objectId) {
@@ -99,6 +106,7 @@ void MeshNodes::CleanUp() {
     m_modelMatrices.clear();
     m_objectTypes.clear();
     m_objectIds.clear();
+    m_renderItems.clear();
 }
 
 void MeshNodes::SetTransformByMeshName(const std::string& meshName, Transform transform) {
@@ -123,8 +131,14 @@ void MeshNodes::SetMaterialByMeshName(const std::string& meshName, const std::st
 
         if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
             m_materialIndices[nodeIndex] = materialIndex;
+            return;
         }
     }
+
+    // If you made it this far then your names were wrong. Print everything to help you.
+    std::cout << "\n\nFailed to set mesh name '" << meshName << "' to " << " material '" << materialName << "' \n";
+    Model* model = AssetManager::GetModelByName(m_modelName);
+    AssetManager::PrintModelMeshNames(model);
 }
 
 void MeshNodes::SetBlendingModeByMeshName(const std::string& meshName, BlendingMode blendingMode) {
@@ -185,6 +199,12 @@ glm::mat4 MeshNodes::GetInverseBindTransform(int nodeIndex) {
 void MeshNodes::UpdateHierachy() {
     for (int i = 0; i < GetNodeCount(); i++) {
         int32_t parentIndex = m_localParentIndices[i];
+
+        // If this node has an open state handler Id, then retrieve it's transform from the opens state handler hive mind
+        if (m_openHandlerStateIds[i] != 0) { // 0 means no handler
+            m_transforms[i] = OpenStateHandlerManager::GetOpenStateHandleTransformById(m_openHandlerStateIds[i]);
+        }
+
         if (parentIndex != -1) {
             m_modelMatrices[i] = m_modelMatrices[parentIndex] * m_localTransforms[i] * m_transforms[i].to_mat4();
         }
@@ -221,6 +241,14 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         renderItem.baseColorTextureIndex = material->m_basecolor;
         renderItem.normalMapTextureIndex = material->m_normal;
         renderItem.rmaTextureIndex = material->m_rma;
+
+        // If this object is gold, replace basecolor and rma textures with that of gold material, normal map does not change
+        if (m_isGold) {
+            static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
+            renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
+            renderItem.rmaTextureIndex = goldMaterial->m_rma;
+        }
+
         Util::PackUint64(m_objectIds[i], renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
         Util::UpdateRenderItemAABB(renderItem);
 

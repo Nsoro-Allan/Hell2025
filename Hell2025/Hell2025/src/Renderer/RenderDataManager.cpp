@@ -114,10 +114,11 @@ namespace RenderDataManager {
 
                 Player* player = Game::GetLocalPlayerByIndex(i);
                 if (player) {
+                    g_viewportData[i].colorTint = glm::vec4(player->GetViewportColorTint(), 1.0f);
+                    g_viewportData[i].colorContrast = player->GetViewportContrast();
+
                     if (player->IsDead()) {
                         viewMatrix = player->m_deathCamViewMatrix;
-                        g_viewportData[i].colorTint = glm::vec4(player->GetViewportColorTint(), 1.0f);
-                        g_viewportData[i].colorContrast = player->GetViewportContrast();
                     }
                     else {
                         viewMatrix = Game::GetLocalPlayerCameraByIndex(i)->GetViewMatrix();

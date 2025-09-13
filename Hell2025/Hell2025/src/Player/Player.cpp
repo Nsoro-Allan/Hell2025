@@ -57,14 +57,22 @@ void Player::Update(float deltaTime) {
 
     // Toggle inventory
     if (PressedToggleInventory()) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-        std::cout << "PRESSED TOGGLE INVENTORY\n";
+
+        // Was the inventory closed? Then open it
         if (m_inventory.IsClosed()) {
             m_inventory.OpenInventory();
         }
         else {
-            m_inventory.CloseInventory();
+            // Viewing items in the main screen? well close it
+            if (GetInvetoryState() == InventoryState::MAIN_SCREEN) {
+                m_inventory.CloseInventory();
+            }
+            // Examining an item? Well return to main screen
+            if (GetInvetoryState() == InventoryState::EXAMINE_ITEM) {
+                m_inventory.GoToMainScreen();
+            }
         }
+        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
     }
 
     // This may break code elsewhere in the player logic like anywhere
@@ -196,9 +204,8 @@ void Player::Respawn() {
     m_inventory.AddItem("Tokarev");
     m_inventory.AddItem("Remington870");
     m_inventory.AddItem("SPAS");
-    //m_inventory.AddItem("Knife");
-    //m_inventory.AddItem("Knife");
-    //m_inventory.AddItem("Remington870");
+    m_inventory.AddItem("BlackSkull");
+    m_inventory.AddItem("SmallKey");
 
     World::GetKangaroos()[0].Respawn();
 
@@ -453,31 +460,36 @@ void Player::Kill() {
         m_deathCount++;
         m_alive = false;
         m_characterModelAnimatedGameObject.SetAnimationModeToRagdoll();
+        m_inventory.CloseInventory();
         Audio::PlayAudio("Death0.wav", 1.0f);
         DropWeapons();
     }
 }
 
 glm::vec3 Player::GetViewportColorTint() {
-    glm::vec3 color = glm::vec3(1, 1, 1);
+    glm::vec3 colorTint = glm::vec3(1, 1, 1);
+
+    if (InventoryIsOpen() && m_inventory.GetInventoryState() == InventoryState::EXAMINE_ITEM) {
+        colorTint = glm::vec3(0.325);
+    }
 
     if (IsDead()) {
-        color.r = 2.0;
-        color.g = 0.2f;
-        color.b = 0.2f;
+        colorTint.r = 2.0;
+        colorTint.g = 0.2f;
+        colorTint.b = 0.2f;
 
         float waitTime = 3;
         if (m_timeSinceDeath > waitTime) {
             float val = (m_timeSinceDeath - waitTime) * 10;
-            color.r -= val;
+            colorTint.r -= val;
         }
     }
 
-    if (m_viewportIndex == 0) {
-        std::cout << color << "\n";
-    }
+    //if (m_viewportIndex == 0) {
+    //    std::cout << colorTint << "\n";
+    //}
 
-    return color;
+    return colorTint;
 }
 
 const void Player::SetName(const std::string& name) {

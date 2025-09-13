@@ -3,11 +3,11 @@
 namespace Util {
     std::string InventoryStateToString(const InventoryState& state) {
         switch (state) {
-            case InventoryState::CLOSED:         return "CLOSED";
-            case InventoryState::ITEM_VIEW_SCREEN:  return "VIEWING_ITEMS";
-            case InventoryState::ITEM_INSPECT:   return "ITEM_INSPECT";
-            case InventoryState::MOVING_ITEM:    return "MOVING_ITEM";
-            case InventoryState::ROTATING_ITEM:  return "ROTATING_ITEM";
+            case InventoryState::CLOSED:            return "CLOSED";
+            case InventoryState::MAIN_SCREEN:       return "MAIN_SCREEN";
+            case InventoryState::EXAMINE_ITEM:      return "EXAMINE_ITEM";
+            case InventoryState::MOVING_ITEM:       return "MOVING_ITEM";
+            case InventoryState::ROTATING_ITEM:     return "ROTATING_ITEM";
             default: return "UNKNOWN";
         }
     }
@@ -121,7 +121,10 @@ namespace Util {
             case ObjectType::CHARACTER_CONTROLLER:          return "CHARACTER_CONTROLLER";
             case ObjectType::DOOR:                          return "DOOR";
             case ObjectType::DOOR_FRAME:                    return "DOOR_FRAME";
+            case ObjectType::DRAWER:                        return "DRAWER";
+            case ObjectType::DRAWERS_FRAME:                 return "DRAWERS_FRAME";
             case ObjectType::GAME_OBJECT:                   return "GAME_OBJECT";
+            case ObjectType::GENERIC_STATIC:                return "GENERIC_STATIC";
             case ObjectType::HEIGHT_MAP:                    return "HEIGHT_MAP";
             case ObjectType::PLANE:                         return "HOUSE_PLANE";
             case ObjectType::LIGHT:                         return "LIGHT";

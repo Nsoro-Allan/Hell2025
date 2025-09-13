@@ -293,6 +293,7 @@ namespace OpenGLRenderer {
         g_shaders["DecalPaintMask"] = OpenGLShader({ "gl_decal_paint_mask.comp" });
         g_shaders["Decals"] = OpenGLShader({ "GL_decals.vert", "GL_decals.frag" });
         g_shaders["EditorMesh"] = OpenGLShader({ "GL_editor_mesh.vert", "GL_editor_mesh.frag" });
+        g_shaders["ExamineItem"] = OpenGLShader({ "GL_examine_item.vert", "GL_examine_item.frag" });
         g_shaders["FogRayMarch"] = OpenGLShader({ "GL_fog_ray_march.comp" });
         g_shaders["FogComposite"] = OpenGLShader({ "GL_fog_composite.comp" });
         g_shaders["FttRadix64Vertical"] = OpenGLShader({ "GL_ftt_radix_64_vertical.comp" });
@@ -391,6 +392,7 @@ namespace OpenGLRenderer {
     }
 
     void TestPass() {
+        return;
 
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
 
@@ -617,7 +619,7 @@ namespace OpenGLRenderer {
         GrassPass();
         GeometryPass();
 
-        //TestPass();
+        TestPass();
         
         WeatherBoardsPass();
         VatBloodPass();
@@ -635,9 +637,10 @@ namespace OpenGLRenderer {
         RayMarchFog();
         OceanUnderwaterCompositePass();
         WinstonPass();
-        InventoryGaussianPass();
-        PostProcessingPass();
-        SpriteSheetPass();
+        SpriteSheetPass(); // Muzzle flash, etc
+        InventoryGaussianPass();      
+        PostProcessingPass();  
+        ExamineItemPass();
         DebugViewPass();
         DebugPass();
         EditorPass();

@@ -8,6 +8,7 @@ struct MeshNodes {
     std::vector<BlendingMode> m_blendingModes;
     std::vector<uint32_t> m_globalMeshIndices;
     std::vector<uint32_t> m_materialIndices;
+    std::vector<uint64_t> m_openHandlerStateIds;
     std::vector<int32_t> m_localParentIndices;
     std::vector<Transform> m_transforms;
     std::vector<glm::mat4> m_modelMatrices;
@@ -28,6 +29,7 @@ struct MeshNodes {
     void SetObjectTypes(ObjectType objectType);
     void SetObjectIds(uint64_t objectId);
     void PrintMeshNames();
+    void SetGoldFlag(bool flag);
 
     bool HasNodeWithObjectId(uint64_t objectId) const;
         
@@ -53,4 +55,5 @@ private:
     std::vector<RenderItem> m_renderItemsAlphaDiscarded;
     std::vector<RenderItem> m_renderItemsHairTopLayer;
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
+    bool m_isGold = false;
 };

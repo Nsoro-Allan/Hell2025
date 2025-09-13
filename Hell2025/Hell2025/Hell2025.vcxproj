@@ -218,6 +218,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\API\OpenGL\Renderer\ComputePasses\GL_global_illumination_passes.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_christmas_lights.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_fog_passes.cpp" />
+    <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_examine_item_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_screenspace_decals_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_decal_painting_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_decal_pass.cpp" />
@@ -302,6 +303,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Callbacks\Callbacks.cpp" />
     <ClCompile Include="src\Common\UniqueID.cpp" />
     <ClCompile Include="src\Core\Bible.cpp" />
+    <ClCompile Include="src\Core\OpenStateHandlerManager.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_height_map.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_house.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_map.cpp" />
@@ -375,6 +377,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\Generics\GenericBouncable.cpp" />
     <ClCompile Include="src\Types\House\WeatherBoards.cpp" />
     <ClCompile Include="src\Types\Generics\GenericStatic.cpp" />
+    <ClCompile Include="src\Types\Interior\Drawers.cpp" />
     <ClCompile Include="src\Types\Interior\Toilet.cpp" />
     <ClCompile Include="src\Types\Misc\Piano.cpp" />
     <ClCompile Include="src\Types\Misc\PictureFrame.cpp" />
@@ -537,6 +540,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\GL_editor_mesh.frag" />
     <None Include="res\shaders\OpenGL\GL_editor_mesh.vert" />
     <None Include="res\shaders\OpenGL\GL_emissive_composite.comp" />
+    <None Include="res\shaders\OpenGL\GL_examine_item.frag" />
+    <None Include="res\shaders\OpenGL\GL_examine_item.vert" />
     <None Include="res\shaders\OpenGL\GL_fog_composite.comp" />
     <None Include="res\shaders\OpenGL\GL_fog_ray_march.comp" />
     <None Include="res\shaders\OpenGL\GL_fur.frag" />
@@ -667,6 +672,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Common\UniqueID.h" />
     <ClInclude Include="src\Bvh\Cpu\CpuBvh.h" />
     <ClInclude Include="src\Core\Bible.h" />
+    <ClInclude Include="src\Core\OpenStateHandlerManager.h" />
     <ClInclude Include="src\Inventory\Inventory.h" />
     <ClInclude Include="src\Pathfinding\AStarMap.h" />
     <ClInclude Include="src\Game\Enemies\Kangaroo\Kangaroo.h" />
@@ -702,6 +708,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Generics\GenericBouncable.h" />
     <ClInclude Include="src\Types\House\WeatherBoards.h" />
     <ClInclude Include="src\Types\Generics\GenericStatic.h" />
+    <ClInclude Include="src\Types\Interior\Drawers.h" />
     <ClInclude Include="src\Types\Interior\Toilet.h" />
     <ClInclude Include="src\Types\Misc\Piano.h" />
     <ClInclude Include="src\Types\Misc\PictureFrame.h" />

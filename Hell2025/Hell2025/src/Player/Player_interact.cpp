@@ -3,6 +3,7 @@
 #include "Core/Game.h"
 #include "Physics/Physics.h"
 #include "Util/Util.h"
+#include "Core/OpenStateHandlerManager.h"
 #include "World/World.h"
 #include <algorithm>
 #include "Input/Input.h"
@@ -118,6 +119,7 @@ void Player::UpdateInteract() {
     m_interactFound = (m_interactObjectType != ObjectType::NONE);
 
     if (PressedInteract()) {
+
         // Pickups
         if (m_interactObjectType == ObjectType::PICK_UP) {
             PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId);
@@ -165,6 +167,22 @@ void Player::UpdateInteract() {
             Toilet* toilet = World::GetToiletByMeshNodeObjectId(m_interactObjectId);
             if (toilet) {
                 toilet->InteractWithSeat();
+            }
+        }
+
+        if (m_interactObjectType == ObjectType::DRAWER) {
+            for (Drawers& drawers: World::GetDrawers()) {
+                const MeshNodes& meshNodes = drawers.GetMeshNodes();
+                if (meshNodes.HasNodeWithObjectId(m_interactObjectId)) {
+                    for (int i = 0; i < meshNodes.GetNodeCount(); i++) {
+                        // If this mesh nodes id matches the raycasted object id, and it has a valid open handler id
+                        if (meshNodes.m_objectIds[i] == m_interactObjectId) {
+                            if (meshNodes.m_openHandlerStateIds[i] != 0) {
+                                OpenStateHandlerManager::TriggerInteract(meshNodes.m_openHandlerStateIds[i]);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

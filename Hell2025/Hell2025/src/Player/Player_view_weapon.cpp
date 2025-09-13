@@ -68,3 +68,11 @@ void Player::UpdateViewWeapon(float deltaTime) {
     viewWeapon->SetCameraMatrix(transform.to_mat4() * glm::inverse(cameraBindMatrix) * glm::inverse(dmMaster));
     viewWeapon->EnableCameraMatrix();
 }
+
+
+bool Player::ShouldRenderViewWeapon() {
+    if (InventoryIsOpen() && GetInvetoryState() == InventoryState::EXAMINE_ITEM) return false;
+    if (InventoryIsOpen() && GetInvetoryState() == InventoryState::EXAMINE_ITEM) return false;
+
+    return true;
+}

@@ -34,6 +34,7 @@ namespace World {
     std::vector<ClippingCube> g_clippingCubes;
     std::vector<Door> g_doors;
     std::vector<Decal> g_decals;
+    std::vector<Drawers> g_drawers;
     std::vector<GameObject> g_gameObjects;
     std::vector<GenericStatic> g_genericStatics;
     std::vector<GenericBouncable> g_genericBouncables;
@@ -812,6 +813,10 @@ namespace World {
         g_toilets.push_back(Toilet(createInfo, spawnOffset));
     }
 
+    void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset) {
+        g_drawers.push_back(Drawers(createInfo, spawnOffset));
+    }
+
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo) {
         ScreenSpaceBloodDecal& screenSpaceBloodDecal = g_screenSpaceBloodDecals.emplace_back();
         screenSpaceBloodDecal.Init(createInfo);
@@ -1013,6 +1018,7 @@ namespace World {
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
     std::vector<Door>& GetDoors()                                       { return g_doors; }
+    std::vector<Drawers>& GetDrawers()                                  { return g_drawers; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }
     std::vector<GenericStatic>& GetGenericStatics()                     { return g_genericStatics; }

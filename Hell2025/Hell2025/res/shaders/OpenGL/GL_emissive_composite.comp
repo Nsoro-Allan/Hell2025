@@ -28,7 +28,7 @@ void main() {
     finalColor.rgb += texture(blurBuffer3ColorB, uv_screenspace).rgb;
     finalColor.rgb *= 0.6;
     finalColor += imageLoad(outputImage, pixelCoords);
-  
+
     imageStore(outputImage, pixelCoords, finalColor);
 }
 

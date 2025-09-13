@@ -72,6 +72,8 @@ enum class ObjectType {
     DECAL,
     DOOR,
     DOOR_FRAME,
+    DRAWER,
+    DRAWERS_FRAME,
     GAME_OBJECT,
     GENERIC_BOUNCABLE,
     GENERIC_STATIC,
@@ -381,9 +383,8 @@ enum class GenericBouncableType : uint32_t {
 
 enum struct InventoryState {
     CLOSED,
-    ITEM_EXAMINE,
-    ITEM_VIEW_SCREEN,
-    ITEM_INSPECT,
+    MAIN_SCREEN,
+    EXAMINE_ITEM,
     MOVING_ITEM,
     ROTATING_ITEM
 };
