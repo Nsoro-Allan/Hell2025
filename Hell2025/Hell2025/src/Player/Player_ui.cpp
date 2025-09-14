@@ -36,6 +36,12 @@ void Player::UpdateUI() {
         m_inventory.SubmitRenderItems();
     }
 
+
+    //std::string text = "Locked...";
+    //UIBackEnd::BlitText("[COL=0.839,0.784,0.635]" + text, "RobotoCondensed", 150, 1080 - 150, Alignment::TOP_LEFT, 2.0f, TextureFilter::LINEAR);
+
+
+
 //   glm::ivec2 location = glm::ivec2(centerX, centerY);
 //   location = glm::ivec2(64, yTop + 64);
 //   //glm::ivec2 size = glm::ivec2(-1, -1);

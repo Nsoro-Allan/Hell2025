@@ -122,7 +122,7 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
 
         // Calculate matrix to scale the model to fit on screen nicely
         float maxXZ = 2.0f;         // Desired max footprint on XZ in meters
-        float maxY = maxXZ * 0.5f;  // Desired max height in meters
+        float maxY = 1.0f;  // Desired max height in meters
         glm::vec3 aabbMin = model->GetAABBMin();
         glm::vec3 aabbMax = model->GetAABBMax();
         glm::vec3 extent = aabbMax - aabbMin;
