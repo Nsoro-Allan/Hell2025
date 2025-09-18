@@ -178,8 +178,6 @@
 #define HELL_PS_4_CONTROLLER_TRIGGER_L		18			// you manually chose this button code so u can store it in the same buttons vector
 #define HELL_PS_4_CONTROLLER_TRIGGER_R		19			// you manually chose this button code so u can store it in the same buttons vector
 
-
-
 #define HELL_XBOX_CONTROLLER_A				0
 #define HELL_XBOX_CONTROLLER_B				1
 #define HELL_XBOX_CONTROLLER_X				2

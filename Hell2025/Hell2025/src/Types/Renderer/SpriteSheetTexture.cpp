@@ -17,8 +17,8 @@ void SpriteSheetTexture::Init() {
         return;
     }
 
-    m_fullWidth = texture->GetWidth(0);
-    m_fullHeight = texture->GetHeight(0);
+    m_fullWidth = texture->GetWidth();
+    m_fullHeight = texture->GetHeight();
     m_frameWidth = m_fullWidth / m_columns;
     m_frameHeight = m_fullHeight / m_rows;
     m_frameCount = m_rows * m_columns; 

@@ -8,8 +8,17 @@
 
 
 void Inventory::Update(float deltaTime) {
+
+    //SetGridCountX(6);
+    //SetGridCountY(4);
+    //MoveItem(5, 4, 3, true);
+
     if (m_state == InventoryState::MAIN_SCREEN) UpdateItemViewScreen(deltaTime);
     if (m_state == InventoryState::EXAMINE_ITEM) UpdateExamineScreen(deltaTime);
+
+    if (Input::KeyPressed(HELL_KEY_SPACE)) {
+        PrintGridOccupiedStateToConsole();
+    }
 }
 
 
@@ -18,42 +27,14 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
     if (!player) return;
 
     // WASD cell input
-    if (player->PressedLeft()) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-        m_selectedCellX--;
-    }
-    if (player->PressedRight()) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-        m_selectedCellX++;
-    }
-    if (player->PressedUp()) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-        m_selectedCellY--;
-    }
-    if (player->PressedDown()) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-        m_selectedCellY++;
-    }
-
-    // Wrap check Left
-    if (m_selectedCellX >= m_gridCountX) {
-        m_selectedCellX = 0;
-    }
-    // Wrap check Right
-    if (m_selectedCellX < 0) {
-        m_selectedCellX = m_gridCountX - 1;
-    }
-    // Wrap check bottom
-    if (m_selectedCellY >= MAX_INVENTORY_Y_SIZE) {
-        m_selectedCellY = 0;
-    }
-    // Wrap check top
-    if (m_selectedCellY < 0) {
-        m_selectedCellY = MAX_INVENTORY_Y_SIZE - 1;
-    }
+    if (player->PressedLeft(true))  StepDirection(-1, 0);
+    if (player->PressedRight(true)) StepDirection(1, 0);
+    if (player->PressedUp(true))    StepDirection(0, -1);
+    if (player->PressedDown(true))  StepDirection(0, 1);
 
     // Buttons
-    if (player->PressedInventoryExamine()) {
+    if (player->PressedInventoryExamine() && GetSelectedItemIndex() != -1) {
+        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
         SetState(InventoryState::EXAMINE_ITEM);
     }
 }
@@ -151,4 +132,28 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
         m_examineItemMeshNodes.SetGoldFlag(itemInfo->m_isGold);
         m_examineItemMeshNodes.UpdateRenderItems(finalScaledAndCenteredModelMatrix);
     }
+}
+
+void Inventory::StepDirection(int dx, int dy) {
+    Audio::PlayAudio(AUDIO_SELECT, 1.0f);
+
+    int startX = m_selectedCellX;
+    int startY = m_selectedCellY;
+    int startIndex = InBounds(startX, startY) ? m_itemIndex2DArray[startX][startY] : -1;
+
+    int x = (startX + dx + m_gridCountX) % m_gridCountX;
+    int y = (startY + dy + m_gridCountY) % m_gridCountY;
+
+    // Only skip contiguous cells if we STARTED on an item
+    if (startIndex != -1) {
+        // Skip all cells that belong to the same item
+        while (m_itemIndex2DArray[x][y] == startIndex) {
+            if (x == startX && y == startY) break; // safety
+            x = (x + dx + m_gridCountX) % m_gridCountX;
+            y = (y + dy + m_gridCountY) % m_gridCountY;
+        }
+    }
+
+    m_selectedCellX = x;
+    m_selectedCellY = y;
 }

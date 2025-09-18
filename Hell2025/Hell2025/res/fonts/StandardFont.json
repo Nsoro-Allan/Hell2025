@@ -3,7 +3,7 @@
   "textureWidth": 120,
   "textureHeight": 120,
   "charHeight": 14,
-  "lineSpacing": 0,
+  "lineSpacing": 1,
   "charSpacing": 0,
   "characters": "!\"#$%&'*+,-./0123456789:;<=>?_ABCDEFGHIJKLMNOPQRSTUVWXYZ\\^_`abcdefghijklmnopqrstuvwxyz []",
   "charDataList": [

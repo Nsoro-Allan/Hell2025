@@ -107,8 +107,8 @@ namespace OpenGLRenderer {
             std::cout << "RendererUtil::CreateRenderItem2D() failed coz texture is nullptr\n";
             return RenderItem2D();
         }
-        float texWidth = (size.x != -1) ? size.x : texture->GetWidth(0);
-        float texHeight = (size.y != -1) ? size.y : texture->GetHeight(0);
+        float texWidth = (size.x != -1) ? size.x : texture->GetWidth();
+        float texHeight = (size.y != -1) ? size.y : texture->GetHeight();
 
         // Alignment
         switch (alignment) {

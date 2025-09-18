@@ -102,14 +102,14 @@ void Player::UpdateUI() {
                     int modifierX = TextBlitter::GetBlitTextSize(totalText, "AmmoFont", smallScale).x + modifierPadding;
                     int gridSize = 10;
                     modifierX = (modifierX / 10) * 10;
-                    int modifierScaleX = texture->GetWidth(0) * smallScale;
-                    int modifierScaleY = texture->GetHeight(0) * smallScale;
+                    int modifierScaleX = texture->GetWidth() * smallScale;
+                    int modifierScaleY = texture->GetHeight() * smallScale;
                     glm::vec4 unselectedColor = glm::vec4(0.541, 0.51, 0.392, 0.5f);
                     glm::vec4 colorAuto = weaponState->shotgunInAutoMode ? WHITE : unselectedColor;
                     glm::vec4 colorPump = weaponState->shotgunInAutoMode ? unselectedColor : WHITE;
                     float padding = 4;
                     float autoY = ammoY;
-                    float pumpY = autoY + ((texture->GetHeight(0) + padding) * smallScale);
+                    float pumpY = autoY + ((texture->GetHeight() + padding) * smallScale);
 
                     int negHack = -9 + 9;
                     int hack = 7 + 9;
@@ -119,8 +119,8 @@ void Player::UpdateUI() {
                         shellTextureName = "ShotgunShellGreen";
                     }
                     Texture* texture = AssetManager::GetTextureByName(shellTextureName);
-                    int shellScaleX = texture->GetWidth(0) * smallScale;
-                    int shellScaleY = texture->GetHeight(0) * smallScale * 1.1f;
+                    int shellScaleX = texture->GetWidth() * smallScale;
+                    int shellScaleY = texture->GetHeight() * smallScale * 1.1f;
 
                     UIBackEnd::BlitTexture(shellTextureName, glm::ivec2(ammoX + modifierX + negHack, autoY), Alignment::TOP_LEFT, WHITE, glm::ivec2(shellScaleX, shellScaleY), TextureFilter::LINEAR);
                     UIBackEnd::BlitTexture("Weapon_Auto", glm::ivec2(ammoX + modifierX + hack, autoY), Alignment::TOP_LEFT, colorAuto, glm::ivec2(modifierScaleX, modifierScaleY), TextureFilter::LINEAR);
@@ -249,8 +249,8 @@ void Player::UpdateUI() {
     if (RespawnAllowed()) {
         static Texture* texture = AssetManager::GetTextureByName("PressStart");
         if (texture) {
-            static int width = texture->GetWidth(0) * 2;
-            static int height = texture->GetHeight(0) * 2;
+            static int width = texture->GetWidth() * 2;
+            static int height = texture->GetHeight() * 2;
             glm::ivec2 location = glm::ivec2(centerX, centerY);
             glm::ivec2 size = glm::ivec2(width, height);
             UIBackEnd::BlitTexture("PressStart", location, Alignment::CENTERED, WHITE, size, TextureFilter::LINEAR);

@@ -3,7 +3,7 @@
   "textureWidth": 180,
   "textureHeight": 180,
   "charHeight": 35,
-  "lineSpacing": 0,
+  "lineSpacing": 1,
   "charSpacing": 2,
   "characters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789’,. ",
   "charDataList": [

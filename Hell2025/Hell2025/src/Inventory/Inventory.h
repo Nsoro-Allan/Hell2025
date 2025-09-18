@@ -25,7 +25,11 @@ struct Inventory {
     void PrintGridOccupiedStateToConsole();
     void GoToMainScreen();
     void SetLocalPlayerIndex(int localPlayerIndex);
-    
+    void SetGridCountX(int count);
+    void SetGridCountY(int count);
+
+    const int GetGridCountX()                       { return m_gridCountX; }
+    const int GetGridCountY()                       { return m_gridCountY; }
     const glm::mat4 GetItemExamineModelMatrix()     { return m_examineModelMatrix; }
     const InventoryState& GetInventoryState()       { return m_state; }
     const std::vector<InventoryItem>& GetItems()    { return m_items; }
@@ -38,10 +42,16 @@ private:
     void UpdateOccupiedSlotsArray(); // rename this to reflect the actual name of the array: m_itemIndex2DArray
     void RenderButton(glm::ivec2 location, const std::string& letter, const std::string& description);
     void SetState(InventoryState state);
+    bool MoveItem(int itemIndex, int cellX, int cellY, bool rotated);
 
     // Render submits
     void SubmitItemViewScreenRenderItems();
     void SubmitItemExamineRenderItems();
+    void BlitGrid(int originX, int originY);
+
+    // Util
+    void StepDirection(int dx, int dy);
+    void BlitInventoryBackground(int originX, int originY, int width, int height);
     
     // Updates
     void UpdateItemViewScreen(float deltaTime);
@@ -50,14 +60,17 @@ private:
     // Getters
     InventoryItemInfo* GetSelectedItemInfo();
     InventoryItem* GetItemAtIndex(int index);
+    int GetCellSizeInPixels();
     int GetSelectedItemIndex();
-    const std::string& GetSelectedItemName();
-    const std::string& GetItemNameAtLocation(int x, int y);
     int GetItemSizeAtLocation(int x, int y);
     bool IsCellOccupied(int x, int y);
+    bool InBounds(int x, int y);
+    const std::string& GetSelectedItemName();
+    const std::string& GetItemNameAtLocation(int x, int y);
 
     int m_itemIndex2DArray[MAX_INVENTORY_X_SIZE][MAX_INVENTORY_Y_SIZE]; // Updated on insertion and move
     int m_gridCountX = 4;
+    int m_gridCountY = 4;
     int m_selectedCellX = 0;
     int m_selectedCellY = 0;
     int m_localPlayerIndex = 0;

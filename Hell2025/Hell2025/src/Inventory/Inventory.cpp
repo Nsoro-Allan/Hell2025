@@ -30,21 +30,14 @@ void Inventory::AddItem(const std::string& name) {
     InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(name);
     if (!itemInfo) return;
 
-    //std::cout << "\n";
-    //std::cout << "Adding: " << name << "\n";
-    //std::cout << "- cell size: " << itemInfo->m_cellSize << "\n";
-;   //PrintGridOccupiedStateToConsole();
-
     // Find the next free location
     glm::ivec2 nextFreeLocation = GetNextFreeLocation(itemInfo->m_cellSize);
     
     // Oh there wasn't one?
     if (nextFreeLocation == glm::ivec2(-1, -1)) {
         std::cout << "NO FREE SPACE FOR ITEM '" << name << "'\n";
+        return;
     }
-
-    //std::cout << "- next free location: " << nextFreeLocation.x << ", " << nextFreeLocation.y << "\n";
-
 
     // Yay, there was, insert it!
     InventoryItem item;
@@ -55,6 +48,14 @@ void Inventory::AddItem(const std::string& name) {
     UpdateOccupiedSlotsArray();
 }
 
+void Inventory::SetGridCountX(int count) {
+    m_gridCountX = count;
+}
+
+void Inventory::SetGridCountY(int count) {
+    m_gridCountY = count;
+}
+
 void Inventory::SetLocalPlayerIndex(int localPlayerIndex) {
     m_localPlayerIndex = localPlayerIndex;
 }
@@ -63,13 +64,37 @@ void Inventory::SetState(InventoryState state) {
     m_state = state;
 }
 
+bool Inventory::MoveItem(int itemIndex, int cellX, int cellY, bool rotated) {
+    InventoryItem& item = m_items[itemIndex];
+    item.m_gridLocation = glm::ivec2(cellX, cellY);
+    item.m_rotatedInGrid = true;
+
+    UpdateOccupiedSlotsArray();
+    return true;
+}
+
 void Inventory::ClearInventory() {
     m_items.clear();
     UpdateOccupiedSlotsArray();
 }
 
+int Inventory::GetCellSizeInPixels() {
+    static int size = 0;
+    if (size == 0) {
+        if (Texture* texture = AssetManager::GetTextureByName("InvSquare_Size1")) {
+            size = texture->GetWidth();
+        }
+    }
+    return size;
+}
+
 int Inventory::GetSelectedItemIndex() {
-    return m_itemIndex2DArray[m_selectedCellX][m_selectedCellY];
+    if (!InBounds(m_selectedCellX, m_selectedCellY)) {
+        return -1;
+    }
+    else {
+        return m_itemIndex2DArray[m_selectedCellX][m_selectedCellY];
+    }
 }
 
 
@@ -99,49 +124,75 @@ InventoryItemInfo* Inventory::GetSelectedItemInfo() {
 
 const std::string& Inventory::GetItemNameAtLocation(int x, int y) {
     static std::string noItem = "NO_ITEM";
+
+    if (!InBounds(x, y)) {
+        return noItem;
+    }
+
     int itemIndex = m_itemIndex2DArray[x][y];
-    if (itemIndex == -1) {
+
+    if (itemIndex < 0 || itemIndex >= (int)m_items.size()) { // -1 is no item, and it should never be larger than size, but you never know.
         return noItem;
     }
     else {
-        return m_items[itemIndex].m_name;
+        return m_items[itemIndex].m_name;   
     }
 }
 
 int Inventory::GetItemSizeAtLocation(int x, int y) {
-    const std::string& itemName = GetItemNameAtLocation(x, y);
-    int itemSize = 1;
-    if (itemName != "NO_ITEM") {
-        itemSize = Bible::GetInventoryItemSizeByName(itemName);
+    if (!InBounds(x, y)) {
+        return 1;
     }
-    return itemSize;
+    const std::string& itemName = GetItemNameAtLocation(x, y);
+
+    if (itemName != "NO_ITEM") {
+        return Bible::GetInventoryItemSizeByName(itemName);
+    }
+    else {
+        return 1;
+    }
 }
 
 bool Inventory::IsCellOccupied(int x, int y) {
-    return m_itemIndex2DArray[x][y] != -1;
+    if (!InBounds(x, y)) {
+        return true;
+    }
+    else {
+        return m_itemIndex2DArray[x][y] != -1;
+    }
 }
 
 void Inventory::UpdateOccupiedSlotsArray() {
-    // Initilize to empty
-    for (int x = 0; x < MAX_INVENTORY_X_SIZE; x++) {
-        for (int y = 0; y < MAX_INVENTORY_Y_SIZE; y++) {
+    // Initialize to empty
+    for (int x = 0; x < MAX_INVENTORY_X_SIZE; x++)
+        for (int y = 0; y < MAX_INVENTORY_Y_SIZE; y++)
             m_itemIndex2DArray[x][y] = -1;
-        }
-    }
 
-    // Iterate your inventory and mark which slots are occupied
-    for (int i = 0; i < m_items.size(); i++) {
+    // Mark occupied cells
+    for (int i = 0; i < (int)m_items.size(); i++) {
         InventoryItem& item = m_items[i];
         InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(item.m_name);
         if (!itemInfo) continue;
 
-        m_itemIndex2DArray[item.m_gridLocation.x][item.m_gridLocation.y] = i;
+        int w = itemInfo->m_cellSize; // horizontal width by default
+        int h = 1;
+        int originX = item.m_gridLocation.x;
+        int originY = item.m_gridLocation.y;
 
-        if (itemInfo->m_cellSize > 1) {
-            m_itemIndex2DArray[item.m_gridLocation.x + 1][item.m_gridLocation.y] = i;
+        if (item.m_rotatedInGrid) {
+            // vertical footprint; anchor is BOTTOM cell
+            std::swap(w, h);                          // w=1, h=size
+            originY -= (itemInfo->m_cellSize - 1);    // move origin to the TOP cell
         }
-        if (itemInfo->m_cellSize > 2) {
-            m_itemIndex2DArray[item.m_gridLocation.x + 2][item.m_gridLocation.y] = i;
+
+        for (int dx = 0; dx < w; ++dx) {
+            for (int dy = 0; dy < h; ++dy) {
+                int x = originX + dx;
+                int y = originY + dy;
+                if (InBounds(x, y)) {
+                    m_itemIndex2DArray[x][y] = i;
+                }
+            }
         }
     }
 }
@@ -149,31 +200,23 @@ void Inventory::UpdateOccupiedSlotsArray() {
 glm::ivec2 Inventory::GetNextFreeLocation(int itemCellSize) {
     UpdateOccupiedSlotsArray();
 
-    // First scan for a non-rotated slot
-    for (int y = 0; y < MAX_INVENTORY_Y_SIZE; y++) {
-        for (int x = 0; x < m_gridCountX; x++) {
+    int w = itemCellSize;
+    int h = 1; // horizontal for now
 
-            //if (x == 3 && y == 3) continue;
-
-            // Skip fat items
-            if (itemCellSize > 1) {
-                if (x + 1 >= m_gridCountX)     continue; // range check
-                if (IsCellOccupied(x + 1, y))  continue; // cell check
+    for (int y = 0; y < m_gridCountY; y++) {
+        for (int x = 0; x <= m_gridCountX - w; x++) {
+            bool fits = true;
+            for (int dx = 0; dx < w && fits; ++dx) {
+                for (int dy = 0; dy < h && fits; ++dy) {
+                    if (IsCellOccupied(x + dx, y + dy)) {
+                        fits = false;
+                        break;
+                    }
+                }
             }
-            if (itemCellSize > 2) {
-                if (x + 2 >= m_gridCountX)     continue; // range check
-                if (IsCellOccupied(x + 2, y))  continue; // cell check
+            if (fits) {
+                return glm::ivec2(x, y); 
             }
-            // Free slot found
-            if (!IsCellOccupied(x,y)) {
-                return glm::ivec2(x, y);
-            }
-        }
-    }
-    // Now scan for a rotated slot
-    for (int y = 0; y < MAX_INVENTORY_Y_SIZE; y++) {
-        for (int x = 0; x < m_gridCountX; x++) {
-            // TODO
         }
     }
 
@@ -183,10 +226,10 @@ glm::ivec2 Inventory::GetNextFreeLocation(int itemCellSize) {
 
 void Inventory::PrintGridOccupiedStateToConsole() { 
     std::cout << " ";
-    for (int y = 0; y < MAX_INVENTORY_Y_SIZE; y++) {
+    for (int y = 0; y < m_gridCountY; y++) {
         for (int x = 0; x < m_gridCountX; x++) {
             std::cout << "[";
-            if (m_itemIndex2DArray[x][y]) {
+            if (m_itemIndex2DArray[x][y] != -1) {
                 std::cout << "X";
             }
             else {
@@ -198,6 +241,6 @@ void Inventory::PrintGridOccupiedStateToConsole() {
     }
 }
 
-//InventoryItem* Inventory::GetSelectedItem() {
-//    if (m_selectedItem)
-//}
+bool Inventory::InBounds(int x, int y) {
+    return x >= 0 && y >= 0 && x < m_gridCountX && y < m_gridCountY;
+}

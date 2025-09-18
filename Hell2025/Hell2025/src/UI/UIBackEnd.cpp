@@ -19,17 +19,17 @@ namespace UIBackEnd {
         std::string characters = R"(!"#$%&'*+,-./0123456789:;<=>?_ABCDEFGHIJKLMNOPQRSTUVWXYZ\^_`abcdefghijklmnopqrstuvwxyz [])";
         std::string textureSourcePath = "res/fonts/raw_images/standard_font/";
         std::string outputPath = "res/fonts/";
-        FontSpriteSheetPacker::Export(name, characters, 0, 0, textureSourcePath, outputPath);
+        FontSpriteSheetPacker::Export(name, characters, 0, 1, textureSourcePath, outputPath);
 
         name = "AmmoFont";
         characters = "0123456789/";
         textureSourcePath = "res/fonts/raw_images/ammo_font/";
-        FontSpriteSheetPacker::Export(name, characters, 0, 0, textureSourcePath, outputPath);
+        FontSpriteSheetPacker::Export(name, characters, 0, 1, textureSourcePath, outputPath);
 
         name = "BebasNeue";
         characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789’,. ";
         textureSourcePath = "res/fonts/raw_images/bebas_neue/";
-        FontSpriteSheetPacker::Export(name, characters, 2, 0, textureSourcePath, outputPath);
+        FontSpriteSheetPacker::Export(name, characters, 2, 1, textureSourcePath, outputPath);
 
         name = "RobotoCondensed";
         characters = R"(!"#$%&'*+,-./0123456789:;<=>?_ABCDEFGHIJKLMNOPQRSTUVWXYZ\^_`abcdefghijklmnopqrstuvwxyz )";
@@ -170,6 +170,10 @@ hits the floor.
         renderItem.indexCount = meshData.indices.size();
         renderItem.textureIndex = AssetManager::GetTextureIndexByName(fontName); 
         renderItem.filter = (textureFilter == TextureFilter::NEAREST) ? 1 : 0;
+        renderItem.clipMinX = 0;
+        renderItem.clipMinY = 0;
+        renderItem.clipMaxX = resolutions.ui.x;
+        renderItem.clipMaxY = resolutions.ui.y;
     }
 
 
@@ -186,8 +190,8 @@ hits the floor.
         }
         // Get texture dimensions
         Texture* texture = AssetManager::GetTextureByIndex(textureIndex);
-        float w = (size.x != -1) ? size.x : texture->GetWidth(0);
-        float h = (size.y != -1) ? size.y : texture->GetHeight(0);
+        float w = (size.x != -1) ? size.x : texture->GetWidth();
+        float h = (size.y != -1) ? size.y : texture->GetHeight();
 
         glm::vec2 positions[4];
         glm::vec2 uvs[4] = {
@@ -239,12 +243,15 @@ hits the floor.
             float newY = positions[i].x * s + positions[i].y * c;
             positions[i] = { newX, newY };
         }
+        
+        // Snap to integer pixels
+        glm::vec2 anchor = glm::round(glm::vec2(location)); 
 
         // Convert the final screen position to NDC
         const Resolutions& resolutions = Config::GetResolutions();
         glm::vec2 finalVertices[4];
         for (int i = 0; i < 4; ++i) {
-            glm::vec2 screenPos = glm::vec2(location) + positions[i];
+            glm::vec2 screenPos = glm::vec2(anchor) + positions[i];
             finalVertices[i].x = (screenPos.x / static_cast<float>(resolutions.ui.x)) * 2.0f - 1.0f;
             finalVertices[i].y = 1.0f - (screenPos.y / static_cast<float>(resolutions.ui.y)) * 2.0f;
         }
@@ -277,18 +284,13 @@ hits the floor.
         renderItem.clipMaxY = clipMaxY;
 
         // Maybe tidy this up later
-        if (renderItem.clipMinX == -1) {
-            renderItem.clipMinX = 0;
-        }
-        if (renderItem.clipMinY == -1) {
-            renderItem.clipMinY = 0;
-        }
-        if (renderItem.clipMaxX == -1) {
-            renderItem.clipMaxX = BackEnd::GetCurrentWindowWidth();
-        }
-        if (renderItem.clipMaxY == -1) {
-            renderItem.clipMaxY = BackEnd::GetCurrentWindowHeight();
-        }
+        const int W = BackEnd::GetCurrentWindowWidth();
+        const int H = BackEnd::GetCurrentWindowHeight();
+
+        renderItem.clipMinX = (clipMinX >= 0) ? clipMinX : 0;
+        renderItem.clipMinY = (clipMinY >= 0) ? clipMinY : 0;
+        renderItem.clipMaxX = (clipMaxX >= 0) ? clipMaxX : W;
+        renderItem.clipMaxY = (clipMaxY >= 0) ? clipMaxY : H;
     }
 
     Mesh2D& GetUIMesh() {

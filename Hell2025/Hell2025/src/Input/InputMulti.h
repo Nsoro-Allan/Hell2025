@@ -16,19 +16,23 @@ struct KeyboardState {
     bool keyPressed[372];
     bool keyDown[372];
     bool keyDownLastFrame[372];
+    bool keyRepeat[372];
+    float keyDownTime[372];
+    float keyRepeatTime[372];
+    float nextRepeatAt[372];
 };
 
 namespace InputMulti {
     void Init();
     void ResetState();
-    void Update();
+    void Update(float deltaTime);
     bool LeftMouseDown(int index);
     bool RightMouseDown(int index);
     bool LeftMousePressed(int index);
     bool RightMousePressed(int index);
     int GetMouseXOffset(int index);
     int GetMouseYOffset(int index);
-    bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keycode);
-    bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keycode);
+    bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keyCode, bool allowKeyRepeat = false);
+    bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keyCode);
     void ResetMouseOffsets();
 }

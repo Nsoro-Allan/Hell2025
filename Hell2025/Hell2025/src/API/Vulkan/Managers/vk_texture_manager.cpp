@@ -16,8 +16,8 @@ namespace VulkanTextureManager {
             return; // Texture already allocated
         }
         // Determine the number of mip levels
-        int mipmapWidth = texture.GetWidth(0);
-        int mipmapHeight = texture.GetHeight(0);
+        int mipmapWidth = texture.GetWidth();
+        int mipmapHeight = texture.GetHeight();
         uint32_t mipLevels = texture.MipmapsAreRequested() ? texture.GetMipmapLevelCount() : 1;
 
         // Create the VkImage
@@ -72,16 +72,16 @@ namespace VulkanTextureManager {
 
         // Store shit 
         // THIS COULD BE BETTER!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        vkTexture.m_width = texture.GetWidth(0);
-        vkTexture.m_height = texture.GetHeight(0);
+        vkTexture.m_width = texture.GetWidth();
+        vkTexture.m_height = texture.GetHeight();
     }
 
     void VulkanTextureManager::GenerateMipmaps(Texture& texture) {
         VulkanCommandManager::ImmediateSubmit2([&](VkCommandBuffer commandBuffer) {
             VkDevice device = VulkanDeviceManager::GetDevice();
             VulkanTexture& vkTexture = texture.GetVKTexture();
-            int width = texture.GetWidth(0);
-            int height = texture.GetHeight(0);
+            int width = texture.GetWidth();
+            int height = texture.GetHeight();
 
             int mipLevels = texture.GetMipmapLevelCount();
             for (int i = 1; i < mipLevels; i++) {

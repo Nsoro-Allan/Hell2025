@@ -319,6 +319,26 @@ namespace World {
         g_gameObjects[0].m_meshNodes.m_materialIndices[0] = AssetManager::GetMaterialIndexByName("Leopard");
         g_gameObjects[0].m_meshNodes.m_materialIndices[1] = AssetManager::GetMaterialIndexByName("Leopard");
 
+
+        createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "PowerPole";
+        AddGameObject(createInfo2);
+
+
+        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "Reflector";
+        AddGameObject(createInfo2);
+
+
+
+        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "Fence";
+        AddGameObject(createInfo2);
+
+
     }
 
     void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {

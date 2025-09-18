@@ -23,6 +23,10 @@ namespace World {
 
     void Update(float deltaTime) {
 
+
+        //auto pos = glm::vec3(31.0f, 30.4f, 38.25f);
+        //Renderer::DrawPoint(pos, RED);
+
         /*
         {
         // Visualize dot product arc

@@ -99,6 +99,7 @@ namespace InputMulti {
         windowClass.lpfnWndProc = targetWindowProc;
         windowClass.hInstance = hInstance;
         windowClass.lpszClassName = TEXT("InputWindow");
+
         if (!RegisterClass(&windowClass)) {
             std::cout << "Failed to register window class\n";
             return;
@@ -112,6 +113,7 @@ namespace InputMulti {
         else {
             std::cout << "Multi mouse/keyboard support initialized\n";
         }
+
         RegisterDeviceOfType(HID_USAGE_GENERIC_MOUSE, eventWindow);
         RegisterDeviceOfType(HID_USAGE_GENERIC_KEYBOARD, eventWindow);
     }
@@ -121,37 +123,67 @@ namespace InputMulti {
         memset(g_mouseStates, 0, sizeof(g_mouseStates));
     }
 
-    void Update() {
+    void Update(float deltaTime) {
         MSG msg;
-        //	while (GetMessage(&msg, NULL, 0, 0))
-        {
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
         for (MouseState& state : g_mouseStates) {
             // Left mouse down/pressed
-            if (state.leftMouseDown && !state.leftMouseDownLastFrame)
+            if (state.leftMouseDown && !state.leftMouseDownLastFrame) {
                 state.leftMousePressed = true;
-            else
+            }
+            else {
                 state.leftMousePressed = false;
+            }
             state.leftMouseDownLastFrame = state.leftMouseDown;
 
             // Right mouse down/pressed
-            if (state.rightMouseDown && !state.rightMouseDownLastFrame)
+            if (state.rightMouseDown && !state.rightMouseDownLastFrame) {
                 state.rightMousePressed = true;
-            else
+            }
+            else {
                 state.rightMousePressed = false;
+            }
             state.rightMouseDownLastFrame = state.rightMouseDown;
         }
 
+        const float initialDelay = 0.36f;
+        const float repeatInterval = 0.08f;
+
+        // Key press/down/repeat
         for (KeyboardState& state : g_keyboardStates) {
-            // Key press
-            for (int i = 0; i < 350; i++) {
-                if (state.keyDown[i] && !state.keyDownLastFrame[i])
-                    state.keyPressed[i] = true;
-                else
+            for (int i = 0; i < 350; ++i) {
+                if (state.keyDown[i]) {
+                    if (!state.keyDownLastFrame[i]) {
+                        state.keyPressed[i] = true;
+                        state.keyDownTime[i] = 0.0f;
+                        state.keyRepeatTime[i] = 0.0f;
+                        state.nextRepeatAt[i] = initialDelay;
+                    }
+                    else {
+                        state.keyPressed[i] = false;
+                        state.keyDownTime[i] += deltaTime;
+                    }
+
+                    // Fire when reached ored pass the scheduled time
+                    bool repeatPulse = false;
+                    while (state.keyDownTime[i] >= state.nextRepeatAt[i]) {
+                        repeatPulse = true;
+                        state.nextRepeatAt[i] += repeatInterval; // Catch up if a long frame
+                    }
+
+                    state.keyRepeat[i] = state.keyPressed[i] || repeatPulse;
+                }
+                else {
                     state.keyPressed[i] = false;
+                    state.keyRepeat[i] = false;
+                    state.keyDownTime[i] = 0.f;
+                    state.keyRepeatTime[i] = 0.f;
+                }
+
                 state.keyDownLastFrame[i] = state.keyDown[i];
             }
         }
@@ -224,38 +256,34 @@ namespace InputMulti {
             return g_mouseStates[index].xoffset;
     }
 
-    bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keycode) {
-        // It's a mouse button
-        if (keycode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4) {
+    bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keyCode) {
+        // Mouse
+        if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4)
             return g_mouseStates[mouseIndex].leftMouseDown;
-        }
-        else if (keycode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4) {
+        else if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4)
             return g_mouseStates[mouseIndex].rightMouseDown;
+
+        // Keyboard
+        if (keyboardIndex >= 0 && keyboardIndex < 4 && keyCode >= 0 && keyCode < 350) {
+            return g_keyboardStates[keyboardIndex].keyDown[keyCode];
         }
 
-        // It's a keyboard button
-        else if (keyboardIndex >= 0 && keyboardIndex < 4) {
-            return g_keyboardStates[keyboardIndex].keyDown[keycode];
-        }
-        // Something else invalid
-        else {
-            return false;
-        }
+        return false;
     }
 
-    bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keycode) {
-
-        // It's a mouse button
-        if (keycode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4)
+    bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keyCode, bool allowKeyRepeat) {
+        // Mouse
+        if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4)
             return g_mouseStates[mouseIndex].leftMousePressed;
-        else if (keycode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4)
+        if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4)
             return g_mouseStates[mouseIndex].rightMousePressed;
 
-        // It's a keyboard button
-        else if (keyboardIndex >= 0 && keyboardIndex < 4)
-            return g_keyboardStates[keyboardIndex].keyPressed[keycode];
-        // Something else invalid
-        else
-            return false;
+        // Keyboard
+        if (keyboardIndex >= 0 && keyboardIndex < 4 && keyCode >= 0 && keyCode < 350) {
+            const KeyboardState& state = g_keyboardStates[keyboardIndex];
+            return allowKeyRepeat ? state.keyRepeat[keyCode] : state.keyPressed[keyCode];
+        }
+
+        return false;
     }
 }

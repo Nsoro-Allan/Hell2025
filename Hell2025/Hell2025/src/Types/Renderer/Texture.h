@@ -23,8 +23,10 @@ public:
     const bool MipmapsAreRequested();
     const bool BakeComplete();
     const int GetTextureDataCount();
-    const int GetWidth(int mipmapLevel);
-    const int GetHeight(int mipmapLevel);
+    const int GetWidth();
+    const int GetHeight();
+    const int GetMipMapWidth(int mipmapLevel);
+    const int GetMipMapHeight(int mipmapLevel);
     const int GetFormat();
     const int GetInternalFormat();
     const int GetMipmapLevelCount();

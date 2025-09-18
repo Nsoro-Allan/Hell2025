@@ -17,8 +17,8 @@ namespace BakeQueue {
             QueuedTextureBake& queuedTextureBake = g_queuedTextureBakes.emplace_back();
             queuedTextureBake.jobID = g_textureBakeJobID++;
             queuedTextureBake.texture = texture;
-            queuedTextureBake.width = texture->GetWidth(i);
-            queuedTextureBake.height = texture->GetHeight(i);
+            queuedTextureBake.width = texture->GetMipMapWidth(i);
+            queuedTextureBake.height = texture->GetMipMapHeight(i);
             queuedTextureBake.format = texture->GetFormat();
             queuedTextureBake.internalFormat = texture->GetInternalFormat();
             queuedTextureBake.data = texture->GetData(i);

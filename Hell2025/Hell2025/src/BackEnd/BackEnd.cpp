@@ -160,7 +160,7 @@ namespace BackEnd {
         float deltaTime = Game::GetDeltaTime();
         //glfwSwapInterval(0);
 
-        InputMulti::Update();
+        InputMulti::Update(deltaTime);
         Synth::Update(deltaTime);
         Audio::Update(deltaTime);
         MidiFileManager::Update(deltaTime);

@@ -203,8 +203,8 @@ namespace OpenGLBackEnd {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, OpenGLUtil::TextureWrapModeToGLEnum(texture.GetTextureWrapMode()));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, OpenGLUtil::TextureFilterToGLEnum(texture.GetMinFilter()));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, OpenGLUtil::TextureFilterToGLEnum(texture.GetMagFilter()));
-        int mipmapWidth = texture.GetWidth(0);
-        int mipmapHeight = texture.GetHeight(0);
+        int mipmapWidth = texture.GetWidth();
+        int mipmapHeight = texture.GetHeight();
         int levelCount = texture.MipmapsAreRequested() ? texture.GetMipmapLevelCount() : 1;
         for (int i = 0; i < levelCount; i++) {
             if (texture.GetImageDataType() == ImageDataType::UNCOMPRESSED) {

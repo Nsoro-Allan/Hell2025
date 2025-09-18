@@ -638,7 +638,7 @@ namespace OpenGLRenderer {
         OceanUnderwaterCompositePass();
         WinstonPass();
         SpriteSheetPass(); // Muzzle flash, etc
-        //InventoryGaussianPass();      
+        InventoryGaussianPass();      
         PostProcessingPass();  
         ExamineItemPass();
         DebugViewPass();

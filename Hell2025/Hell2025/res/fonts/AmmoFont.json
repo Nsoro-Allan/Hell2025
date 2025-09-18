@@ -3,7 +3,7 @@
   "textureWidth": 96,
   "textureHeight": 96,
   "charHeight": 31,
-  "lineSpacing": 0,
+  "lineSpacing": 1,
   "charSpacing": 0,
   "characters": "0123456789/",
   "charDataList": [

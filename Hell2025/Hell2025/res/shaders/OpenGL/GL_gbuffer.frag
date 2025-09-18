@@ -108,6 +108,8 @@ void main() {
     RMAOut.a = BlockScreenSpaceBloodDecalsFlag;
 
     WorldPositionOut = vec4(WorldPos.rgb, 1.0);
-
+    
+  //  NormalOut.rgb = vec3(TexCoord, 0);
+  //  NormalOut.rgb = normalize(Tangent);
 
 }

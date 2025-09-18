@@ -147,10 +147,14 @@ struct Player {
     bool PressingWalkLeft();
     bool PressingWalkRight();
     bool PressingCrouch();
-    bool PressedWalkForward();
-    bool PressedWalkBackward();
-    bool PressedWalkLeft();
-    bool PressedWalkRight();
+    bool PressedUp(bool allowKeyRepeat = false);
+    bool PressedDown(bool allowKeyRepeat = false);
+    bool PressedLeft(bool allowKeyRepeat = false);
+    bool PressedRight(bool allowKeyRepeat = false);
+    bool PressedWalkForward(bool allowKeyRepeat = false);
+    bool PressedWalkBackward(bool allowKeyRepeat = false);
+    bool PressedWalkLeft(bool allowKeyRepeat = false);
+    bool PressedWalkRight(bool allowKeyRepeat = false);
     bool PressedInteract();
     bool PressingInteract();
     bool PressedReload();
@@ -168,10 +172,6 @@ struct Player {
     bool PressedMelee();
     bool PressedFlashlight();
     bool PressedToggleInventory();
-    bool PressedUp();
-    bool PressedDown();
-    bool PressedLeft();
-    bool PressedRight();
     bool PressedInventoryExamine();
 
     const InventoryState& GetInvetoryState() { return m_inventory.GetInventoryState(); }

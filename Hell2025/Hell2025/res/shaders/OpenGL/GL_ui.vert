@@ -7,32 +7,30 @@ layout(location = 2) in vec4 vColor;
 out vec4 Color;
 out vec2 TexCoord;
 
-// Make these NOT uniforms
-uniform int u_clipMinX;
-uniform int u_clipMinY;
-uniform int u_clipMaxX;
-uniform int u_clipMaxY;
+uniform float u_clipMinX;
+uniform float u_clipMinY;
+uniform float u_clipMaxX;
+uniform float u_clipMaxY;
+uniform float u_renderTargetWidth;
+uniform float u_renderTargetHeight;
 
 void main() {
     Color = vColor;
     TexCoord = vUV;
 
-    vec4 clip = vec4(vPosition, 0.0, 1.0);
-    gl_Position = clip;
+    vec4 position = vec4(vPosition, 0.0, 1.0);
 
-    vec2 uViewportSizePx = vec2(1920, 1080);
-    vec2 uRectMinPx = vec2(u_clipMinX, u_clipMinY);
-    vec2 uRectMaxPx = vec2(u_clipMaxX, u_clipMaxY);
-    
-    vec2 ndcMin = vec2((uRectMinPx.x / uViewportSizePx.x) * 2.0 - 1.0,
-                       (uRectMinPx.y / uViewportSizePx.y) * 2.0 - 1.0);
-    vec2 ndcMax = vec2((uRectMaxPx.x / uViewportSizePx.x) * 2.0 - 1.0,
-                       (uRectMaxPx.y / uViewportSizePx.y) * 2.0 - 1.0);
-    
-    vec2 ndc = clip.xy / clip.w;
-    
-    //gl_ClipDistance[0] = ndc.x - ndcMin.x;
-    //gl_ClipDistance[1] = ndcMax.x - ndc.x;
-    //gl_ClipDistance[2] = ndc.y - ndcMin.y;
-    gl_ClipDistance[3] = ndcMax.y - ndc.y;
+    float ndcLeft   = (u_clipMinX / u_renderTargetWidth)  * 2.0 - 1.0;
+    float ndcRight  = (u_clipMaxX / u_renderTargetWidth)  * 2.0 - 1.0;
+    float ndcTop    = 1.0 - (u_clipMinY / u_renderTargetHeight) * 2.0;
+    float ndcBottom = 1.0 - (u_clipMaxY / u_renderTargetHeight) * 2.0;
+
+    vec2 ndc = position.xy / position.w;
+
+    gl_ClipDistance[0] = ndc.x - ndcLeft;    // left
+    gl_ClipDistance[1] = ndcRight - ndc.x;   // right
+    gl_ClipDistance[2] = ndc.y - ndcBottom;  // bottom
+    gl_ClipDistance[3] = ndcTop - ndc.y;     // top
+
+    gl_Position = position;
 }

@@ -19,7 +19,7 @@ void Texture::Load() {
     m_loadingState = LoadingState::LOADING_COMPLETE;
 
     // Calculate mipmap level count
-    m_mipmapLevelCount = 1 + static_cast<int>(std::log2(std::max(GetWidth(0), GetHeight(0))));
+    m_mipmapLevelCount = 1 + static_cast<int>(std::log2(std::max(GetWidth(), GetHeight())));
 
     // Initiate bake states
     m_textureDataLevelBakeStates.resize(m_textureDataLevels.size(), BakeState::AWAITING_BAKE);
@@ -32,22 +32,30 @@ void Texture::FreeCPUMemory() {
     }
 }
 
-const int Texture::GetWidth(int mipmapLevel) {
+const int Texture::GetWidth() {
+    return GetMipMapWidth(0);
+}
+
+const int Texture::GetHeight() {
+    return GetMipMapHeight(0);
+}
+
+const int Texture::GetMipMapWidth(int mipmapLevel) {
     if (mipmapLevel >= 0 && mipmapLevel < m_textureDataLevels.size()) {
         return m_textureDataLevels[mipmapLevel].m_width;
     }
     else {
-        std::cout << "Texture::GetWidth(int mipmapLevel) failed. mipmapLevel '" << mipmapLevel << "' out of range of size " << m_textureDataLevels.size() << "\n";
+        std::cout << "Texture::GetMipMapWidth(int mipmapLevel) failed. mipmapLevel '" << mipmapLevel << "' out of range of size " << m_textureDataLevels.size() << "\n";
         return 0;
     }
 }
 
-const int Texture::GetHeight(int mipmapLevel) {
+const int Texture::GetMipMapHeight(int mipmapLevel) {
     if (mipmapLevel >= 0 && mipmapLevel < m_textureDataLevels.size()) {
         return m_textureDataLevels[mipmapLevel].m_height;
     }
     else {
-        std::cout << "Texture::GetHeight(int mipmapLevel) failed. mipmapLevel '" << mipmapLevel << "' out of range of size " << m_textureDataLevels.size() << "\n";
+        std::cout << "Texture::GetMipMapHeight(int mipmapLevel) failed. mipmapLevel '" << mipmapLevel << "' out of range of size " << m_textureDataLevels.size() << "\n";
         return 0;
     }
 }
@@ -222,8 +230,8 @@ const bool Texture::MipmapsAreRequested() {
 
 const void Texture::PrintDebugInfo() {
     std::cout << GetFileName() << "\n";
-    std::cout << " - width: " << GetWidth(0) << "\n";
-    std::cout << " - height: " << GetHeight(0) << "\n";
+    std::cout << " - width: " << GetWidth() << "\n";
+    std::cout << " - height: " << GetHeight() << "\n";
     std::cout << " - channel count: " << GetChannelCount() << "\n";
     std::cout << " - internal format: " << OpenGLUtil::GLInternalFormatToString(GetInternalFormat()) << "\n";
     std::cout << " - format: " << OpenGLUtil::GLFormatToString(GetFormat()) << "\n";
