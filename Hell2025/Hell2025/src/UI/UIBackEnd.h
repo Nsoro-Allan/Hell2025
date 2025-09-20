@@ -33,15 +33,8 @@ struct BlitTextureInfo {
 namespace UIBackEnd {
     void Init();
     void Update();
-    void BlitText(
-        const std::string& text,
-        const std::string& fontName,
-        int locationX,
-        int locationY,
-        Alignment alignment,
-        float scale,
-        TextureFilter textureFilter = TextureFilter::NEAREST
-    );
+    void BlitText(const std::string& text, const std::string& fontName, glm::ivec2 location, Alignment alignment, float scale, TextureFilter textureFilter = TextureFilter::NEAREST);
+    void BlitText(const std::string& text, const std::string& fontName, int locationX, int locationY, Alignment alignment, float scale, TextureFilter textureFilter = TextureFilter::NEAREST);
 
     void BlitTexture(BlitTextureInfo info);
 

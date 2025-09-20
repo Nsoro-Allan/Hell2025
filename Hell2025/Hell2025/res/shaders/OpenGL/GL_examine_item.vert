@@ -23,10 +23,11 @@ out vec3 EmissiveColor;
 uniform int u_viewportIndex;
 uniform mat4 u_model;
 uniform mat4 u_viewMatrix;
+uniform mat4 u_inverseModel;
 
 void main() {
     mat4 modelMatrix = u_model;
-    mat4 inverseModelMatrix = inverse(modelMatrix);  
+    mat4 inverseModelMatrix = u_inverseModel;  
 	mat4 projection = viewportData[u_viewportIndex].projection; 
 	mat4 projectionView = viewportData[u_viewportIndex].projectionView;            
     mat4 normalMatrix = transpose(inverseModelMatrix);

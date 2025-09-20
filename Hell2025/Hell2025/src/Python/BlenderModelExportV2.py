@@ -105,8 +105,12 @@ class ModelExporter:
                         p3 = (self.conv3 @ v.co) * self.scale
                         n3 = (self.conv3 @ loop.normal).normalized()
                         t3 = (self.conv3 @ loop.tangent).normalized() if mesh.uv_layers.active else mathutils.Vector((0,0,0))
-                        uv = mesh.uv_layers.active.data[li].uv if mesh.uv_layers.active else (0.0, 0.0)
-                        uv2 = (uv.x, 1 - uv.y)
+
+                        if mesh.uv_layers.active:
+                            uv = mesh.uv_layers.active.data[li].uv
+                        else:
+                            uv = mathutils.Vector((0.0, 0.0))
+                        uv2 = (uv.x, 1.0 - uv.y)
 
                         key = (
                             round(p3.x, self.rounding), round(p3.y, self.rounding), round(p3.z, self.rounding),
@@ -175,9 +179,9 @@ class ModelExporter:
 
 # Usage
 exporter = ModelExporter(
-    'C:/Hell2025/Hell2025/Hell2025/res/models/Glock_Silencer.model',
+    'C:/Hell2025/Hell2025/Hell2025/res/models/Fence.model',
     rounding=6,
-    selected_only=True,
-    scale=100.0
+    selected_only=False,
+    scale=1.0
 )
 exporter.export()

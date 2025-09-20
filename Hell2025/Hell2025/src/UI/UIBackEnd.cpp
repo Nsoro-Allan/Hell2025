@@ -149,6 +149,9 @@ hits the floor.
         g_renderItems.clear();
     }
 
+    void BlitText(const std::string& text, const std::string& fontName, glm::ivec2 location, Alignment alignment, float scale, TextureFilter textureFilter) {
+        BlitText(text, fontName, location.x, location.y, alignment, scale, textureFilter);
+    }
 
     void BlitText(const std::string& text, const std::string& fontName, int originX, int originY, Alignment alignment, float scale, TextureFilter textureFilter) {
         FontSpriteSheet* fontSpriteSheet = TextBlitter::GetFontSpriteSheet(fontName);

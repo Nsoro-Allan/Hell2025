@@ -64,4 +64,24 @@ void main() {
 
     // Write it
     ColorOut = vec4(finalColor, 1.0);
+
+    /*
+    vec3 n = normalize(Normal);
+
+    vec3 dpdx = dFdx(WorldPos.xyz);
+    vec3 dpdy = dFdy(WorldPos.xyz);
+    vec2 dUVdx = dFdx(TexCoord);
+    vec2 dUVdy = dFdy(TexCoord);
+
+    float invDet = 1.0 / (dUVdx.x * dUVdy.y - dUVdx.y * dUVdy.x);
+    vec3 T = normalize(( dpdx * dUVdy.y - dpdy * dUVdx.y) * invDet);
+    vec3 B = normalize(( dpdy * dUVdx.x - dpdx * dUVdy.x) * invDet);
+
+    T = normalize(T - n * dot(n, T));
+    B = normalize(cross(n, T));
+    mat3 TBN = mat3(T, B, n);
+
+    vec3 worldNormal = normalize(TBN * (normalMap));
+
+    ColorOut.rgb = normal;*/
 }

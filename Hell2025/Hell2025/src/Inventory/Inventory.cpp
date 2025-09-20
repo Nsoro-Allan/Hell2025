@@ -78,6 +78,16 @@ void Inventory::ClearInventory() {
     UpdateOccupiedSlotsArray();
 }
 
+glm::ivec2 Inventory::GetSelectedItemHeadingSize() {
+    if (!ItemSelected()) return glm::ivec2(0, 0);
+    return TextBlitter::GetBlitTextSize(GetSelectedItemHeading(), m_style.itemHeadingFont, 1.0f);
+}
+
+glm::ivec2 Inventory::GetSelectedItemDescriptionSize() {
+    if (!ItemSelected()) return glm::ivec2(0, 0);
+    return TextBlitter::GetBlitTextSize(GetSelectedItemDescription(), m_style.itemDescriptionFont, 1.0f);
+}
+
 int Inventory::GetCellSizeInPixels() {
     static int size = 0;
     if (size == 0) {
@@ -86,6 +96,10 @@ int Inventory::GetCellSizeInPixels() {
         }
     }
     return size;
+}
+
+glm::ivec2 Inventory::GetItemGridSize() {
+    return GetCellSizeInPixels() * glm::ivec2(m_gridCountX, m_gridCountY);
 }
 
 int Inventory::GetSelectedItemIndex() {
@@ -137,6 +151,24 @@ const std::string& Inventory::GetItemNameAtLocation(int x, int y) {
     else {
         return m_items[itemIndex].m_name;   
     }
+}
+
+const std::string& Inventory::GetSelectedItemHeading() {
+    static std::string noItem = "";
+
+    InventoryItemInfo* itemInfo = GetSelectedItemInfo();
+    if (!itemInfo) return noItem;
+
+    return itemInfo->m_itemHeading;
+}
+
+const std::string& Inventory::GetSelectedItemDescription() {
+    static std::string noItem = "";
+
+    InventoryItemInfo* itemInfo = GetSelectedItemInfo();
+    if (!itemInfo) return noItem;
+
+    return itemInfo->m_description;
 }
 
 int Inventory::GetItemSizeAtLocation(int x, int y) {
@@ -243,4 +275,8 @@ void Inventory::PrintGridOccupiedStateToConsole() {
 
 bool Inventory::InBounds(int x, int y) {
     return x >= 0 && y >= 0 && x < m_gridCountX && y < m_gridCountY;
+}
+
+bool Inventory::ItemSelected() {
+    return GetItemAtIndex(GetSelectedItemIndex()) != nullptr;
 }

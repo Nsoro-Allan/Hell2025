@@ -14,6 +14,28 @@ struct InventoryItem {
     bool m_rotatedInGrid = false;
 };
 
+struct InventoryStyle {
+    int invOriginX = 100;
+    int invOriginY = 100;
+    int gridMargin = 49;
+    int theLinePadding = 30;
+    int itemHeadingTopPadding = 32;
+    int itemDescriptionTopPadding = 18;
+    int itemButtonsTopPadding = 35;
+    int itemButtonLineHeight = 31;
+    std::string itemHeadingFont = "BebasNeue";
+    std::string itemDescriptionFont = "RobotoCondensed";
+};
+
+struct InventoryLocations {
+    glm::ivec2 background = {};
+    glm::ivec2 itemGrid = {};
+    glm::ivec2 itemHeading = {};
+    glm::ivec2 itemDescription = {};
+    glm::ivec2 itemButtons = {};
+    glm::ivec2 theLine = {};
+};
+
 struct Inventory {
     Inventory();
     void Update(float deltaTime);
@@ -45,13 +67,17 @@ private:
     bool MoveItem(int itemIndex, int cellX, int cellY, bool rotated);
 
     // Render submits
-    void SubmitItemViewScreenRenderItems();
+    void BlitTheLine(glm::ivec2 origin);
+    void BlitItemGrid(glm::ivec2 origin);
+    void BlitItemHeading(glm::ivec2 origin);
+    void BlitItemDescription(glm::ivec2 origin);
+    void BlitItemButtons(glm::ivec2 origin);
+
     void SubmitItemExamineRenderItems();
-    void BlitGrid(int originX, int originY);
 
     // Util
     void StepDirection(int dx, int dy);
-    void BlitInventoryBackground(int originX, int originY, int width, int height);
+    void BlitInventoryBackground(glm::ivec2 origin, int width, int height);
     
     // Updates
     void UpdateItemViewScreen(float deltaTime);
@@ -60,13 +86,19 @@ private:
     // Getters
     InventoryItemInfo* GetSelectedItemInfo();
     InventoryItem* GetItemAtIndex(int index);
+    glm::ivec2 GetSelectedItemHeadingSize();
+    glm::ivec2 GetSelectedItemDescriptionSize();
+    glm::ivec2 GetItemGridSize();
     int GetCellSizeInPixels();
     int GetSelectedItemIndex();
     int GetItemSizeAtLocation(int x, int y);
     bool IsCellOccupied(int x, int y);
     bool InBounds(int x, int y);
+    bool ItemSelected();
     const std::string& GetSelectedItemName();
     const std::string& GetItemNameAtLocation(int x, int y);
+    const std::string& GetSelectedItemHeading();
+    const std::string& GetSelectedItemDescription();
 
     int m_itemIndex2DArray[MAX_INVENTORY_X_SIZE][MAX_INVENTORY_Y_SIZE]; // Updated on insertion and move
     int m_gridCountX = 4;
@@ -81,4 +113,6 @@ private:
     float m_examineZoom = 0.0f;
     glm::mat4 m_examineModelMatrix;
     MeshNodes m_examineItemMeshNodes;
+    InventoryStyle m_style;
+    InventoryLocations m_locations;
 };

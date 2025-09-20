@@ -233,6 +233,14 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
 
         glm::mat4 meshModelMatrix = GetMeshModelMatrix(i);
 
+        //if (mesh->GetName() == "Wire" || mesh->GetName() == "WireBarbed" || mesh->GetName() == "WireDemo") {
+        //    material = AssetManager::GetMaterialByName("Tokarev");
+        //}
+        //if (mesh->GetName() == "FencePoleA" || mesh->GetName() == "FencePoleB" ||
+        //    mesh->GetName() == "FenceInnerPoleA" || mesh->GetName() == "FenceInnerPoleB") {
+        //    material = AssetManager::GetMaterialByName("TreeLarge_0");
+        //}
+
         RenderItem renderItem;
         renderItem.objectType = (int)m_objectTypes[i];
         renderItem.modelMatrix = worldMatrix * meshModelMatrix;

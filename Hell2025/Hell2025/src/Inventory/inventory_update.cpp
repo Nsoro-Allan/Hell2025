@@ -10,8 +10,8 @@
 void Inventory::Update(float deltaTime) {
 
     //SetGridCountX(6);
-    //SetGridCountY(4);
-    //MoveItem(5, 4, 3, true);
+    ////SetGridCountY(4);
+    //MoveItem(5, 4, 2, true);
 
     if (m_state == InventoryState::MAIN_SCREEN) UpdateItemViewScreen(deltaTime);
     if (m_state == InventoryState::EXAMINE_ITEM) UpdateExamineScreen(deltaTime);

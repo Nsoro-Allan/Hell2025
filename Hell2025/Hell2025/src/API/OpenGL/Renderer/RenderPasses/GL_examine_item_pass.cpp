@@ -67,6 +67,7 @@ namespace OpenGLRenderer {
                 for (RenderItem& renderItem : m_renderItems) {
                     Mesh* mesh = AssetManager::GetMeshByIndex(renderItem.meshIndex);
                     shader->SetMat4("u_model", renderItem.modelMatrix);
+                    shader->SetMat4("u_inverseModel", renderItem.inverseModelMatrix);
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.baseColorTextureIndex)->GetGLTexture().GetHandle());
                     glActiveTexture(GL_TEXTURE1);

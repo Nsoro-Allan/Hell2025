@@ -331,8 +331,6 @@ namespace World {
         createInfo2.modelName = "Reflector";
         AddGameObject(createInfo2);
 
-
-
         createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
         createInfo2.scale = glm::vec3(1.0f);
         createInfo2.modelName = "Fence";
