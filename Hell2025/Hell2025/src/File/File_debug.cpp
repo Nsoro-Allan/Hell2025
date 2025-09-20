@@ -82,4 +82,12 @@ namespace File {
         std::cout << " Node Count:  " << header.floatCount << "\n";
         std::cout << " Float Count: " << header.nodeCount << "\n\n";
     }
+
+    void PrintArmatureHeader(ArmatureHeader header, const std::string& identifier) {
+        std::cout << identifier << "\n";
+        std::cout << " Signature:   " << header.signature << "\n";
+        std::cout << " Name:  " << header.name << "\n";
+        std::cout << " Bone Count: " << header.boneCount << "\n";
+        std::cout << "\n";
+    }
 }

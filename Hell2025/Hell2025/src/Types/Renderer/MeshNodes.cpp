@@ -54,6 +54,11 @@ void MeshNodes::InitFromModel(Model* model) {
             }
         }
     }
+
+    // If the model contains armatures, store the first one (TODO: allow more maybe)
+    if (model->m_modelData.armatures.size() > 0) {
+        m_armatureData = model->m_modelData.armatures[0];
+    }
 }
 
 

@@ -1,6 +1,7 @@
 #include "GameObject.h"
 #include "AssetManagement/AssetManager.h"
 #include "Physics/Physics.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Util.h"
 #include "UniqueID.h"
@@ -32,6 +33,20 @@ GameObjectCreateInfo GameObject::GetCreateInfo() {
 
 void GameObject::Update(float deltaTime) {
     
+    if (m_meshNodes.GetModelName() == "Fence") {
+
+        m_transform.rotation.x = 0.01f;
+
+        for (const Bone& bone : m_meshNodes.GetArmature().bones) {
+
+            const glm::mat4 rest = GetModelMatrix() * bone.localRestPose;
+            glm::vec3 p = rest[3];
+
+            Renderer::DrawPoint(p, RED);
+        }
+
+    }
+
 }
 
 void GameObject::CleanUp() {

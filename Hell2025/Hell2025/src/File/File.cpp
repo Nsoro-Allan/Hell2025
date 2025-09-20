@@ -36,6 +36,34 @@ namespace File {
         std::memcpy(expectedSignature, signatureName.data(), signatureName.length());
         return (std::memcmp(signatureBuffer, expectedSignature, HELL_SIGNATURE_BUFFER_SIZE) == 0);
     }
+
+    bool ValidateSignature(const std::string& signature, const std::string& expectedSignature) {
+        if (signature.size() < expectedSignature.size()) return false;
+        return std::memcmp(signature.data(), expectedSignature.data(), expectedSignature.size()) == 0;
+    }
+
+    std::string ReadFileHeaderSignature(const std::string& filepath) {
+        std::ifstream file(filepath, std::ios::binary);
+        if (!file.is_open()) return "";
+
+        char fileSignature[32];
+        if (!file.read(fileSignature, sizeof(fileSignature))) return "";
+
+        return std::string(fileSignature, sizeof(fileSignature));
+    }
+
+    uint32_t ReadFileHeaderVersion(const std::string& filepath) {
+        std::ifstream file(filepath, std::ios::binary);
+        if (!file) return 0;
+
+        // Skip fixed 32-byte signature
+        file.seekg(32, std::ios::beg);
+        if (!file) return 0;
+
+        uint32_t version = 0;
+        if (!file.read(reinterpret_cast<char*>(&version), sizeof(version))) return 0;
+        return version;
+    }
 }
 
 /*

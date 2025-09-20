@@ -13,28 +13,69 @@
 #define PRINT_MODEL_HEADERS_ON_WRITE 0
 #define PRINT_MESH_HEADERS_ON_READ 0
 #define PRINT_MESH_HEADERS_ON_WRITE 0
+#define PRINT_ARMATURE_HEADERS_ON_READ 0
 
 namespace File {
 
     ModelHeaderV2 ReadModelHeaderV2(const std::string& filepath) {
-        ModelHeaderV2 header = {};
+        ModelHeaderV2 header{};
         std::ifstream file(filepath, std::ios::binary);
-
-        // Check for invalid file AFTER trying to open
-        if (!file.is_open()) {
-            std::cerr << "ReadModelHeader() failed to open file " << filepath << "\n";
-            header = {};
-            return header;
+        if (!file) {
+            std::cout << "ReadModelHeaderV2(): open failed " << filepath << "\n";
+            return {};
         }
 
-        // Read file data
-        file.read(reinterpret_cast<char*>(&header), sizeof(ModelHeaderV2));
+        file.seekg(0, std::ios::end);
+        if (file.tellg() < std::streamoff(sizeof(ModelHeaderV2))) {
+            std::cout << "ReadModelHeaderV2(): file too small " << filepath << "\n";
+            return {};
+        }
+        file.seekg(0, std::ios::beg);
 
-        // Error check stream state after read attempt
+        if (!file.read(reinterpret_cast<char*>(&header), sizeof(header))) {
+            std::cout << "ReadModelHeaderV2(): read failed " << filepath << "\n";
+            return {};
+        }
+
+        if (std::memcmp(header.signature, HELL_MODEL_SIGNATURE, sizeof(HELL_MODEL_SIGNATURE) - 1) != 0) {
+            std::cout << "ReadModelHeaderV2(): bad signature\n";
+            return {};
+        }
+        if (header.version != 2) {
+            std::cout << "ReadModelHeaderV2(): wrong version " << header.version << "\n";
+            return {};
+        }
+
+        return header;
+    }
+
+    ModelHeaderV3 ReadModelHeaderV3(const std::string& filepath) {
+        ModelHeaderV3 header{};
+        std::ifstream file(filepath, std::ios::binary);
         if (!file) {
-            std::cerr << "ReadModelHeader() failed to read file " << filepath << "\n";
-            header = {};
-            return header;
+            std::cerr << "ReadModelHeaderV3(): open failed " << filepath << "\n";
+            return {};
+        }
+
+        file.seekg(0, std::ios::end);
+        if (file.tellg() < std::streamoff(sizeof(ModelHeaderV3))) {
+            std::cerr << "ReadModelHeaderV3(): file too small " << filepath << "\n";
+            return {};
+        }
+        file.seekg(0, std::ios::beg);
+
+        if (!file.read(reinterpret_cast<char*>(&header), sizeof(header))) {
+            std::cerr << "ReadModelHeaderV3(): read failed " << filepath << "\n";
+            return {};
+        }
+
+        if (std::memcmp(header.signature, HELL_MODEL_SIGNATURE, sizeof(HELL_MODEL_SIGNATURE) - 1) != 0) {
+            std::cerr << "ReadModelHeaderV3(): bad signature\n";
+            return {};
+        }
+        if (header.version != 3) {
+            std::cerr << "ReadModelHeaderV3(): wrong version " << header.version << "\n";
+            return {};
         }
 
         return header;
@@ -94,163 +135,7 @@ namespace File {
         std::cout << "Exported: " << outputPath << "\n";
     }
 
-    void ExportModel(const ModelData& modelData) {
-        std::string outputPath = "res/models/" + modelData.name + ".model";
-        std::ofstream file(outputPath, std::ios::binary);
-        if (!file.is_open()) {
-            std::cout << "Failed to open file for writing: " << outputPath << "\n";
-            return;
-        }
-
-        // Fill the header
-        ModelHeader modelHeader;
-        modelHeader.version = 1;
-        modelHeader.meshCount = modelData.meshCount;
-        modelHeader.nameLength = modelData.name.size();
-        modelHeader.timestamp = modelData.timestamp;
-        modelHeader.aabbMin = modelData.aabbMin;
-        modelHeader.aabbMax = modelData.aabbMax;
-        std::memcpy(modelHeader.signature, "HELL_MODEL", 10);
-
-        // Write the header
-        file.write(modelHeader.signature, 10);
-        file.write((char*)&modelHeader.version, sizeof(modelHeader.version));
-        file.write((char*)&modelHeader.meshCount, sizeof(modelHeader.meshCount));
-        file.write((char*)&modelHeader.nameLength, sizeof(modelHeader.nameLength));
-        file.write(reinterpret_cast<char*>(&modelHeader.timestamp), sizeof(modelHeader.timestamp));
-        file.write(reinterpret_cast<const char*>(&modelHeader.aabbMin), sizeof(glm::vec3));
-        file.write(reinterpret_cast<const char*>(&modelHeader.aabbMax), sizeof(glm::vec3));
-        #if PRINT_MODEL_HEADERS_ON_WRITE
-        PrintModelHeader(modelHeader, "Wrote model header: " + outputPath);
-        #endif
-
-        // Write the name
-        file.write(modelData.name.data(), modelHeader.nameLength);
-
-        // Write the mesh data
-        for (const MeshData& meshData : modelData.meshes) {
-            MeshHeader meshHeader;
-            meshHeader.nameLength = (uint32_t)meshData.name.size();
-            meshHeader.vertexCount = (uint32_t)meshData.vertices.size();
-            meshHeader.indexCount = (uint32_t)meshData.indices.size();
-            meshHeader.aabbMin = meshData.aabbMin;
-            meshHeader.aabbMax = meshData.aabbMax;
-            file.write((char*)&meshHeader.nameLength, sizeof(meshHeader.nameLength));
-            file.write((char*)&meshHeader.vertexCount, sizeof(meshHeader.vertexCount));
-            file.write((char*)&meshHeader.indexCount, sizeof(meshHeader.indexCount));
-            file.write(meshData.name.data(), meshHeader.nameLength);
-            file.write(reinterpret_cast<const char*>(&meshHeader.aabbMin), sizeof(glm::vec3));
-            file.write(reinterpret_cast<const char*>(&meshHeader.aabbMax), sizeof(glm::vec3));
-            file.write(reinterpret_cast<const char*>(meshData.vertices.data()), meshData.vertices.size() * sizeof(Vertex));
-            file.write(reinterpret_cast<const char*>(meshData.indices.data()), meshData.indices.size() * sizeof(uint32_t));
-            #if PRINT_MESH_HEADERS_ON_WRITE
-            PrintMeshHeader(meshHeader, "Wrote mesh: " + meshData.name);
-            #endif
-        }
-        file.close();
-        std::cout << "Exported: " << outputPath << "\n";
-    }
-
-    ModelHeader ReadModelHeader(const std::string& filepath) {
-        ModelHeader header{};
-        std::ifstream file(filepath, std::ios::binary);
-
-        // Check for invalid file
-        if (!file.is_open()) {
-            return header;
-        }
-
-        // Check for valid signature
-        char fileSignature[10];
-        file.read(fileSignature, 10);
-        if (std::strncmp(fileSignature, "HELL_MODEL", 10) != 0) {
-            return header;
-        }
-
-        // Read the rest of header
-        file.read(reinterpret_cast<char*>(&header.version), sizeof(header.version));
-        file.read(reinterpret_cast<char*>(&header.meshCount), sizeof(header.meshCount));
-        file.read(reinterpret_cast<char*>(&header.nameLength), sizeof(header.nameLength));
-        file.read(reinterpret_cast<char*>(&header.timestamp), sizeof(header.timestamp));
-        file.read(reinterpret_cast<char*>(&header.aabbMin), sizeof(header.aabbMin));
-        file.read(reinterpret_cast<char*>(&header.aabbMax), sizeof(header.aabbMax));
-        return header;
-    }
-
     ModelData ImportModel(const std::string& filepath) {
-        ModelData modelData;
-
-        std::ifstream file(filepath, std::ios::binary);
-        if (!file.is_open()) {
-            std::cerr << "Failed to open file for reading: " << filepath << "\n";
-            return modelData;
-        }
-
-        FileInfo fileInfo = Util::GetFileInfoFromPath(filepath);
-        ModelHeader modelHeader;
-
-        // Read 10 bytes for HELL_MODEL
-        char fileSignature[10];
-        file.read(fileSignature, 10);
-
-        // Read the rest of the header
-        file.read((char*)&modelHeader.version, sizeof(modelHeader.version));
-        file.read((char*)&modelHeader.meshCount, sizeof(modelHeader.meshCount));
-        file.read((char*)&modelHeader.nameLength, sizeof(modelHeader.nameLength));
-        file.read(reinterpret_cast<char*>(&modelHeader.timestamp), sizeof(modelHeader.timestamp));
-        file.read(reinterpret_cast<char*>(&modelHeader.aabbMin), sizeof(glm::vec3));
-        file.read(reinterpret_cast<char*>(&modelHeader.aabbMax), sizeof(glm::vec3));
-        #if PRINT_MODEL_HEADERS_ON_READ
-        PrintModelHeader(modelHeader, "Read model header: '" + filepath + "'");
-        #endif
-
-        // Read the name
-        std::string modelName(modelHeader.nameLength, '\0');
-        file.read(&modelName[0], modelHeader.nameLength);
-
-
-        // Store header data
-        modelData.meshCount = modelHeader.meshCount;
-        modelData.meshes.resize(modelHeader.meshCount);
-        //modelData.name = modelName;
-        modelData.name = fileInfo.name;
-        modelData.aabbMin = modelHeader.aabbMin;
-        modelData.aabbMax = modelHeader.aabbMax;
-        modelData.timestamp = modelHeader.timestamp;
-
-        // Load each mesh
-        for (uint32_t i = 0; i < modelHeader.meshCount; ++i) {
-            MeshHeader meshHeader;
-            file.read((char*)&meshHeader.nameLength, sizeof(meshHeader.nameLength));
-            file.read((char*)&meshHeader.vertexCount, sizeof(meshHeader.vertexCount));
-            file.read((char*)&meshHeader.indexCount, sizeof(meshHeader.indexCount));
-            std::string meshName(meshHeader.nameLength, '\0');
-            file.read(&meshName[0], meshHeader.nameLength);
-            file.read(reinterpret_cast<char*>(&meshHeader.aabbMin), sizeof(glm::vec3));
-            file.read(reinterpret_cast<char*>(&meshHeader.aabbMax), sizeof(glm::vec3));
-            MeshData& meshData = modelData.meshes[i];
-            meshData.name = meshName;
-            meshData.vertexCount = meshHeader.vertexCount;
-            meshData.indexCount = meshHeader.indexCount;
-            meshData.vertices.resize(meshData.vertexCount);
-            meshData.indices.resize(meshData.indexCount);
-            meshData.aabbMin = meshHeader.aabbMin;
-            meshData.aabbMax = meshHeader.aabbMax;
-            file.read(reinterpret_cast<char*>(meshData.vertices.data()), meshHeader.vertexCount * sizeof(Vertex));
-            file.read(reinterpret_cast<char*>(meshData.indices.data()), meshHeader.indexCount * sizeof(uint32_t));
-
-            #if PRINT_MESH_HEADERS_ON_READ
-            PrintMeshHeader(meshHeader, "Read mesh: " + meshData.name);
-            #endif
-        }
-        file.close();
-
-        ExportModelV2(modelData);
-
-        return modelData;
-    }
-
-    ModelData ImportModelv2(const std::string& filepath) {
         ModelData modelData;
 
         // Bail if file does not exist
@@ -258,6 +143,23 @@ namespace File {
             std::cout << "File::ImportMovel() failed: " << filepath << " does not exist\n";
             return modelData;
         }
+
+        // Validate signature
+        std::string signature = ReadFileHeaderSignature(filepath);
+        if (!ValidateSignature(signature, HELL_MODEL_SIGNATURE)) {
+            std::cout << "File::ImportMovel() invalid ModelHeader signature '" << signature << "' for " << filepath << "\n";
+            return modelData;
+        }
+
+        // Validate version
+        uint32_t version = ReadFileHeaderVersion(filepath);
+        if (version == 0) {
+            std::cout << "File::ImportMovel() invalid ModelHeader version '" << version << "' for " << filepath << "\n";
+            return modelData;
+        }
+
+        // Get FileInfo to get the model name
+        FileInfo fileInfo = Util::GetFileInfoFromPath(filepath);
 
         // Attempt to load the file
         std::ifstream file(filepath, std::ios::binary);
@@ -267,36 +169,47 @@ namespace File {
         }
 
         // Read the header
-        ModelHeaderV2 modelHeader = ReadModelHeaderV2(filepath);
+        if (version == 2) {
+            ModelHeaderV2 modelHeader = ReadModelHeaderV2(filepath);
+            modelData.meshCount = modelHeader.meshCount;
+            modelData.armatureCount = 0;
+            modelData.meshes.resize(modelHeader.meshCount);
+            modelData.name = fileInfo.name;
+            modelData.aabbMin = modelHeader.aabbMin;
+            modelData.aabbMax = modelHeader.aabbMax;
+            modelData.timestamp = modelHeader.timestamp;
+            
+            file.seekg(sizeof(ModelHeaderV2), std::ios::beg);
 
-        // Bail if signature invalid
-        if (!CompareFileSignature(modelHeader.signature, HELL_MODEL_SIGNATURE)) {
-            std::cout << "File::ImportMovel() failed: invalid Modeleader signature '" << modelHeader.signature << "'\n";
-            return modelData;
+            #if PRINT_MODEL_HEADERS_ON_READ
+            PrintModelHeader(modelHeader, "Read model header in: " + filepath);
+            #endif
         }
+        else if (version == 3) {
+            ModelHeaderV3 modelHeader = ReadModelHeaderV3(filepath);
+            modelData.meshCount = modelHeader.meshCount;
+            modelData.armatureCount = modelHeader.armatureCount;
+            modelData.meshes.resize(modelHeader.meshCount);
+            modelData.name = fileInfo.name;
+            modelData.aabbMin = modelHeader.aabbMin;
+            modelData.aabbMax = modelHeader.aabbMax;
+            modelData.timestamp = modelHeader.timestamp;
 
-        #if PRINT_MODEL_HEADERS_ON_READ
-        PrintModelHeader(modelHeader, "Read model header in: " + filepath);
-        #endif
+            file.seekg(sizeof(ModelHeaderV3), std::ios::beg);
 
-        // Seek to the end of the header
-        file.seekg(sizeof(ModelHeaderV2), std::ios::beg);
-
-        FileInfo fileInfo = Util::GetFileInfoFromPath(filepath);
-
-        // Store header data
-        modelData.meshCount = modelHeader.meshCount;
-        modelData.meshes.resize(modelHeader.meshCount);
-        modelData.name = fileInfo.name;
-        modelData.aabbMin = modelHeader.aabbMin;
-        modelData.aabbMax = modelHeader.aabbMax;
-        modelData.timestamp = modelHeader.timestamp;
+            #if PRINT_MODEL_HEADERS_ON_READ
+            PrintModelHeader(modelHeader, "Read model header in: " + filepath);
+            #endif
+        }
+        else {
+            std::cout << "File::ImportMovel() failed to load '" << fileInfo.name << ".model, unsupported version '" << version << "'\n";
+        }
 
         // Resize meshes vector ready for import
         modelData.meshes.resize(modelData.meshCount);
 
         // Load each mesh
-        for (uint32_t i = 0; i < modelHeader.meshCount; ++i) {
+        for (uint32_t i = 0; i < modelData.meshCount; ++i) {
             MeshData& meshData = modelData.meshes[i];
 
             // Read the header
@@ -304,13 +217,10 @@ namespace File {
             file.read(reinterpret_cast<char*>(&meshHeader), sizeof(MeshHeaderV2));
 
             #if PRINT_MESH_HEADERS_ON_READ
-            //if (modelData.name == "Piano") {
-                PrintMeshHeader(meshHeader, "Read mesh: " + meshData.name);
-            //}
+            PrintMeshHeader(meshHeader, "Read mesh: " + meshData.name);
             #endif
 
             meshData.name.assign(meshHeader.name, strnlen(meshHeader.name, sizeof(meshHeader.name)));
-            //meshData.name = meshHeader.name;
             meshData.vertexCount = meshHeader.vertexCount;
             meshData.indexCount = meshHeader.indexCount;
             meshData.vertices.resize(meshData.vertexCount);
@@ -322,8 +232,57 @@ namespace File {
             meshData.inverseBindTransform = meshHeader.inverseBindTransform;
             file.read(reinterpret_cast<char*>(meshData.vertices.data()), meshHeader.vertexCount * sizeof(Vertex));
             file.read(reinterpret_cast<char*>(meshData.indices.data()), meshHeader.indexCount * sizeof(uint32_t));
-
         }
+
+        // Load each armature
+        modelData.armatures.resize(modelData.armatureCount);
+
+        for (uint32_t i = 0; i < modelData.armatureCount; ++i) {
+            ArmatureData& armatureData = modelData.armatures[i];
+
+            ArmatureHeader armatureHeader = {};
+            file.read(reinterpret_cast<char*>(&armatureHeader), sizeof(ArmatureHeader));
+        
+            #if PRINT_ARMATURE_HEADERS_ON_READ
+            PrintArmatureHeader(armatureHeader, "Read armature [" + std::to_string(i) + "] " + fileInfo.name + ".model");
+            #endif
+
+            armatureData.name.assign(armatureHeader.name, strnlen(armatureHeader.name, sizeof(armatureHeader.name)));
+            armatureData.boneCount = armatureHeader.boneCount;
+            armatureData.bones.resize(armatureHeader.boneCount);
+            file.read(reinterpret_cast<char*>(armatureData.bones.data()), armatureHeader.boneCount * sizeof(Bone));
+        }
+
+        if (version == 3 && true) {
+            std::cout << "\n";
+            std::cout << fileInfo.name << ".model\n";
+            std::cout << "meshCount: " << modelData.meshCount << "\n";
+            std::cout << "armatureCount: " << modelData.armatureCount << "\n";
+            std::cout << "\n";
+
+            for (MeshData& meshData : modelData.meshes) {
+                std::cout << "- " << meshData.name << "\n";
+                std::cout << "- " << meshData.vertexCount << " verts\n";
+                std::cout << "- " << meshData.indexCount << " indices\n";
+            }
+
+            for (ArmatureData& armatureData : modelData.armatures) {
+                std::cout << "- " << armatureData.name << "\n";
+                std::cout << "- " << armatureData.boneCount << " bones\n";
+
+                for (Bone& bone : armatureData.bones) {
+                    std::cout << "Name: " << bone.name << "\n";
+                    std::cout << "Parent: " << bone.parentIndex << "\n";
+                    std::cout << "Local Rest\n";
+                    std::cout << Util::Mat4ToString(bone.localRestPose);
+                    std::cout << "\nInverse Bind Pose\n";
+                    std::cout << Util::Mat4ToString(bone.localRestPose);
+                    std::cout << "\n\n";
+                }
+            }
+        }
+
+
         file.close();
 
         return modelData;

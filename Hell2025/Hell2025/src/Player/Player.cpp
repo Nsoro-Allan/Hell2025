@@ -104,36 +104,6 @@ void Player::Update(float deltaTime) {
             Audio::PlayAudio("RE_Beep.wav", 0.5);
         }
     }
-
-    if (World::HasOcean()) {
-        float feetHeight = GetFootPosition().y;
-        float waterHeight = Ocean::GetWaterHeightAtPlayer(m_viewportIndex);
-        m_waterState.feetUnderWaterPrevious = m_waterState.feetUnderWater;
-        m_waterState.cameraUnderWaterPrevious = m_waterState.cameraUnderWater;
-        m_waterState.wadingPrevious = m_waterState.wading;
-        m_waterState.swimmingPrevious = m_waterState.swimming;
-        m_waterState.cameraUnderWater = GetCameraPosition().y < waterHeight;
-        m_waterState.feetUnderWater = GetFootPosition().y < waterHeight;
-        m_waterState.heightAboveWater = (GetFootPosition().y > waterHeight) ? (GetFootPosition().y - waterHeight) : 0.0f;
-        m_waterState.heightBeneathWater = (GetFootPosition().y < waterHeight) ? (waterHeight - GetFootPosition().y) : 0.0f;
-        m_waterState.swimming = m_waterState.cameraUnderWater && IsMoving();
-        m_waterState.wading = !m_waterState.cameraUnderWater && m_waterState.feetUnderWater && IsMoving() && feetHeight < waterHeight - 0.5f;
-    } 
-    else {
-        m_waterState.feetUnderWaterPrevious = false;
-        m_waterState.cameraUnderWaterPrevious = false;
-        m_waterState.wadingPrevious = false;
-        m_waterState.swimmingPrevious = false;
-        m_waterState.cameraUnderWater = false;
-        m_waterState.feetUnderWater = false;
-        m_waterState.heightAboveWater = 0.0f;
-        m_waterState.heightBeneathWater = 0.0f;
-        m_waterState.swimming = false;
-        m_waterState.wading = false;
-    }
-
-    // Weapon audio frequency (for under water)
-    m_weaponAudioFrequency = CameraIsUnderwater() ? 0.4f : 1.0f;
  
     UpdateMovement(deltaTime);
     UpdateHeadBob(deltaTime);
@@ -153,6 +123,37 @@ void Player::Update(float deltaTime) {
     UpdatePlayingPiano(deltaTime);
     UpdateCharacterModelHacks();
     UpdateMelleBulletWave(deltaTime);
+
+
+    if (World::HasOcean()) {
+        float feetHeight = GetFootPosition().y;
+        float waterHeight = Ocean::GetWaterHeightAtPlayer(m_viewportIndex);
+        m_waterState.feetUnderWaterPrevious = m_waterState.feetUnderWater;
+        m_waterState.cameraUnderWaterPrevious = m_waterState.cameraUnderWater;
+        m_waterState.wadingPrevious = m_waterState.wading;
+        m_waterState.swimmingPrevious = m_waterState.swimming;
+        m_waterState.cameraUnderWater = GetCameraPosition().y < waterHeight;
+        m_waterState.feetUnderWater = GetFootPosition().y < waterHeight;
+        m_waterState.heightAboveWater = (GetFootPosition().y > waterHeight) ? (GetFootPosition().y - waterHeight) : 0.0f;
+        m_waterState.heightBeneathWater = (GetFootPosition().y < waterHeight) ? (waterHeight - GetFootPosition().y) : 0.0f;
+        m_waterState.swimming = m_waterState.cameraUnderWater && IsMoving();
+        m_waterState.wading = !m_waterState.cameraUnderWater && m_waterState.feetUnderWater && IsMoving() && feetHeight < waterHeight - 0.5f;
+    }
+    else {
+        m_waterState.feetUnderWaterPrevious = false;
+        m_waterState.cameraUnderWaterPrevious = false;
+        m_waterState.wadingPrevious = false;
+        m_waterState.swimmingPrevious = false;
+        m_waterState.cameraUnderWater = false;
+        m_waterState.feetUnderWater = false;
+        m_waterState.heightAboveWater = 0.0f;
+        m_waterState.heightBeneathWater = 0.0f;
+        m_waterState.swimming = false;
+        m_waterState.wading = false;
+    }
+
+    // Weapon audio frequency (for under water)
+    m_weaponAudioFrequency = CameraIsUnderwater() ? 0.4f : 1.0f;
 
     if (m_infoTextTimer > 0) {
         m_infoTextTimer -= deltaTime;

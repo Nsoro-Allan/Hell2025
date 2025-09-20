@@ -187,22 +187,26 @@ namespace Audio {
 
     uint64_t LoopAudio(const std::string& filename, float volume) {
         // Load if needed
-        if (g_loadedAudio.find(filename) == g_loadedAudio.end()) {
-            LoadAudio(filename);
-        }
-        uint64_t uniqueId = UniqueID::GetNext();
-        AudioHandle& handle = g_playingAudio[uniqueId];
+        if (g_loadedAudio.find(filename) == g_loadedAudio.end()) LoadAudio(filename);
 
-        handle.state = AudioHandle::State::LOOPING;
-        handle.sound = g_loadedAudio[filename];
-        handle.filename = filename;
-        handle.channel->setMode(FMOD_LOOP_NORMAL);
-        handle.sound->setMode(FMOD_LOOP_NORMAL);
-        handle.sound->setLoopCount(-1);
-        g_system->playSound(handle.sound, nullptr, false, &handle.channel);
-        handle.channel->setVolume(volume);
+        uint64_t id = UniqueID::GetNext();
+        AudioHandle& h = g_playingAudio[id];
+        h.state = AudioHandle::State::LOOPING;
+        h.sound = g_loadedAudio[filename];
+        h.filename = filename;
 
-        return uniqueId;
+        // Start paused to configure the channel safely
+        FMOD_RESULT r = g_system->playSound(h.sound, nullptr, true, &h.channel);
+        if (r != FMOD_OK || !h.channel) { std::cout << "playSound failed\n"; return 0; }
+
+        // Per channel loop config
+        h.channel->setMode(FMOD_LOOP_NORMAL);
+        h.channel->setLoopCount(-1);
+        h.channel->setVolume(volume);
+
+        // Unpause to play
+        h.channel->setPaused(false);
+        return id;
     }
 
     void StopAudio(const std::string& filename) {

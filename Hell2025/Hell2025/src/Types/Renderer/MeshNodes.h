@@ -40,6 +40,8 @@ struct MeshNodes {
     glm::mat4 GetInverseBindTransform(int nodeIndex);
     glm::mat4 GetMeshModelMatrix(int nodeIndex);
 
+    const ArmatureData& GetArmature() const                                 { return m_armatureData; }
+    const std::string& GetModelName() const                                 { return m_modelName; }
     const size_t GetNodeCount() const                                       { return m_nodeCount; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_renderItems; }
     const std::vector<RenderItem>& GetRenderItemsBlended()const             { return m_renderItemsBlended; }
@@ -48,8 +50,9 @@ struct MeshNodes {
     const std::vector<RenderItem>& GetRenderItemsHairBottomLayer() const    { return m_renderItemsHairBottomLayer; }
 
 private:
+    ArmatureData m_armatureData;
     uint32_t m_nodeCount = 0;
-    std::string m_modelName = "UNDEFINED\n";
+    std::string m_modelName = UNDEFINED_STRING;
     std::vector<RenderItem> m_renderItems;
     std::vector<RenderItem> m_renderItemsBlended;
     std::vector<RenderItem> m_renderItemsAlphaDiscarded;

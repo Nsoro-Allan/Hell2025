@@ -242,7 +242,7 @@ namespace Game {
         Audio::PlayAudio(indoorFootstepFilenames[random], 0.5f);
     }
 
-    void UpdateAudioLoops() {
+    void UpdateAudioLoops555() {
         // Under water loop
         bool playersUnderWater = false;
         for (Player& player : g_localPlayers) {
@@ -261,6 +261,38 @@ namespace Game {
         // Wading loop
         Player& player = g_localPlayers[0]; // WARNNG!!! Only works for player 0
         if (player.IsWading()) {
+            Audio::LoopAudioIfNotPlaying("Water_PaddlingLoop_1.wav", 1.0);
+        }
+        else {
+            Audio::StopAudio("Water_PaddlingLoop_1.wav");
+        }
+    }
+
+    void UpdateAudioLoops() {
+        bool playersUnderWater = false;
+        bool playersWading = false;
+
+        for (Player& player : g_localPlayers) {
+            // Under water
+            if (player.CameraIsUnderwater() && player.ViewportIsVisible() && player.IsAlive()) {
+                playersUnderWater = true;
+            }
+            // Wading
+            if (player.IsWading()) {
+                playersWading = true;
+            }
+        }
+
+        // Under water
+        if (playersUnderWater && g_totalTime > 1.0f) {
+            Audio::LoopAudioIfNotPlaying("Water_AmbientLoop.wav", 1.0);
+        }
+        else {
+            Audio::StopAudio("Water_AmbientLoop.wav");
+        }
+
+        // Wading
+        if (playersWading) {
             Audio::LoopAudioIfNotPlaying("Water_PaddlingLoop_1.wav", 1.0);
         }
         else {

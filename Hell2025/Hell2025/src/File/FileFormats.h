@@ -6,26 +6,28 @@
 inline const char HEIGHT_MAP_SIGNATURE[] = "HELL_HEIGHT_MAP";
 #define HELL_NAME_BUFFER_SIZE 256
 #define HELL_SIGNATURE_BUFFER_SIZE 32
+#define HELL_ARMATURE_SIGNATURE "HELL_ARMATURE"
 #define HELL_MODEL_BVH_SIGNATURE "HELL_MODEL_BVH"
 #define HELL_MODEL_SIGNATURE "HELL_MODEL"
 #define HELL_MESH_SIGNATURE "HELL_MESH"
 #define HELL_MESH_BVH_SIGNATURE  "HELL_MESH_BVH"
 
 #pragma pack(push, 1)
-struct ModelHeader {
-    char signature[10];     // "HELL_MODEL" 10 bytes
-    uint32_t version;
-    uint32_t meshCount;
-    uint32_t nameLength;
-    uint64_t timestamp;
-    glm::vec3 aabbMin;
-    glm::vec3 aabbMax;
-};
 
 struct ModelHeaderV2 {
     char signature[32];
     uint32_t version;
     uint32_t meshCount;
+    uint64_t timestamp;
+    glm::vec3 aabbMin;
+    glm::vec3 aabbMax;
+};
+
+struct ModelHeaderV3 {
+    char signature[32];
+    uint32_t version;
+    uint32_t meshCount;
+    uint32_t armatureCount;
     uint64_t timestamp;
     glm::vec3 aabbMin;
     glm::vec3 aabbMax;
@@ -43,14 +45,6 @@ struct MeshHeaderV2 {
     glm::mat4 inverseBindTransform;
 };
 
-struct MeshHeader {
-    uint32_t nameLength;
-    uint32_t vertexCount;
-    uint32_t indexCount;
-    glm::vec3 aabbMin;
-    glm::vec3 aabbMax;
-};
-
 struct SkinnedModelHeader {
     char signature[18];     // "HELL_SKINNED_MODEL" 18 bytes
     uint32_t version;
@@ -62,7 +56,6 @@ struct SkinnedModelHeader {
     uint32_t boneCount;
     uint64_t timestamp;
 };
-
 
 struct SkinnedMeshHeader {
     uint32_t nameLength;
@@ -91,6 +84,13 @@ struct MeshBvhHeader {
     uint64_t floatCount;
     uint64_t nodeCount;
 };
+
+struct ArmatureHeader {
+    char signature[32];
+    char name[256];
+    uint32_t boneCount;
+};
+
 #pragma pack(pop)
 
 struct MeshData {
@@ -117,11 +117,19 @@ struct SkinnedMeshData {
     uint32_t localBaseVertex;
 };
 
+struct ArmatureData {
+    std::string name = UNDEFINED_STRING;
+    uint32_t boneCount = 0;
+    std::vector<Bone> bones;
+};
+
 struct ModelData {
     std::string name;
     uint32_t meshCount;
+    uint32_t armatureCount;
     uint64_t timestamp;
     std::vector<MeshData> meshes;
+    std::vector<ArmatureData> armatures;
     glm::vec3 aabbMin = glm::vec3(std::numeric_limits<float>::max());
     glm::vec3 aabbMax = glm::vec3(-std::numeric_limits<float>::max());
 };

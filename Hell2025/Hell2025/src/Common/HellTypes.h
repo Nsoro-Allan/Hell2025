@@ -668,3 +668,11 @@ struct InventoryItemInfo {
     std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
     std::vector<std::string> m_supportedAttachments;
 };
+
+struct Bone {
+    char name[64];
+    glm::mat4 localRestPose = glm::mat4(1.0f);
+    glm::mat4 inverseBindPose = glm::mat4(1.0f);
+    int32_t parentIndex = -1;
+    int32_t deformFlag = 0; // 0: non-deforming 1: deforming
+};

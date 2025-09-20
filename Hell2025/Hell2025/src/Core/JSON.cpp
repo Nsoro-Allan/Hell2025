@@ -153,7 +153,7 @@ namespace nlohmann {
         info.textureOffsetV = j.value("TextureOffsetV", 0.0f);
         info.textureRotation = j.value("TextureRotation", 0.0f);
         info.ceilingTrimType = Util::StringToTrimType(j.value("TrimTypeCeiling", "NONE"));
-        info.floorTrimType = Util::StringToTrimType(j.value("TrimTypeCeiling", "NONE"));
+        info.floorTrimType = Util::StringToTrimType(j.value("TrimTypeFloor", "NONE"));
         info.wallType = Util::StringToWallType(j.value("WallType", "NONE"));
         info.useReversePointOrder = j.value("UseReversePointOrder", false);
     }

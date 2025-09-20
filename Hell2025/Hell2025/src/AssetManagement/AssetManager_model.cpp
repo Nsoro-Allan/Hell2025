@@ -9,6 +9,7 @@ namespace AssetManager {
     void PrintModelMeshNames(Model* model) {
         if (!model) {
             std::cout << "AssetManager::PrintModelMeshNames() failed coz model param was nullptr\n";
+            return;
         }
 
         std::cout << model->GetName() << "\n";
@@ -47,7 +48,7 @@ namespace AssetManager {
         const FileInfo& fileInfo = model->GetFileInfo();
         std::string modelPath = "res/models/" + fileInfo.name + "." + fileInfo.ext;
         std::string bvhPath = "res/models/bvh/" + fileInfo.name + ".bvh";
-        model->m_modelData = File::ImportModelv2(modelPath);
+        model->m_modelData = File::ImportModel(modelPath);
         model->m_modelBvhData = File::ImportModelBvh(bvhPath);
         model->SetLoadingState(LoadingState::LOADING_COMPLETE);
     }
@@ -94,11 +95,25 @@ namespace AssetManager {
 
             // If the file exists..
             if (Util::FileExists(bvhPath)) {
-                ModelHeaderV2 modelHeader = File::ReadModelHeaderV2(modelPath);
-                ModelBvhHeader modelBvhHeader = File::ReadModelBvhHeader(bvhPath);
-                
+                uint64_t timestamp = 0;
+                uint32_t version = File::ReadFileHeaderVersion(modelPath);
+
+                if (version == 2) {
+                    ModelHeaderV2 modelHeader = File::ReadModelHeaderV2(modelPath);
+                    timestamp = modelHeader.timestamp;
+                }
+                else if (version == 3) {
+                    ModelHeaderV3 modelHeader = File::ReadModelHeaderV3(modelPath);
+                    timestamp = modelHeader.timestamp;
+                }
+                else {
+                    std::cout << "ExportMissingModelBvhs() failed to export bvh for '" << fileInfo.name << ".model' because invalid version '" << version << "'\n";
+                    continue;
+                }
+
                 // ... but timestamps don't match, then delete the old bvh file and trigger a re-export
-                if (modelHeader.timestamp != modelBvhHeader.timestamp) {
+                ModelBvhHeader modelBvhHeader = File::ReadModelBvhHeader(bvhPath);
+                if (timestamp != modelBvhHeader.timestamp) {
                     File::DeleteFile(bvhPath);
                     exportRequired = true;
                 }
@@ -110,7 +125,7 @@ namespace AssetManager {
 
             // Export the bvh from re-imported model data, not the most optimal, but this only happens once when there is no .bvh file
             if (exportRequired) {
-                ModelData modelData = File::ImportModelv2(modelPath);
+                ModelData modelData = File::ImportModel(modelPath);
                 File::ExportModelBvh(modelData);
             }
         }
@@ -120,6 +135,9 @@ namespace AssetManager {
         std::vector<Model>& models = GetModels();
 
         for (Model& model : models) {
+            // Skip primitives
+            if (model.GetName() == "Primitives") continue;
+
             // Quick error check that bvh count matches mesh count
             if (model.m_modelBvhData.bvhs.size() != model.GetMeshCount()) {
                 std::cout << "CopyInAllLoadedModelBvhData() error: bvh count does not equal mesh count for " << model.GetName() << "\n";

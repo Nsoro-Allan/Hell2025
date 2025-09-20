@@ -617,6 +617,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\gl_lighting.vert" />
     <None Include="src\Python\BlenderModelExportV2.py" />
     <None Include="src\Python\BlenderModelExportV2_indentity_transforms.py" />
+    <None Include="src\Python\BlenderModelExportV3.py" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\Types\GL_shadow_map_array.h" />

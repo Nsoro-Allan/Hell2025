@@ -75,11 +75,13 @@ namespace AssetManager {
 
     Texture* GetTextureByIndex(int index) {
         std::vector<Texture>& textures = GetTextures();
-        if (index != -1) {
-            return &textures[index];
+
+        if (index < 0 || index >= textures.size()) {
+            std::cout << "AssetManager::GetTextureByIndex() failed because index '" << index << "' was out of range of size " << textures.size() << "\n";
+            return nullptr;
         }
-        std::cout << "AssetManager::GetTextureByIndex() failed because index was -1\n";
-        return nullptr;
+        
+        return &textures[index];
     }
 
     int GetTextureCount() {
