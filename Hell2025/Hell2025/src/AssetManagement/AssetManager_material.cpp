@@ -32,24 +32,55 @@ namespace AssetManager {
     void BuildMaterials() {
         std::vector<Material>& materials = GetMaterials();
         std::vector<Texture>& textures = GetTextures();
-        materials.clear();
-        for (Texture& texture : textures) {
-            if (FileInfoIsAlbedoTexture(texture.GetFileInfo())) {
-                Material& material = materials.emplace_back(Material());
-                material.m_name = GetMaterialNameFromFileInfo(texture.GetFileInfo());
-                int basecolorIndex = GetTextureIndexByName(material.m_name + "_ALB", true);
-                int normalIndex = GetTextureIndexByName(material.m_name + "_NRM", true);
-                int rmaIndex = GetTextureIndexByName(material.m_name + "_RMA", true);
-                material.m_basecolor = basecolorIndex;
-                material.m_normal = (normalIndex != -1) ? normalIndex : GetTextureIndexByName("DefaultNRM");
-                material.m_rma = (rmaIndex != -1) ? rmaIndex : GetTextureIndexByName("DefaultRMA");
+
+        // Defaults
+        int defaultNormal = -1;
+        int defaultRma = -1;
+        for (int i = 0; i < textures.size(); i++) {
+            if (textures[i].GetFileName() == "DefaultNRM") {
+                defaultNormal = i;
+            }
+            if (textures[i].GetFileName() == "DefaultRMA") {
+                defaultRma = i;
             }
         }
-    }
 
-    void BuildGoldenMaterialVariants() {
-        CreateGoldenVariant("Glock", "GoldenGlock");
-        CreateGoldenVariant("Bench", "GoldenBench");
+        // Look for textures with _ALB suffix, create a material, and search for accompaning _NRM & _RMA textures
+        materials.clear();
+
+        for (int i = 0; i < textures.size(); i++) {
+            Texture& texture = textures[i];
+
+            if (FileInfoIsAlbedoTexture(texture.GetFileInfo())) {
+                Material& material = materials.emplace_back(Material());
+
+                material.m_name = GetMaterialNameFromFileInfo(texture.GetFileInfo());
+                material.m_basecolor = i;
+                material.m_normal = defaultNormal;
+                material.m_rma = defaultRma;
+
+                for (int j = 0; j < textures.size(); j++) {
+                    if (textures[j].GetFileName() == material.m_name + "_ALB") {
+                        material.m_basecolor = j;
+                        break;
+                    }
+                }
+
+                for (int j = 0; j < textures.size(); j++) {
+                    if (textures[j].GetFileName() == material.m_name + "_NRM") {
+                        material.m_normal = j;
+                        break;
+                    }
+                }
+
+                for (int j = 0; j < textures.size(); j++) {
+                    if (textures[j].GetFileName() == material.m_name + "_RMA") {
+                        material.m_rma = j;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     Material* GetDefaultMaterial() {

@@ -67,19 +67,14 @@ namespace OpenGLRenderer {
         }
 
 
-
-
-
-
+        waterFrameBuffer->Bind();
+        waterFrameBuffer->DrawBuffers({ "Color", "UnderwaterMask", "WorldPosition" });
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (!viewport->IsVisible()) continue;
 
             OpenGLRenderer::BlitFrameBufferDepth(gBuffer, waterFrameBuffer);
-
-            waterFrameBuffer->Bind();
-            waterFrameBuffer->DrawBuffers({ "Color", "UnderwaterMask", "WorldPosition" });
             OpenGLRenderer::SetViewport(waterFrameBuffer, viewport);
          
             const ViewportData& viewportData = RenderDataManager::GetViewportData()[i];

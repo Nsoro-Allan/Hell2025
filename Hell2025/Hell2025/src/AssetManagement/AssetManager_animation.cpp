@@ -9,8 +9,8 @@ namespace AssetManager {
 
     void LoadPendingAnimationsAsync() {
         for (Animation& animation : GetAnimations()) {
-            if (animation.GetLoadingState() == LoadingState::AWAITING_LOADING_FROM_DISK) {
-                animation.SetLoadingState(LoadingState::LOADING_FROM_DISK);
+            if (animation.GetLoadingState() == LoadingState::Value::AWAITING_LOADING_FROM_DISK) {
+                animation.SetLoadingState(LoadingState::Value::LOADING_FROM_DISK);
                 AddItemToLoadLog(animation.GetFileInfo().path);
                 //std::async(std::launch::async, LoadAnimation, &animation);
                 LoadAnimation(&animation);
@@ -93,7 +93,7 @@ namespace AssetManager {
         // Store it
         m_AnimationImporter.FreeScene();
 
-        animation->SetLoadingState(LoadingState::LOADING_COMPLETE);
+        animation->SetLoadingState(LoadingState::Value::LOADING_COMPLETE);
     }
 
     Animation* AssetManager::GetAnimationByName(const std::string& name) {

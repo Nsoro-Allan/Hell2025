@@ -41,9 +41,18 @@ void AnimatedGameObject::UpdateRenderItems() {
             RenderItem& renderItem = m_renderItems.emplace_back();
             SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(m_meshRenderingEntries[i].meshIndex);
             Material* material = AssetManager::GetMaterialByIndex(m_meshRenderingEntries[i].materialIndex);
-            renderItem.baseColorTextureIndex = material->m_basecolor;
+
+            if (m_isGold) {
+                static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
+                renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
+                renderItem.rmaTextureIndex = goldMaterial->m_rma;
+            }
+            else {
+                renderItem.baseColorTextureIndex = material->m_basecolor;
+                renderItem.rmaTextureIndex = material->m_rma;
+            }
+
             renderItem.normalMapTextureIndex = material->m_normal;
-            renderItem.rmaTextureIndex = material->m_rma;
             renderItem.modelMatrix = GetModelMatrix();
             renderItem.inverseModelMatrix = glm::inverse(GetModelMatrix());
             renderItem.meshIndex = m_skinnedModel->GetMeshIndices()[i];
@@ -557,4 +566,8 @@ void AnimatedGameObject::SubmitForSkinning() {
 
 void AnimatedGameObject::SetBaseTransfromIndex(int index) {
     baseTransformIndex = index;
+}
+
+void AnimatedGameObject::SetGoldFlag(bool flag) {
+    m_isGold = flag;
 }

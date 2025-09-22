@@ -1,23 +1,24 @@
 #pragma once
+#include "File/FileFormats.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
-#include "File/FileFormats.h"
+#include "LoadingState.h"
+#include "Mesh.h"
+
+#include <limits>
 #include <string>
 #include <vector>
-#include <limits>
-#include <glm/glm.hpp>
-#include "Mesh.h"
 
 struct Model {
     Model() = default;
 
     void SetFileInfo(FileInfo fileInfo);
     void AddMeshIndex(uint32_t index);
-    void SetLoadingState(LoadingState loadingState);
     void SetName(std::string modelName);
     void SetAABB(glm::vec3 aabbMin, glm::vec3 aabbMax);
-    
-    const LoadingState& GetLoadingState() const               { return m_loadingState; }
+    void SetLoadingState(LoadingState loadingState);
+
+    LoadingState GetLoadingState() const;
     const FileInfo& GetFileInfo() const                       { return m_fileInfo; }
     const size_t GetMeshCount()  const                        { return m_meshIndices.size(); }
     const glm::vec3& GetAABBMin() const                       { return m_aabbMin; }
@@ -33,10 +34,10 @@ struct Model {
 
 
 private:
+    FileInfo m_fileInfo;
+    LoadingState m_loadingState{ LoadingState::Value::AWAITING_LOADING_FROM_DISK };
     glm::vec3 m_aabbMin = glm::vec3(std::numeric_limits<float>::max());
     glm::vec3 m_aabbMax = glm::vec3(-std::numeric_limits<float>::max());
     std::string m_name = "undefined";
     std::vector<uint32_t> m_meshIndices;
-    FileInfo m_fileInfo;
-    LoadingState m_loadingState = LoadingState::AWAITING_LOADING_FROM_DISK;
 };

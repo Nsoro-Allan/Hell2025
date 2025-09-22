@@ -1,5 +1,6 @@
 #pragma once
 #include "HellTypes.h"
+#include "LoadingState.h"
 #include <map>
 
 struct SQT {
@@ -27,13 +28,14 @@ struct Animation {
     std::map<const char*, unsigned int> m_NodeMapping;
 
     void SetFileInfo(FileInfo fileInfo);
-    void SetLoadingState(LoadingState loadingState);
+    void SetLoadingState(LoadingState value);
+
     FileInfo GetFileInfo();
-    LoadingState& GetLoadingState();
+    LoadingState GetLoadingState() const;
     float GetTicksPerSecond();
     const std::string& GetName();
 
 private:
     FileInfo m_fileInfo;
-    LoadingState m_loadingState = LoadingState::AWAITING_LOADING_FROM_DISK;
+    LoadingState m_loadingState { LoadingState::Value::AWAITING_LOADING_FROM_DISK };
 };

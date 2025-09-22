@@ -25,8 +25,8 @@ namespace AssetManager {
         std::vector<std::future<void>> futures;
 
         for (Texture& texture : textures) {
-            if (texture.GetLoadingState() == LoadingState::AWAITING_LOADING_FROM_DISK) {
-                texture.SetLoadingState(LoadingState::LOADING_FROM_DISK);
+            if (texture.GetLoadingState() == LoadingState::Value::AWAITING_LOADING_FROM_DISK) {
+                texture.SetLoadingState(LoadingState::Value::LOADING_FROM_DISK);
                 futures.emplace_back(std::async(std::launch::async, LoadTexture, &texture));
             }
         }

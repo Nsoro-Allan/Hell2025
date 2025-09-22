@@ -163,6 +163,7 @@ struct PickUpCreateInfo {
     glm::vec3 rotation = glm::vec3(0.0f);
     glm::vec3 intitialForce = glm::vec3(0.0f);
     std::string pickUpType = "";
+    bool isGold = false;
 };
 
 struct PictureFrameCreateInfo {

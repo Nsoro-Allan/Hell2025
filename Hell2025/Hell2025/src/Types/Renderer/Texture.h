@@ -1,5 +1,6 @@
 #pragma once
 #include "HellEnums.h"
+#include "LoadingState.h"
 #include <string>
 #include <memory>
 #include "../API/OpenGL/Types/gl_texture.h"
@@ -9,7 +10,7 @@ struct Texture {
 public:
     Texture() = default;
     void Load();
-    void SetLoadingState(LoadingState loadingState);
+    void SetLoadingState(LoadingState value);
     void SetFileInfo(FileInfo fileInfo);
     void SetImageDataType(ImageDataType imageDataType);
     void SetTextureWrapMode(TextureWrapMode wrapMode);
@@ -35,13 +36,13 @@ public:
     const void* GetData(int mipmapLevel);
     const std::string& GetFileName();
     const std::string& GetFilePath();
-    const LoadingState GetLoadingState();
     const BakeState GetTextureDataLevelBakeState(int index);
     const FileInfo GetFileInfo();
     const ImageDataType GetImageDataType();
     const TextureWrapMode GetTextureWrapMode();
     const TextureFilter GetMinFilter();
     const TextureFilter GetMagFilter();
+    LoadingState GetLoadingState() const;
     OpenGLTexture& GetGLTexture();
     VulkanTexture& GetVKTexture();
 
@@ -49,7 +50,7 @@ public:
 private:
     OpenGLTexture m_glTexture;
     VulkanTexture m_vkTexture;
-    LoadingState m_loadingState = LoadingState::AWAITING_LOADING_FROM_DISK;
+    LoadingState m_loadingState { LoadingState::Value::AWAITING_LOADING_FROM_DISK };
     ImageDataType m_imageDataType = ImageDataType::UNDEFINED;
     TextureWrapMode m_wrapMode = TextureWrapMode::REPEAT;
     TextureFilter m_minFilter = TextureFilter::NEAREST;

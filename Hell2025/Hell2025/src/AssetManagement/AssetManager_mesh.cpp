@@ -31,6 +31,7 @@ namespace AssetManager {
         allVertices.insert(std::end(allVertices), std::begin(vertices), std::end(vertices));
         allIndices.reserve(allIndices.size() + indices.size());
         allIndices.insert(std::end(allIndices), std::begin(indices), std::end(indices));
+
         g_nextVertexInsert += mesh.vertexCount;
         g_nextIndexInsert += mesh.indexCount;
 

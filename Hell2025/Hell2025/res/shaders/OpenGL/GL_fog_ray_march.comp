@@ -19,19 +19,19 @@ uniform bool u_isSplitscreen;
 uniform float u_time;
 
 const vec3 fogSpeed = vec3(0.10, 0.02, 0.10);
-vec3 fogColor = vec3(0.222, 0.233, 0.260) * 0.5325;
+vec3 fogColor = vec3(0.222, 0.233, 0.260) * 0.5325 * 0.35;
 
-const float MAX_FOG_DIST = 30.0;      
+const float MAX_FOG_DIST = 15.0;      
 const int NUM_STEPS = 48;     
 
 const float nearFadeAmbient = 1.0;
 const float farFadeAmbient = MAX_FOG_DIST;
 
-const float nearFadeFlashlight = 0.5;
+const float nearFadeFlashlight = 0.05;
 const float farFadeFlashlight = 5;
 
-const float noiseScaleXZ = 1.0 / 8.0; // repeat every x metres and x == (1 / y)
-const float noiseScaleY = 1.0 / 6.0; // repeat every x metres and x == (1 / y)
+const float noiseScaleXZ = 1.0 / 8.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
+const float noiseScaleY = 1.0 / 4.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
 
 
 float dt = MAX_FOG_DIST / float(NUM_STEPS); 
@@ -193,7 +193,10 @@ void main() {
         // Lambert
         float irradiance = lightAttenuation * spotFactor;        
         vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
-                
+        
+        // Hack
+        flashlightLighting *= 0.275;                
+
         // Total in scattering at this step
         float fogStrength = 0.5;
         vec3 insc = (ambientFogColor + flashlightLighting) * fogStrength; 

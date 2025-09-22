@@ -246,6 +246,15 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         //    material = AssetManager::GetMaterialByName("TreeLarge_0");
         //}
 
+
+        if (mesh->GetName() == "ReflectorPole") {
+            material = AssetManager::GetMaterialByName("White");
+        }
+        if (mesh->GetName() == "ReflectorRed") {
+            material = AssetManager::GetMaterialByName("Red");
+        }
+
+
         RenderItem renderItem;
         renderItem.objectType = (int)m_objectTypes[i];
         renderItem.modelMatrix = worldMatrix * meshModelMatrix;
@@ -254,6 +263,7 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         renderItem.baseColorTextureIndex = material->m_basecolor;
         renderItem.normalMapTextureIndex = material->m_normal;
         renderItem.rmaTextureIndex = material->m_rma;
+
 
         // If this object is gold, replace basecolor and rma textures with that of gold material, normal map does not change
         if (m_isGold) {

@@ -34,17 +34,14 @@ GameObjectCreateInfo GameObject::GetCreateInfo() {
 void GameObject::Update(float deltaTime) {
     
     if (m_meshNodes.GetModelName() == "Fence") {
-
         m_transform.rotation.x = 0.01f;
 
         for (const Bone& bone : m_meshNodes.GetArmature().bones) {
-
             const glm::mat4 rest = GetModelMatrix() * bone.localRestPose;
             glm::vec3 p = rest[3];
 
             Renderer::DrawPoint(p, RED);
         }
-
     }
 
 }

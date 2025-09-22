@@ -31,6 +31,7 @@ private:
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
     std::vector<RenderItem> m_renderItems;
     //bool m_markedForRemoval = false;
+    bool m_isGold = false;
 
     void SetModel(const std::string& modelName);
     void SetMeshMaterial(const std::string& meshName, const std::string& materialName);

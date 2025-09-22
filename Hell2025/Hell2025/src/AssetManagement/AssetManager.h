@@ -33,7 +33,6 @@ namespace AssetManager {
     Material* GetMaterialByName(const std::string& name);
     int GetMaterialIndexByName(const std::string& name);
     std::string GetMaterialNameByIndex(int index);
-    void BuildGoldenMaterialVariants();
 
     // Mesh
     std::vector<Mesh>& GetMeshes();
@@ -108,8 +107,8 @@ namespace AssetManager {
     void LoadTexture(Texture* texture);
 
     // Baking
-    void BakePendingModels();
-    void BakeModel(Model& model);
+    void BakeModels();
+    void BakeSkinnedModels();
 
     // Import/Export
     void ExportMissingModels();

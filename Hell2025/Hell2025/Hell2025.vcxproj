@@ -623,6 +623,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\API\OpenGL\Types\GL_shadow_map_array.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_texture_3d.h" />
     <ClInclude Include="src\Bvh\Gpu\Bvh.h" />
+    <ClInclude Include="src\Common\CopyableAtomic.h" />
     <ClInclude Include="src\Common\HellGlm.h" />
     <ClInclude Include="src\API\OpenGL\GL_backend.h" />
     <ClInclude Include="src\API\OpenGL\Renderer\GL_renderer.h" />
@@ -666,6 +667,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Common\CreateInfo.h" />
     <ClInclude Include="src\Common\HellDefines.h" />
     <ClInclude Include="src\Common\HellFunctionTypes.h" />
+    <ClInclude Include="src\Common\LoadingState.h" />
     <ClInclude Include="src\Config\Config.h" />
     <ClInclude Include="src\Audio\Audio.h" />
     <ClInclude Include="src\AssetManagement\BakeQueue.h" />

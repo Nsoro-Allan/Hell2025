@@ -140,6 +140,7 @@ void Player::SwitchWeapon(const std::string& name, WeaponAction weaponAction) {
     viewWeapon->SetName(weaponInfo->name);
     viewWeapon->SetSkinnedModel(weaponInfo->modelName);
     viewWeapon->EnableDrawingForAllMesh();
+    viewWeapon->SetGoldFlag(weaponInfo->isGold);
 
     // Set materials
     for (auto& it : weaponInfo->meshMaterials) {
@@ -365,6 +366,7 @@ void Player::DropWeapons() {
                 createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.pickUpType = weaponInfo->pickupName;
+                createInfo.isGold = weaponInfo->isGold;
 
                 createInfo.intitialForce.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
                 createInfo.intitialForce.y = 1.0f;

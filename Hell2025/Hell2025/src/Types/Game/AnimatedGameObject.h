@@ -64,6 +64,7 @@ public:
     void EnableBlendingByMeshIndex(int index);
     void SetAdditiveTransform(const std::string& nodeName, const glm::mat4& matrix);
     void PauseAllAnimationLayers();
+    void SetGoldFlag(bool flag);
 
     bool AnimationIsPastFrameNumber(const std::string& animationLayerName, int frameNumber);
     bool AnimationByNameIsComplete(const std::string& name);
@@ -79,6 +80,7 @@ public:
     const uint32_t GetVerteXCount();
 
     SkinnedModel* GetSkinnedModel()                                 { return m_skinnedModel; }
+    bool IsGold() const                                             { return m_isGold; }
     const uint64_t& GetObjectId() const                             { return m_objectId; }
     const uint64_t& GetRagdollId() const                            { return m_ragdollId; }
     const uint32_t GetBaseTransfromIndex() const                    { return baseTransformIndex; }
@@ -111,4 +113,5 @@ private:
     uint32_t m_exclusiveViewportIndex = -1;
     uint32_t baseTransformIndex = -1;
     bool m_useCameraMatrix = false;
+    bool m_isGold = false;
 };

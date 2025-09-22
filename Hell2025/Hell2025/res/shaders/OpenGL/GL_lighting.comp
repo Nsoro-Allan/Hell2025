@@ -145,7 +145,24 @@ vec3 ShadowCalculationCSM(vec3 fragPosWorldSpace, vec3 normal, vec3 lightDir, ma
     return vec3(result);
 }
 
+vec3 retroBRDF(vec3 albedo, vec3 L, vec3 V, vec3 N, float mask, float retroSharpness, float retroGain) {
+    float ndotl = max(dot(N, L), 0.0);          // no light from back
+    float lv = max(dot(L, V), 0.0);             // retro alignment
+    float lobe = pow(lv, retroSharpness);       // tight lobe around L V
 
+    // Schlick like fresnel using L.V to boost at grazing/near align
+    float F = mix(0.02, 1.0, pow(1.0 - lv, 5.0));
+
+    // micro prism sparkle (optional)
+    // hash = per pixel blue noise or bayer, anim with time for sparkle
+    float hash = fract(sin(dot(gl_GlobalInvocationID.xy, vec2(12.9898,78.233))) * 43758.5453);
+    float sparkle = step(1.0 - lobe, hash);     // sparse bright specks
+    float micro = mix(1.0, 1.0 + 4.0 * sparkle, 0.15);
+
+    float retro = mask * ndotl * lobe * F * retroGain * micro;
+
+    return albedo * retro;
+}
 
 void main() {
 	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);   
@@ -231,14 +248,16 @@ void main() {
         directLighting += GetDirectLighting(lightPosition, lightColor, lightRadius, lightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos) * shadow;
      
         // Subsurface scattering
-        vec3 radius = vec3(sssRadius);
-        vec3 subColor = Saturate(baseColor.rgb, 1.5);
-        vec3 L = normalize(lightPosition - worldSpacePosition.xyz);
-        float NdotL = max(dot(normal.xyz, L), 0.0);
-        vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
-        vec3 sssColor = subColor * radius * sss * sssStrength;
-        float lightAttenuation = smoothstep(lightRadius, 0, length(lightPosition - worldSpacePosition.xyz));
-        directLighting += sssColor * lightAttenuation * shadow;
+        if (sssRadius > 0) {
+            vec3 radius = vec3(sssRadius);
+            vec3 subColor = Saturate(baseColor.rgb, 1.5);
+            vec3 L = normalize(lightPosition - worldSpacePosition.xyz);
+            float NdotL = max(dot(normal.xyz, L), 0.0);
+            vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
+            vec3 sssColor = subColor * radius * sss * sssStrength;
+            float lightAttenuation = smoothstep(lightRadius, 0, length(lightPosition - worldSpacePosition.xyz));
+            directLighting += sssColor * lightAttenuation * shadow;
+        }
     }
 
     for (int i = 0; i < 2; i++) {    
@@ -277,6 +296,18 @@ void main() {
             float outerAngle = cos(radians(25.0));         
             mat4 lightProjectionView = flashlightProjectionView;
             vec3 spotLighting = GetSpotlightLighting(spotLightPos, spotLightDir, spotLightColor, spotLightRadius, spotLightStregth, innerAngle, outerAngle, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, flashlightViewPos, lightProjectionView);
+            
+            
+            if (baseColor.rgb == vec3(1, 0, 0)) {
+                vec3 L = normalize(spotLightPos - worldSpacePosition.xyz);
+                vec3 V = normalize(viewPos - worldSpacePosition.xyz); 
+                float mask = 1; // 0 or 1
+                float retroSharpness = 64; // 64 to 2048
+                float retroGain = 10; // 5 to 30
+                spotLighting = retroBRDF(baseColor.rgb, L, V, normal.xyz, mask, retroSharpness, retroGain);
+            }
+            
+            
             vec4 FragPosLightSpace = lightProjectionView * vec4(worldSpacePosition.xyz, 1.0);
             float shadow = SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
 
@@ -327,7 +358,7 @@ void main() {
     moonColor = vec3(1, 0.7799999713897705, 0.5289999842643738);    
 
     vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
-    float moonLightStrength = 0.025;
+    float moonLightStrength = 0.0125;
        
     //float shadow = ShadowCalculation(lightIndex, lightPosition, lightRadius, worldSpacePosition.xyz, viewPos, normal.xyz, shadowMapArray);
     vec3 moonLighting = GetDirectionalLighting(moonLightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
@@ -395,7 +426,7 @@ void main() {
     
     // Ambient light
     vec3 amibentLightColor = vec3(1, 0.98, 0.94);
-    float ambientIntensity = 0.0005;
+    float ambientIntensity = 0.00025;
 
     vec3 ambientColor = baseColor.rgb * amibentLightColor;
     vec3 ambientLighting = ambientColor * ambientIntensity;

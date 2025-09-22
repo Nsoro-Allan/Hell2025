@@ -13,8 +13,8 @@ FileInfo Animation::GetFileInfo() {
     return m_fileInfo;
 }
 
-LoadingState& Animation::GetLoadingState() {
-    return m_loadingState;
+LoadingState Animation::GetLoadingState() const {
+    return m_loadingState.GetLoadingState();
 }
 
 void Animation::SetLoadingState(LoadingState loadingState) {

@@ -11,37 +11,36 @@
 #include "HellTypes.h"
 
 namespace AssetManager {
+    static std::vector<std::future<void>> g_skinnedModelFutures;
 
     void LoadPendingSkinnedModelsAsync() {
         for (SkinnedModel& skinnedModel : GetSkinnedModels()) {
-            if (skinnedModel.GetLoadingState() == LoadingState::AWAITING_LOADING_FROM_DISK) {
-                skinnedModel.SetLoadingState(LoadingState::LOADING_FROM_DISK);
+            if (skinnedModel.GetLoadingState() == LoadingState::Value::AWAITING_LOADING_FROM_DISK) {
+                skinnedModel.SetLoadingState(LoadingState::Value::LOADING_FROM_DISK);
                 AddItemToLoadLog(skinnedModel.GetFileInfo().path);
-                std::async(std::launch::async, LoadSkinnedModel, &skinnedModel);
-                return;
+                g_skinnedModelFutures.emplace_back(std::async(std::launch::async, LoadSkinnedModel, &skinnedModel));
+                break;
+            }
+        }
+
+        // Pump any completed futures
+        for (size_t i = 0; i < g_skinnedModelFutures.size();) {
+            if (g_skinnedModelFutures[i].wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                try {
+                    g_skinnedModelFutures[i].get();
+                }
+                catch (...) {
+                    std::cout << "Some async skinned model loading error occured\n";
+                }
+                g_skinnedModelFutures.erase(g_skinnedModelFutures.begin() + i);
+            }
+            else {
+                ++i;
             }
         }
     }
     
     void GrabSkeleton(std::vector<Node>& nodes, const aiNode* pNode, int parentIndex) {
-
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-        //const std::string name = pNode->mName.C_Str();
-        //if (name.size() >= 4) {
-        //    const std::string suf = name.substr(name.size() - 4);
-        //    if (suf == ".001" || suf == ".002" || suf == ".003" ||
-        //        suf == ".004" || suf == ".005" || suf == ".006" ||
-        //        suf == ".007") {
-        //        return; // skip this node and its children
-        //    }
-        //}
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-        // REMOVE ME WHEN YOU FIX BROKEN GLOCK BLEND FILE
-
-
         // Create the joint node
         Node node;
         node.name = Util::CopyConstChar(pNode->mName.C_Str());
@@ -61,10 +60,28 @@ namespace AssetManager {
     void AssetManager::LoadSkinnedModel(SkinnedModel* skinnedModel) {
         const FileInfo& fileInfo = skinnedModel->GetFileInfo();
         std::string assetPath = "res/skinned_models/" + fileInfo.name + ".skinnedmodel";
-        SkinnedModelData skinnedModelData = File::ImportSkinnedModel(assetPath);
+        skinnedModel->m_skinnedModelData = File::ImportSkinnedModel(assetPath);
+        skinnedModel->SetLoadingState(LoadingState::Value::LOADING_COMPLETE);
+    }
 
-        skinnedModel->Load(skinnedModelData);
-        skinnedModel->SetLoadingState(LoadingState::LOADING_COMPLETE);
+    void BakeSkinnedModels() {
+        // Prellocate the vertex/index count
+        size_t vertexCount = 0;
+        size_t indexCount = 0;
+
+        for (const SkinnedModel& skinnedModel : GetSkinnedModels()) {
+            for (const SkinnedMeshData& mesh : skinnedModel.m_skinnedModelData.meshes) {
+                vertexCount += mesh.vertexCount;
+                indexCount += mesh.indexCount;
+            }
+        }
+        GetVertices().reserve(GetVertices().size() + vertexCount);
+        GetIndies().reserve(GetIndies().size() + indexCount);
+
+        // Copy vertices/indices to asset manager
+        for (SkinnedModel& skinnedModel : GetSkinnedModels()) {
+            skinnedModel.BakeToAssetManager();
+        }
     }
 
     void ExportMissingSkinnedModels() {

@@ -5,6 +5,7 @@
 #include <future>
 
 namespace AssetManager {
+    static std::vector<std::future<void>> g_modelFutures;
 
     void PrintModelMeshNames(Model* model) {
         if (!model) {
@@ -26,20 +27,52 @@ namespace AssetManager {
 
     void LoadPendingModelsAsync() {
         for (Model& model : GetModels()) {
-            if (model.GetLoadingState() == LoadingState::AWAITING_LOADING_FROM_DISK) {
-                model.SetLoadingState(LoadingState::LOADING_FROM_DISK);
+            if (model.GetLoadingState() == LoadingState::Value::AWAITING_LOADING_FROM_DISK) {
+                model.SetLoadingState(LoadingState::Value::LOADING_FROM_DISK);
                 AddItemToLoadLog(model.GetFileInfo().path);
-                std::async(std::launch::async, LoadModel, &model);
-                return;
+                g_modelFutures.emplace_back(std::async(std::launch::async, LoadModel, &model));
+                break;
+            }
+        }
+
+        // Pump any completed futures
+        for (size_t i = 0; i < g_modelFutures.size();) {
+            if (g_modelFutures[i].wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+                try { 
+                    g_modelFutures[i].get();
+                }
+                catch (...) {
+                    std::cout << "Some async model loading error occured\n";
+                }
+                g_modelFutures.erase(g_modelFutures.begin() + i);
+            }
+            else {
+                ++i;
             }
         }
     }
 
-    void BakePendingModels() {
+    void BakeModels() {
+        // Prellocate the vertex/index count
+        size_t vertexCount = 0;
+        size_t indexCount = 0;
+
+        for (const Model& model : GetModels()) {
+            for (const MeshData& mesh : model.m_modelData.meshes) {
+                vertexCount += mesh.vertexCount;
+                indexCount += mesh.indexCount;
+            }
+        }
+        GetVertices().reserve(GetVertices().size() + vertexCount);
+        GetIndies().reserve(GetIndies().size() + indexCount);
+
+        // Copy the vertices/indices into the asset manager
         for (Model& model : GetModels()) {
-            if (model.GetLoadingState() == LoadingState::LOADING_COMPLETE) {
-                BakeModel(model);
-                AddItemToLoadLog("Baking: " + model.GetName());
+            model.SetName(model.m_modelData.name);
+            model.SetAABB(model.m_modelData.aabbMin, model.m_modelData.aabbMax);
+            for (MeshData& meshData : model.m_modelData.meshes) {
+                int meshIndex = CreateMesh(meshData.name, meshData.vertices, meshData.indices, meshData.aabbMin, meshData.aabbMax, meshData.parentIndex, meshData.localTransform, meshData.inverseBindTransform);
+                model.AddMeshIndex(meshIndex);
             }
         }
     }
@@ -50,16 +83,7 @@ namespace AssetManager {
         std::string bvhPath = "res/models/bvh/" + fileInfo.name + ".bvh";
         model->m_modelData = File::ImportModel(modelPath);
         model->m_modelBvhData = File::ImportModelBvh(bvhPath);
-        model->SetLoadingState(LoadingState::LOADING_COMPLETE);
-    }
-
-    void BakeModel(Model& model) {
-        model.SetName(model.m_modelData.name);
-        model.SetAABB(model.m_modelData.aabbMin, model.m_modelData.aabbMax);
-        for (MeshData& meshData : model.m_modelData.meshes) {
-            int meshIndex = CreateMesh(meshData.name, meshData.vertices, meshData.indices, meshData.aabbMin, meshData.aabbMax, meshData.parentIndex, meshData.localTransform, meshData.inverseBindTransform);
-            model.AddMeshIndex(meshIndex);
-        }
+        model->SetLoadingState(LoadingState::Value::LOADING_COMPLETE);
     }
 
     void ExportMissingModels() {
@@ -197,6 +221,8 @@ namespace AssetManager {
     }
 
     void BuildPrimitives() {
+        // TODO: Rewrite this to store these values in model.m_modelData so that you can bake after creating these!
+
         Model* model = CreateModel("Primitives");
 
         /* Quad */ {
@@ -265,6 +291,6 @@ namespace AssetManager {
             int meshIndexCube = CreateMesh("Cube", cubeVertices, cubeIndices);
             model->AddMeshIndex(meshIndexCube);
         }
-        model->SetLoadingState(LoadingState::LOADING_COMPLETE);
+        model->SetLoadingState(LoadingState::Value::LOADING_COMPLETE);
     }
 }

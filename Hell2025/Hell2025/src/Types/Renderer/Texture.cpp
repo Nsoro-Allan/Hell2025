@@ -16,7 +16,7 @@ void Texture::Load() {
     else if (m_imageDataType == ImageDataType::EXR) {
         m_textureDataLevels = { ImageTools::LoadEXRData(m_fileInfo.path) };
     }
-    m_loadingState = LoadingState::LOADING_COMPLETE;
+    m_loadingState = LoadingState::Value::LOADING_COMPLETE;
 
     // Calculate mipmap level count
     m_mipmapLevelCount = 1 + static_cast<int>(std::log2(std::max(GetWidth(), GetHeight())));
@@ -129,8 +129,8 @@ VulkanTexture& Texture::GetVKTexture() {
     return m_vkTexture;
 }
 
-void Texture::SetLoadingState(LoadingState state) {
-    m_loadingState = state;
+void Texture::SetLoadingState(LoadingState loadingState) {
+    m_loadingState = loadingState;
 }
 
 void Texture::SetTextureDataLevelBakeState(int index, BakeState state) {
@@ -162,10 +162,6 @@ void Texture::SetMagFilter(TextureFilter filter) {
     m_magFilter = filter;
 }
 
-const LoadingState Texture::GetLoadingState() {
-    return m_loadingState;
-}
-
 const BakeState Texture::GetTextureDataLevelBakeState(int index) {
     if (index >= 0 && m_textureDataLevelBakeStates.size() && index < m_textureDataLevelBakeStates.size()) {
         return m_textureDataLevelBakeStates[index];
@@ -174,6 +170,10 @@ const BakeState Texture::GetTextureDataLevelBakeState(int index) {
         std::cout << "Texture::GetTextureDataLevelBakeState(int index) failed. Index '" << index << "' out of range of size " << m_textureDataLevelBakeStates.size() << "\n";
         return BakeState::UNDEFINED;
     }
+}
+
+LoadingState Texture::GetLoadingState() const {
+    return m_loadingState;
 }
 
 const FileInfo Texture::GetFileInfo() {

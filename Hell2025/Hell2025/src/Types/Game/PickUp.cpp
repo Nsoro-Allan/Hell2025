@@ -11,6 +11,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     m_initialTransform.position = createInfo.position;
     m_initialTransform.rotation = createInfo.rotation;
     m_pickUpType = Util::StringToPickUpType(createInfo.pickUpType);
+    m_isGold = createInfo.isGold;
 
     PhysicsFilterData filterData;
     filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
@@ -66,10 +67,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
 
     else if (m_pickUpType == PickUpType::GLOCK || m_pickUpType == PickUpType::GOLDEN_GLOCK) {
         SetModel("Glock_Isolated");
-        switch (m_pickUpType) {
-            case PickUpType::GOLDEN_GLOCK: SetAllMeshMaterials("GoldenGlock"); break;
-            case PickUpType::GLOCK:        SetAllMeshMaterials("Glock"); break;
-        }
+        SetAllMeshMaterials("Glock");
         mass = 0.7f;
         physicsModel = AssetManager::GetModelByName("Glock_Isolated_ConvexMesh");
     }
@@ -212,10 +210,18 @@ void PickUp::UpdateRenderItems() {
             renderItem.objectType = (int)ObjectType::PICK_UP;
             renderItem.modelMatrix = GetModelMatrix();
             renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-            renderItem.meshIndex = m_model->GetMeshIndices()[i];       
-            renderItem.baseColorTextureIndex = material->m_basecolor;
+            renderItem.meshIndex = m_model->GetMeshIndices()[i];  
+            if (m_isGold) {
+                static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
+                renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
+                renderItem.rmaTextureIndex = goldMaterial->m_rma;
+            }
+            else {
+                renderItem.baseColorTextureIndex = material->m_basecolor;
+                renderItem.rmaTextureIndex = material->m_rma;
+            }
             renderItem.normalMapTextureIndex = material->m_normal;
-            renderItem.rmaTextureIndex = material->m_rma;
+
             Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
             Util::UpdateRenderItemAABB(renderItem);
         }

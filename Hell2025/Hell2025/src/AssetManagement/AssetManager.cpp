@@ -46,6 +46,7 @@ namespace AssetManager {
     std::vector<uint32_t> g_weightedIndices;
 
     void AddItemToLoadLog(std::string text);
+    void BlitLoadLog();
     void CompressMissingDDSTexutres();
     void FindAssetPaths();
     void LoadMinimumTextures();
@@ -64,45 +65,29 @@ namespace AssetManager {
 
         // Fire off all async loading calls
         LoadPendingTexturesAsync();
-
         LoadPendingAnimationsAsync();
     }
 
-    bool LoadingComplete() {
-        return g_loadingComplete;
-    }
-
     void UpdateLoading() {
-
+        BlitLoadLog();
         LoadPendingModelsAsync();
         LoadPendingSkinnedModelsAsync();
 
-        // Calculate load log text
-        std::string text = "";
-        int maxLinesDisplayed = 36;
-        int endIndex = AssetManager::GetLoadLog().size();
-        int beginIndex = std::max(0, endIndex - maxLinesDisplayed);
-        for (int i = beginIndex; i < endIndex; i++) {
-            text += AssetManager::GetLoadLog()[i] + "\n";
-        }
-
-        UIBackEnd::BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
-
         // Loading complete?
         g_loadingComplete = true;
+
         for (Model& model : g_models) {
-            if (model.GetLoadingState() != LoadingState::LOADING_COMPLETE) {
+            if (model.GetLoadingState() != LoadingState::Value::LOADING_COMPLETE) {
                 g_loadingComplete = false;
                 return;
             }
         }
-
-        static bool modelsBaked = false;
-        if (!modelsBaked) {
-            BakePendingModels();
-            modelsBaked = true;
+        for (SkinnedModel& skinnedModel : g_skinnedModels) {
+            if (skinnedModel.GetLoadingState() != LoadingState::Value::LOADING_COMPLETE) {
+                g_loadingComplete = false;
+                return;
+            }
         }
-
         for (Texture& texture : g_textures) {
             texture.CheckForBakeCompletion();
             if (!texture.BakeComplete()) {
@@ -110,21 +95,12 @@ namespace AssetManager {
                 return;
             }
         }
-        for (SkinnedModel& skinnedModel : g_skinnedModels) {
-            if (skinnedModel.GetLoadingState() != LoadingState::LOADING_COMPLETE) {
-                g_loadingComplete = false;
-                std::cout << skinnedModel.GetFileInfo().name;
-                return;
-            }
-        }
 
         if (LoadingComplete()) {
-            //BakePendingModels();
+            BakeModels();
+            BakeSkinnedModels();
             BuildPrimitives();
-            BuildIndexMaps(); // required before BuildMaterials()
             BuildMaterials();
-            BuildIndexMaps(); // but also required after BuildMaterials()... FIX! maybe just add to the index map when you create these objects.
-            BuildGoldenMaterialVariants();
             BuildIndexMaps();
             BuildSpriteSheetTextures();
             CopyInAllLoadedModelBvhData();
@@ -147,12 +123,6 @@ namespace AssetManager {
             }
 
             Renderer::InitMain();
-            std::cout << "Assets loaded\n";
-
-
-            //for (Model& model : GetModels()) {
-            //    std::cout << "'" << model.GetName() << "'\n";
-            //}
         }
     }
 
@@ -247,6 +217,20 @@ namespace AssetManager {
         }
     }
 
+    void BlitLoadLog() {
+        // Calculate load log text
+        std::string text = "";
+        int maxLinesDisplayed = 36;
+        int endIndex = AssetManager::GetLoadLog().size();
+        int beginIndex = std::max(0, endIndex - maxLinesDisplayed);
+
+        for (int i = beginIndex; i < endIndex; i++) {
+            text += AssetManager::GetLoadLog()[i] + "\n";
+        }
+
+        UIBackEnd::BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
+    }
+
     //void ASyncConsoleLog(std::string text) {
     //    static std::mutex mutex;
     //    std::lock_guard<std::mutex> lock(mutex);
@@ -270,6 +254,10 @@ namespace AssetManager {
         for (int i = 0; i < g_materials.size(); i++) {
             g_materialIndexMap[g_materials[i].m_name] = i;
         }
+    }
+
+    bool LoadingComplete() {
+        return g_loadingComplete;
     }
 
     std::vector<Animation>& GetAnimations() {

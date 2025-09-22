@@ -22,12 +22,6 @@ enum class Alignment {
     BOTTOM_RIGHT
 };
 
-enum class LoadingState {
-    AWAITING_LOADING_FROM_DISK,
-    LOADING_FROM_DISK,
-    LOADING_COMPLETE
-};
-
 enum class BakeState {
     AWAITING_BAKE,
     BAKING_IN_PROGRESS,
