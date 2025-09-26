@@ -50,7 +50,7 @@ namespace Physics {
                 }
             }
             // Activate physics so ray casts work in the sector editor
-            if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::SECTOR_EDITOR) {
+            if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
                 heightfield.ActivatePhsyics();
             }
             // Regular check

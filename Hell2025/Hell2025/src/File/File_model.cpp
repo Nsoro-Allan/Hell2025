@@ -253,7 +253,7 @@ namespace File {
             file.read(reinterpret_cast<char*>(armatureData.bones.data()), armatureHeader.boneCount * sizeof(Bone));
         }
 
-        if (version == 3 && true) {
+        if (version == 3 && false) {
             std::cout << "\n";
             std::cout << fileInfo.name << ".model\n";
             std::cout << "meshCount: " << modelData.meshCount << "\n";

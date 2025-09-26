@@ -1,10 +1,13 @@
-﻿#include <iostream>
-#include "GL_texture.h"
+﻿#include "GL_texture.h"
+#include "HellLogging.h"
+
+#include "API/OpenGL/GL_util.h"
 #include "BackEnd/BackEnd.h"
-#include "Util/Util.h"
-#include <stb_image.h>
 #include "Tools/ImageTools.h"
-#include "../GL_Util.h"
+#include "Util/Util.h"
+
+#include <iostream>
+#include <stb_image.h>
 #include "tinyexr.h"
 
 GLuint64 OpenGLTexture::GetBindlessID() {
@@ -25,33 +28,79 @@ TextureData LoadEXRData(std::string filepath) {
     return textureData;
 }
 
-void OpenGLTexture::AllocateMemory(int width, int height, int format, int internalFormat, int mipmapLevelCount) {
-    if (m_memoryAllocated) {
-        return;
-    }
-    glCreateTextures(GL_TEXTURE_2D, 1, &m_handle);
+void OpenGLTexture::Create(int width, int height, int internalFormat, int mipmapLevelCount) {
+    if (m_handle != 0) Reset();
 
-    glTextureStorage2D(m_handle, mipmapLevelCount, internalFormat, width, height);
     m_width = width;
     m_height = height;
     m_mipmapLevelCount = mipmapLevelCount;
-    glBindTexture(GL_TEXTURE_2D, m_handle);
-    int mipmapWidth = width;
-    int mipmapHeight = height;
-    for (int i = 0; i < mipmapLevelCount; i++) {
-        if (m_imageDataType == ImageDataType::UNCOMPRESSED) {
-            glTextureSubImage2D(m_handle, i, 0, 0, mipmapWidth, mipmapHeight, format, GL_UNSIGNED_BYTE, nullptr);
-        }
-        if (m_imageDataType == ImageDataType::COMPRESSED) {
-            glCompressedTextureSubImage2D(m_handle, i, 0, 0, mipmapWidth, mipmapHeight, internalFormat, 0, nullptr);
-        }
-        if (m_imageDataType == ImageDataType::EXR) {
-            glTextureSubImage2D(m_handle, i, 0, 0, mipmapWidth, mipmapHeight, GL_RGBA, GL_FLOAT, nullptr);
-        }
-        mipmapWidth = std::max(1, mipmapWidth / 2);
-        mipmapHeight = std::max(1, mipmapHeight / 2);
+    m_internalFormat = internalFormat;
+    m_format = OpenGLUtil::GetFormatFromInternalFormat(internalFormat);
+
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_handle);
+    glTextureStorage2D(m_handle, mipmapLevelCount, internalFormat, width, height);
+    
+    SetMinFilter(mipmapLevelCount > 1 ? TextureFilter::LINEAR_MIPMAP : TextureFilter::LINEAR);
+    SetMagFilter(TextureFilter::LINEAR);
+    SetWrapMode(TextureWrapMode::CLAMP_TO_EDGE);
+}
+
+void OpenGLTexture::ClearR(float value) {
+    if (!m_handle) return;
+
+    // Allow only non-integer color formats
+    if (!(m_format == GL_RED || m_format == GL_RG || m_format == GL_RGB || m_format == GL_RGBA)) {
+        std::cout << "OpenGLTexture::ClearR() Unsupported format\n";
+        return;
     }
-    m_memoryAllocated = true;
+
+    const GLfloat color[4] = { value, 0.0f, 0.0f, 0.0f };
+
+    for (int level = 0; level < m_mipmapLevelCount; ++level) {
+        glClearTexImage(m_handle, level, m_format, GL_FLOAT, color);
+    }
+}
+
+void OpenGLTexture::UploadR16FData(const float* data, int width, int height, int xOffset, int yOffset, int mipLevel) {
+    if (!m_handle || !data) return;
+
+    if (m_internalFormat != GL_R16F) {
+        Logging::Error() << "UploadR16FData(): failed coz m_internalFormat was not GL_R16F, but was " << OpenGLUtil::GLInternalFormatToString(m_internalFormat) << "(" << m_internalFormat << ")";
+        return;
+    }
+
+    // Validate bounds against the mip level size
+    GLint levelWidth = 0;
+    GLint levelHeight = 0;
+    glGetTextureLevelParameteriv(m_handle, mipLevel, GL_TEXTURE_WIDTH, &levelWidth);
+    glGetTextureLevelParameteriv(m_handle, mipLevel, GL_TEXTURE_HEIGHT, &levelHeight);
+
+    if (xOffset < 0 || yOffset < 0 || xOffset + width  > levelWidth || yOffset + height > levelHeight) {
+        Logging::Error() 
+            << "UploadR16FData(): out of bounds subimage upload\n"
+            << "-xOffset:     " << xOffset << "\n"
+            << "-yOffset:     " << yOffset << "\n"
+            << "-width:       " << width << "\n"
+            << "-height:      " << height << "\n"
+            << "-mipLevel:    " << mipLevel << "\n"
+            << "-levelWidth:  " << levelWidth << "\n"
+            << "-levelHeight: " << levelHeight;
+        return;
+    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    glTextureSubImage2D(m_handle, mipLevel, xOffset, yOffset, width, height, GL_RED, GL_FLOAT, data);
+}
+
+void OpenGLTexture::Reset() {
+    if (m_handle) {
+        glDeleteTextures(1, &m_handle);
+        m_handle = 0;
+    }
+    m_width = 0;
+    m_height = 0;
+    m_mipmapLevelCount = 0;
 }
 
 GLuint& OpenGLTexture::GetHandle() {

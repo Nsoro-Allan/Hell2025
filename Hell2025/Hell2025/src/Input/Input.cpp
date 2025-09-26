@@ -114,6 +114,14 @@ namespace Input {
         g_middleMouseDownLastFrame = g_middleMouseDown;
     }
 
+    void ClearKeyStates() {
+        for (int i = 32; i < 349; i++) {
+            g_keyDown[i] = false;
+            g_keyPressed[i] = false;
+            g_keyDownLastFrame[i] = false;
+        }
+    }
+
     bool KeyPressed(unsigned int keycode) {
         return g_keyPressed[keycode];
     }

@@ -6,16 +6,12 @@
 
 Tree::Tree(TreeCreateInfo createInfo) {
     m_objectId = UniqueID::GetNext();
-
-    m_transform.position = createInfo.position;
-    m_transform.rotation = createInfo.rotation;
-    m_transform.scale = createInfo.scale;// *2.0f;
-    m_treeType = (TreeType)createInfo.type;
+    m_createInfo = createInfo;
 
     float collisionCaspuleRadius = 0.0f;
     float collisionCaspuleHalfHeight = 0.0f;
 
-    if (m_treeType == TreeType::TREE_LARGE_0) {
+    if (m_createInfo.type == TreeType::TREE_LARGE_0) {
         m_model = AssetManager::GetModelByName("TreeLarge_0");
         m_meshNodes.InitFromModel(m_model);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_0");
@@ -23,21 +19,21 @@ Tree::Tree(TreeCreateInfo createInfo) {
         collisionCaspuleHalfHeight = 2.0f;
 
     }
-    else if (m_treeType == TreeType::TREE_LARGE_1) {
+    else if (m_createInfo.type == TreeType::TREE_LARGE_1) {
         m_model = AssetManager::GetModelByName("TreeLarge_1");
         m_meshNodes.InitFromModel(m_model);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_1");
         collisionCaspuleRadius = 0.4f;
         collisionCaspuleHalfHeight = 2.0f;
     }
-    else if (m_treeType == TreeType::TREE_LARGE_2) {
+    else if (m_createInfo.type == TreeType::TREE_LARGE_2) {
         m_model = AssetManager::GetModelByName("TreeLarge_2");
         m_meshNodes.InitFromModel(m_model);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_2");
         collisionCaspuleRadius = 0.4f;
         collisionCaspuleHalfHeight = 2.0f;
     }
-    else if (m_treeType == TreeType::BLACK_BERRIES) {
+    else if (m_createInfo.type == TreeType::BLACK_BERRIES) {
         m_model = AssetManager::GetModelByName("BlackBerries");
         m_meshNodes.InitFromModel(m_model);
         m_meshNodes.SetMaterialByMeshName("Leaves", "Leaves_BlackBerry");
@@ -49,6 +45,8 @@ Tree::Tree(TreeCreateInfo createInfo) {
     }
     m_meshNodes.SetObjectTypes(ObjectType::TREE);
     m_meshNodes.SetObjectIds(m_objectId);
+
+    UpdateTransformAndModelMatrix();
 
     // Collision shape
     PhysicsFilterData filterData;
@@ -64,15 +62,6 @@ Tree::Tree(TreeCreateInfo createInfo) {
     m_rigidStaticId = Physics::CreateRigidStaticFromCapsule(m_transform, collisionCaspuleRadius, collisionCaspuleHalfHeight, filterData, localOffset);
 }
 
-TreeCreateInfo Tree::GetCreateInfo() {
-    TreeCreateInfo createInfo;
-    createInfo.position = m_transform.position;
-    createInfo.rotation = m_transform.rotation;
-    createInfo.scale = m_transform.scale;
-    createInfo.type = m_treeType;
-    return createInfo;
-}
-
 void Tree::BeginFrame() {
     m_isSelected = false;
 }
@@ -86,7 +75,6 @@ bool Tree::IsSelected() {
 }
 
 void Tree::Update(float deltaTime) {
-    m_modelMatrix = m_transform.to_mat4();
     UpdateRenderItems();
 }
 
@@ -95,9 +83,17 @@ void Tree::CleanUp() {
 }
 
 void Tree::SetPosition(glm::vec3 position) {
-    m_transform.position = position;
+    m_createInfo.position = position;
+    UpdateTransformAndModelMatrix();
 }
 
 void Tree::UpdateRenderItems() {
     m_meshNodes.UpdateRenderItems(GetModelMatrix());
+}
+
+void Tree::UpdateTransformAndModelMatrix() {
+    m_transform.position = m_createInfo.position;
+    m_transform.rotation = m_createInfo.rotation;
+    m_transform.scale = m_createInfo.scale;
+    m_modelMatrix = m_transform.to_mat4();
 }

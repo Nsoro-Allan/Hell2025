@@ -40,7 +40,7 @@ namespace Physics {
     }
 
 
-    PhysXRayResult CastPhysXRayStaticEnviroment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength) {
+    PhysXRayResult CastPhysXRayStaticEnvironment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength) {
         PxScene* scene = Physics::GetPxScene();
         PxVec3 origin = PxVec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
         PxVec3 unitDir = PxVec3(rayDirection.x, rayDirection.y, rayDirection.z);

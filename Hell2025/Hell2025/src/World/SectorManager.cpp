@@ -1,6 +1,5 @@
 #include "SectorManager.h"
 #include "Core/JSON.h"
-#include "World/HeightMapManager.h"
 #include "World/World.h"
 #include "Util.h"
 
@@ -71,21 +70,5 @@ namespace SectorManager {
             static std::string empty = "None";
             return empty;
         }
-    }
-
-    void SetSectorHeightMap(const std::string& sectorName, const std::string& heightMapName) {
-        SectorCreateInfo* sectorCreateInfo = GetSectorCreateInfoByName(sectorName);
-        if (!sectorCreateInfo) {
-            std::cout << "SectorManager::SetSectorHeightMap() failed: sector name '" << sectorName << "' was not found\n";
-            return;
-        }
-        
-        bool heightMapExists = HeightMapManager::HeightMapExists(heightMapName);
-        if (!heightMapExists && heightMapName != "None") {
-            std::cout << "SectorManager::SetSectorHeightMap() failed: height map name '" << heightMapName << "' was not found\n";
-            return;
-        }
-
-        sectorCreateInfo->heightMapName = heightMapName;
     }
 }

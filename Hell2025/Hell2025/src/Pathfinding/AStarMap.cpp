@@ -64,7 +64,7 @@ namespace AStarMap {
             glm::vec3 rayDirection = glm::vec3(0.0f, -1.0f, 0.0f);
             float rayLength = 1000;
 
-            PhysXRayResult rayresult = Physics::CastPhysXRayStaticEnviroment(rayOrigin, rayDirection, rayLength);
+            PhysXRayResult rayresult = Physics::CastPhysXRayStaticEnvironment(rayOrigin, rayDirection, rayLength);
 
             if (rayresult.hitFound) {
 

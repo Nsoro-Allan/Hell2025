@@ -1,3 +1,4 @@
+#include "HellLogging.h"
 #include "API/OpenGL/Renderer/GL_renderer.h"
 #include "API/OpenGL/GL_backend.h"
 #include "Renderer/RenderDataManager.h"
@@ -7,7 +8,6 @@
 namespace OpenGLRenderer {
 
     void InitFog() {
-
         OpenGLShader* shader = GetShader("PerlinNoise3D");
         OpenGLTexture3D* perlinNoiseTexture = GetTexture3D("PerlinNoise");
 
@@ -24,8 +24,7 @@ namespace OpenGLRenderer {
         
         glDispatchCompute((size + 7) / 8, (size + 7) / 8, (size + 7) / 8);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-        std::cout << "Initialized the BERLIN NOISE\n";
+        Logging::Init() << "Initialized the BERLIN NOISE";
     }
 
     void RayMarchFog() {

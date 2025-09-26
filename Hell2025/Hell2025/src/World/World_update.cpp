@@ -166,28 +166,28 @@ namespace World {
 
     void LazyDebugSpawns() {
         // AKs
-        if (Input::KeyPressed(HELL_KEY_BACKSPACE)) {
-            PickUpCreateInfo createInfo;
-            createInfo.position = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
-            createInfo.position += Game::GetLocalPlayerByIndex(0)->GetCameraForward();
-            createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.pickUpType = Util::PickUpTypeToString(PickUpType::AKS74U);
-            AddPickUp(createInfo);
-        }
+        //if (Input::KeyPressed(HELL_KEY_BACKSPACE)) {
+        //    PickUpCreateInfo createInfo;
+        //    createInfo.position = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
+        //    createInfo.position += Game::GetLocalPlayerByIndex(0)->GetCameraForward();
+        //    createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.pickUpType = Util::PickUpTypeToString(PickUpType::AKS74U);
+        //    AddPickUp(createInfo);
+        //}
 
         // Remingtons
-        if (Input::KeyPressed(HELL_KEY_INSERT)) {
-            PickUpCreateInfo createInfo;
-            createInfo.position = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
-            createInfo.position += Game::GetLocalPlayerByIndex(0)->GetCameraForward();
-            createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
-            createInfo.pickUpType = Util::PickUpTypeToString(PickUpType::REMINGTON_870);
-            AddPickUp(createInfo);
-        }
+        //if (Input::KeyPressed(HELL_KEY_INSERT)) {
+        //    PickUpCreateInfo createInfo;
+        //    createInfo.position = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
+        //    createInfo.position += Game::GetLocalPlayerByIndex(0)->GetCameraForward();
+        //    createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
+        //    createInfo.pickUpType = Util::PickUpTypeToString(PickUpType::REMINGTON_870);
+        //    AddPickUp(createInfo);
+        //}
     }
 
     void UpdateDoorAndWindowCubeTransforms() {

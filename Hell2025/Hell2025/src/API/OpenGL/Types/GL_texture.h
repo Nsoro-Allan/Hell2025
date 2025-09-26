@@ -10,7 +10,10 @@ public:
     OpenGLTexture() = default;
     GLuint& GetHandle();
     GLuint64 GetBindlessID();
-    void AllocateMemory(int width, int height, int format, int internalFormat, int mipmapLevelCount);
+    void Create(int width, int height, int internalFormat, int mipmapLevelCount);
+    void ClearR(float value);
+    void UploadR16FData(const float* data, int width, int height, int xOffset, int yOffset, int mipLevel);
+    void Reset();
     void SetWrapMode(TextureWrapMode wrapMode);
     void SetMinFilter(TextureFilter filter);
     void SetMagFilter(TextureFilter filter);
@@ -36,6 +39,5 @@ private:
     GLint m_format = 0;
     GLint m_internalFormat = 0;
     GLint m_mipmapLevelCount = 0;
-    ImageDataType m_imageDataType;
-    bool m_memoryAllocated = false;
+    ImageDataType m_imageDataType = ImageDataType::UNCOMPRESSED;
 };

@@ -248,11 +248,11 @@ void Player::UpdateSwimmingMovement(float deltaTime) {
 
     Physics::ClearCharacterControllerCollsionReports();
 
-    static bool test = false;
-    if (Input::KeyPressed(HELL_KEY_L)) {
-        test = !test;
-    }
-    test = true;
+    //static bool test = false;
+    //if (Input::KeyPressed(HELL_KEY_L)) {
+    //    test = !test;
+    //}
+    //test = true;
 
     m_swimmingSpeed = 3.0;
 

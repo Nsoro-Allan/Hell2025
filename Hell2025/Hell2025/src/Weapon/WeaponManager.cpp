@@ -173,7 +173,7 @@ namespace WeaponManager {
         WeaponInfo& goldeneGlock = g_weapons.emplace_back();
         goldeneGlock.name = "GoldenGlock";
         goldeneGlock.modelName = "Glock";
-        goldeneGlock.meshMaterials["Glock"] = "GoldenGlock";
+        goldeneGlock.meshMaterials["Glock"] = "Glock";
         goldeneGlock.meshMaterials["ArmsMale"] = "Hands";
         goldeneGlock.meshMaterials["ArmsFemale"] = "FemaleArms";
         goldeneGlock.meshMaterials["Glock_silencer"] = "Silencer";

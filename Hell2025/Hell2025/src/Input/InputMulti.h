@@ -35,4 +35,5 @@ namespace InputMulti {
     bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keyCode, bool allowKeyRepeat = false);
     bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keyCode);
     void ResetMouseOffsets();
+    void ClearKeyStates();
 }

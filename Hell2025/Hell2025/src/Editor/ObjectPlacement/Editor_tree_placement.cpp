@@ -24,13 +24,14 @@ namespace Editor {
             glm::vec3 rayDir = GetMouseRayDirectionByViewportIndex(GetHoveredViewportIndex());
             PhysXRayResult rayResult = Physics::CastPhysXRay(rayOrigin, rayDir, maxRayDistance, true);
 
-            // Place picture frame
+            // Place Tree
             if (rayResult.userData.physicsType == PhysicsType::HEIGHT_FIELD) {
                 Audio::PlayAudio(AUDIO_SELECT, 1.0f);
                 TreeCreateInfo createInfo;
                 createInfo.position = rayResult.hitPosition;
                 createInfo.rotation.y = Util::RandomFloat(0.0f, HELL_PI * 2.0f);
                 createInfo.type = g_treeType;
+                createInfo.editorName = GetNextAvailableTreeName(g_treeType);
 
                 if (g_treeType == TreeType::BLACK_BERRIES) {
                     createInfo.scale = glm::vec3(2.0f);

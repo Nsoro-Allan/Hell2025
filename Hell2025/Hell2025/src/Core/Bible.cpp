@@ -1,4 +1,5 @@
 #include "Bible.h"
+#include "HellLogging.h"
 #include <iostream>
 #include <unordered_map>
 
@@ -11,7 +12,7 @@ namespace Bible {
     void Init() {
         InitInventoryInfo();
         InitWeaponInfo();
-        std::cout << "The Bible has been read\n";
+        Logging::Init() << "The Bible has been read";
     }
 
     void InitInventoryInfo() {

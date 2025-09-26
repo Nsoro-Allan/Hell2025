@@ -22,9 +22,6 @@ in vec3 Tangent;
 in vec3 BiTangent;
 in vec3 WorldPos;
 
-uniform int u_test;
-flat in int vtxID;
-
 void main() {
     vec4 dirtBaseColor = texture2D(baseColorTexture, TexCoord);
     vec3 dirtNormalMap = texture2D(normalTexture, TexCoord).rgb;
@@ -43,23 +40,18 @@ void main() {
     float roadMask = texture(RoadMaskTexture, normalizedCoords).r;
     
     vec3 baseColor = mix(dirtBaseColor.rgb, dirtRoadBaseColor.rgb, roadMask);
-    vec3 normal = mix(dirtNormalMap.rgb, dirtRoadNormalMap.rgb, roadMask);
+    vec3 normalMap = mix(dirtNormalMap.rgb, dirtRoadNormalMap.rgb, roadMask);
     vec3 rma = mix(dirtRma.rgb, dirtRoadRma.rgb, roadMask);
 
-    // Compute world normal
-    vec3 tangentNormal = normal * 2.0 - 1.0;
-    vec3 T = vec3(1,0,0);
-    vec3 B = vec3(0,0,1);
-    vec3 N = vec3(0,1,0);
-    mat3 TBN = mat3(T, B, N);
-    vec3 worldNormal = normalize(TBN * tangentNormal);
-    
+    //vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
+    mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
+    normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
+    normalMap = normalize(normalMap);
+    vec3 normal = normalize(tbn * (normalMap));
+
     BaseColorOut = vec4(baseColor, 1);
     RMAOut = vec4(rma, 1.0);
-    NormalOut = vec4(normalize(worldNormal), 0);
+    NormalOut = vec4(normalize(normal), 0);
     WorldPosOut = vec4(WorldPos, 1.0);
     EmissiveOut = vec4(0.0, 0.0, 0.0, 0.45);
-
-    
-
 }

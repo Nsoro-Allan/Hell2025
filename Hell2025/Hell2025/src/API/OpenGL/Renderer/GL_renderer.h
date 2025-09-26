@@ -12,6 +12,7 @@
 #include "API/OpenGL/Types/GL_texture_array.h"
 #include "API/OpenGL/Types/GL_texture_3d.h"
 #include "API/OpenGL/Types/GL_ssbo.hpp"
+#include "Types/Map/Map.h"
 #include "Viewport/Viewport.h"
 
 struct OpenGLRasterizerState {
@@ -85,8 +86,8 @@ namespace OpenGLRenderer {
     void DrawLightVolume();
 
     // Utility passes
-    void RecalculateAllHeightMapData();
-    void SaveHeightMaps();
+    void RecalculateAllHeightMapData(bool blitWorldMap);
+    void ReadBackHeightMapData(Map* map);
 
     // Render tasks
     void RenderShadowMaps();
@@ -105,6 +106,7 @@ namespace OpenGLRenderer {
     void DrawAABB(const AABB& aabb, const glm::vec3& color);
     void DrawAABB(const AABB& aabb, const glm::vec3& color, const glm::mat4& worldTransform);
     void DebugBlitFrameBufferTexture(const std::string& frameBufferName, const std::string& attachmentName, GLint dstX, GLint dstY, GLint width, GLint height);
+    void DebugBlitOpenGLTexture(GLuint textureHandle, float scale);
     void BlitDebugTextures();
 
     inline std::vector<DebugVertex> g_points;

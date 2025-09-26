@@ -11,6 +11,7 @@ inline const char HEIGHT_MAP_SIGNATURE[] = "HELL_HEIGHT_MAP";
 #define HELL_MODEL_SIGNATURE "HELL_MODEL"
 #define HELL_MESH_SIGNATURE "HELL_MESH"
 #define HELL_MESH_BVH_SIGNATURE  "HELL_MESH_BVH"
+#define HELL_MAP_SIGNATURE  "HELL_MAP"
 
 #pragma pack(push, 1)
 
@@ -72,6 +73,16 @@ struct HeightMapHeader {
     uint32_t width;
     uint32_t height;
 };
+
+struct MapHeader {
+    char signature[32];
+    uint32_t version;
+    uint32_t chunkCountX;
+    uint32_t chunkCountZ;
+    uint32_t createInfoJsonLength;
+    uint32_t additionalJsonLength;
+};
+
 struct ModelBvhHeader {
     char signature[32]; // "HELL_MODEL_BVH"
     uint64_t version;
@@ -150,9 +161,8 @@ struct SkinnedModelData {
 };
 
 struct HeightMapData {
-    std::string name;
-    uint32_t width;
-    uint32_t height;
+    uint32_t textureWidth;
+    uint32_t textureHeight;
     std::vector<float> data;
 };
 

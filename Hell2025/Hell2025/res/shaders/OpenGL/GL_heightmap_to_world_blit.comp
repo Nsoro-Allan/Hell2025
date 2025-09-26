@@ -1,0 +1,104 @@
+#version 430 core
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(r16f, binding = 0) writeonly uniform image2D dstImage;
+layout(r16f, binding = 1) readonly  uniform image2D srcImage;
+
+uniform int u_offsetX;
+uniform int u_offsetZ;
+
+// Controls
+uniform float uBaseFrequency = 0.01;
+uniform float uLacunarity   = 2.0;
+uniform float uGain         = 0.5;
+uniform int   uOctaves      = 4;
+uniform float uAmplitude    = 1.0;
+uniform float uSeed         = 0.0;
+uniform float uTime         = 0.0;
+uniform vec2  uOffset       = vec2(0.0);
+
+// Hash/grad helpers
+float hash21(vec2 p) {
+    p = fract(p * vec2(123.34, 345.45));
+    p += dot(p, p + 34.345 + uSeed);
+    return fract(p.x * p.y);
+}
+
+vec2 grad(vec2 p) {
+    float a = 6.2831853 * hash21(p);
+    return vec2(cos(a), sin(a));
+}
+
+float fade(float t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+float perlin2(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+
+    float n00 = dot(grad(i + vec2(0.0, 0.0)), f - vec2(0.0, 0.0));
+    float n10 = dot(grad(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0));
+    float n01 = dot(grad(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0));
+    float n11 = dot(grad(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0));
+
+    vec2 u = vec2(fade(f.x), fade(f.y));
+    float nx0 = mix(n00, n10, u.x);
+    float nx1 = mix(n01, n11, u.x);
+    return mix(nx0, nx1, u.y);
+}
+
+// FBM wrapper
+float fbm(vec2 p) {
+    float freq = uBaseFrequency;
+    float amp  = 1.0;
+    float sum  = 0.0;
+    float norm = 0.0;
+
+    for (int o = 0; o < uOctaves; ++o) {
+        sum  += amp * perlin2(p * freq);
+        norm += amp;
+        freq *= uLacunarity;
+        amp  *= uGain;
+    }
+    // Normalize to 0..1
+    return 0.5 + 0.5 * (sum / max(norm, 1e-6));
+}
+
+float mapRange(float v, float oldMin, float oldMax, float newMin, float newMax) {
+    float denom = max(abs(oldMax - oldMin), 1e-20);
+    float t = (v - oldMin) / denom;
+    return mix(newMin, newMax, t);
+}
+
+void main() {
+    ivec2 srcPixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 dstPixelCoords = ivec2(gl_GlobalInvocationID.xy) + ivec2(u_offsetX, u_offsetZ);
+    ivec2 srcSize = imageSize(srcImage);
+    ivec2 dstSize = imageSize(dstImage);
+    
+    vec4 v = imageLoad(srcImage, srcPixelCoords);
+
+    // Temporarily overwrite loaded value with perlin noise
+    // vec2 uv = (vec2(srcPixelCoords) + 0.5) / vec2(srcSize);
+    // vec2 p  = uv * vec2(srcSize) + uOffset + uTime * vec2(0.11, 0.07);
+    // float n = fbm(p) * uAmplitude;
+    // n = mapRange(n, 0, 1, 0.6, 0.9);
+    // v.r = n;
+
+    // Main write
+    imageStore(dstImage, dstPixelCoords, v);
+    
+    // Conditonal cleanup for final row/column of world map
+    // Prevents heightmap looking like shit on the final row/column because of the +1 pixel width/height of the world map
+    if (dstPixelCoords.x == dstSize.x - 2) {
+        imageStore(dstImage, dstPixelCoords + ivec2(1, 0), v);
+    }
+    if (dstPixelCoords.y == dstSize.y - 2) {
+        imageStore(dstImage, dstPixelCoords + ivec2(0, 1), v);
+    }
+    if (dstPixelCoords.x == dstSize.x - 2 && dstPixelCoords.y == dstSize.y - 2) {
+        imageStore(dstImage, dstPixelCoords + ivec2(1, 1), v);
+    }
+}

@@ -139,11 +139,12 @@ enum struct EditorState {
     DRAGGING_SELECT_RECT,
 
     // Object placement
-    DOOR_PLACEMENT,
-    PICTURE_FRAME_PLACEMENT,
-    TREE_PLACEMENT,
-    WALL_PLACEMENT,
-    WINDOW_PLACEMENT
+    PLACE_DOOR,
+    PLACE_HOUSE,
+    PLACE_PICTURE_FRAME,
+    PLACE_TREE,
+    PLACE_WALL,
+    PLACE_WINDOW
 };
 
 enum WeaponAction {
@@ -255,11 +256,10 @@ enum struct PickUpType {
 };
 
 enum struct EditorMode {
-    HEIGHTMAP_EDITOR,
     HOUSE_EDITOR,
-    MAP_EDITOR,
-    SECTOR_EDITOR,
-    WEAPON_EDITOR
+    MAP_HEIGHT_EDITOR,
+    MAP_OBJECT_EDITOR,
+    UNDEFINED,
 };
 
 enum struct PhysicsType {
@@ -395,6 +395,14 @@ enum struct InventoryItemType {
     AMMO,
     KEY,
     UESLESS,
+};
+
+enum struct HouseType {
+    SMALL_HOUSE,
+    MEDIUM_HOUSE,
+    LARGE_HOUSE,
+    NAMED,
+    UNDEFINED
 };
 
 inline RaycastIgnoreFlags operator|(RaycastIgnoreFlags a, RaycastIgnoreFlags b) {

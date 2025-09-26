@@ -209,8 +209,8 @@ namespace OpenGLRenderer {
             if (!shader) return;
 
             shader->Bind();
-            shader->SetFloat("u_brushSize", Editor::GetHeightMapBrushSize());
-            shader->SetBool("u_heightMapEditor", (Editor::GetEditorMode() == EditorMode::HEIGHTMAP_EDITOR) && Editor::IsOpen());
+            shader->SetFloat("u_brushSize", Editor::GetMapHeightBrushSize());
+            shader->SetBool("u_heightMapEditor", (Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) && Editor::IsOpen());
             glBindImageTexture(0, gBuffer->GetColorAttachmentHandleByName("FinalLighting"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
 
             glBindTextureUnit(1, gBuffer->GetColorAttachmentHandleByName("BaseColor"));

@@ -451,7 +451,7 @@ namespace RenderDataManager {
 
         // Offset water origin when in heightmap editor
         //glm::vec3 originOffset = glm::vec3(0.0f);
-        //if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::HEIGHTMAP_EDITOR) {
+        //if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
         //    originOffset = glm::vec3(64.0f, 0.0f, 64.0f);
         //}
         //

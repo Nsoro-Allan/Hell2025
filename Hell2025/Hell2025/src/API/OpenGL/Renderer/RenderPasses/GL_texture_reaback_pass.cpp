@@ -19,7 +19,7 @@ namespace OpenGLRenderer {
     glm::vec3 g_playerRayWorldPosition[4];
 
     void TextureReadBackPass() {
-        if (Editor::IsClosed() && Editor::GetEditorMode() != EditorMode::HEIGHTMAP_EDITOR) return;
+        if (Editor::IsClosed() && Editor::GetEditorMode() != EditorMode::MAP_HEIGHT_EDITOR) return;
 
         // Get mouse hit position
         if (!g_mouseRayReadBack.IsRequestInProgress()) {

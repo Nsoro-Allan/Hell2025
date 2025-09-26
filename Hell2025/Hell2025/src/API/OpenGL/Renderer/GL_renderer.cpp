@@ -285,6 +285,7 @@ namespace OpenGLRenderer {
         g_shaders["DebugLightVolume"] = OpenGLShader({ "GL_debug_light_volume.vert", "GL_debug_light_volume.frag" });
         g_shaders["DebugPointCloud"] = OpenGLShader({ "GL_debug_point_cloud.vert", "GL_debug_point_cloud.frag" });
         g_shaders["DebugSolidColor"] = OpenGLShader({ "GL_debug_solid_color.vert", "GL_debug_solid_color.frag" });
+        g_shaders["DebugTextureBlit"] = OpenGLShader({ "GL_debug_texture_blit.vert", "GL_debug_texture_blit.frag" });
         g_shaders["DebugTextured"] = OpenGLShader({ "GL_debug_textured.vert", "GL_debug_textured.frag" });
         g_shaders["DebugView"] = OpenGLShader({ "GL_debug_view.comp" });
         g_shaders["DebugTileView"] = OpenGLShader({ "GL_debug_tile_view.comp" });
@@ -318,6 +319,7 @@ namespace OpenGLRenderer {
         g_shaders["HeightMapColor"] = OpenGLShader({ "GL_heightmap_color.vert", "GL_heightmap_color.frag" });
         g_shaders["HeightMapImageGeneration"] = OpenGLShader({ "GL_heightmap_image_generation.comp" });
         g_shaders["HeightMapPhysxTextureGeneration"] = OpenGLShader({ "GL_heightmap_physx_texture_generation.comp" });
+        g_shaders["HeightMapToWorldBlit"] = OpenGLShader({ "GL_heightmap_to_world_blit.comp" });
         g_shaders["HeightMapVertexGeneration"] = OpenGLShader({ "GL_heightmap_vertex_generation.comp" });
         g_shaders["HeightMapPaint"] = OpenGLShader({ "GL_heightmap_paint.comp" });
         g_shaders["LightCulling"] = OpenGLShader({ "GL_light_culling.comp" });

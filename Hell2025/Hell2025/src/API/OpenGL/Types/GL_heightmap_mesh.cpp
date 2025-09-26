@@ -1,5 +1,6 @@
 #pragma once
 #include "GL_heightmap_mesh.h"
+#include "HellLogging.h"
 #include "HellGlm.h"
 #include <glad/glad.h>
 
@@ -13,31 +14,24 @@ void OpenGLHeightMapMesh::Create() {
     glBindVertexArray(0);
 }
 
-void OpenGLHeightMapMesh::AllocateMemory(int heightMapCount) {
-    if (m_vao == 0) {
-        Create();
-    }
+void OpenGLHeightMapMesh::AllocateMemory(int chunkCount) {
+    if (m_vao == 0) Create();
 
-    int chunkSize = HEIGHT_MAP_SIZE / 8;     // #define HEIGHT_MAP_SIZE 256
-    int chunkWidth = chunkSize + 1;          // 33 vertices per chunk
-    int chunkDepth = chunkSize + 1;          // 33 vertices per chunk
+    // cells per side of a chunk (e.g. 32) -> 33x33 verts
+    constexpr int CHUNK_CELLS = 32;
+    const int chunkWidth = CHUNK_CELLS + 1; // 33
+    const int chunkDepth = CHUNK_CELLS + 1; // 33
 
-    //std::cout << "vertices per heightmap: " << chunkWidth * chunkDepth << "\n";
-    //std::cout << "indices per heightmap: " << (chunkWidth - 1) * (chunkDepth - 1) * 6 << "\n";
+    const int vertsPerChunk = chunkWidth * chunkDepth;                 // 1089
+    const int indicesPerChunk = (CHUNK_CELLS * CHUNK_CELLS) * 6;         // 6144
 
-    // Memory for one chunk:
-    int localVertexBufferSize = chunkWidth * chunkDepth * sizeof(Vertex);
-    int localIndexBufferSize = (chunkWidth - 1) * (chunkDepth - 1) * 6 * sizeof(uint32_t);
+    const int localVertexBytes = vertsPerChunk * sizeof(Vertex);
+    const int localIndexBytes = indicesPerChunk * sizeof(uint32_t);
 
-    // Total number of chunks per heightmap:
-    int chunksPerHeightMap = 8 * 8;
+    const int totalVertexBytes = localVertexBytes * chunkCount;          // 6,133,248 (if Vertex=44B)
+    const int totalIndexBytes = localIndexBytes * chunkCount;          // 3,145,728
 
-    // Total memory for all heightmaps:
-    int totalVertexBufferSize = localVertexBufferSize * chunksPerHeightMap * heightMapCount;
-    int totalIndexBufferSize = localIndexBufferSize * chunksPerHeightMap * heightMapCount;
-
-    // If you need more space, destroy the old buffers and create new ones
-    if (m_totalVertexBufferSize < totalVertexBufferSize || m_totalIndexBufferSize < totalIndexBufferSize) {
+    if (m_totalVertexBufferSize < totalVertexBytes || m_totalIndexBufferSize < totalIndexBytes) {
         glDeleteBuffers(1, &m_vbo);
         glDeleteBuffers(1, &m_ebo);
         glGenBuffers(1, &m_vbo);
@@ -46,10 +40,10 @@ void OpenGLHeightMapMesh::AllocateMemory(int heightMapCount) {
         glBindVertexArray(m_vao);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-        glBufferData(GL_ARRAY_BUFFER, totalVertexBufferSize, nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, totalVertexBytes, nullptr, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalIndexBufferSize, nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, totalIndexBytes, nullptr, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
@@ -60,13 +54,14 @@ void OpenGLHeightMapMesh::AllocateMemory(int heightMapCount) {
         glEnableVertexAttribArray(3);
         glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, tangent));
 
-        m_totalVertexBufferSize = totalVertexBufferSize;
-        m_totalIndexBufferSize = totalIndexBufferSize;
+        m_totalVertexBufferSize = totalVertexBytes;
+        m_totalIndexBufferSize = totalIndexBytes;
 
-        std::cout << "Allocated heightmap memory: " << m_totalVertexBufferSize << " verts " << m_totalIndexBufferSize << " indices\n";
+        Logging::Debug() << "Allocated heightmap memory: " << m_totalVertexBufferSize << " verts-bytes " << m_totalIndexBufferSize << " index-bytes";
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
 
 void OpenGLHeightMapMesh::CleanUp() {
     if (m_vao) glDeleteVertexArrays(1, &m_vao);

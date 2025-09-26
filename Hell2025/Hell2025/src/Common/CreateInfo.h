@@ -77,6 +77,7 @@ struct DecalCreateInfo {
 
 struct ScreenSpaceBloodDecalCreateInfo {
     glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 direction = glm::vec3(0.0f);
     int type = 0;
 };
 
@@ -206,6 +207,7 @@ struct TreeCreateInfo {
     glm::vec3 rotation = glm::vec3(0.0f);
     glm::vec3 scale = glm::vec3(1.0f);
     TreeType type = TreeType::TREE_LARGE_0;
+    std::string editorName = UNDEFINED_STRING;
 };
 
 struct SectorCreateInfo {
@@ -238,4 +240,13 @@ struct MapCreateInfo {
     uint32_t depth = 4;
     ivecXZ spawnCoords = ivecXZ(0, 0);
     std::string m_sectorNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
+};
+
+struct CreateInfoCollection {
+    std::vector<PickUpCreateInfo> pickUps;
+    std::vector<TreeCreateInfo> trees;
+};
+
+struct AdditionalMapData {
+    std::vector<HouseLocation> houseLocations;
 };

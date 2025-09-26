@@ -1,4 +1,7 @@
 #include "GL_renderer.h"
+#include "API/OpenGL/Types/GL_texture.h"
+#include "AssetManagement/AssetManager.h"
+#include "Managers/MapManager.h"
 
 namespace OpenGLRenderer {
     
@@ -10,8 +13,9 @@ namespace OpenGLRenderer {
         }
 
         // World heightmap
-        if (false) {
-            DebugBlitFrameBufferTexture("World", "HeightMap", 0, 0, 480, 480);
+        if (true) {
+            OpenGLFrameBuffer* worldFrameBuffer = GetFrameBuffer("World");
+            DebugBlitFrameBufferTexture("World", "HeightMap", 0, 0, worldFrameBuffer->GetWidth(), worldFrameBuffer->GetHeight());
         }
 
         // Ocean
@@ -26,6 +30,48 @@ namespace OpenGLRenderer {
         if (false) {
             DebugBlitFrameBufferTexture("Fog", "Color", 0, 0, 1920 * 2, 1080 * 2);
         }
+
+        // Test texture
+        if (false) {
+            Texture* texture = AssetManager::GetTextureByName("Glock_ALB");
+            if (texture) {
+                OpenGLTexture& glTexture = texture->GetGLTexture();
+                DebugBlitOpenGLTexture(glTexture.GetHandle(), 0.5f);
+            }
+        }
+
+        // Heightmap
+        if (false) {
+            Map* map = MapManager::GetMapByName("Shit");
+            if (map) {
+                OpenGLTexture& glTexture = map->GetHeightMapGLTexture();
+                DebugBlitOpenGLTexture(glTexture.GetHandle(), 1.0f);
+            }
+        }
+    }
+
+    void DebugBlitOpenGLTexture(GLuint textureHandle, float scale) {
+        OpenGLShader* shader = GetShader("DebugTextureBlit");
+        if (!shader) return;
+
+        shader->Bind();
+        shader->SetFloat("u_scale", scale);
+
+        static GLuint vao = 0;
+        if (vao == 0) {
+            glCreateVertexArrays(1, &vao);
+        }
+        
+        // Check if depth test was enabled, store that, and disable depth test
+        GLboolean lastDepth = glIsEnabled(GL_DEPTH_TEST);
+        if (lastDepth) glDisable(GL_DEPTH_TEST);
+
+        glBindVertexArray(vao);
+        glBindTextureUnit(0, textureHandle);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // Restore last depth state
+        if (lastDepth) glEnable(GL_DEPTH_TEST);
     }
 
     void DebugBlitFrameBufferTexture(const std::string& frameBufferName, const std::string& attachmentName, GLint dstX, GLint dstY, GLint width, GLint height) {

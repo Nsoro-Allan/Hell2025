@@ -25,11 +25,12 @@ namespace Editor {
         else if (GetEditorState() == EditorState::RESIZING_VERTICAL) {
             BackEnd::SetCursor(HELL_CURSOR_VRESIZE);
         }
-        else if (GetEditorState() == EditorState::DOOR_PLACEMENT ||
-                 GetEditorState() == EditorState::PICTURE_FRAME_PLACEMENT ||
-                 GetEditorState() == EditorState::TREE_PLACEMENT ||
-                 GetEditorState() == EditorState::WALL_PLACEMENT ||
-                 GetEditorState() == EditorState::WINDOW_PLACEMENT) {
+        else if (GetEditorState() == EditorState::PLACE_DOOR ||
+                 GetEditorState() == EditorState::PLACE_HOUSE ||
+                 GetEditorState() == EditorState::PLACE_PICTURE_FRAME ||
+                 GetEditorState() == EditorState::PLACE_TREE ||
+                 GetEditorState() == EditorState::PLACE_WALL ||
+                 GetEditorState() == EditorState::PLACE_WINDOW) {
             BackEnd::SetCursor(HELL_CURSOR_CROSSHAIR);
         }
         // Nothing? Then the arrow

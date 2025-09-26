@@ -18,6 +18,14 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const HouseLocation& houseLocation) {
+        j = nlohmann::json{
+            {"Position", houseLocation.position},
+            {"Rotation", houseLocation.rotation},
+            {"Type", Util::HouseTypeToString(houseLocation.type)}
+        };
+    }
+
     void to_json(nlohmann::json& j, const LightCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Color", createInfo.color},
@@ -110,6 +118,12 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, DoorCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
+    }
+
+    void from_json(const nlohmann::json& j, HouseLocation& houseLocation) {
+        houseLocation.position = j.value("Position", glm::vec3(0.0f));
+        houseLocation.rotation = j.value("Rotation", 0.0f);
+        houseLocation.type = Util::StringToHouseType(j.value("Type", "UNDEFINED"));
     }
 
     void from_json(const nlohmann::json& j, LightCreateInfo& info) {

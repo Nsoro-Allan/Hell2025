@@ -46,7 +46,6 @@ public:
     OpenGLTexture& GetGLTexture();
     VulkanTexture& GetVKTexture();
 
-
 private:
     OpenGLTexture m_glTexture;
     VulkanTexture m_vkTexture;
@@ -61,5 +60,4 @@ private:
     int m_mipmapLevelCount = 0;
     bool m_mipmapsRequested = false;
     bool m_bakeComplete = false;
-
 };

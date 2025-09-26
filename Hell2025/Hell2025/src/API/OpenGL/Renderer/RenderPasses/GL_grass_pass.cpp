@@ -1,4 +1,7 @@
 ﻿#include "API/OpenGL/Renderer/GL_renderer.h" 
+
+#include "HellLogging.h"
+
 #include "AssetManagement/AssetManager.h"
 #include "Types/Renderer/GrassMesh.h"
 
@@ -13,7 +16,6 @@
 #include "Util/Util.h"
 #include "Ocean/Ocean.h"
 
-#include "World/HeightMapManager.h"
 #include "World/World.h"
 
 struct GrassVertex {
@@ -99,7 +101,7 @@ namespace OpenGLRenderer {
         //std::cout << "Grass SSBO allocated: " << Util::BytesToMBString(bufferSize) << "\n";
         CreateSSBO("BladePositions", bufferSize, GL_DYNAMIC_STORAGE_BIT);
         CreateGrassGeometry();
-
+            
         // Create indirect buffer
         if (g_indirectBuffer == 0) {
             glGenBuffers(1, &g_indirectBuffer);
@@ -107,6 +109,7 @@ namespace OpenGLRenderer {
             glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawIndexedIndirectCommand), NULL, GL_DYNAMIC_DRAW);
             glBindBuffer(GL_DRAW_INDIRECT_BUFFER, 0);
         }
+        Logging::Init() << "Initialized grass geometry";
     }
 
     void CreateGrassGeometry() {        
@@ -126,7 +129,7 @@ namespace OpenGLRenderer {
         glDispatchCompute(bladeCount, 1, 1);
     }
 
-    void GrassPass() {        
+    void GrassPass() {
         RendererSettings& rendererSettings = Renderer::GetCurrentRendererSettings();
         if (!rendererSettings.drawGrass) return;
 
@@ -168,10 +171,10 @@ namespace OpenGLRenderer {
             const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
             glm::vec3 viewPos = viewportData[viewportIndex].inverseView[3];
 
-            int maxChunkDrawDistance = 5; 
+            int maxChunkDrawDistance = 3; 
 
-            ivecXZ cameraChunk(static_cast<int>(std::floor(viewPos.x / CHUNK_SIZE_WORLDSPACE)), 
-                                static_cast<int>(std::floor(viewPos.z / CHUNK_SIZE_WORLDSPACE)));
+            ivecXZ cameraChunk(static_cast<int>(std::floor(viewPos.x / HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE)),
+                                static_cast<int>(std::floor(viewPos.z / HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE)));
 
             int32_t xBegin = cameraChunk.x - maxChunkDrawDistance;
             int32_t xEnd = cameraChunk.x + maxChunkDrawDistance;
@@ -195,6 +198,7 @@ namespace OpenGLRenderer {
             glm::vec3 chunkBoundsMin;
             glm::vec3 chunkBoundsMax;
 
+            /*
             for (int x = xBegin; x < xEnd; x++) {
                 for (int z = zBegin; z < zEnd; z++) {
 
@@ -220,6 +224,29 @@ namespace OpenGLRenderer {
                         chunkOffsets.emplace_back(vecXZ(xOffset, zOffset));
                         //DrawAABB(chunkAABB, GREEN);
                     }
+                }
+            }
+            */
+
+            for (HeightMapChunk& chunk : World::GetHeightMapChunks()) {
+                chunkAABB = AABB(chunk.aabbMin, chunk.aabbMax);
+
+                // Check if within threshold to camera
+                float threshold = 30.0f;
+                glm::vec3 viewPosNormalized = viewPos * glm::vec3(1.0f, 0.0f, 1.0f);
+                glm::vec3 aabbCenterNormalized = chunkAABB.GetCenter() * glm::vec3(1.0f, 0.0f, 1.0f);
+
+                float distance = Util::ManhattanDistance(viewPosNormalized, aabbCenterNormalized);
+                if (distance >= threshold) {
+                    //std::cout << "skipping " << chunk.coord.x << ", " << chunk.coord.z << "\n";
+                    continue;
+                }
+
+                if (frustum.IntersectsAABBFast(chunkAABB)) {
+                    float xOffset = chunk.coord.x * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+                    float zOffset = chunk.coord.z * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+                    chunkOffsets.emplace_back(vecXZ(xOffset, zOffset));
+                    //DrawAABB(chunkAABB, GREEN);
                 }
             }
 

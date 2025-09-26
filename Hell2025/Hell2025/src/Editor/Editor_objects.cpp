@@ -1,6 +1,7 @@
 #include "Editor.h"
 #include "Audio/Audio.h"
 #include "Editor/Gizmo.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
 #include "Physics/Physics.h"
 #include "Renderer/Renderer.h"

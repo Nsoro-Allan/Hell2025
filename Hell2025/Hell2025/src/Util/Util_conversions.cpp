@@ -85,6 +85,17 @@ namespace Util {
         }
     }
 
+    std::string HouseTypeToString(HouseType houseType) {
+        switch (houseType) {
+            case HouseType::SMALL_HOUSE:    return "SMALL_HOUSE";
+            case HouseType::MEDIUM_HOUSE:   return "MEDIUM_HOUSE";
+            case HouseType::LARGE_HOUSE:    return "LARGE_HOUSE";
+            case HouseType::NAMED:          return "NAMED";
+            case HouseType::UNDEFINED:      return "UNDEFINED";
+            default: return "UNKNOWN";
+        }
+    }
+
     TreeType StringToTreeType(const std::string& str) {
         if (str == "TREE_LARGE_0")   return TreeType::TREE_LARGE_0;
         if (str == "TREE_LARGE_1")   return TreeType::TREE_LARGE_1;
@@ -201,6 +212,14 @@ namespace Util {
         return BlendingMode::BLEND_DISABLED;
     }
 
+    HouseType StringToHouseType(const std::string& str) {
+        if (str == "SMALL_HOUSE")   return HouseType::SMALL_HOUSE;
+        if (str == "MEDIUM_HOUSE")  return HouseType::MEDIUM_HOUSE;
+        if (str == "LARGE_HOUSE")   return HouseType::LARGE_HOUSE;
+        if (str == "NAMED")         return HouseType::NAMED;
+        return HouseType::UNDEFINED;
+    }
+
     std::string WeaponActionToString(const WeaponAction& weaponAction) {
         switch (weaponAction) {
             case WeaponAction::IDLE:                          return "IDLE";
@@ -240,10 +259,8 @@ namespace Util {
     std::string EditorModeToString(const EditorMode& editorMode) {
         switch (editorMode) {
             case EditorMode::HOUSE_EDITOR:      return "HOUSE_EDITOR";
-            case EditorMode::MAP_EDITOR:        return "MAP_EDITOR";
-            case EditorMode::SECTOR_EDITOR:     return "SECTOR_EDITOR";
-            case EditorMode::HEIGHTMAP_EDITOR:  return "HEIGHTMAP_EDITOR";
-            case EditorMode::WEAPON_EDITOR:     return "WEAPON_EDITOR";
+            case EditorMode::MAP_OBJECT_EDITOR: return "MAP_OBJECT_EDITOR";
+            case EditorMode::MAP_HEIGHT_EDITOR: return "MAP_HEIGHT_EDITOR";
             default:                            return "UNDEFINED";
         }
     }
@@ -308,11 +325,11 @@ namespace Util {
             case EditorState::GIZMO_SCALING:                return "GIZMO_SCALING";
             case EditorState::GIZMO_ROTATING:               return "GIZMO_ROTATING";
             case EditorState::DRAGGING_SELECT_RECT:         return "DRAGGING_SELECT_RECT";
-            case EditorState::DOOR_PLACEMENT:               return "DOOR_PLACEMENT";
-            case EditorState::PICTURE_FRAME_PLACEMENT:      return "PICTURE_FRAME_PLACEMENT";
-            case EditorState::TREE_PLACEMENT:               return "TREE_PLACEMENT";
-            case EditorState::WALL_PLACEMENT:               return "WALL_PLACEMENT";
-            case EditorState::WINDOW_PLACEMENT:             return "WINDOW_PLACEMENT";
+            case EditorState::PLACE_DOOR:               return "DOOR_PLACEMENT";
+            case EditorState::PLACE_PICTURE_FRAME:      return "PICTURE_FRAME_PLACEMENT";
+            case EditorState::PLACE_TREE:               return "TREE_PLACEMENT";
+            case EditorState::PLACE_WALL:               return "WALL_PLACEMENT";
+            case EditorState::PLACE_WINDOW:             return "WINDOW_PLACEMENT";
             default:                                        return "UNDEFINED";
         }
     }

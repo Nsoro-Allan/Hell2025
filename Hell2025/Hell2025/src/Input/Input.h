@@ -4,6 +4,7 @@
 namespace Input {
 	void Init(void* glfwWinodw);
 	void Update();
+    void ClearKeyStates();
 	bool KeyPressed(unsigned int keycode);
 	bool KeyDown(unsigned int keycode);
 	float GetMouseOffsetX();

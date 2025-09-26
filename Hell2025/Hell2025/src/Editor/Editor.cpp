@@ -7,17 +7,17 @@
 #include "Config/Config.h"
 #include "Audio/Audio.h"
 #include "Core/Debug.h"
+#include "Core/Game.h"
 #include "Imgui/ImguiBackEnd.h"
 #include "Input/Input.h"
+#include "Input/InputMulti.h"
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
 #include "World/SectorManager.h"
-#include "World/HeightMapManager.h"
 
 namespace Editor {
-
-    EditorMode g_editorMode = EditorMode::SECTOR_EDITOR;
+    EditorMode g_editorMode = EditorMode::UNDEFINED;
     int g_activeViewportIndex = 3;
     bool g_isOpen = false;
     bool g_isOrthographic[4];
@@ -35,8 +35,7 @@ namespace Editor {
     EditorViewportSplitMode g_editorViewportSplitMode = EditorViewportSplitMode::SINGLE;
     Axis g_axisConstraint = Axis::NONE;
     
-    std::string g_sectorName = "TestSector";
-    std::string g_heightMapName = "";
+    std::string g_editorMapName = UNDEFINED_STRING;
 
     float g_orthoCameraDistances[4];
     EditorState g_editorState;
@@ -46,8 +45,8 @@ namespace Editor {
         ResetViewports();
         ResetCameras();
 
-        InitSectorEditor();
-        InitHeightMapEditor();
+        InitMapObjectEditor();
+        InitMapHeightEditor();
         InitHouseEditor();
     }
 
@@ -92,17 +91,9 @@ namespace Editor {
     void Update(float deltaTime) {
 
         // Toggle editor
-        if (Input::KeyPressed(HELL_KEY_F1)) {
+        if (Input::KeyPressed(HELL_KEY_J)) {
             Audio::PlayAudio(AUDIO_SELECT, 1.0f);
             Editor::ToggleEditorOpenState();
-
-            // you need to figure this out bro
-            // you need to figure this out bro
-            // you need to figure this out bro
-            HeightMapManager::LoadHeightMapsFromDisk();
-            // you need to figure this out bro
-            // you need to figure this out bro
-            // you need to figure this out bro
         }
 
         if (Input::KeyPressed(HELL_KEY_F1)) {
@@ -112,13 +103,10 @@ namespace Editor {
             Callbacks::OpenHouseEditor();
         }
         if (Input::KeyPressed(HELL_KEY_F6)) {
-            Callbacks::OpenHeightMapEditor();
+            Callbacks::OpenMapHeightEditor();
         }
         if (Input::KeyPressed(HELL_KEY_F5)) {
-            Callbacks::OpenSectorEditor();
-        }
-        if (Input::KeyPressed(HELL_KEY_F7)) {
-            Callbacks::OpenMapEditor();
+            Callbacks::OpenMapObjectEditor();
         }
 
         if (!IsOpen()) {
@@ -140,7 +128,7 @@ namespace Editor {
         UpdateCameraInterpolation(deltaTime);
         Gizmo::Update();
 
-        if (GetEditorMode() == EditorMode::HOUSE_EDITOR || GetEditorMode() == EditorMode::SECTOR_EDITOR) {
+        if (GetEditorMode() == EditorMode::HOUSE_EDITOR || GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             UpdateObjectPlacement();
         }
         if (GetEditorState() == EditorState::IDLE) {
@@ -148,10 +136,9 @@ namespace Editor {
         }
 
         switch (GetEditorMode()) {
-            case EditorMode::HEIGHTMAP_EDITOR:   UpdateHeightMapEditor();   break;
-            case EditorMode::HOUSE_EDITOR:       UpdateHouseEditor();   break;
-            case EditorMode::MAP_EDITOR:         UpdateMapEditor();         break;
-            case EditorMode::SECTOR_EDITOR:      UpdateSectorEditor();      break;
+            case EditorMode::HOUSE_EDITOR:      UpdateHouseEditor();       break;
+            case EditorMode::MAP_HEIGHT_EDITOR: UpdateMapHeightEditor();   break;
+            case EditorMode::MAP_OBJECT_EDITOR: UpdateMapObjectEditor();   break;
             default: break;
         }
 
@@ -175,29 +162,27 @@ namespace Editor {
 
         Editor::SetEditorState(EditorState::IDLE);
         Editor::ResetAxisConstraint();
-        
+
         g_isOpen = true;
     }
 
     void CloseEditor() {
-        std::cout << "Exited editor\n";
         Audio::PlayAudio("UI_Select.wav", 1.0f);
         Input::DisableCursor();
-        UnselectAnyObject();
 
+        UnselectAnyObject();
         SetHoveredObjectType(ObjectType::NONE);
         SetHoveredObjectId(0);
 
-        g_isOpen = false;
+        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
+            World::LoadMapInstanceObjects("Shit", SpawnOffset());
+            Renderer::RecalculateAllHeightMapData(false);
+        } 
 
-        // HACK FIX ME
-        if (GetEditorMode() == EditorMode::HEIGHTMAP_EDITOR ||
-            GetEditorMode() == EditorMode::SECTOR_EDITOR) {
-            std::string filename = "TestSector";
-            SectorManager::UpdateSectorFromDisk(filename);
-            SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(filename);
-            World::LoadSingleSector(sectorCreateInfo, true);
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            World::LoadMapInstanceObjects("Shit", SpawnOffset());
         }
+        g_isOpen = false;
     }
 
     void ToggleEditorOpenState() {
@@ -205,11 +190,10 @@ namespace Editor {
         if (g_isOpen) {
             OpenEditor();
             switch (GetEditorMode()) {
-                case EditorMode::HEIGHTMAP_EDITOR:   OpenHeightMapEditor();   break;
-                case EditorMode::HOUSE_EDITOR:       OpenHouseEditor();       break;
-                case EditorMode::MAP_EDITOR:         OpenMapEditor();         break;
-                case EditorMode::SECTOR_EDITOR:      OpenSectorEditor();      break;
-                default: break;
+                case EditorMode::HOUSE_EDITOR:      OpenHouseEditor();      break;
+                case EditorMode::MAP_HEIGHT_EDITOR: OpenMapHeightEditor();  break;
+                case EditorMode::MAP_OBJECT_EDITOR: OpenMapObjectEditor();  break;
+                default:                            OpenMapObjectEditor();  break;
             }
         }
         else {
@@ -421,37 +405,17 @@ namespace Editor {
         return g_axisConstraint;
     }
 
-
     void CloseAllEditorWindows() {
-        CloseAllHeightMapEditorWindows();
         CloseAllHouseEditorWindows();
-        CloseAllMapEditorWindows();
-        CloseAllSectorEditorWindows();
+        CloseAllMapHeightEditorWindows();
+        CloseAllMapObjectEditorWindows();
     }
 
-    const std::string& GetSectorName() {
-        return g_sectorName;
+    void SetEditorMapName(const std::string& mapName) {
+        g_editorMapName = mapName;
     }
 
-    const std::string& GetHeightMapName() {
-        return g_heightMapName;
-    }
-
-    void SaveSector() {
-        SectorCreateInfo createInfo = World::CreateSectorInfoFromWorldObjects();
-        createInfo.sectorName = GetSectorName();
-        createInfo.heightMapName = GetHeightMapName();
-        World::SaveSector(createInfo);
-    }
-
-    void LoadSectorFromDisk(const std::string& sectorName) {
-        SectorManager::LoadSectorsFromDisk();
-        SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-
-        if (sectorCreateInfo) {
-            g_sectorName = sectorCreateInfo->sectorName;
-            g_heightMapName = sectorCreateInfo->heightMapName;
-            World::LoadSingleSector(sectorCreateInfo, false);
-        }
+    const std::string& GetEditorMapName() {
+        return g_editorMapName;
     }
 }

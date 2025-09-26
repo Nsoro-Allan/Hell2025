@@ -61,23 +61,19 @@ namespace Editor {
     void SetAxisConstraint(Axis axis);
     Axis GetAxisConstraint();
 
-    // Height Map Editor
-    void InitHeightMapEditor();
-    void OpenHeightMapEditor();
-    void LoadHeightMap(const std::string& heightMapName);
-    void UpdateHeightMapEditor();
-    void ShowNewHeightMapWindow();
-    void ShowOpenHeightMapWindow();
-    void CloseAllHeightMapEditorWindows();
-    void CreateHeigthMapEditorImGuiElements();
+    // File Menu
+    void InitFileMenuImGuiElements();
+    void CreateFileMenuImGuiElements();
 
-    float GetHeightMapNoiseScale();
-    float GetHeightMapBrushSize();
-    float GetHeightMapBrushStrength();
-    float GetHeightMapNoiseStrength();
-    float GetHeightMapMinPaintHeight();
-    float GetHeightMapMaxPaintHeight();
-     
+    // Left panel
+    void InitLeftPanel();
+    void BeginLeftPanel();
+    void EndLeftPanel();
+
+    // New/Open
+    void ShowNewMapWindow();
+    void ShowOpenMapWindow();
+
     // House Editor
     void InitHouseEditor();
     void OpenHouseEditor();
@@ -87,23 +83,39 @@ namespace Editor {
     void CloseAllHouseEditorWindows();
     void CreateHouseEditorImGuiElements();
 
-    // Map Editor
-    void InitMapEditor();
+    // Map Height Editor
+    void InitMapHeightEditor();
+    void OpenMapHeightEditor();
+    void UpdateMapHeightEditor();
+    void CloseAllMapHeightEditorWindows();
+    void CreateMapHeightEditorImGuiElements();
+
+    float GetMapHeightNoiseScale();
+    float GetMapHeightBrushSize();
+    float GetMapHeightBrushStrength();
+    float GetMapHeightNoiseStrength();
+    float GetMapHeightMinPaintHeight();
+    float GetMapHeightMaxPaintHeight();
+    
+    std::string GetNextEditorName(const std::string& desiredName, ObjectType objectType);
+    std::string GetNextAvailableTreeName(TreeType type);
+
+    //void InitMapEditor();
     void OpenMapEditor();
-    void UpdateMapEditor();
-    void ShowNewMapWindow();
-    void ShowOpenMapWindow();
-    void CloseAllMapEditorWindows();
-    void CreateMapEditorImGuiElements();
+    //void UpdateMapEditor();
+    
+    
+    //void CloseAllMapEditorWindows();
+    //void CreateMapEditorImGuiElements();
 
     // Sector Editor
-    void InitSectorEditor();
-    void OpenSectorEditor();
-    void UpdateSectorEditor();
-    void CreateSectorEditorImGuiElements();
+    void InitMapObjectEditor();
+    void OpenMapObjectEditor();
+    void UpdateMapObjectEditor();
+    void CreateMapObjectEditorImGuiElements();
     void ShowNewSectorWindow();
     void ShowOpenSectorWindow();
-    void CloseAllSectorEditorWindows();
+    void CloseAllMapObjectEditorWindows();
 
     void CloseAllEditorWindows();
 
@@ -144,12 +156,12 @@ namespace Editor {
     EditorMode& GetEditorMode();
     Axis GetAxisConstraint();
 
-    const std::string& GetSectorName();
-    const std::string& GetHeightMapName();
+    void SetEditorMapName(const std::string& mapName);
+    const std::string& GetEditorMapName();
 
     // Saving/Loading
-    void SaveSector();
-    void LoadSectorFromDisk(const std::string& sectorName);
+    //void SaveSector();
+    //void LoadSectorFromDisk(const std::string& sectorName);
 
     // Dividers
     bool IsVerticalDividerHovered();

@@ -42,7 +42,7 @@ void AnimatedGameObject::UpdateRenderItems() {
             SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(m_meshRenderingEntries[i].meshIndex);
             Material* material = AssetManager::GetMaterialByIndex(m_meshRenderingEntries[i].materialIndex);
 
-            if (m_isGold) {
+            if (m_isGold && mesh->name != "ArmsMale" && mesh->name!= "ArmsFemale") {
                 static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
                 renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
                 renderItem.rmaTextureIndex = goldMaterial->m_rma;

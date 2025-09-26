@@ -10,7 +10,6 @@
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
 #include "World/HouseManager.h"
-#include "World/MapManager.h"
 #include "World/World.h"
 #include <imgui/imgui.h>
 
@@ -45,8 +44,8 @@ namespace Editor {
         HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
 
         EditorUI::FileMenuNode& file = elements.fileMenu.AddMenuNode("File", nullptr);
-        file.AddChild("New", []() { ShowNewMapWindow(); }, "F2");
-        file.AddChild("Open", []() { ShowOpenMapWindow(); }, "F3");
+        file.AddChild("New", []() { ShowNewHouseWindow(); }, "F2");
+        file.AddChild("Open", []() { ShowOpenHouseWindow(); }, "F3");
         file.AddChild("Save", &Callbacks::SaveHouse, "Ctrl+S");
         file.AddChild("Revert", nullptr);
         file.AddChild("Delete", nullptr);
@@ -55,10 +54,8 @@ namespace Editor {
 
         EditorUI::FileMenuNode& editor = elements.fileMenu.AddMenuNode("Editor");
         editor.AddChild("House", &Callbacks::OpenHouseEditor, "F4");
-        editor.AddChild("Sector", &Callbacks::OpenSectorEditor, "F5");
-        editor.AddChild("Height Map", &Callbacks::OpenHeightMapEditor, "F6");
-        editor.AddChild("Map", &Callbacks::OpenMapEditor, "F7");
-        editor.AddChild("Weapons", &Callbacks::OpenWeaponsEditor, "F8");
+        editor.AddChild("Map Objects", &Callbacks::OpenMapObjectEditor, "F5");
+        editor.AddChild("Map Height", &Callbacks::OpenMapHeightEditor, "F6");
 
         EditorUI::FileMenuNode& insert = elements.fileMenu.AddMenuNode("Insert");
         insert.AddChild("Door", &Callbacks::BeginAddingDoor, "");

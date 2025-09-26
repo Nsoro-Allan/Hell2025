@@ -64,6 +64,10 @@ namespace EditorUI {
         }
     }
 
+    void FileMenu::Reset() {
+        m_menuNodes.clear();
+    }
+
     void NewFileWindow::SetTitle(const std::string& title) {
         m_title = title;
     }
@@ -635,12 +639,13 @@ namespace EditorUI {
     }
 
     void Outliner::SetItems(const std::string name, std::vector<std::string>& items) {
-        for (auto it = m_types.begin(); it != m_types.end(); ++it) {
-            if (it->first == name) {
-                it->second = items;
-                return;
-            }
-        }
+        m_types[name] = items;
+        //for (auto it = m_types.begin(); it != m_types.end(); ++it) {
+        //    if (it->first == name) {
+        //        it->second = items;
+        //        return;
+        //    }
+        //}
     }
 
     bool Outliner::CreateImGuiElements() {
@@ -650,6 +655,9 @@ namespace EditorUI {
         for (auto& kv : m_types) {
             const std::string& type = kv.first;
             const std::vector<std::string>& items = kv.second;
+
+            // Skip if no items in this category
+            if (items.empty()) continue;
 
             if (ImGui::TreeNodeEx(type.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth)) {
                 ImGui::Indent(objectIndent);

@@ -1,6 +1,7 @@
 #include "World.h"
 #include "CreateInfo.h"
 #include "HellDefines.h"
+#include "HellLogging.h"
 #include "HellTypes.h"
 #include "UniqueID.h"
 #include "Util.h"
@@ -8,13 +9,14 @@
 #include "AssetManagement/AssetManager.h"
 #include "Audio/Audio.h"
 #include "Core/Game.h"
+#include "Editor/Editor.h"
 #include "Input/Input.h"
+#include "Managers/MapManager.h"
 #include "Renderer/GlobalIllumination.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Physics/Physics.h"
 #include "World/HouseManager.h"
-#include "World/MapManager.h"
 #include "World/SectorManager.h"
 
 #include "Pathfinding/AStarMap.h"
@@ -22,12 +24,10 @@
 #include "Physics/Types/Ragdoll.h"
 
 namespace World {
-
-    std::vector<Light> g_lights;
     std::vector<AnimatedGameObject> g_animatedGameObjects;
     std::vector<ScreenSpaceBloodDecal> g_screenSpaceBloodDecals;
     std::vector<Bullet> g_bullets;
-    std::vector<BulletCasing> g_bulletCasings;  
+    std::vector<BulletCasing> g_bulletCasings;
     std::vector<ChristmasLights> g_christmasLights;
     std::vector<ChristmasPresent> g_christmasPresents;
     std::vector<ChristmasTree> g_christmasTrees;
@@ -40,6 +40,8 @@ namespace World {
     std::vector<GenericBouncable> g_genericBouncables;
     std::vector<Kangaroo> g_kangaroos;
     std::vector<HeightMapChunk> g_heightMapChunks;
+    std::vector<Light> g_lights;
+    std::vector<MapInstance> g_mapInstances;
     std::vector<Mermaid> g_mermaids;
     std::vector<Plane> g_planes;
     std::vector<PickUp> g_pickUps;
@@ -60,21 +62,22 @@ namespace World {
     std::map<ivecXZ, int> g_validChunks;
 
     std::string g_mapName = "";
-    uint32_t g_mapWidth = 0;
-    uint32_t g_mapDepth = 0;
+    uint32_t g_worldMapChunkCountX = 0;
+    uint32_t g_worldMapChunkCountZ = 0;
+
     std::string g_sectorNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
     std::string g_heightMapNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
+
+
 
     struct WorldState {
         bool oceanEnabled = true;
     } g_worldState;
 
-    void RecreateHieghtMapChunks();
+
     void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses);
 
     void Init() {
-       // AStarMap::Init();
-
         KangarooCreateInfo kangarooCreateInfo;
         kangarooCreateInfo.position = glm::vec3(45, 32.6, 39);
         kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
@@ -84,13 +87,121 @@ namespace World {
         NewRun();
     }
 
+    void LoadMapInstance(const std::string& mapName) {
+        ResetWorld();
+
+        MapInstanceCreateInfo createInfo;
+        createInfo.mapName = mapName;
+        createInfo.spawnOffsetChunkX = 0;
+        createInfo.spawnOffsetChunkZ = 0;
+
+        LoadMapInstances({ createInfo });
+    }
+
+    void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
+        g_mapInstances.clear();
+        g_worldMapChunkCountX = 0;
+        g_worldMapChunkCountZ = 0;
+
+        // Load height map data from all map instances
+        for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
+            int32_t mapIndex = MapManager::GetMapIndexByName(mapInstanceCreateInfo.mapName);
+            if (mapIndex == -1) {
+                Logging::Error() << "World::LoadMapInstances() failed coz '" << mapInstanceCreateInfo.mapName << "' was not found";
+                return;
+            }
+
+            Map* map = MapManager::GetMapByName(mapInstanceCreateInfo.mapName);
+
+            MapInstance& mapInstance = g_mapInstances.emplace_back();
+            mapInstance.m_mapIndex = mapIndex;
+            mapInstance.spawnOffsetChunkX = mapInstanceCreateInfo.spawnOffsetChunkX;
+            mapInstance.spawnOffsetChunkZ = mapInstanceCreateInfo.spawnOffsetChunkZ;
+
+            uint32_t reachX = mapInstance.spawnOffsetChunkX + map->GetChunkCountX();
+            uint32_t reachZ = mapInstance.spawnOffsetChunkZ + map->GetChunkCountZ();
+
+            g_worldMapChunkCountX = std::max(g_worldMapChunkCountX, reachX);
+            g_worldMapChunkCountZ = std::max(g_worldMapChunkCountZ, reachZ);
+        }
+
+        // Create heightmap chunks
+        g_heightMapChunks.clear();
+        g_validChunks.clear();
+
+        // Init heightmap chunks
+        int baseVertex = 0;
+        int baseIndex = 0;
+        for (int x = 0; x < g_worldMapChunkCountX; x++) {
+            for (int z = 0; z < g_worldMapChunkCountZ; z++) {
+                int cellX = x / 8;
+                int cellZ = z / 8;
+
+                HeightMapChunk& chunk = g_heightMapChunks.emplace_back();
+                chunk.coord.x = x;
+                chunk.coord.z = z;
+                chunk.baseVertex = baseVertex;
+                chunk.baseIndex = baseIndex;
+                baseVertex += VERTICES_PER_CHUNK;
+                baseIndex += INDICES_PER_CHUNK;
+
+                g_validChunks[chunk.coord] = g_heightMapChunks.size() - 1;
+            }
+        }
+
+        Renderer::RecalculateAllHeightMapData(true);
+
+        // Load the objects from all map instances
+        for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
+            Map* map = MapManager::GetMapByName(mapInstanceCreateInfo.mapName);
+            if (!map) {
+                Logging::Error() << "World::LoadMapInstances() failed coz '" << mapInstanceCreateInfo.mapName << "' was not found";
+                return;
+            }
+            SpawnOffset spawnOffset;
+            spawnOffset.translation.x = mapInstanceCreateInfo.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+            spawnOffset.translation.z = mapInstanceCreateInfo.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+            LoadMapInstanceObjects(mapInstanceCreateInfo.mapName, spawnOffset);
+        }
+    }
+
+    void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
+        for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps) {
+            AddPickUp(createInfo, spawnOffset);
+        }
+        for (TreeCreateInfo& createInfo : createInfoCollection.trees) {
+            AddTree(createInfo, spawnOffset);
+        }
+    }
+
+    CreateInfoCollection GetCreateInfoCollection() {
+        CreateInfoCollection createInfoCollection;
+
+        for (PickUp& pickUp : World::GetPickUps()) {
+            createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
+        }
+        for (Tree& tree : World::GetTrees()) {
+            createInfoCollection.trees.push_back(tree.GetCreateInfo());
+        }
+
+        return createInfoCollection;
+    }
+
+    void LoadMapInstanceObjects(const std::string& mapName, SpawnOffset spawnOffset) {
+        Map* map = MapManager::GetMapByName(mapName);
+        if (!map) {
+            Logging::Error() << "World::LoadMapInstanceObjects() failed coz '" << mapName << "' was not found";
+            return;
+        }
+        AddCreateInfoCollection(map->GetCreateInfoCollection(), spawnOffset);
+    }
 
     void NewRun() {
-        std::string sectorName = "TestSector";
-        SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-        if (sectorCreateInfo) {
-            World::LoadSingleSector(sectorCreateInfo, true);
-        }
+        //std::string sectorName = "TestSector";
+        //SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
+        //if (sectorCreateInfo) {
+        //    World::LoadSingleSector(sectorCreateInfo, true);
+        //}
 
         Game::RespawnPlayers();
 
@@ -98,12 +209,28 @@ namespace World {
         Shark& shark = g_sharks.emplace_back();
         shark.Init(glm::vec3(5.0f, 29.05f, 40.0f));
 
-        //Shark& shark2 = g_sharks.emplace_back();
-        //shark2.Init(glm::vec3(25.0f, 29.05f, 60.0f));
-
+        // Respawn roos
         for (Kangaroo& kangaroo : g_kangaroos) {
             kangaroo.Respawn();
         }
+
+        // Load two instances of the map
+        std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet;
+
+        MapInstanceCreateInfo mapInstanceCreateInfo;
+        mapInstanceCreateInfo.mapName = "Shit";
+        mapInstanceCreateInfo.spawnOffsetChunkX = 0;
+        mapInstanceCreateInfo.spawnOffsetChunkZ = 0;
+        mapInstanceCreateInfoSet.push_back(mapInstanceCreateInfo);
+
+        mapInstanceCreateInfo.mapName = "Shit";
+        mapInstanceCreateInfo.spawnOffsetChunkX = 8;
+        mapInstanceCreateInfo.spawnOffsetChunkZ = 4;
+        mapInstanceCreateInfoSet.push_back(mapInstanceCreateInfo);
+
+        LoadMapInstances(mapInstanceCreateInfoSet);
+
+        Editor::SetEditorMapName(UNDEFINED_STRING);
     }
 
     void BeginFrame() {
@@ -187,54 +314,6 @@ namespace World {
         }
     }
 
-
-
-    void NewCampainWorld() {
-        ResetWorld();
-    }
-
-    void LoadDeathMatchMap() {
-        ResetWorld();
-    }
-
-
-    void RecreateHieghtMapChunks() {
-        g_heightMapChunks.clear();
-        g_validChunks.clear();
-
-        // Init heightmap chunks
-        int chunkCountX = g_mapWidth * 8;
-        int chunkCountZ = g_mapDepth * 8;
-        int baseVertex = 0;
-        int baseIndex = 0;
-        for (int x = 0; x < chunkCountX; x++) {
-            for (int z = 0; z < chunkCountZ; z++) {
-                int cellX = x / 8;
-                int cellZ = z / 8;
-
-                // Skip if map cell out of range somehow
-                if (!IsMapCellInRange(cellX, cellZ)) continue;
-
-                // Skip if there is no height map at this cell
-                const std::string& heightMapName = GetHeightMapNameAtLocation(cellX, cellZ);
-                //std::cout << x << " " << z << " heightMapName: " << heightMapName << "\n";
-                if (heightMapName == "") continue;
-
-                HeightMapChunk& chunk = g_heightMapChunks.emplace_back();
-                chunk.coord.x = x;
-                chunk.coord.z = z;
-                chunk.baseVertex = baseVertex;
-                chunk.baseIndex = baseIndex;
-                baseVertex += VERTICES_PER_CHUNK;
-                baseIndex += INDICES_PER_CHUNK;
-
-                g_validChunks[chunk.coord] = g_heightMapChunks.size() - 1;
-            }
-        }
-
-        Renderer::RecalculateAllHeightMapData();
-    }
-
     void LoadMap(MapCreateInfo* mapCreateInfo) {
         // Handle failed map load
         if (!mapCreateInfo) {
@@ -246,50 +325,18 @@ namespace World {
         ResetWorld();
 
         g_mapName = mapCreateInfo->name;
-        g_mapWidth = mapCreateInfo->width;
-        g_mapDepth = mapCreateInfo->depth;
+        std::string sectorName = mapCreateInfo->m_sectorNames[0][0];
+        SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
+        if (sectorCreateInfo) {
+            g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
 
-        // and iterate over all the sector locations...
-        int mapWidth = World::GetMapWidth();
-        int mapDepth = World::GetMapDepth();
-        for (int x = 0; x < mapWidth; x++) {
-            for (int z = 0; z < mapDepth; z++) {
-                std::string sectorName = mapCreateInfo->m_sectorNames[x][z];
-                SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-                if (sectorCreateInfo) {
-                    g_heightMapNames[x][z] = sectorCreateInfo->heightMapName;
-
-                    SpawnOffset spawnOffset;
-                    spawnOffset.translation.x = x * SECTOR_SIZE_WORLD_SPACE;
-                    spawnOffset.translation.z = z * SECTOR_SIZE_WORLD_SPACE;
-                    AddSectorAtLocation(*sectorCreateInfo, spawnOffset, true);
-                    //std::cout << " - [" << sectorLocation.x << "][" << sectorLocation.z << "] " << sectorName << "\n";
-                }
-            }
+            SpawnOffset spawnOffset;
+            spawnOffset.translation.x = SECTOR_SIZE_WORLD_SPACE;
+            spawnOffset.translation.z = SECTOR_SIZE_WORLD_SPACE;
+            AddSectorAtLocation(*sectorCreateInfo, spawnOffset, true);
         }
-
-        RecreateHieghtMapChunks();
 
         std::cout << "Loaded map: " << g_mapName << "\n";
-
-        //GameObject* sup = GetGameObjectByIndex(9999999);
-        //std::cout << sup->GetPosition() << "\n";
-    }
-
-    void LoadMap(const std::string& mapName) {
-        MapCreateInfo* mapCreateInfo = MapManager::GetMapCreateInfoByName(mapName);
-        if (mapCreateInfo) {
-            LoadMap(mapCreateInfo);
-        }
-    }
-
-    void LoadEmptyWorld() {
-        ResetWorld();
-        g_mapName = "EmptyWorld";
-        g_mapWidth = 0;
-        g_mapDepth = 0;
-        RecreateHieghtMapChunks();
-        std::cout << "Loaded empty world\n";
     }
 
     void LoadSingleSector(SectorCreateInfo* sectorCreateInfo, bool loadHouses) {
@@ -300,11 +347,11 @@ namespace World {
         g_mapName = "SectorEditorMap";
         g_sectorNames[0][0] = sectorCreateInfo->sectorName;
         g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
-        g_mapWidth = 1;
-        g_mapDepth = 1;
+        //g_mapWidth = 1;
+        //g_mapDepth = 1;
 
         AddSectorAtLocation(*sectorCreateInfo, SpawnOffset(), loadHouses);
-        RecreateHieghtMapChunks();
+        
 
         std::cout << "Loaded Single Sector: '" << g_sectorNames[0][0] << "' with height map '" << g_heightMapNames[0][0] << "'\n";
 
@@ -320,23 +367,21 @@ namespace World {
         g_gameObjects[0].m_meshNodes.m_materialIndices[1] = AssetManager::GetMaterialIndexByName("Leopard");
 
 
-        createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "PowerPole";
-        AddGameObject(createInfo2);
-
-
-        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "Reflector";
-        AddGameObject(createInfo2);
-
-        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "Fence";
-        AddGameObject(createInfo2);
-
-
+        //createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
+        //createInfo2.scale = glm::vec3(1.0f);
+        //createInfo2.modelName = "PowerPole";
+        //AddGameObject(createInfo2);
+        //
+        //
+        //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        //createInfo2.scale = glm::vec3(1.0f);
+        //createInfo2.modelName = "Reflector";
+        //AddGameObject(createInfo2);
+        //
+        //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        //createInfo2.scale = glm::vec3(1.0f);
+        //createInfo2.modelName = "Fence";
+        //AddGameObject(createInfo2);
     }
 
     void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
@@ -346,11 +391,10 @@ namespace World {
         }
 
         ResetWorld();
-        RecreateHieghtMapChunks();
 
         g_mapName = "HouseEditorMap";
-        g_mapWidth = 1;
-        g_mapDepth = 1;
+        //g_mapWidth = 1;
+        //g_mapDepth = 1;
 
         AddHouse(*houseCreateInfo, SpawnOffset());
 
@@ -694,6 +738,7 @@ namespace World {
         //g_kangaroos.clear();
         g_heightMapChunks.clear();
         g_lights.clear();
+        g_mapInstances.clear();
         g_mermaids.clear();
         g_pianos.clear();
         g_pickUps.clear();
@@ -705,13 +750,10 @@ namespace World {
         g_walls.clear();
         g_windows.clear();
 
-
         MermaidCreateInfo mermaidCreateInfo;
         mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
         mermaidCreateInfo.rotation.y = 0.25f;
         AddMermaid(mermaidCreateInfo);
-
-
 
         //AnimatedGameObject* animatedGameObject = nullptr;
         //uint64_t id = World::CreateAnimatedGameObject();
@@ -865,7 +907,7 @@ namespace World {
         g_trees.push_back(Tree(createInfo));
     }
 
-    void AddVolumetricBlood(glm::vec3 position, glm::vec3 front) {
+    void AddVATBlood(glm::vec3 position, glm::vec3 front) {
         int maxAllowed = 4;
         if (g_volumetricBloodSplatters.size() < maxAllowed) {
             g_volumetricBloodSplatters.push_back(VolumetricBloodSplatter(position, front));
@@ -906,16 +948,20 @@ namespace World {
         window.Init(createInfo);
     }
 
+    void AddMapInstance(const std::string& mapName, int32_t spawnOffsetChunkX, int32_t spawnOffsetChunkZ) {
+
+    }
+
     std::vector<HeightMapChunk>& GetHeightMapChunks() {
         return g_heightMapChunks;
     }
 
     const uint32_t GetChunkCountX() {
-        return GetMapWidth() * CHUNK_COUNT_PER_MAP_CELL;
+        return g_worldMapChunkCountX;
     }
 
     const uint32_t GetChunkCountZ() {
-        return GetMapDepth() * CHUNK_COUNT_PER_MAP_CELL;
+        return g_worldMapChunkCountZ;
     }
 
     const uint32_t GetChunkCount() {
@@ -939,24 +985,17 @@ namespace World {
 
 
     const float GetWorldSpaceWidth() {
-        return g_mapWidth * MAP_CELL_WORLDSPACE_SIZE;
+        return g_worldMapChunkCountX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
     }
 
     const float GetWorldSpaceDepth() {
-        return g_mapDepth * MAP_CELL_WORLDSPACE_SIZE;
+        return g_worldMapChunkCountZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
     }
 
-    const uint32_t GetMapWidth() {
-        return g_mapWidth;
-    }
-
-    const uint32_t GetMapDepth() {
-        return g_mapDepth;
-    }
 
     const std::string& GetSectorNameAtLocation(int x, int z) {
-        if (x < 0 || x >= g_mapWidth || z < 0 || z >= g_mapDepth) {
-            std::cout << "World::GetSectorNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << g_mapWidth << "][" << g_mapDepth << "]\n";
+        if (x < 0 || x >= 1 || z < 0 || z >= 1) {
+            std::cout << "World::GetSectorNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
             static const std::string emptyStr = "";
             return emptyStr;
         }
@@ -964,8 +1003,8 @@ namespace World {
     }
 
     const std::string& GetHeightMapNameAtLocation(int x, int z) {
-        if (x < 0 || x >= g_mapWidth || z < 0 || z >= g_mapDepth) {
-            std::cout << "World::GetHeightMapNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << g_mapWidth << "][" << g_mapDepth << "]\n";
+        if (x < 0 || x >= 1 || z < 0 || z >= 1) {
+            std::cout << "World::GetHeightMapNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
             static const std::string emptyStr = "";
             return emptyStr;
         }
@@ -973,19 +1012,7 @@ namespace World {
     }
 
     bool IsMapCellInRange(int x, int z) {
-        return (x >= 0 && x < g_mapWidth && z >= 0 && z < g_mapDepth);
-    }
-
-    const uint32_t GetHeightMapCount() {
-        int count = 0;
-        for (int x = 0; x < g_mapWidth; x++) {
-            for (int z = 0; z < g_mapDepth; z++) {
-                if (g_heightMapNames[x][z] != "") {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return (x >= 0 && x < 1 && z >= 0 && z < 1);
     }
 
     Piano* GetPianoByObjectId(uint64_t objectId) {
@@ -1043,6 +1070,7 @@ namespace World {
     std::vector<Plane>& GetPlanes()                                     { return g_planes; }
     std::vector<Light>& GetLights()                                     { return g_lights; };
     std::vector<Kangaroo>& GetKangaroos()                               { return g_kangaroos; }
+    std::vector<MapInstance>& GetMapInstances()                         { return g_mapInstances; }
     std::vector<Mermaid>& GetMermaids()                                 { return g_mermaids; }
     std::vector<Piano>& GetPianos()                                     { return g_pianos; }
     std::vector<PickUp>& GetPickUps()                                   { return g_pickUps; }
@@ -1058,18 +1086,4 @@ namespace World {
     std::vector<GPULight>& GetGPULightsLowRes()                 { return g_gpuLightsLowRes; }
     std::vector<GPULight>& GetGPULightsMidRes()                 { return g_gpuLightsMidRes; }
     std::vector<GPULight>& GetGPULightsHighRes()                { return g_gpuLightsHighRes; }
-
-    void PrintMapCreateInfoDebugInfo() {
-        std::cout << "Map: '" << g_mapName << "'\n";
-        // Iterate the map, save any sectors height map that isn't none
-        for (int x = 0; x < g_mapWidth; x++) {
-            for (int z = 0; z < g_mapDepth; z++) {
-                std::string sectorName = GetSectorNameAtLocation(x, z);
-                std::string heightMapName = GetHeightMapNameAtLocation(x, z);
-                std::cout << " - [" << x << "][" << z << "] Sector: '" << sectorName << "'";
-                std::cout << " HeightMap: '" << heightMapName << "'";
-                std::cout << "\n";
-            }
-        }
-    }
 }

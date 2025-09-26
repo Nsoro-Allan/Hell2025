@@ -12,9 +12,8 @@
 #include "Util/Util.h"
 #include "World/World.h"
 
+#include "Managers/MapManager.h"
 #include "World/HouseManager.h"
-#include "World/HeightMapManager.h"
-#include "World/MapManager.h"
 #include "World/SectorManager.h"
 
 #include <unordered_map>
@@ -105,7 +104,6 @@ namespace AssetManager {
             BuildSpriteSheetTextures();
             CopyInAllLoadedModelBvhData();
 
-            HeightMapManager::Init();
             HouseManager::Init();
             MapManager::Init();
             SectorManager::LoadSectorsFromDisk();

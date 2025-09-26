@@ -676,3 +676,10 @@ struct Bone {
     int32_t parentIndex = -1;
     int32_t deformFlag = 0; // 0: non-deforming 1: deforming
 };
+
+struct HouseLocation {
+    HouseType type = HouseType::UNDEFINED;
+    std::string houseName = "RANDOM";
+    glm::vec3 position = glm::vec3(0.0f);
+    float rotation = 0.0f;
+};

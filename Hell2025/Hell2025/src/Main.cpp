@@ -18,11 +18,12 @@
 #include "Renderer/Renderer.h"
 #include "UI/UIBackEnd.h"
 #include <iostream>
-#include "Timer.hpp"
+#include "HellLogging.h"
 
 #include "API/Vulkan/vk_backend.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+
 /*
 int main2() {
     VulkanBackEnd::Init();
@@ -31,6 +32,12 @@ int main2() {
 
 int main() {
     std::cout << "We are all alone on life's journey, held captive by the limitations of human consciousness.\n";
+
+    Logging::EnableLevel(Logging::Level::INIT);
+    Logging::EnableLevel(Logging::Level::DEBUG);
+    Logging::EnableLevel(Logging::Level::ERROR);
+    Logging::EnableLevel(Logging::Level::FATAL);
+    Logging::EnableLevel(Logging::Level::TODO);
 
     // Init the back-end, sub-systems, and the minimum to render loading screen
     if (!BackEnd::Init(API::OPENGL, WindowedMode::WINDOWED)) {

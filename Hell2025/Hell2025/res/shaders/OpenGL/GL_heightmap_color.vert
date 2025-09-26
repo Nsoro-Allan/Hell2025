@@ -15,41 +15,23 @@ out vec2 TexCoord;
 out vec3 WorldPos;
 out vec3 Normal;
 out vec3 Tangent;
-out vec3 Bitangent;
+out vec3 BiTangent;
 
 uniform mat4 modelMatrix;
 uniform mat4 inverseModelMatrix;
 uniform float u_textureScaling;
 
-flat out int vtxID;
-
 void main() {
-    // Pass UV coordinates (scaled as desired)
     TexCoord = vUV * 50.0 * u_textureScaling;
-    
-    // Retrieve projection and view info from the viewport buffer.
     int viewportIndex = gl_BaseInstance;
     mat4 projectionView = viewportData[viewportIndex].projectionView;
     
-    // Transform the vertex position using the model matrix.
-    // This model matrix now incorporates the non-uniform scaling (for example, 0.25 for x/z and 5 for y, etc.)
     vec4 worldPos4 = modelMatrix * vec4(vPosition, 1.0);
     WorldPos = worldPos4.xyz;
     
-    // Compute the normal transformation.
-    // For non-uniform scaling the normals must be transformed with the transpose of the inverse of the model matrix.
-    // Here, inverseModelMatrix is assumed to be the inverse of modelMatrix.
     mat3 normalMatrix = transpose(mat3(inverseModelMatrix));
     Normal = normalize(normalMatrix * vNormal);
-    
-    // Transform the tangent in the same way.
     Tangent = normalize(normalMatrix * vTangent);
-    
-    // Compute the bitangent as the cross product of the transformed normal and tangent.
-    Bitangent = normalize(cross(Normal, Tangent));
-    
-    // Finally, compute the clip-space position.
+    BiTangent = normalize(cross(Normal, Tangent));
     gl_Position = projectionView * worldPos4;
-
-    vtxID = gl_VertexID;
 }

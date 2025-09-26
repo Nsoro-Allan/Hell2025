@@ -23,6 +23,7 @@ namespace EditorUI {
     struct FileMenu {
         FileMenuNode& AddMenuNode(const std::string& text, std::function<void()> callback = nullptr, bool addPadding = false);
         void CreateImguiElements();
+        void Reset();
 
     private:
         std::vector<FileMenuNode> m_menuNodes;

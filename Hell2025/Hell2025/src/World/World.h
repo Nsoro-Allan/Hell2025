@@ -24,6 +24,7 @@
 #include "Types/House/Plane.h"
 #include "Types/House/Wall.h"
 #include "Types/House/Window.h"
+#include "Types/Map/MapInstance.h"
 #include "Types/Misc/PictureFrame.h"
 #include "Types/Misc/Piano.h"
 #include "Types/Exterior/Tree.h"
@@ -40,6 +41,12 @@ struct ViewportBvhData {
     BvhRayResult closestHit;
 };
 
+struct MapInstanceCreateInfo {
+    std::string mapName;
+    uint32_t spawnOffsetChunkX;
+    uint32_t spawnOffsetChunkZ;
+};
+
 namespace World {
     //AnimatedGameObject* GetRooTest();
 
@@ -54,17 +61,14 @@ namespace World {
 
     void RecreateHouseMesh();
 
-    void LoadMap(const std::string& mapName);
-    void LoadMap(MapCreateInfo* mapCreateInfo);
+    void ResetWorld();
+    void LoadMapInstance(const std::string& mapName);
+    void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet);
+    void LoadMapInstanceObjects(const std::string& mapName, SpawnOffset spawnOffset); // Everything except the heightmap
 
     void LoadSingleSector(SectorCreateInfo* sectorCreateInfo, bool loadHouses);
     void LoadSingleHouse(HouseCreateInfo* houseCreateInfo);
     
-    void LoadDeathMatchMap();
-
-    void ResetWorld();
-    void LoadEmptyWorld();
-    void NewCampainWorld();
 
     bool ChunkExists(int x, int z);
     const uint32_t GetChunkCountX();
@@ -78,6 +82,7 @@ namespace World {
     void AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset());
     void AddDecal(const DecalCreateInfo& createInfo);
     void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -94,7 +99,7 @@ namespace World {
     void AddToilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddVolumetricBlood(glm::vec3 position, glm::vec3 front);
+    void AddVATBlood(glm::vec3 position, glm::vec3 front);
     void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset);
 
     void AddHouse(HouseCreateInfo houseCreateInfo, SpawnOffset spawnOffset);
@@ -102,7 +107,7 @@ namespace World {
     void EnableOcean();
     void DisableOcean();
     bool HasOcean();
-
+    
     // Logic
     void ProcessBullets();
 
@@ -124,13 +129,11 @@ namespace World {
 
     const float GetWorldSpaceWidth();
     const float GetWorldSpaceDepth();
-    const uint32_t GetMapWidth();
-    const uint32_t GetMapDepth();
-    const uint32_t GetHeightMapCount();
+    //const uint32_t GetMapWidth();
+    //const uint32_t GetMapDepth();
     const std::string& GetSectorNameAtLocation(int x, int z);
     const std::string& GetHeightMapNameAtLocation(int x, int z);
     bool IsMapCellInRange(int x, int z);
-    void PrintMapCreateInfoDebugInfo();
 
     void UpdateDoorAndWindowCubeTransforms();
     void ResetWeatherboardMeshBuffer();
@@ -151,6 +154,8 @@ namespace World {
     MeshBuffer& GetHouseMeshBuffer();
     MeshBuffer& GetWeatherBoardMeshBuffer();
     Mesh* GetHouseMeshByIndex(uint32_t meshIndex);
+
+    CreateInfoCollection GetCreateInfoCollection();
 
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectID);
     Door* GetDoorByObjectId(uint64_t objectID);
@@ -193,6 +198,7 @@ namespace World {
     std::vector<Plane>& GetPlanes();
     std::vector<Light>& GetLights();
     std::vector<Kangaroo>& GetKangaroos();
+    std::vector<MapInstance>& GetMapInstances();
     std::vector<Mermaid>& GetMermaids();
     std::vector<Piano>& GetPianos();
     std::vector<PickUp>& GetPickUps();
@@ -212,21 +218,3 @@ namespace World {
     //std::vector<RenderItem>& GetRenderItemsHairBottomLayer();
     std::vector<RenderItem>& GetSkinnedRenderItems();
 }
-
-/*
-    Notes
-    
-    * Sectors
-      - Each sector can or can not have a house
-      - There is always a house in the first sector you DON'T spawn in
-      - Each sector has a 50% chance of having a house
-      - There can never be 2 sectors WITHOUT a house in a row
-      - If a sector has no house, then it may be a mermaid shop sector
-      - If a sector has no house, then it may be a dense woods sector, aka trees and full of enemies
-
-    * Witches
-      - they are a rarer shop than the mermaid shop
-      - they sell better items
-      - they hover above a fire 
-
-*/

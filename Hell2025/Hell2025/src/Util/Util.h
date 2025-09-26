@@ -1,4 +1,5 @@
 #pragma once
+#include "CreateInfo.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
 #include "Math/AABB.h"
@@ -83,15 +84,18 @@ namespace Util {
     std::string Mat4ToString(glm::mat4 m);
     std::string Lowercase(std::string& str);
     std::string Uppercase(std::string& str);
-    std::string ViewportModeToString(const ShadingMode& viewportMode);
+    std::string FloatToString(float value, int precision = 3);
+    std::string DoubleToString(double value, int precision = 3);
+
     std::string CameraViewToString(const CameraView& cameraView);
-    std::string EditorStateToString(const EditorState& g_editorState);
-    std::string WeaponActionToString(const WeaponAction& weaponAction);
-    std::string ImageDataTypeToString(const ImageDataType& imageDataType);
-    std::string EditorModeToString(const EditorMode& editorMode);
     std::string DebugRenderModeToString(const DebugRenderMode& mode);
+    std::string EditorModeToString(const EditorMode& editorMode);
+    std::string EditorStateToString(const EditorState& g_editorState);
+    std::string ImageDataTypeToString(const ImageDataType& imageDataType);
     std::string SharkMovementStateToString(const SharkMovementState& state);
     std::string SharkHuntingStateToString(const SharkHuntingState& state);
+    std::string ViewportModeToString(const ShadingMode& viewportMode);
+    std::string WeaponActionToString(const WeaponAction& weaponAction);
 
     const char* CopyConstChar(const char* text);
     bool StrCmp(const char* queryA, const char* queryB);
@@ -125,6 +129,12 @@ namespace Util {
     float EaseInOut(float t, float a);
     float HermiteEaseInOut(float t);
 
+    // JSON
+    AdditionalMapData AdditionalMapDataFromJSON(const std::string& jsonString);
+    CreateInfoCollection CreateInfoCollectionFromJSON(const std::string& jsonString);
+    std::string AdditionalMapDataToJSON(AdditionalMapData& additionalMapData);
+    std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection);
+
     // Animation
     //int FindAnimatedNodeIndex(float AnimationTime, const AnimatedNode* animatedNode);
     const AnimatedNode* FindAnimatedNode(Animation* animation, const char* NodeName);
@@ -141,29 +151,33 @@ namespace Util {
     glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);
     glm::mat4 aiMatrix3x3ToGlm(const aiMatrix3x3& from); 
 
-    // Conversions
+    // Type to string Conversions
+    std::string BlendingModeToString(BlendingMode mode);
+    std::string HouseTypeToString(HouseType houseType);
     std::string InventoryStateToString(const InventoryState& state);
-    std::string OpenStateToString(OpenState mode);
     std::string LightTypeToString(LightType type);
     std::string PickUpTypeToString(PickUpType type);
-    std::string BlendingModeToString(BlendingMode mode);
     std::string ObjectTypeToString(ObjectType type);
+    std::string OpenStateToString(OpenState mode);
     std::string PictureFrameTypeToString(PictureFrameType type);
     std::string PhysicsTypeToString(PhysicsType type);
     std::string TreeTypeToString(TreeType type);
     std::string TrimTypeToString(TrimType type);
     std::string WallTypeToString(WallType type);
+
+    // String to type conversions
     BlendingMode StringToBlendingMode(const std::string& str);
+    HouseType StringToHouseType(const std::string& str);
     LightType StringToLightType(const std::string& str);
     PickUpType StringToPickUpType(const std::string& str);
     PictureFrameType StringToPictureFrameType(const std::string& str);
     TreeType StringToTreeType(const std::string& str);
     TrimType StringToTrimType(const std::string& str);
     WallType StringToWallType(const std::string& str);
+
+    // Int conversions
     ObjectType IntToEnum(int value);
     int32_t EnumToInt(ObjectType type);
-    std::string FloatToString(float value, int precision = 3);
-    std::string DoubleToString(double value, int precision = 3);
 
     // Time
     double GetCurrentTime();

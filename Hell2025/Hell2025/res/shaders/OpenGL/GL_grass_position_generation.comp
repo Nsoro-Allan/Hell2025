@@ -67,20 +67,18 @@ bool IntersectsPoint(vec3 point, int viewportIndex) {
 }
 
 bool IntersectsSphere(vec3 center, float radius, int viewportIndex) {
-    vec4 frustumPlanes[6];
-    frustumPlanes[0] = viewportData[viewportIndex].frustumPlane0;
-    frustumPlanes[1] = viewportData[viewportIndex].frustumPlane1;
-    frustumPlanes[2] = viewportData[viewportIndex].frustumPlane2;
-    frustumPlanes[3] = viewportData[viewportIndex].frustumPlane3;
-    frustumPlanes[4] = viewportData[viewportIndex].frustumPlane4;
-    frustumPlanes[5] = viewportData[viewportIndex].frustumPlane5;
-    
-    for (int i = 0; i < 6; i++) {
-        float distance = SignedDistance(center, frustumPlanes[i]);
-        if (distance < -radius) { // Fully outside
-            return false;
-        }
-    }
+    vec4 P0 = viewportData[viewportIndex].frustumPlane0;
+    vec4 P1 = viewportData[viewportIndex].frustumPlane1;
+    vec4 P2 = viewportData[viewportIndex].frustumPlane2;
+    vec4 P3 = viewportData[viewportIndex].frustumPlane3;
+    vec4 P4 = viewportData[viewportIndex].frustumPlane4;
+    vec4 P5 = viewportData[viewportIndex].frustumPlane5;
+    if (SignedDistance(center, P0) < -radius) return false;
+    if (SignedDistance(center, P1) < -radius) return false;
+    if (SignedDistance(center, P2) < -radius) return false;
+    if (SignedDistance(center, P3) < -radius) return false;
+    if (SignedDistance(center, P4) < -radius) return false;
+    if (SignedDistance(center, P5) < -radius) return false;
     return true;
 }
 
@@ -158,6 +156,9 @@ void main() {
     vec2 screenUV = WorldToScreen(basePos, projectionView, viewportPos, viewportSize);
     screenUV = clamp(screenUV, vec2(0.0), vec2(1.0));
 
+    // Early reject without sampling world position
+    if (any(lessThan(screenUV, vec2(0.0))) || any(greaterThan(screenUV, vec2(1.0)))) return;
+
     // Occlusion cull
     vec3 sceneWorldPos = texture(WorldPositionTexture, screenUV).rgb;
     float sceneDistanceToCamera = length(sceneWorldPos - viewPos);
@@ -178,10 +179,8 @@ void main() {
     //basePos.x += jitterX;
     //basePos.z += jitterZ;
 
-    // Increment the draw command
+    // Append
     uint baseIndex = atomicAdd(drawCmd.count, 24);
-    //baseIndex = gid.y * gridSize + gid.x;
-    // Store the positions
     uint indx = baseIndex / 24; // there are 24 indices per blade
     bladePositions[indx] = vec4(basePos, 0);
 }

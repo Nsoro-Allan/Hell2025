@@ -95,7 +95,7 @@ namespace World {
                     // Spawn volumetric blood
                     glm::vec3 position = rayResult.hitPosition;
                     glm::vec3 front = bullet.GetDirection() * glm::vec3(-1);
-                    World::AddVolumetricBlood(position, -bullet.GetDirection());
+                    World::AddVATBlood(position, -bullet.GetDirection());
                 }
 
 
@@ -194,19 +194,20 @@ namespace World {
     }
 
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction) {
-        World::AddVolumetricBlood(position, direction);
+        // Create VAT blood then and there
+        AddVATBlood(position, direction);
 
-        // Find screenspace blood decal spawn position
+        // For the screenspace decal blood, cast a ray directly down and create it at the ray hit position
         glm::vec3 rayOrigin = position;
         glm::vec3 rayDirection = glm::vec3(0.0f, -1.0f, 0.0f);
         float rayLength = 100;
-        PhysXRayResult downwardRayResult = Physics::CastPhysXRayStaticEnviroment(rayOrigin, rayDirection, rayLength);
+        PhysXRayResult rayResult = Physics::CastPhysXRayStaticEnvironment(rayOrigin, rayDirection, rayLength);
 
-        if (downwardRayResult.hitFound) {
+        if (rayResult.hitFound) {
             ScreenSpaceBloodDecalCreateInfo decalCreateInfo;
-            decalCreateInfo.position = downwardRayResult.hitPosition;
-            World::AddScreenSpaceBloodDecal(decalCreateInfo);
+            decalCreateInfo.position = rayResult.hitPosition;
+            decalCreateInfo.direction = direction;
+            AddScreenSpaceBloodDecal(decalCreateInfo);
         }
     }
-
 }

@@ -3,16 +3,16 @@
 #include "API/Vulkan/Renderer/VK_renderer.h"
 #include "BackEnd/BackEnd.h"
 #include "Editor/Editor.h"
+#include "HellLogging.h"
 #include "Timer.hpp"
 
 namespace Renderer {
 
     struct RendererSettingsSet {
         RendererSettings game;
-        RendererSettings heightMapEditor;
         RendererSettings houseEditor;
-        RendererSettings mapEditor;
-        RendererSettings sectorEditor;
+        RendererSettings mapHeightEditor;
+        RendererSettings mapObjectEditor;
     } g_rendererSettingsSet;
 
     void InitMain() {
@@ -20,20 +20,17 @@ namespace Renderer {
             OpenGLRenderer::InitMain();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO: VulkanRenderer::InitMain();
+            Logging::ToDo() << "Vulkan TODO: Renderer::InitMain()";
         }
 
         g_rendererSettingsSet.houseEditor.rendererOverrideState = RendererOverrideState::CAMERA_NDOTL;
         g_rendererSettingsSet.houseEditor.drawGrass = false;
 
-        g_rendererSettingsSet.mapEditor.rendererOverrideState = RendererOverrideState::NORMALS;
-        g_rendererSettingsSet.mapEditor.drawGrass = false;
+        g_rendererSettingsSet.mapHeightEditor.rendererOverrideState = RendererOverrideState::CAMERA_NDOTL;
+        g_rendererSettingsSet.mapHeightEditor.drawGrass = false;
 
-        g_rendererSettingsSet.heightMapEditor.rendererOverrideState = RendererOverrideState::CAMERA_NDOTL;
-        g_rendererSettingsSet.heightMapEditor.drawGrass = false;
-
-        g_rendererSettingsSet.sectorEditor.rendererOverrideState = RendererOverrideState::BASE_COLOR;
-        g_rendererSettingsSet.sectorEditor.drawGrass = true;
+        g_rendererSettingsSet.mapObjectEditor.rendererOverrideState = RendererOverrideState::CAMERA_NDOTL;
+        g_rendererSettingsSet.mapObjectEditor.drawGrass = true;
     }
 
     void RenderLoadingScreen() {
@@ -50,7 +47,7 @@ namespace Renderer {
             OpenGLRenderer::PreGameLogicComputePasses();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO: VulkanRenderer::PreGameLogicComputePasses();
+            // Vulkan TODO:Renderer::PreGameLogicComputePasses();
         }
     }
 
@@ -59,7 +56,7 @@ namespace Renderer {
             OpenGLRenderer::RenderGame();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO: VulkanRenderer::RenderLoadingScreen();
+            // Vulkan TODO:Renderer::RenderLoadingScreen();
         }
     }
 
@@ -72,9 +69,9 @@ namespace Renderer {
         }
     }
 
-    void RecalculateAllHeightMapData() {
+    void RecalculateAllHeightMapData(bool blitWorldMap) {
         if (BackEnd::GetAPI() == API::OPENGL) {
-            OpenGLRenderer::RecalculateAllHeightMapData();
+            OpenGLRenderer::RecalculateAllHeightMapData(blitWorldMap);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
             // TODO
@@ -117,13 +114,21 @@ namespace Renderer {
         }
     }
 
+    void ReadBackHeightMapData(Map* map) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::ReadBackHeightMapData(map);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan TODO: Renderer::GetHeightMapData()";
+        }
+    }
+
     RendererSettings& GetCurrentRendererSettings() {
         if (Editor::IsOpen()) {
             switch (Editor::GetEditorMode()) {
-                case EditorMode::HEIGHTMAP_EDITOR: return g_rendererSettingsSet.heightMapEditor;
-                case EditorMode::HOUSE_EDITOR:     return g_rendererSettingsSet.houseEditor;
-                case EditorMode::SECTOR_EDITOR:    return g_rendererSettingsSet.sectorEditor;
-                case EditorMode::MAP_EDITOR:       return g_rendererSettingsSet.mapEditor;
+                case EditorMode::HOUSE_EDITOR:      return g_rendererSettingsSet.houseEditor;
+                case EditorMode::MAP_HEIGHT_EDITOR: return g_rendererSettingsSet.mapHeightEditor;
+                case EditorMode::MAP_OBJECT_EDITOR: return g_rendererSettingsSet.mapObjectEditor;
             }
         }
         return g_rendererSettingsSet.game;

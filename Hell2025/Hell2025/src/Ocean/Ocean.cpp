@@ -20,7 +20,7 @@ namespace Ocean {
     const float g_oceanMeshToGridRatio = 8.0f;       // Ratio of original ocean mesh size to the FFT grid size; used to scale the model matrix
     const float g_meshSubdivisionFactor = 32.0f;     // Number of mesh subdivisions per FFT grid cell; controls mesh density 
     const float g_modelMatrixScale = g_oceanMeshToGridRatio / g_baseFftResolution; // was g_fftResolution.x;
-    const float g_oceanOriginY = 30.0f;
+    const float g_oceanOriginY = 29.5f;
 
     //glm::vec2 g_mWindDir = glm::normalize(glm::vec2(1.0f, 0.0f));
     float g_windSpeed = 75.0f;

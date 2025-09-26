@@ -19,4 +19,5 @@ namespace OpenGLUtil {
     GLint TextureFilterToGLEnum(TextureFilter filter);
     GLenum GLInternalFormatToGLType(GLenum internalFormat);
     GLenum GLInternalFormatToGLFormat(GLenum internalFormat);
+    GLint GetFormatFromInternalFormat(GLint internalFormat);
 }

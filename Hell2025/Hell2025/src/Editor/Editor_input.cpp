@@ -106,7 +106,7 @@ namespace Editor {
             }
         }
 
-        if (GetEditorMode() == EditorMode::SECTOR_EDITOR) {
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             //UpdateObjectSelection();
             UpdateGizmoInteract();
             UpdateSelectRect();

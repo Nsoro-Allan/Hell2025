@@ -85,11 +85,13 @@ void Player::Update(float deltaTime) {
     glm::vec3 rayOrigin = GetCameraPosition();
     glm::vec3 rayDirection = glm::vec3(0.0f, -1.0f, 0.0f);
     float rayLength = 100.0f;
-    PhysXRayResult rayResult = Physics::CastPhysXRayStaticEnviroment(rayOrigin, rayDirection, rayLength);
+    PhysXRayResult rayResult = Physics::CastPhysXRayStaticEnvironment(rayOrigin, rayDirection, rayLength);
     m_feetAboveHeightField = (rayResult.hitFound && rayResult.userData.physicsType == PhysicsType::HEIGHT_FIELD);
 
     // Running
     m_running = PressingRun() && !m_crouching;
+
+    m_runningSpeed = 20;
 
     // Respawn
     if (IsAwaitingSpawn()) Respawn();
@@ -213,6 +215,7 @@ void Player::Respawn() {
     if (m_viewportIndex == 0) {
 
         std::vector<SpawnPoint> spawnPoints;
+        spawnPoints.push_back({ glm::vec3(25.0f, 30.7f, 38.5f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0) });
         spawnPoints.push_back({ glm::vec3(17.0f, 30.7f, 41.5f), glm::vec3(-0.162, 0.002, 0) });
         spawnPoints.push_back({ glm::vec3(17.103, 30.7209, 37.7175), glm::vec3(-0.184, -3.124, 0) });
         spawnPoints.push_back({ glm::vec3(21.7034, 30.7429, 45.7712), glm::vec3(-0.228, 0.00400294, 0) });
@@ -266,15 +269,15 @@ void Player::Respawn() {
 
     m_alive = true;
 
-   if (m_viewportIndex == 0) {
-       SetFootPosition(glm::vec3(17.0f, 30.7f, 41.5f));
-       //SetFootPosition(glm::vec3(27.0f, 32.7f, 36.5f)); // roo
-   }
-   if (m_viewportIndex == 1) {
-       SetFootPosition(glm::vec3(17.0f, 30.7f, 38.5f));
-       //SetFootPosition(glm::vec3(12.5f, 30.6f, 45.5f));
-       m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
-   }
+   //if (m_viewportIndex == 0) {
+   //    SetFootPosition(glm::vec3(17.0f, 30.7f, 41.5f));
+   //    //SetFootPosition(glm::vec3(27.0f, 32.7f, 36.5f)); // roo
+   //}
+   //if (m_viewportIndex == 1) {
+   //    SetFootPosition(glm::vec3(17.0f, 30.7f, 38.5f));
+   //    //SetFootPosition(glm::vec3(12.5f, 30.6f, 45.5f));
+   //    m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
+   //}
 
     m_weaponStates.clear();
     for (int i = 0; i < WeaponManager::GetWeaponCount(); i++) {

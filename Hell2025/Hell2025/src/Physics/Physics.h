@@ -171,7 +171,7 @@ namespace Physics {
     PxVec3 GlmVec3toPxVec3(glm::vec3 vec);
     PxQuat GlmQuatToPxQuat(glm::quat quat);
     PxMat44 GlmMat4ToPxMat44(glm::mat4 glmMatrix);
-    PhysXRayResult CastPhysXRayStaticEnviroment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
+    PhysXRayResult CastPhysXRayStaticEnvironment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
     PhysXRayResult CastPhysXRayHeightMap(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
     PhysXRayResult CastPhysXRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, bool cullBackFacing = false, RaycastIgnoreFlags ignoreFlags = RaycastIgnoreFlags(), std::vector<PxRigidActor*> ignoredActors = std::vector<PxRigidActor*>());
     PhysXOverlapReport OverlapTest(const PxGeometry& overlapShape, const PxTransform& shapePose, PxU32 collisionGroup);

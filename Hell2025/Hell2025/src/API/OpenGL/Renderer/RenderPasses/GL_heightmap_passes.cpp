@@ -1,25 +1,21 @@
- #include "../GL_renderer.h" 
-#include "../../GL_backend.h"
+#include "HellLogging.h"
+#include "API/OpenGL/GL_backend.h"
+#include "API/OpenGL/Renderer/GL_renderer.h"
 #include "API/OpenGL/Types/GL_heightmap_mesh.h"
-#include "Config/Config.h"
-#include "AssetManagement/AssetManager.h"
-#include "Viewport/ViewportManager.h"
-#include "Renderer/RenderDataManager.h"
-
 #include "API/OpenGL/Types/GL_texture_readback.h"
+#include "AssetManagement/AssetManager.h"
 #include "BackEnd/BackEnd.h"
+#include "Config/Config.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "Editor/Gizmo.h"
 #include "Imgui/ImguiBackEnd.h"
 #include "Input/Input.h"
-#include "World/HeightMapManager.h"
 #include "Tools/ImageTools.h"
 #include "Util/Util.h"
-#include "World/MapManager.h"
+#include "Viewport/ViewportManager.h"
 #include "World/SectorManager.h"
 #include "World/World.h"
-
 
 #include "Pathfinding/AStarMap.h"
 #include "lodepng/lodepng.h"
@@ -28,27 +24,34 @@
 
 #include "Physics/Physics.h"
 
+#include "Managers/MapManager.h"
+#include "World/World.h"
+
 namespace OpenGLRenderer {
 
-    void BlitHeightMapWorld();
+    void BlitWorldMap();
     void GenerateHeightMapVertexData();
     void GeneratePhysXTextures();
     void DrawHeightMap();
-    void SaveHeightMap();
 
-
-    void RecalculateAllHeightMapData() {
-        BlitHeightMapWorld();
+    void RecalculateAllHeightMapData(bool blitWorldMap) {
+        if (blitWorldMap) {
+            BlitWorldMap();
+        }
         GenerateHeightMapVertexData();
         GeneratePhysXTextures();
+        AStarMap::Init();
         AStarMap::UpdateDebugMeshesFromHeightField();
     }
 
     void HeightMapPass() {
 
+        //if (Input::KeyPressed(HELL_KEY_SPACE))
+        //BlitHeightMapWorld();
+
         DrawHeightMap();
 
-        if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::HEIGHTMAP_EDITOR) {
+        if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
 
             //if (Input::KeyPressed(HELL_KEY_L)) {                
             //    HeightMapData heightMapData = File::LoadHeightMap("TEST.heightmap");
@@ -67,65 +70,47 @@ namespace OpenGLRenderer {
         }
     }
 
-    void BlitHeightMapWorld() {
-
+    void BlitWorldMap() {
+        Map* map = MapManager::GetMapByName("Shit");
         OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
-        OpenGLFrameBuffer* heightMapBlitBuffer = GetFrameBuffer("HeightMapBlitBuffer");
-        OpenGLTextureArray& heightmapTextureArray = HeightMapManager::GetGLTextureArray();
+        OpenGLShader* shader = GetShader("HeightMapToWorldBlit");
 
-        unsigned int mapWidth = World::GetMapWidth();
-        unsigned int mapDepth = World::GetMapDepth();
-        unsigned int textureWidth = mapWidth * 256 + 1;
-        unsigned int textureHeight = mapDepth * 256 + 1;
+        if (!map) return;
+        if (!shader) return;
+        if (!worldFramebuffer) return;
 
-        // Hack! write better error checking and handling:
-        textureWidth = std::max(textureWidth, 257u);
-        textureHeight = std::max(textureHeight, 257u);
 
-        if (worldFramebuffer->GetWidth() != textureWidth || worldFramebuffer->GetHeight() != textureHeight) {
-            worldFramebuffer->Resize(textureWidth, textureHeight);
+        int textureWidth = (World::GetChunkCountX() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
+        int textureHeight = (World::GetChunkCountZ() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
+
+        const glm::ivec2 textureSize = glm::ivec2(textureWidth, textureHeight);
+
+        // Resize world framebuffer if it is too small for the heightmap
+        if (worldFramebuffer->GetWidth() != textureSize.x || worldFramebuffer->GetHeight() != textureSize.y) {
+            worldFramebuffer->Resize(textureSize.x, textureSize.y);
         }
 
-        worldFramebuffer->ClearAttachment("HeightMap", 0.0);
-
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, heightMapBlitBuffer->GetHandle());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, worldFramebuffer->GetHandle());
-
-        for (int x = 0; x < 1; x++) {
-            for (int z = 0; z < 1; z++) {
-
-                // Skip if there is no heightmap at this map cell
-                const std::string& heightMapName = World::GetHeightMapNameAtLocation(x, z);
-                if (heightMapName == "") continue;
-
-                //if (!MapManager::IsHeightMapAtLocation(mapCreateInfo, x, z)) continue;
-                
-                // Skip if the height map there is is invalid
-                int32_t layerIndex = MapManager::GetHeightMapIndexByHeightMapName(heightMapName);
-                if (layerIndex == -1) continue;
-
-                // Otherwise blit it into the world heightmap
-                int srcX0 = 0;
-                int srcY0 = 0;
-                int srcX1 = HEIGHT_MAP_SIZE;
-                int srcY1 = HEIGHT_MAP_SIZE; 
-                int dstX0 = x * HEIGHT_MAP_SIZE;
-                int dstY0 = z * HEIGHT_MAP_SIZE;
-                int dstX1 = dstX0 + HEIGHT_MAP_SIZE;
-                int dstY1 = dstY0 + HEIGHT_MAP_SIZE;
-                glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, heightmapTextureArray.GetHandle(), 0, layerIndex);
-                glDrawBuffer(worldFramebuffer->GetColorAttachmentSlotByName("HeightMap"));
-                glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-            }
+        // Blit height maps
+        shader->Bind();
+        for (MapInstance& mapInstance : World::GetMapInstances()) {
+            int offsetX = mapInstance.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_PIXEL_SIZE;
+            int offsetZ = mapInstance.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_PIXEL_SIZE;
+            int heightMapTextureWidth = mapInstance.GetChunkCountX() * HEIGHT_MAP_CHUNK_PIXEL_SIZE;
+            int heightMapTextureHeight = mapInstance.GetChunkCountZ() * HEIGHT_MAP_CHUNK_PIXEL_SIZE;
+            shader->SetInt("u_offsetX", offsetX);
+            shader->SetInt("u_offsetZ", offsetZ);
+            glBindImageTexture(0, worldFramebuffer->GetColorAttachmentHandleByName("HeightMap"), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R16F);
+            glBindImageTexture(1, map->GetHeightMapGLTexture().GetHandle(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R16F);
+            glDispatchCompute(heightMapTextureWidth / 8, heightMapTextureHeight / 8, 1);
         }
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+        // Blit roads
     }
 
     void PaintHeightMap() {
         if (!IsMouseRayWorldPositionReadBackReady()) return;
         if (!Editor::IsOpen()) return;
-        if (Editor::GetEditorMode() != EditorMode::HEIGHTMAP_EDITOR) return;
+        if (Editor::GetEditorMode() != EditorMode::MAP_HEIGHT_EDITOR) return;
         if (ImGuiBackEnd::OwnsMouse()) return;
 
         OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
@@ -136,12 +121,12 @@ namespace OpenGLRenderer {
             shader->Bind();
             shader->SetInt("u_paintX", static_cast<int>(GetMouseRayWorldPostion().x / (float)worldFramebuffer->GetWidth()));
             shader->SetInt("u_paintY", static_cast<int>(GetMouseRayWorldPostion().z / (float)worldFramebuffer->GetHeight()));
-            shader->SetFloat("u_brushSize", Editor::GetHeightMapBrushSize());
-            shader->SetFloat("u_brushStrength", Editor::GetHeightMapBrushStrength() * (Input::RightMouseDown() ? -1.0f : 1.0f));
-            shader->SetFloat("u_noiseStrength", Editor::GetHeightMapNoiseStrength());
-            shader->SetFloat("u_noiseScale", Editor::GetHeightMapNoiseScale());
-            shader->SetFloat("u_minPaintHeight", Editor::GetHeightMapMinPaintHeight());
-            shader->SetFloat("u_maxPaintHeight", Editor::GetHeightMapMaxPaintHeight());
+            shader->SetFloat("u_brushSize", Editor::GetMapHeightBrushSize());
+            shader->SetFloat("u_brushStrength", Editor::GetMapHeightBrushStrength() * (Input::RightMouseDown() ? -1.0f : 1.0f));
+            shader->SetFloat("u_noiseStrength", Editor::GetMapHeightNoiseStrength());
+            shader->SetFloat("u_noiseScale", Editor::GetMapHeightNoiseScale());
+            shader->SetFloat("u_minPaintHeight", Editor::GetMapHeightMinPaintHeight());
+            shader->SetFloat("u_maxPaintHeight", Editor::GetMapHeightMaxPaintHeight());
 
             glMemoryBarrier(GL_ALL_BARRIER_BITS);
             glBindImageTexture(0, worldFramebuffer->GetColorAttachmentHandleByName("HeightMap"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_R16F);
@@ -157,26 +142,21 @@ namespace OpenGLRenderer {
         OpenGLHeightMapMesh& heightMapMesh = OpenGLBackEnd::GetHeightMapMesh();
         OpenGLShader* shader = GetShader("HeightMapVertexGeneration");
 
-        int heightMapCount = World::GetHeightMapCount();
-        int heightMapWidth = 256;//worldFramebuffer->GetWidth();
-        int heightMapDepth = 256;//worldFramebuffer->GetHeight();
+        int heightMapWidth = 256;
+        int heightMapDepth = 512;
 
-        heightMapMesh.AllocateMemory(heightMapCount);
+        std::vector<HeightMapChunk>& chunks = World::GetHeightMapChunks();
+
+        heightMapMesh.AllocateMemory(chunks.size());
         
         shader->Bind();
-        shader->SetInt("u_heightMapWidth", heightMapWidth);
-        shader->SetInt("u_heightMapDepth", heightMapDepth);
-
         glBindImageTexture(0, worldFramebuffer->GetColorAttachmentHandleByName("HeightMap"), 0, GL_FALSE, 0, GL_READ_ONLY, GL_R16F);
         
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 5, heightMapMesh.GetVBO());
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 6, heightMapMesh.GetEBO());
-        //glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
-       
+
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
 
-
-        std::vector<HeightMapChunk>& chunks = World::GetHeightMapChunks();
         for (HeightMapChunk& chunk : chunks) {
             shader->SetInt("u_baseIndex", chunk.baseIndex);
             shader->SetInt("u_baseVertex", chunk.baseVertex);
@@ -191,9 +171,6 @@ namespace OpenGLRenderer {
         }
 
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
-
-        // TODO: You're gonna forget this is here
-        AStarMap::Init();
     }
 
     void GeneratePhysXTextures() {
@@ -236,6 +213,7 @@ namespace OpenGLRenderer {
                 std::cout << " - yOffset: " << yOffset << "\n";
                 std::cout << " - width: " << width << "\n";
                 std::cout << " - height: " << height << "\n";
+                std::cout << " - chunkCount: " << chunkCount << "\n";
             }
 
             glGetTextureSubImage(handle, level, xOffset, yOffset, zOffset, width, height, depth, GL_RED, GL_FLOAT, dataSize, chunkReadBackDataSet[i].vertices);
@@ -261,7 +239,7 @@ namespace OpenGLRenderer {
             chunk.aabbMin = aabbMin;
             chunk.aabbMax = aabbMax;
 
-            vecXZ worldSpaceOffest = vecXZ(chunk.coord.x * CHUNK_SIZE_WORLDSPACE, chunk.coord.z * CHUNK_SIZE_WORLDSPACE);
+            vecXZ worldSpaceOffest = vecXZ(chunk.coord.x * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE, chunk.coord.z * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE);
             Physics::CreateHeightField(worldSpaceOffest, chunkReadBackDataSet[i].vertices);
        }
     }
@@ -292,7 +270,7 @@ namespace OpenGLRenderer {
 
         Material* dirtRoadMaterial = AssetManager::GetMaterialByName("DirtRoad");
 
-        if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::HEIGHTMAP_EDITOR) {
+        if (Editor::IsOpen() && Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
             material = AssetManager::GetDefaultMaterial();
             shader->SetFloat("u_textureScaling", 0.1);
         }
@@ -312,16 +290,12 @@ namespace OpenGLRenderer {
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(dirtRoadMaterial->m_rma)->GetGLTexture().GetHandle());
         glBindTextureUnit(6, AssetManager::GetTextureByName("RoadMask")->GetGLTexture().GetHandle());
 
-        //int indexCount = (HEIGHT_MAP_SIZE - 1) * (HEIGHT_MAP_SIZE - 1) * 6;
-        //int vertexCount = HEIGHT_MAP_SIZE * HEIGHT_MAP_SIZE;
         glBindVertexArray(heightMapMesh.GetVAO());
 
         int verticesPerChunk = 33 * 33;
         int verticesPerHeightMap = verticesPerChunk * 8 * 8;
         int indicesPerChunk = 32 * 32 * 6;
         int indicesPerHeightMap = indicesPerChunk * 8 * 8;
-
-        int heightMapCount = World::GetHeightMapCount();
 
         int culled = 0;
 
@@ -344,9 +318,6 @@ namespace OpenGLRenderer {
                             continue;
                         }
                     }
-                   // std::cout << "hi\n";
-
-                    shader->SetInt("u_test", test++);
 
                     int indexCount = INDICES_PER_CHUNK;
                     int baseVertex = 0;
@@ -355,8 +326,6 @@ namespace OpenGLRenderer {
                     int instanceCount = 1;
                     int viewportIndex = i;
                     glDrawElementsInstancedBaseVertexBaseInstance(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, indexOffset, instanceCount, baseVertex, viewportIndex);
-                    // Draw chunk vertices as points
-                    // glDrawArraysInstancedBaseInstance(GL_POINTS, chunk.baseVertex, VERTICES_PER_CHUNK, instanceCount, viewportIndex); 
                 }
             }
         }
@@ -364,65 +333,33 @@ namespace OpenGLRenderer {
         //std::cout << "Culled: " << culled << "\n";
     }
 
-    void SaveHeightMap() {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
 
-        OpenGLTextureArray& heightmapTextureArray = HeightMapManager::GetGLTextureArray();
+    void ReadBackHeightMapData(Map* map) {
+        if (!map) {
+            Logging::Error() << "OpenGLRenderer::ReadBackHeightMapData() failed coz map was nullptr";
+            return;
+        }
 
-        GLuint textureHandle = heightmapTextureArray.GetHandle();
-        GLuint width = heightmapTextureArray.GetWidth();
-        GLuint height = heightmapTextureArray.GetHeight();
-        int layerIndex = 0;
+        OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
+        if (!worldFramebuffer) {
+            Logging::Error() << "OpenGLRenderer::ReadBackHeightMapData() failed coz could not retrieve World framebuffer";
+            return;
+        }
+
+        GLuint textureHandle = worldFramebuffer->GetColorAttachmentHandleByName("HeightMap");
+
+        GLuint width = map->GetTextureWidth();
+        GLuint height = map->GetTextureHeight();
         size_t dataSize = width * height * sizeof(float);
 
-        HeightMapData heightMapData;
-        heightMapData.name = "TEST";
-        heightMapData.width = width;
-        heightMapData.height = height;
-        heightMapData.data.resize(heightMapData.width * heightMapData.height);
+        map->GetHeightMapData().resize(width * height);
 
         // Readback
         glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-        glGetTextureSubImage(textureHandle, 0, 0, 0, layerIndex, width, height, 1, GL_RED, GL_FLOAT, dataSize, heightMapData.data.data());
+        glGetTextureSubImage(textureHandle, 0, 0, 0, 0, width, height, 1, GL_RED, GL_FLOAT, dataSize, map->GetHeightMapData().data());
 
-        // Write file
-        File::SaveHeightMap(heightMapData);
-    }
-
-    void SaveHeightMaps() {
-        std::cout << "Renderer::SaveHeightMaps()\n";
-
-        OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
-        GLuint textureHandle = worldFramebuffer->GetColorAttachmentHandleByName("HeightMap");
-        GLuint width = HEIGHT_MAP_SIZE;
-        GLuint height = HEIGHT_MAP_SIZE;
-        size_t dataSize = width * height * sizeof(float);
-
-        HeightMapData heightMapData;
-        heightMapData.width = width;
-        heightMapData.height = height;
-        heightMapData.data.resize(heightMapData.width * heightMapData.height);
-
-        MapCreateInfo* mapCreateInfo = MapManager::GetHeightMapEditorMapCreateInfo();
-        if (mapCreateInfo) {
-            int mapWidth = World::GetMapWidth();
-            int mapDepth = World::GetMapDepth();
-
-            // Iterate the map, save any sectors height map that isn't none
-            for (int x = 0; x < mapWidth; x++) {
-                for (int z = 0; z < mapDepth; z++) {
-                    const std::string& heightMapName = World::GetHeightMapNameAtLocation(x, z);
-                    if (heightMapName != "") {
-                        int xOffset = x * HEIGHT_MAP_SIZE;
-                        int yOffset = z * HEIGHT_MAP_SIZE;
-                        glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
-                        glGetTextureSubImage(textureHandle, 0, xOffset, yOffset, 0, width, height, 1, GL_RED, GL_FLOAT, dataSize, heightMapData.data.data());
-                        heightMapData.name = heightMapName;
-                        File::SaveHeightMap(heightMapData);
-                    }
-                }
-            }           
-        }
-
+        Logging::Debug() << "ReadBackHeightMapData() width: " << width;
+        Logging::Debug() << "ReadBackHeightMapData() height: " << height;
+        Logging::Debug() << "ReadBackHeightMapData() dataSize: " << dataSize;
     }
 }

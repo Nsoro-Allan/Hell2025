@@ -60,6 +60,10 @@ namespace OpenGLRenderer {
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
 
+                if (World::GetGameObjects().size() == 0) {
+                    continue;
+                }
+
                 GameObject& bunny = World::GetGameObjects()[0];
 
                 for (const RenderItem& renderItem : bunny.GetRenderItems()) {

@@ -1,5 +1,6 @@
 #include "InputMulti.h"
 #include "HellDefines.h"
+#include "HellLogging.h"
 #include "BackEnd/BackEnd.h"
 #include "BackEnd/GLFWIntegration.h"
 #include <iostream>
@@ -101,17 +102,17 @@ namespace InputMulti {
         windowClass.lpszClassName = TEXT("InputWindow");
 
         if (!RegisterClass(&windowClass)) {
-            std::cout << "Failed to register window class\n";
+            Logging::Fatal() << "Failed to register InputMulti window class";
             return;
         }
 
         HWND eventWindow = CreateWindowEx(0, windowClass.lpszClassName, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, hInstance, NULL);
         if (!eventWindow) {
-            std::cout << "Failed to register window class\n";
+            Logging::Fatal() << "Failed to register InputMulti window class";
             return;
         }
         else {
-            std::cout << "Multi mouse/keyboard support initialized\n";
+            Logging::Init() << "Multi mouse/keyboard support";
         }
 
         RegisterDeviceOfType(HID_USAGE_GENERIC_MOUSE, eventWindow);
@@ -203,6 +204,19 @@ namespace InputMulti {
                 state.leftMouseDownLastFrame = false;
                 state.rightMousePressed = false;
                 state.rightMouseDownLastFrame = false;
+            }
+        }
+    }
+
+    void ClearKeyStates() {
+        for (KeyboardState& state : g_keyboardStates) {
+            for (int i = 0; i < 350; ++i) {
+                state.keyPressed[i] = false;
+                state.keyDown[i] = false;
+                state.keyDownLastFrame[i] = false;
+                state.keyDownTime[i] = 0.0f;
+                state.keyRepeatTime[i] = 0.0f;
+                state.nextRepeatAt[i] = 0.0f;
             }
         }
     }
