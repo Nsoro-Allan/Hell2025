@@ -7,6 +7,9 @@
 #include "Types/Christmas/ChristmasLights.h"
 #include "Types/Christmas/ChristmasPresent.h"
 #include "Types/Christmas/ChristmasTree.h"
+#include "Types/Effects/VolumetricBloodSplatter.h"
+#include "Types/Effects/ScreenSpaceBloodDecal.h"
+#include "Types/Exterior/Fence.h"
 #include "Types/Exterior/Road.h"
 #include "Types/Exterior/PowerPoleSet.h"
 #include "Types/Exterior/Tree.h"
@@ -19,8 +22,6 @@
 #include "Types/Game/PickUp.h"
 #include "Types/Generics/GenericBouncable.h"
 #include "Types/Generics/GenericStatic.h"
-#include "Types/Effects/VolumetricBloodSplatter.h"
-#include "Types/Effects/ScreenSpaceBloodDecal.h"
 #include "Types/Interior/Drawers.h"
 #include "Types/Interior/Toilet.h"
 #include "Types/House/Door.h"
@@ -201,6 +202,7 @@ namespace World {
     std::vector<Decal>& GetDecals();
     std::vector<Drawers>& GetDrawers();
     std::vector<Door>& GetDoors();
+    std::vector<Fence>& GetFences();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();
     std::vector<GenericStatic>& GetGenericStatics();

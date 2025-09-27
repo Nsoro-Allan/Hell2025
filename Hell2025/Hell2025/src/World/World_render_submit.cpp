@@ -130,6 +130,10 @@ namespace World {
             RenderDataManager::SubmitRenderItems(powerPoleSet.GetRenderItems());
         }
 
+        for (Fence& fence: GetFences()) {
+            RenderDataManager::SubmitRenderItems(fence.GetRenderItems());
+        }
+
         for (GenericBouncable& genericBouncable : GetGenericBouncables()) {
             RenderDataManager::SubmitRenderItems(genericBouncable.GetRenderItems());
         }

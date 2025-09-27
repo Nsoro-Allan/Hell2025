@@ -35,6 +35,7 @@ namespace World {
     std::vector<Door> g_doors;
     std::vector<Decal> g_decals;
     std::vector<Drawers> g_drawers;
+    std::vector<Fence> g_fences;
     std::vector<GameObject> g_gameObjects;
     std::vector<GenericStatic> g_genericStatics;
     std::vector<GenericBouncable> g_genericBouncables;
@@ -209,6 +210,9 @@ namespace World {
         // remove meeeeeeeeeeeeeeeee
         PowerPoleSet& powerPoleSet = g_powerPoleSets.emplace_back();
         powerPoleSet.Init();
+
+        Fence& fence = g_fences.emplace_back();
+        fence.Init();
 
     }
 
@@ -1068,6 +1072,7 @@ namespace World {
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
     std::vector<Door>& GetDoors()                                       { return g_doors; }
+    std::vector<Fence>& GetFences()                                     { return g_fences; }
     std::vector<Drawers>& GetDrawers()                                  { return g_drawers; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }

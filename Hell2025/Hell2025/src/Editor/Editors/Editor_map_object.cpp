@@ -186,6 +186,7 @@ namespace Editor {
         Renderer::DrawLine(p2, p3, GRID_COLOR, true);
         Renderer::DrawLine(p1, p3, GRID_COLOR, true);
 
+        // Draw spawn points as little dots
         Map* map = MapManager::GetMapByName(GetEditorMapName());
         if (map) {
             for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerCampaignSpawns) {
@@ -194,6 +195,11 @@ namespace Editor {
             for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerDeathmatchSpawns) {
                 Renderer::DrawPoint(spawnPoints.GetPosition(), YELLOW);
             }
+        }
+
+        // Draw cubes around spawn points
+        for (SpawnPoint& spawnPoint : World::GetCampaignSpawnPoints()) {
+            spawnPoint.DrawDebugCube();
         }
     }
 }
