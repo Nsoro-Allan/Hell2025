@@ -25,12 +25,14 @@ struct MeshNodes {
     void UpdateRenderItems(const glm::mat4& worldMatrix);
     void SetTransformByMeshName(const std::string& meshName, Transform transform);
     void SetMaterialByMeshName(const std::string& meshName, const std::string& materialName);
+    void SetMeshMaterials(const std::string& materialName);
     void SetBlendingModeByMeshName(const std::string& meshName, BlendingMode blendingMode);
     void SetObjectTypes(ObjectType objectType);
     void SetObjectIds(uint64_t objectId);
     void PrintMeshNames();
     void SetGoldFlag(bool flag);
 
+    bool BoneExists(const std::string& boneName);
     bool HasNodeWithObjectId(uint64_t objectId) const;
         
     RenderItem* GetRenderItemByNodeIndex(int nodeIndex);
@@ -39,6 +41,7 @@ struct MeshNodes {
     glm::mat4 GetLocalTransform(int nodeIndex);
     glm::mat4 GetInverseBindTransform(int nodeIndex);
     glm::mat4 GetMeshModelMatrix(int nodeIndex);
+    glm::mat4 GetBoneLocalMatrix(const std::string& boneName);
 
     const ArmatureData& GetArmature() const                                 { return m_armatureData; }
     const std::string& GetModelName() const                                 { return m_modelName; }

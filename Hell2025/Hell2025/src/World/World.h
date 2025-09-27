@@ -7,6 +7,8 @@
 #include "Types/Christmas/ChristmasLights.h"
 #include "Types/Christmas/ChristmasPresent.h"
 #include "Types/Christmas/ChristmasTree.h"
+#include "Types/Exterior/Road.h"
+#include "Types/Exterior/Tree.h"
 #include "Types/Game/AnimatedGameObject.h"
 #include "Types/Game/Bullet.h"
 #include "Types/Game/BulletCasing.h"
@@ -27,7 +29,6 @@
 #include "Types/Map/MapInstance.h"
 #include "Types/Misc/PictureFrame.h"
 #include "Types/Misc/Piano.h"
-#include "Types/Exterior/Tree.h"
 #include "Util/Util.h"
 #include "glm/gtx/intersect.hpp"
 #include <vector>
@@ -62,6 +63,8 @@ namespace World {
     void RecreateHouseMesh();
 
     void ResetWorld();
+    void ClearAllObjects();
+
     void LoadMapInstance(const std::string& mapName);
     void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet);
     void LoadMapInstanceObjects(const std::string& mapName, SpawnOffset spawnOffset); // Everything except the heightmap
@@ -131,9 +134,9 @@ namespace World {
     const float GetWorldSpaceDepth();
     //const uint32_t GetMapWidth();
     //const uint32_t GetMapDepth();
-    const std::string& GetSectorNameAtLocation(int x, int z);
-    const std::string& GetHeightMapNameAtLocation(int x, int z);
-    bool IsMapCellInRange(int x, int z);
+    ///// const std::string& GetSectorNameAtLocation(int x, int z);
+    ///// const std::string& GetHeightMapNameAtLocation(int x, int z);
+    ///// bool IsMapCellInRange(int x, int z);
 
     void UpdateDoorAndWindowCubeTransforms();
     void ResetWeatherboardMeshBuffer();
@@ -204,6 +207,7 @@ namespace World {
     std::vector<PickUp>& GetPickUps();
     std::vector<PictureFrame>& GetPictureFrames();
     std::vector<Transform>& GetDoorAndWindowCubeTransforms();
+    std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();
     std::vector<Toilet>& GetToilets();;
     std::vector<Tree>& GetTrees();

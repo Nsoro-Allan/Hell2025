@@ -112,6 +112,8 @@ namespace World {
             RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(tree.GetRenderItemsHairBottomLayer());
             if (Editor::GetSelectedObjectId() == tree.GetObjectId()) {
                 RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItems());
+                RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsAlphaDiscarded());
+                RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsBlended());
             }
         }
 

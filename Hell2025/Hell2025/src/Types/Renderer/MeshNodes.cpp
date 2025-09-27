@@ -3,6 +3,7 @@
 #include "Core/OpenStateHandlerManager.h"
 #include "Renderer/RenderDataManager.h"
 #include "Input/Input.h"
+#include "HellLogging.h"
 #include "Util.h"
 
 void MeshNodes::InitFromModel(const std::string & modelName) {
@@ -88,6 +89,14 @@ void MeshNodes::SetGoldFlag(bool flag) {
     m_isGold = flag;
 }
 
+bool MeshNodes::BoneExists(const std::string& boneName) {
+    for (Bone& bone : m_armatureData.bones) {
+        if (bone.name == boneName)
+            return true;
+    }
+    return false;
+}
+
 bool MeshNodes::HasNodeWithObjectId(uint64_t objectId) const {
     for (uint64_t queryId : m_objectIds) {
         if (queryId == objectId) {
@@ -121,6 +130,18 @@ void MeshNodes::SetTransformByMeshName(const std::string& meshName, Transform tr
         if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
             m_transforms[nodeIndex] = transform;
         }
+    }
+}
+
+void MeshNodes::SetMeshMaterials(const std::string& materialName) {
+    int materialIndex = AssetManager::GetMaterialIndexByName(materialName);
+    if (materialIndex == -1) {
+        std::cout << "MeshNodes::SetMeshMaterials() failed: '" << materialName << "' not found!\n";
+        return;
+    }
+
+    for (int i = 0; i < m_materialIndices.size(); i++) {
+        m_materialIndices[i] = materialIndex;
     }
 }
 
@@ -254,7 +275,6 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
             material = AssetManager::GetMaterialByName("Red");
         }
 
-
         RenderItem renderItem;
         renderItem.objectType = (int)m_objectTypes[i];
         renderItem.modelMatrix = worldMatrix * meshModelMatrix;
@@ -294,4 +314,13 @@ glm::mat4 MeshNodes::GetMeshModelMatrix(int nodeIndex) {
     else {
         return glm::mat4(1.0f);
     }
+}
+
+glm::mat4 MeshNodes::GetBoneLocalMatrix(const std::string& boneName) {
+    for (Bone& bone : m_armatureData.bones) {
+        if (bone.name == boneName) {
+            return bone.localRestPose;
+        }
+    }
+    return glm::mat4(1.0f);
 }

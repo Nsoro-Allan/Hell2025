@@ -55,8 +55,6 @@ namespace World {
             Renderer::DrawLine(origin, origin + rightEdge * length, color);   // right limit
         }*/
 
-        
-
         ProcessBullets();
         LazyDebugSpawns();
 
@@ -120,6 +118,9 @@ namespace World {
             piano.Update(deltaTime);
         }
 
+        for (Road& road : GetRoads()) {
+            road.Update();
+        }
         for (Shark& shark : GetSharks()) {
             shark.Update(deltaTime);
         }

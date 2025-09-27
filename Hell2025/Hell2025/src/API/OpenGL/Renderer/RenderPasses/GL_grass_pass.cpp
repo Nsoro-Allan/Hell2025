@@ -133,11 +133,13 @@ namespace OpenGLRenderer {
         RendererSettings& rendererSettings = Renderer::GetCurrentRendererSettings();
         if (!rendererSettings.drawGrass) return;
 
+        //return;
         //if (Input::KeyPressed(HELL_KEY_X)) {
         //    CreateGrassGeometry();
         //}
 
         OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
+        OpenGLFrameBuffer* roadFramebuffer = GetFrameBuffer("Road");
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* wipBuffer = GetFrameBuffer("WIP");
         OpenGLSSBO* bladeositionsSSBO = GetSSBO("BladePositions");
@@ -153,7 +155,7 @@ namespace OpenGLRenderer {
         glBindTextureUnit(0, worldFramebuffer->GetColorAttachmentHandleByName("HeightMap"));
         glBindTextureUnit(1, wipBuffer->GetColorAttachmentHandleByName("WorldPosition"));
         glBindTextureUnit(2, AssetManager::GetTextureByName("Perlin")->GetGLTexture().GetHandle());
-        glBindTextureUnit(3, AssetManager::GetTextureByName("RoadMask")->GetGLTexture().GetHandle());
+        glBindTextureUnit(3, roadFramebuffer->GetColorAttachmentHandleByName("RoadMask"));
 
         // GL State
         SetRasterizerState("GeometryPass_NonBlended");

@@ -60,6 +60,14 @@ Tree::Tree(TreeCreateInfo createInfo) {
     localOffset.rotation.x = HELL_PI * 0.5f;
     localOffset.rotation.z = HELL_PI * 0.5f;
     m_rigidStaticId = Physics::CreateRigidStaticFromCapsule(m_transform, collisionCaspuleRadius, collisionCaspuleHalfHeight, filterData, localOffset);
+    
+    // Set PhysX user data
+    PhysicsUserData userData;
+    userData.physicsId = m_rigidStaticId;
+    userData.objectId = m_objectId;
+    userData.physicsType = PhysicsType::RIGID_STATIC;
+    userData.objectType = ObjectType::TREE;
+    Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
 }
 
 void Tree::BeginFrame() {
@@ -84,6 +92,11 @@ void Tree::CleanUp() {
 
 void Tree::SetPosition(glm::vec3 position) {
     m_createInfo.position = position;
+    UpdateTransformAndModelMatrix();
+}
+
+void Tree::SetRotation(glm::vec3 rotation) {
+    m_createInfo.rotation = rotation;
     UpdateTransformAndModelMatrix();
 }
 

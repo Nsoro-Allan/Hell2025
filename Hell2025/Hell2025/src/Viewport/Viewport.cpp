@@ -113,6 +113,17 @@ glm::vec2 Viewport::WorldToScreen(const glm::mat4& viewMatrix, const glm::vec3& 
     return glm::vec2(screenX, viewportHeight - screenY);
 }
 
+glm::ivec2 Viewport::GetLocalMouseCoords() {
+    int w = static_cast<int>(GetWindowSpaceCoords().width);
+    int h = static_cast<int>(GetWindowSpaceCoords().height);
+    int mx = Input::GetMouseX();
+    int my = Input::GetMouseY();
+    int x = mx - GetLeftPixel();
+    int y = GetTopPixel() - my;
+    y = my + GetTopPixel() - h;
+
+    return glm::ivec2(x, y);
+}
 
 glm::mat4 Viewport::GetProjectionMatrix() const {
     if (IsOrthographic()) {

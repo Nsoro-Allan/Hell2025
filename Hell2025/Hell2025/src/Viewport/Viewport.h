@@ -34,6 +34,7 @@ public:
     glm::mat4 GetPerpsectiveMatrix() const;
     glm::mat4 GetOrthographicMatrix() const;
     glm::vec2 WorldToScreen(const glm::mat4& viewMatrix, const glm::vec3& worldPosition) const;
+    glm::ivec2 GetLocalMouseCoords();
     ShadingMode GetViewportMode() const;
     SpaceCoords GetWindowSpaceCoords() const;
     SpaceCoords GetGBufferSpaceCoords() const;

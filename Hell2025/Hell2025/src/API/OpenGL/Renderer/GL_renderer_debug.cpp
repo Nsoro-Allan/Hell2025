@@ -13,9 +13,11 @@ namespace OpenGLRenderer {
         }
 
         // World heightmap
-        if (true) {
+        if (false) {
             OpenGLFrameBuffer* worldFrameBuffer = GetFrameBuffer("World");
+            OpenGLFrameBuffer* roadFrameBuffer = GetFrameBuffer("Road");
             DebugBlitFrameBufferTexture("World", "HeightMap", 0, 0, worldFrameBuffer->GetWidth(), worldFrameBuffer->GetHeight());
+            DebugBlitFrameBufferTexture("Road", "RoadMask", worldFrameBuffer->GetWidth(), 0, roadFrameBuffer->GetWidth(), roadFrameBuffer->GetHeight());
         }
 
         // Ocean

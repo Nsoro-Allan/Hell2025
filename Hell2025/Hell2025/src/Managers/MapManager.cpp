@@ -164,6 +164,17 @@ namespace MapManager {
         return;
     }
 
+    void UpdateCreateInfoCollectionFromWorld(const std::string& mapName) {
+        Map* map = GetMapByName(mapName);
+        if (!map) {
+            Logging::Error() << "UpdateCreateInfoCollectionFromWorld(): failed because '" << mapName << "' was not found.";
+            return;
+        }
+
+        CreateInfoCollection createInfoCollection = World::GetCreateInfoCollection();
+        map->SetCreateInfoCollection(createInfoCollection);
+    }
+
     Map* GetTestMap() {
         return GetMapByName("Shit");
     }

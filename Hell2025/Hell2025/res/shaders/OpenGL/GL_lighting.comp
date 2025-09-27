@@ -585,6 +585,19 @@ void main() {
 
 
 
+   if (rendererData.rendererOverrideState == 4) {
+        vec3 lightDir = normalize(inverseView[2].xyz);
+        vec3 lightColor = vec3(1.0, 0.7799999713897705, 0.5289999842643738);
+        lightColor = mix(lightColor, vec3(1.0), 0.9);
+        outputColor.rgb = GetDirectionalLighting(lightDir, lightColor, 2, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
+
+        
+        //float ndotl = max(dot(normal.xyz, lightDir), 0.0);
+        //lightColor = vec3(0.5, 0.5, 0.6) * ndotl;
+        //vec3 color = baseColor.rgb * ndotl;
+        //outputColor.rgb = mix(gammaBaseColor.rgb, outputColor.rgb, 0.75);
+   }
+
    // ivec3 coords = ivec3(11, 3, 3);
    // vec3 debugColor = texelFetch(LightVolumeTexture, coords, 0).rgb;
  //   outputColor.rgb = indirect;

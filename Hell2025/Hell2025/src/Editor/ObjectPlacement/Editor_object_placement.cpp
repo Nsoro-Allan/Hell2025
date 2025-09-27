@@ -47,6 +47,7 @@ namespace Editor {
     void ExitObjectPlacement() {
         SetPlacementObjectId(0);
         SetEditorState(EditorState::IDLE);
+        UpdateOutliner();
     }
 
     uint64_t GetPlacementObjectId() {

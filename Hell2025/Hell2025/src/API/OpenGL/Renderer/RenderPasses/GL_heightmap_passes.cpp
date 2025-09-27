@@ -73,6 +73,7 @@ namespace OpenGLRenderer {
     void BlitWorldMap() {
         Map* map = MapManager::GetMapByName("Shit");
         OpenGLFrameBuffer* worldFramebuffer = GetFrameBuffer("World");
+        OpenGLFrameBuffer* roadFramebuffer = GetFrameBuffer("Road"); 
         OpenGLShader* shader = GetShader("HeightMapToWorldBlit");
 
         if (!map) return;
@@ -88,6 +89,9 @@ namespace OpenGLRenderer {
         // Resize world framebuffer if it is too small for the heightmap
         if (worldFramebuffer->GetWidth() != textureSize.x || worldFramebuffer->GetHeight() != textureSize.y) {
             worldFramebuffer->Resize(textureSize.x, textureSize.y);
+
+            int roadScale = 4;
+            roadFramebuffer->Resize(textureSize.x * roadScale, textureSize.y * roadScale);
         }
 
         // Blit height maps
@@ -246,8 +250,14 @@ namespace OpenGLRenderer {
 
     void DrawHeightMap() {
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
-        OpenGLHeightMapMesh& heightMapMesh = OpenGLBackEnd::GetHeightMapMesh();
+        OpenGLFrameBuffer* roadFramebuffer = GetFrameBuffer("Road");
         OpenGLShader* shader = GetShader("HeightMapColor");
+
+        if (!gBuffer) return;
+        if (!roadFramebuffer) return;
+        if (!shader) return;
+
+        OpenGLHeightMapMesh& heightMapMesh = OpenGLBackEnd::GetHeightMapMesh();
 
         Transform transform;
         transform.scale = glm::vec3(HEIGHTMAP_SCALE_XZ, HEIGHTMAP_SCALE_Y, HEIGHTMAP_SCALE_XZ);
@@ -261,6 +271,8 @@ namespace OpenGLRenderer {
         shader->SetMat4("modelMatrix", modelMatrix);
         shader->SetMat4("inverseModelMatrix", inverseModelMatrix);
         shader->SetFloat("u_textureScaling", 1);
+        shader->SetFloat("u_worldWidth", World::GetWorldSpaceWidth());
+        shader->SetFloat("u_worldDepth", World::GetWorldSpaceDepth());
 
         SetRasterizerState("GeometryPass_NonBlended");
 
@@ -275,7 +287,6 @@ namespace OpenGLRenderer {
             shader->SetFloat("u_textureScaling", 0.1);
         }
 
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(material->m_basecolor)->GetGLTexture().GetHandle());
         glActiveTexture(GL_TEXTURE1);
@@ -287,8 +298,8 @@ namespace OpenGLRenderer {
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(dirtRoadMaterial->m_normal)->GetGLTexture().GetHandle());
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(dirtRoadMaterial->m_rma)->GetGLTexture().GetHandle());
-        glBindTextureUnit(6, AssetManager::GetTextureByName("RoadMask")->GetGLTexture().GetHandle());
+        glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(dirtRoadMaterial->m_rma)->GetGLTexture().GetHandle());;
+        glBindTextureUnit(6, roadFramebuffer->GetColorAttachmentHandleByName("RoadMask"));
 
         glBindVertexArray(heightMapMesh.GetVAO());
 

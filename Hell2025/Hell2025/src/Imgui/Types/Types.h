@@ -166,9 +166,10 @@ namespace EditorUI {
     };
 
     struct Outliner {
+        bool CreateImGuiElements(float height);
         bool CreateImGuiElements();
         void AddType(const std::string name);
-        void SetItems(const std::string name, std::vector<std::string>& items);
+        void SetItems(const std::string name, const std::vector<std::string>& items);
         void SetSelectedType(const std::string& type);
         void SetSelectedItem(const std::string& item);
         const std::string& GetSelectedType();

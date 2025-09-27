@@ -186,8 +186,10 @@ void Player::Update(float deltaTime) {
     Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
     if (viewport->IsVisible()) {
         if (Input::KeyPressed(HELL_KEY_8)) {
-            std::cout << "\nPlayer " << m_viewportIndex << " inventory:\n";
-            m_inventory.PrintGridOccupiedStateToConsole();
+            //std::cout << "\nPlayer " << m_viewportIndex << " inventory:\n";
+            //m_inventory.PrintGridOccupiedStateToConsole();
+
+            std::cout << "glm::(" << GetCameraPosition().x << ", " << GetCameraPosition().z << "\n";
         }
     }
 }

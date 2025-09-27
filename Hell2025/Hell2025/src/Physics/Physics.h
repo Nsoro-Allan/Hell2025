@@ -168,6 +168,7 @@ namespace Physics {
     glm::vec3 PxVec3toGlmVec3(PxExtendedVec3 vec);
     glm::quat PxQuatToGlmQuat(PxQuat quat);
     glm::mat4 PxMat44ToGlmMat4(physx::PxMat44 pxMatrix);
+    glm::vec3 GetHeightMapPositionAtXZ(float x, float z);
     PxVec3 GlmVec3toPxVec3(glm::vec3 vec);
     PxQuat GlmQuatToPxQuat(glm::quat quat);
     PxMat44 GlmMat4ToPxMat44(glm::mat4 glmMatrix);

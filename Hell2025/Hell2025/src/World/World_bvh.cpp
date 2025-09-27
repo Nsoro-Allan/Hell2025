@@ -109,8 +109,10 @@ namespace World {
 
             if (Editor::IsOpen()) {
                 for (Tree& tree : GetTrees()) {
-                    const std::vector<RenderItem>& renderItems = tree.GetRenderItems();
-                    for (const RenderItem& renderItem : renderItems) {
+                    for (const RenderItem& renderItem : tree.GetRenderItems()) {
+                        CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
+                    }
+                    for (const RenderItem& renderItem : tree.GetRenderItemsAlphaDiscarded()) {
                         CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                     }
                 }

@@ -148,6 +148,9 @@ namespace OpenGLRenderer {
         g_frameBuffers["World"] = OpenGLFrameBuffer("World", 1, 1);
         g_frameBuffers["World"].CreateAttachment("HeightMap", GL_R16F);
 
+        g_frameBuffers["Road"] = OpenGLFrameBuffer("Road", 1, 1);
+        g_frameBuffers["Road"].CreateAttachment("RoadMask", GL_R16F);
+
         g_frameBuffers["HeightMapBlitBuffer"] = OpenGLFrameBuffer("HeightMapBlitBuffer", HEIGHT_MAP_SIZE, HEIGHT_MAP_SIZE);
 
         g_frameBuffers["HeightMap"] = OpenGLFrameBuffer("HeightMap", HEIGHT_MAP_SIZE, HEIGHT_MAP_SIZE);
@@ -178,7 +181,6 @@ namespace OpenGLRenderer {
         g_ssbos["CSMLightProjViewMatrices"] = OpenGLSSBO(sizeof(glm::mat4) * MAX_VIEWPORT_COUNT * SHADOW_CASCADE_COUNT, GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["Lights"] = OpenGLSSBO(sizeof(GPULight) * MAX_GPU_LIGHTS, GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["ScreenSpaceBloodDecals"] = OpenGLSSBO(sizeof(ScreenSpaceBloodDecalInstanceData) * MAX_SCREEN_SPACE_BLOOD_DECAL_COUNT, GL_DYNAMIC_STORAGE_BIT);
-
 
         //g_ssbos["ffth0"] = OpenGLSSBO(oceanSize.x * oceanSize.y * sizeof(std::complex<float>), staticFlags);
 
@@ -277,6 +279,7 @@ namespace OpenGLRenderer {
         
         g_shaders["RaytraceScene"] = OpenGLShader({ "GL_raytrace_scene.comp" });
 
+        g_shaders["BlitRoad"] = OpenGLShader({ "GL_blit_road.comp" });
         g_shaders["BlurHorizontal"] = OpenGLShader({ "GL_blur_horizontal.vert", "GL_blur.frag" });
         g_shaders["BlurVertical"] = OpenGLShader({ "GL_blur_vertical.vert", "GL_blur.frag" });
         g_shaders["BloodScreenSpaceDecalsComposite"] = OpenGLShader({ "GL_blood_screenspace_composite.comp" });
@@ -492,6 +495,8 @@ namespace OpenGLRenderer {
         OpenGLFrameBuffer& finalImageBuffer = g_frameBuffers["FinalImage"];
 
         glDisable(GL_DITHER);
+
+        BlitRoads();
 
         UpdateGlobalIllumintation();
         PointCloudDirectLighting();

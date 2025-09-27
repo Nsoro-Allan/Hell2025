@@ -202,13 +202,15 @@ namespace Util {
         return screenCoords;
     }
 
-    bool IsWithinThreshold(const glm::ivec2& pointA, const glm::ivec2& pointB, float threshold) {
-        // Calculate the difference in x and y coordinates.
-        float dx = static_cast<float>(pointA.x - pointB.x);
-        float dy = static_cast<float>(pointA.y - pointB.y);
+    bool IsWithinThreshold(const glm::ivec2& a, const glm::ivec2& b, float threshold) {
+        if (threshold < 0.0f) return false;
 
-        // Check if the Euclidean distance is within the threshold.
-        return (dx * dx + dy * dy) <= (threshold * threshold);
+        // Calculate the difference in x and y coordinates
+        float dx = float(a.x) - float(b.x);
+        float dy = float(a.y) - float(b.y);
+
+        // Check if the Euclidean distance is within the threshold
+        return dx * dx + dy * dy <= threshold * threshold;
     }
 
     //glm::ivec2 WorldToScreenCoordsOrtho(const glm::vec3& worldPos, const glm::mat4& orthoMatrix, int screenWidth, int screenHeight, bool flipY) {
@@ -378,5 +380,75 @@ namespace Util {
         float u = 1.0f - v - w;
         // Check if point is inside the triangle
         return (u >= 0.0f) && (v >= 0.0f) && (w >= 0.0f);
+    }
+
+    inline glm::vec3 BezierEval(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float t) {
+        float u = 1.0f - t;
+        float uu = u * u;
+        float tt = t * t;
+        return u * uu * p0 + 3.0f * uu * t * p1 + 3.0f * u * tt * p2 + tt * t * p3;
+    }
+
+    std::vector<glm::vec3> GetBeizerPointsFromControlPoints(const std::vector<glm::vec3>& controlPoints, float spacing) {
+        std::vector<glm::vec3> result;
+        if (controlPoints.size() < 2) return result;
+
+        struct Seg { glm::vec3 b0, b1, b2, b3; };
+        std::vector<Seg> segments;
+        segments.reserve(std::max<int>(1, (int)controlPoints.size() - 1));
+
+        for (int i = 0; i < (int)controlPoints.size() - 1; ++i) {
+            const glm::vec3& Pm1 = (i > 0) ? controlPoints[i - 1] : controlPoints[i];
+            const glm::vec3& P0 = controlPoints[i];
+            const glm::vec3& P1 = controlPoints[i + 1];
+            const glm::vec3& P2 = (i + 2 < (int)controlPoints.size()) ? controlPoints[i + 2] : controlPoints[i + 1];
+
+            glm::vec3 B0 = P0;
+            glm::vec3 B3 = P1;
+            glm::vec3 B1 = P0 + (P1 - Pm1) / 6.0f;
+            glm::vec3 B2 = P1 - (P2 - P0) / 6.0f;
+
+            segments.push_back({ B0, B1, B2, B3 });
+        }
+
+        std::vector<glm::vec3> dense;
+        dense.reserve(segments.size() * 64 + 1);
+
+        const int samplesPerSeg = 64;
+        for (size_t s = 0; s < segments.size(); ++s) {
+            const Seg& seg = segments[s];
+            for (int i = 0; i < samplesPerSeg; ++i) {
+                float t = (float)i / (float)samplesPerSeg;
+                dense.push_back(BezierEval(seg.b0, seg.b1, seg.b2, seg.b3, t));
+            }
+        }
+        dense.push_back(segments.back().b3);
+
+        if (dense.empty()) return result;
+
+        result.push_back(dense.front());
+        float nextDist = spacing;
+        float accum = 0.0f;
+
+        for (size_t i = 1; i < dense.size(); ++i) {
+            const glm::vec3& a = dense[i - 1];
+            const glm::vec3& b = dense[i];
+            accum += glm::length(b - a);
+
+            while (accum >= nextDist) {
+                float over = accum - nextDist;
+                float segLen = glm::length(b - a);
+                float t = segLen > 0.0f ? 1.0f - (over / segLen) : 0.0f;
+                glm::vec3 p = glm::mix(a, b, t);
+                if (glm::length(p - result.back()) > 1e-5f) result.push_back(p);
+                nextDist += spacing;
+            }
+        }
+
+        if (glm::length(result.back() - dense.back()) > 0.01f) {
+            result.push_back(dense.back());
+        }
+
+        return result;
     }
 }

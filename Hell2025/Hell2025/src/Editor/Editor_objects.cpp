@@ -28,6 +28,7 @@ namespace Editor {
             SetHoveredObjectType(physxRayResult.userData.objectType);
             SetHoveredObjectId(physxRayResult.userData.objectId);
         }
+
         // BVH ray
         BvhRayResult bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, GetHoveredViewportIndex());
         if (bvhRayResult.hitFound) {
@@ -72,7 +73,7 @@ namespace Editor {
     void UpdateObjectSelection() {
         if (GetEditorState() != EditorState::IDLE) return;
 
-        if (Input::LeftMousePressed() && !Gizmo::HasHover()) {
+        if (Input::LeftMousePressed() && !Gizmo::HasHover() && Input::GetMouseX() > EDITOR_LEFT_PANEL_WIDTH) {
             Audio::PlayAudio(AUDIO_SELECT, 1.0f);
             SetSelectedObjectType(GetHoveredObjectType());
             SetSelectedObjectId(GetHoveredObjectId());
@@ -127,6 +128,7 @@ namespace Editor {
                     Gizmo::SetPosition(tree->GetPosition());
                 }
             }
+            UpdateOutliner();
         }
     }
 

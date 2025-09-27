@@ -171,11 +171,15 @@ namespace Editor {
     }
 
     void UpdateMapObjectEditor() {
+        float h = 30.0f;
+        float w = World::GetWorldSpaceWidth();
+        float d = World::GetWorldSpaceDepth();
+        
         // Draw perimeter
-        glm::vec3 p0 = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 p1 = glm::vec3(64.0f, 0.0f, 0.0f);
-        glm::vec3 p2 = glm::vec3(0.0f, 0.0f, 64.0f);
-        glm::vec3 p3 = glm::vec3(64.0f, 0.0f, 64.0f);
+        glm::vec3 p0 = glm::vec3(0.0f, h, 0.0f);
+        glm::vec3 p1 = glm::vec3(w, h, 0.0f);
+        glm::vec3 p2 = glm::vec3(0.0f, h, d);
+        glm::vec3 p3 = glm::vec3(w, h, d);
         Renderer::DrawLine(p0, p1, GRID_COLOR, true);
         Renderer::DrawLine(p0, p2, GRID_COLOR, true);
         Renderer::DrawLine(p2, p3, GRID_COLOR, true);

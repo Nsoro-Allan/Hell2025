@@ -5,10 +5,9 @@
 #include "Core/Game.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
-
+#include "Renderer/Renderer.h"
 
 void Inventory::Update(float deltaTime) {
-
     //SetGridCountX(6);
     ////SetGridCountY(4);
     //MoveItem(5, 4, 2, true);
@@ -20,7 +19,6 @@ void Inventory::Update(float deltaTime) {
         PrintGridOccupiedStateToConsole();
     }
 }
-
 
 void Inventory::UpdateItemViewScreen(float deltaTime) {
     Player* player = Game::GetLocalPlayerByIndex(m_localPlayerIndex);
@@ -87,22 +85,18 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
             return;
         }
 
-
-         // Move me to the bible when u find the values!
+        // Move me to the bible when u find the values!
         Transform initialTransform = itemInfo->m_initialExamineItemTransform;
-       // initialRotTransform.rotation.y = -0.2f;
-       // initialRotTransform.rotation.z = -0.6f;
-
-
+        // initialRotTransform.rotation.y = -0.2f;
+        // initialRotTransform.rotation.z = -0.6f;
 
         m_examineModelMatrix = rotX.to_mat4() * rotY.to_mat4() * initialTransform.to_mat4() * scale.to_mat4();
 
-   
         // Update the mesh nodes from the model. WARNNG: YOu dont wanna do this every frame like you are currently!
         m_examineItemMeshNodes.InitFromModel(itemInfo->m_examineModelName);
 
         // Calculate matrix to scale the model to fit on screen nicely
-        float maxXZ = 2.0f;         // Desired max footprint on XZ in meters
+        float maxXZ = 2.0f; // Desired max footprint on XZ in meters
         float maxY = 1.0f;  // Desired max height in meters
         glm::vec3 aabbMin = model->GetAABBMin();
         glm::vec3 aabbMax = model->GetAABBMax();

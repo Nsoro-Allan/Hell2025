@@ -12,14 +12,26 @@ namespace Editor {
     EditorUI::LeftPanel g_leftPanel;
 
     EditorUI::CollapsingHeader g_mapPropertiesHeader;
+    EditorUI::CollapsingHeader g_objectPropertiesHeader;
     EditorUI::CollapsingHeader g_outlinerHeader;
     EditorUI::StringInput g_mapNameInput;
+    EditorUI::StringInput g_objectNameInput;
+    EditorUI::FloatInput g_positionX;
+    EditorUI::FloatInput g_positionY;
+    EditorUI::FloatInput g_positionZ;
+    EditorUI::FloatSliderInput g_rotationX;
+    EditorUI::FloatSliderInput g_rotationY;
+    EditorUI::FloatSliderInput g_rotationZ;
     EditorUI::Outliner g_outliner;
 
     void InitLeftPanel() {
         g_mapPropertiesHeader.SetTitle("Map Editor");
+        g_objectPropertiesHeader.SetTitle("Properties");
 
+        UpdateOutliner();
+    }
 
+    void UpdateOutliner() {
         if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR ||
             GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             Map* map = MapManager::GetMapByName(GetEditorMapName());
@@ -29,14 +41,39 @@ namespace Editor {
 
                 g_outlinerHeader.SetTitle("Outliner");
 
-                //g_outliner.AddType("House Locations");
-                //if (World::GetPickUps().size()) g_outliner.AddType("Pick Ups");
-                //if (World::GetTrees().size()) g_outliner.AddType("Trees");
-
                 std::vector<std::string> gameObjects = { "shit", "fuck" };
-                std::vector<std::string> trees = {};
+
                 g_outliner.SetItems("Game Objects", gameObjects);
-                g_outliner.SetItems("Trees", trees);
+                g_outliner.SetItems("Trees", GetTreeNames());
+
+                g_objectNameInput.SetLabel("Name");
+
+                g_positionX.SetText("Position X");
+                g_positionY.SetText("Position Y");
+                g_positionZ.SetText("Position Z");
+
+                g_rotationX.SetText("Rotation X");
+                g_rotationY.SetText("Rotation Y");
+                g_rotationZ.SetText("Rotation Z");
+                g_rotationX.SetRange(-HELL_PI, HELL_PI);
+                g_rotationY.SetRange(-HELL_PI, HELL_PI);
+                g_rotationZ.SetRange(-HELL_PI, HELL_PI);
+            }
+        }
+
+        // move to UpdateObjectProperties()
+        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR || GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            if (GetSelectedObjectType() == ObjectType::TREE) {
+                Tree* tree = World::GetTreeByObjectId(GetSelectedObjectId());
+                if (tree) {
+                    g_objectNameInput.SetText(tree->GetEditorName());
+                    g_positionX.SetValue(tree->GetPosition().x);
+                    g_positionY.SetValue(tree->GetPosition().y);
+                    g_positionZ.SetValue(tree->GetPosition().z);
+                    g_rotationX.SetValue(tree->GetRotation().x);
+                    g_rotationY.SetValue(tree->GetRotation().y);
+                    g_rotationZ.SetValue(tree->GetRotation().z);
+                }
             }
         }
     }
@@ -56,10 +93,36 @@ namespace Editor {
         // Outliner
         if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             if (g_outlinerHeader.CreateImGuiElement()) {
-                g_outliner.CreateImGuiElements();
+                float outlinerHeight = BackEnd::GetCurrentWindowHeight() * 0.45f;
+                g_outliner.CreateImGuiElements(outlinerHeight);
                 ImGui::Dummy(ImVec2(0.0f, 20.0f));
+            }
         }
+
+        // Object properties
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            if (g_objectPropertiesHeader.CreateImGuiElement()) {
+                if (GetSelectedObjectType() != ObjectType::NONE) {
+                    g_objectNameInput.CreateImGuiElement();
+                }
+
+                if (GetSelectedObjectType() == ObjectType::TREE) {
+                    Tree* tree = World::GetTreeByObjectId(GetSelectedObjectId());
+                    if (tree) {
+                        if (g_positionX.CreateImGuiElements())  tree->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                        if (g_positionY.CreateImGuiElements())  tree->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                        if (g_positionZ.CreateImGuiElements())  tree->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+
+                        if (g_rotationX.CreateImGuiElements())  tree->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                        if (g_rotationY.CreateImGuiElements())  tree->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                        if (g_rotationZ.CreateImGuiElements())  tree->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0.0f, 20.0f));
+            }
         }
+        
     }
 
     void EndLeftPanel() {

@@ -47,6 +47,7 @@ namespace World {
     std::vector<PickUp> g_pickUps;
     std::vector<PictureFrame> g_pictureFrames;
     std::vector<Piano> g_pianos;
+    std::vector<Road> g_roads;
     std::vector<Shark> g_sharks;
     std::vector<Toilet> g_toilets;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
@@ -65,8 +66,8 @@ namespace World {
     uint32_t g_worldMapChunkCountX = 0;
     uint32_t g_worldMapChunkCountZ = 0;
 
-    std::string g_sectorNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
-    std::string g_heightMapNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
+    //std::string g_sectorNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
+    //std::string g_heightMapNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
 
 
 
@@ -85,6 +86,11 @@ namespace World {
         AddKangaroo(kangarooCreateInfo);
 
         NewRun();
+
+        if (GetRoads().size() == 0) {
+            Road& road = GetRoads().emplace_back();
+            road.Init();
+        }
     }
 
     void LoadMapInstance(const std::string& mapName) {
@@ -162,7 +168,27 @@ namespace World {
             spawnOffset.translation.x = mapInstanceCreateInfo.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
             spawnOffset.translation.z = mapInstanceCreateInfo.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
             LoadMapInstanceObjects(mapInstanceCreateInfo.mapName, spawnOffset);
+
+            SpawnOffset houseSpawnOffset = spawnOffset;
+            houseSpawnOffset.translation += glm::vec3(34.0f, 31.0f, 36.0f);
+
+            HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
+            World::AddHouse(*houseCreateInfo, houseSpawnOffset);
         }
+
+        GameObjectCreateInfo createInfo2;
+        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "RuralSet";
+        AddGameObject(createInfo2);
+        g_gameObjects[0].m_meshNodes.SetMeshMaterials("RuralSet0");
+
+
+        createInfo2.position = glm::vec3(21.0f, 30.4f, 14.25f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "RuralSet";
+        AddGameObject(createInfo2);
+        g_gameObjects[1].m_meshNodes.SetMeshMaterials("RuralSet0");
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
@@ -315,73 +341,74 @@ namespace World {
     }
 
     void LoadMap(MapCreateInfo* mapCreateInfo) {
-        // Handle failed map load
-        if (!mapCreateInfo) {
-            std::cout << "World::LoadMap() failed: mapCreateInfo was nullptr\n";
-            return;
-        }
-
-        // It loaded successfully so reset the world...
-        ResetWorld();
-
-        g_mapName = mapCreateInfo->name;
-        std::string sectorName = mapCreateInfo->m_sectorNames[0][0];
-        SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-        if (sectorCreateInfo) {
-            g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
-
-            SpawnOffset spawnOffset;
-            spawnOffset.translation.x = SECTOR_SIZE_WORLD_SPACE;
-            spawnOffset.translation.z = SECTOR_SIZE_WORLD_SPACE;
-            AddSectorAtLocation(*sectorCreateInfo, spawnOffset, true);
-        }
-
-        std::cout << "Loaded map: " << g_mapName << "\n";
+        //// // Handle failed map load
+        //// if (!mapCreateInfo) {
+        ////     std::cout << "World::LoadMap() failed: mapCreateInfo was nullptr\n";
+        ////     return;
+        //// }
+        //// 
+        //// // It loaded successfully so reset the world...
+        //// ResetWorld();
+        //// 
+        //// g_mapName = mapCreateInfo->name;
+        //// std::string sectorName = mapCreateInfo->m_sectorNames[0][0];
+        //// SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
+        //// if (sectorCreateInfo) {
+        ////     g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
+        //// 
+        ////     SpawnOffset spawnOffset;
+        ////     spawnOffset.translation.x = SECTOR_SIZE_WORLD_SPACE;
+        ////     spawnOffset.translation.z = SECTOR_SIZE_WORLD_SPACE;
+        ////     AddSectorAtLocation(*sectorCreateInfo, spawnOffset, true);
+        //// }
+        //// 
+        //// std::cout << "Loaded map: " << g_mapName << "\n";
     }
 
     void LoadSingleSector(SectorCreateInfo* sectorCreateInfo, bool loadHouses) {
-        if (!sectorCreateInfo) return;
+        ///// if (!sectorCreateInfo) return;
+        ///// 
+        ///// ResetWorld();
+        ///// 
+        ///// g_mapName = "SectorEditorMap";
+        ///// g_sectorNames[0][0] = sectorCreateInfo->sectorName;
+        ///// g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
+        ///// //g_mapWidth = 1;
+        ///// //g_mapDepth = 1;
+        ///// 
+        ///// AddSectorAtLocation(*sectorCreateInfo, SpawnOffset(), loadHouses);
+        ///// 
+        ///// 
+        ///// std::cout << "Loaded Single Sector: '" << g_sectorNames[0][0] << "' with height map '" << g_heightMapNames[0][0] << "'\n";
+        ///// 
+        ///// // TEST REMOVE ME!
+        ///// g_gameObjects.clear();
+        ///// 
+        ///// GameObjectCreateInfo createInfo2;
+        ///// createInfo2.position = glm::vec3(22.0f, 30.5f, 38.25f);
+        ///// createInfo2.scale = glm::vec3(1.0f);
+        ///// createInfo2.modelName = "Bunny";
+        ///// AddGameObject(createInfo2);
+        ///// g_gameObjects[0].m_meshNodes.m_materialIndices[0] = AssetManager::GetMaterialIndexByName("Leopard");
+        ///// g_gameObjects[0].m_meshNodes.m_materialIndices[1] = AssetManager::GetMaterialIndexByName("Leopard");
+        ///// 
+        ///// 
+        ///// //createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
+        ///// //createInfo2.scale = glm::vec3(1.0f);
+        ///// //createInfo2.modelName = "PowerPole";
+        ///// //AddGameObject(createInfo2);
+        ///// //
+        ///// //
+        ///// //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        ///// //createInfo2.scale = glm::vec3(1.0f);
+        ///// //createInfo2.modelName = "Reflector";
+        ///// //AddGameObject(createInfo2);
+        ///// //
+        ///// //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+        ///// //createInfo2.scale = glm::vec3(1.0f);
+        ///// //createInfo2.modelName = "Fence";
+        ///// //AddGameObject(createInfo2);
 
-        ResetWorld();
-
-        g_mapName = "SectorEditorMap";
-        g_sectorNames[0][0] = sectorCreateInfo->sectorName;
-        g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
-        //g_mapWidth = 1;
-        //g_mapDepth = 1;
-
-        AddSectorAtLocation(*sectorCreateInfo, SpawnOffset(), loadHouses);
-        
-
-        std::cout << "Loaded Single Sector: '" << g_sectorNames[0][0] << "' with height map '" << g_heightMapNames[0][0] << "'\n";
-
-        // TEST REMOVE ME!
-        g_gameObjects.clear();
-
-        GameObjectCreateInfo createInfo2;
-        createInfo2.position = glm::vec3(22.0f, 30.5f, 38.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "Bunny";
-        AddGameObject(createInfo2);
-        g_gameObjects[0].m_meshNodes.m_materialIndices[0] = AssetManager::GetMaterialIndexByName("Leopard");
-        g_gameObjects[0].m_meshNodes.m_materialIndices[1] = AssetManager::GetMaterialIndexByName("Leopard");
-
-
-        //createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
-        //createInfo2.scale = glm::vec3(1.0f);
-        //createInfo2.modelName = "PowerPole";
-        //AddGameObject(createInfo2);
-        //
-        //
-        //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        //createInfo2.scale = glm::vec3(1.0f);
-        //createInfo2.modelName = "Reflector";
-        //AddGameObject(createInfo2);
-        //
-        //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        //createInfo2.scale = glm::vec3(1.0f);
-        //createInfo2.modelName = "Fence";
-        //AddGameObject(createInfo2);
     }
 
     void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
@@ -599,42 +626,42 @@ namespace World {
             if (g_doors[i].GetObjectId() == objectID) {
                 g_doors[i].CleanUp();
                 g_doors.erase(g_doors.begin() + i);
-                i--;
+                return;
             }
         }
         for (int i = 0; i < g_pianos.size(); i++) {
             if (g_pianos[i].GetObjectId() == objectID) {
                 g_pianos[i].CleanUp();
                 g_pianos.erase(g_pianos.begin() + i);
-                i--;
+                return;
             }
         }
         for (int i = 0; i < g_planes.size(); i++) {
             if (g_planes[i].GetObjectId() == objectID) {
                 g_planes[i].CleanUp();
                 g_planes.erase(g_planes.begin() + i);
-                i--;
+                return;
             }
         }
         for (int i = 0; i < g_pickUps.size(); i++) {
             if (g_pickUps[i].GetObjectId() == objectID) {
                 g_pickUps[i].CleanUp();
                 g_pickUps.erase(g_pickUps.begin() + i);
-                i--;
+                return;
             }
         }
         for (int i = 0; i < g_walls.size(); i++) {
             if (g_walls[i].GetObjectId() == objectID) {
                 g_walls[i].CleanUp();
                 g_walls.erase(g_walls.begin() + i);
-                i--;
+                return;
             }
         }
         for (int i = 0; i < g_windows.size(); i++) {
             if (g_windows[i].GetObjectId() == objectID) {
                 g_windows[i].CleanUp();
                 g_windows.erase(g_windows.begin() + i);
-                i--;
+                return;
             }
         }
 
@@ -642,113 +669,34 @@ namespace World {
             if (g_animatedGameObjects[i].GetObjectId() == objectID) {
                 g_animatedGameObjects[i].CleanUp();
                 g_animatedGameObjects.erase(g_animatedGameObjects.begin() + i);
-                i--;
+                return;
             }
         }
+
+        for (int i = 0; i < g_trees.size(); i++) {
+            if (g_trees[i].GetObjectId() == objectID) {
+                Logging::Debug() << "Deleted " << g_trees[i].GetEditorName();
+                g_trees[i].CleanUp();
+                g_trees.erase(g_trees.begin() + i);
+                return;
+            }
+        }
+
+        Logging::Error() << "World::RemoveObject() Failed to remove object " << objectID << ", check you have implemented this type!\n";
     }
 
     void ResetWorld() {
         std::cout << "Reset world()\n";
 
-        // Zero out all map names
-        for (int x = 0; x < MAX_MAP_WIDTH; x++) {
-            for (int z = 0; z < MAX_MAP_DEPTH; z++) {
-                g_sectorNames[x][z] = "";
-                g_heightMapNames[x][z] = "";
-            }
-        }
         // Clear heightmap data
         g_heightMapChunks.clear();
         g_validChunks.clear();
-        // TODO: probably clear heightmap data
+        g_mapInstances.clear();
 
         ResetWeatherboardMeshBuffer();
 
         // Cleanup all objects
-
-        for (BulletCasing& bulletCasing : g_bulletCasings) {
-            bulletCasing.CleanUp();
-        }
-
-        for (ChristmasLights& christmasLights : g_christmasLights) {
-            christmasLights.CleanUp();
-        }
-
-        for (ChristmasPresent& christmasPresent : g_christmasPresents) {
-            christmasPresent.CleanUp();
-        }
-
-        for (ChristmasTree& christmasTree : g_christmasTrees) {
-            christmasTree.CleanUp();
-        }
-
-        for (Door& door : g_doors) {
-            door.CleanUp();
-        }
-        for (GameObject& gameObject : g_gameObjects) {
-            gameObject.CleanUp();
-        }
-
-       //for (GenericBouncable& genericBouncable : g_genericBouncables) {
-       //    genericStatic.CleanUp();
-       //}
-
-        for (GenericStatic& genericStatic : g_genericStatics) {
-            genericStatic.CleanUp();
-        }
-
-        //for (Kangaroo& kangaroo : g_kangaroos) {
-        //    kangaroo.CleanUp();
-        //}
-        for (Mermaid& mermaid : g_mermaids) {
-            mermaid.CleanUp();
-        }
-        for (Plane& housePlane : g_planes) {
-            housePlane.CleanUp();
-        }
-        for (Piano& piano : g_pianos) {
-            piano.CleanUp();
-        }
-        for (PickUp& pickUp : g_pickUps) {
-            pickUp.CleanUp();
-        }
-        for (Shark& shark : g_sharks) {
-            shark.CleanUp();
-        }
-        for (Tree& tree : g_trees) {
-            tree.CleanUp();
-        }
-        for (Wall& wall : g_walls) {
-            wall.CleanUp();
-        }
-        for (Window& window : g_windows) {
-            window.CleanUp();
-        }
-
-        // Clear all containers
-        g_bulletCasings.clear();
-        g_screenSpaceBloodDecals.clear();
-        g_christmasLights.clear();
-        g_christmasPresents.clear();
-        g_christmasTrees.clear();
-        g_decals.clear();
-        g_doors.clear();
-        g_gameObjects.clear();
-        g_genericStatics.clear();
-        //g_kangaroos.clear();
-        g_heightMapChunks.clear();
-        g_lights.clear();
-        g_mapInstances.clear();
-        g_mermaids.clear();
-        g_pianos.clear();
-        g_pickUps.clear();
-        g_planes.clear();
-        g_pictureFrames.clear();
-        g_sharks.clear();
-        g_toilets.clear();
-        g_trees.clear();
-        g_walls.clear();
-        g_windows.clear();
+        ClearAllObjects();
 
         MermaidCreateInfo mermaidCreateInfo;
         mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
@@ -766,6 +714,50 @@ namespace World {
         //animatedGameObject->SetPosition(glm::vec3(17, 31, 40));
         //animatedGameObject->SetMeshMaterialByMeshName("ArmsMale", "Hands");
         //animatedGameObject->SetMeshMaterialByMeshName("ArmsFemale", "FemaleArms");
+    }
+
+    void ClearAllObjects() {
+        // Clean up
+        for (BulletCasing& bulletCasing : g_bulletCasings)              bulletCasing.CleanUp();
+        for (ChristmasLights& christmasLights : g_christmasLights)      christmasLights.CleanUp();
+        for (ChristmasPresent& christmasPresent : g_christmasPresents)  christmasPresent.CleanUp();
+        for (ChristmasTree& christmasTree : g_christmasTrees)           christmasTree.CleanUp();
+        for (Door& door : g_doors)                                      door.CleanUp();
+        for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
+        //for (GenericBouncable& genericBouncable : g_genericBouncables) genericStatic.CleanUp();
+        for (GenericStatic& genericStatic : g_genericStatics)           genericStatic.CleanUp();
+        //for (Kangaroo& kangaroo : g_kangaroos)                        kangaroo.CleanUp();
+        for (Mermaid& mermaid : g_mermaids)                             mermaid.CleanUp();
+        for (Plane& housePlane : g_planes)                              housePlane.CleanUp();
+        for (Piano& piano : g_pianos)                                   piano.CleanUp();
+        for (PickUp& pickUp : g_pickUps)                                pickUp.CleanUp();
+        for (Shark& shark : g_sharks)                                   shark.CleanUp();
+        for (Tree& tree : g_trees)                                      tree.CleanUp();
+        for (Wall& wall : g_walls)                                      wall.CleanUp();
+        for (Window& window : g_windows)                                window.CleanUp();
+        
+        // Clear all containers
+        g_bulletCasings.clear();
+        g_screenSpaceBloodDecals.clear();
+        g_christmasLights.clear();
+        g_christmasPresents.clear();
+        g_christmasTrees.clear();
+        g_decals.clear();
+        g_doors.clear();
+        g_gameObjects.clear();
+        g_genericStatics.clear();
+        //g_kangaroos.clear();
+        g_lights.clear();
+        g_mermaids.clear();
+        g_pianos.clear();
+        g_pickUps.clear();
+        g_planes.clear();
+        g_pictureFrames.clear();
+        g_sharks.clear();
+        g_toilets.clear();
+        g_trees.clear();
+        g_walls.clear();
+        g_windows.clear();
     }
 
     void UpdateClippingCubes() {
@@ -904,6 +896,9 @@ namespace World {
 
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
+        if (createInfo.editorName == UNDEFINED_STRING) {
+            createInfo.editorName = Editor::GetNextAvailableTreeName(createInfo.type);
+        }
         g_trees.push_back(Tree(createInfo));
     }
 
@@ -992,28 +987,27 @@ namespace World {
         return g_worldMapChunkCountZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
     }
 
+    ///// const std::string& GetSectorNameAtLocation(int x, int z) {
+    /////     if (x < 0 || x >= 1 || z < 0 || z >= 1) {
+    /////         std::cout << "World::GetSectorNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
+    /////         static const std::string emptyStr = "";
+    /////         return emptyStr;
+    /////     }
+    /////     return g_sectorNames[x][z];
+    ///// }
+    ///// 
+    ///// const std::string& GetHeightMapNameAtLocation(int x, int z) {
+    /////     if (x < 0 || x >= 1 || z < 0 || z >= 1) {
+    /////         std::cout << "World::GetHeightMapNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
+    /////         static const std::string emptyStr = "";
+    /////         return emptyStr;
+    /////     }
+    /////     return g_heightMapNames[x][z];
+    ///// }
 
-    const std::string& GetSectorNameAtLocation(int x, int z) {
-        if (x < 0 || x >= 1 || z < 0 || z >= 1) {
-            std::cout << "World::GetSectorNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
-            static const std::string emptyStr = "";
-            return emptyStr;
-        }
-        return g_sectorNames[x][z];
-    }
-
-    const std::string& GetHeightMapNameAtLocation(int x, int z) {
-        if (x < 0 || x >= 1 || z < 0 || z >= 1) {
-            std::cout << "World::GetHeightMapNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
-            static const std::string emptyStr = "";
-            return emptyStr;
-        }
-        return g_heightMapNames[x][z];
-    }
-
-    bool IsMapCellInRange(int x, int z) {
-        return (x >= 0 && x < 1 && z >= 0 && z < 1);
-    }
+    ///// bool IsMapCellInRange(int x, int z) {
+    /////     return (x >= 0 && x < 1 && z >= 0 && z < 1);
+    ///// }
 
     Piano* GetPianoByObjectId(uint64_t objectId) {
         for (Piano& piano : g_pianos) {
@@ -1077,6 +1071,7 @@ namespace World {
     std::vector<PictureFrame>& GetPictureFrames()                       { return g_pictureFrames; }
     std::vector<Transform>& GetDoorAndWindowCubeTransforms()            { return g_doorAndWindowCubeTransforms; }
     std::vector<Toilet>& GetToilets()                                   { return g_toilets; }
+    std::vector<Road>& GetRoads()                                       { return g_roads; }
     std::vector<Shark>& GetSharks()                                     { return g_sharks; }
     std::vector<Tree>& GetTrees()                                       { return g_trees; }
     std::vector<Wall>& GetWalls()                                       { return g_walls; }

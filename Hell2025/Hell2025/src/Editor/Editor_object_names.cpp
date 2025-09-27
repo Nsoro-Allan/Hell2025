@@ -41,7 +41,6 @@ namespace Editor {
         return UNDEFINED_STRING; // Should never reach here!
     }
 
-
     std::string GetNextAvailableTreeName(TreeType type) {
         std::string desiredName = "Tree";
         switch (type) {
@@ -51,5 +50,18 @@ namespace Editor {
             case TreeType::BLACK_BERRIES:   desiredName = "Blackberries"; break;
         }
         return GetNextEditorName(desiredName, ObjectType::TREE);
+    }
+
+    std::vector<std::string> GetTreeNames() {
+        std::vector<std::string> names;
+        
+        names.clear();
+        names.reserve(World::GetTrees().size());
+
+        for (const Tree& tree : World::GetTrees()) {
+            names.push_back(tree.GetEditorName());
+        }
+
+        return names;
     }
 }

@@ -14,13 +14,16 @@ layout (binding = 2) uniform sampler2D rmaTexture;
 layout (binding = 3) uniform sampler2D DirtRoadBaseColorTexture;
 layout (binding = 4) uniform sampler2D DirtRoadNormalTexture;
 layout (binding = 5) uniform sampler2D DirtRoadRmaTexture;
-layout (binding = 6) uniform sampler2D RoadMaskTexture;;
+layout (binding = 6) uniform sampler2D RoadMaskTexture;
 
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 Tangent;
 in vec3 BiTangent;
 in vec3 WorldPos;
+
+uniform float u_worldWidth;
+uniform float u_worldDepth;
 
 void main() {
     vec4 dirtBaseColor = texture2D(baseColorTexture, TexCoord);
@@ -32,13 +35,10 @@ void main() {
     vec3 dirtRoadNormalMap = texture2D(DirtRoadNormalTexture, dirtRoadUV).rgb;
     vec3 dirtRoadRma = texture2D(DirtRoadRmaTexture, dirtRoadUV).rgb;
     
-    float roadMaskRatio = 4;
-    vec2 heightMapDimensions = textureSize(RoadMaskTexture, 0) * HEIGHTMAP_SCALE_XZ / roadMaskRatio;
-    //heightMapDimensions = textureSize(RoadMaskTexture, 0) * HEIGHTMAP_SCALE_XZ * 0.5;
-    vec2 normalizedCoords = vec2(WorldPos.x / heightMapDimensions.x, WorldPos.z / heightMapDimensions.y);
+    vec2 roadMaskWorldSize = textureSize(RoadMaskTexture, 0) * HEIGHTMAP_SCALE_XZ / 4;
+    vec2 roadMaskUV = vec2(WorldPos.x / roadMaskWorldSize.x, WorldPos.z / roadMaskWorldSize.y);
+    float roadMask = texture(RoadMaskTexture, roadMaskUV).r;
 
-    float roadMask = texture(RoadMaskTexture, normalizedCoords).r;
-    
     vec3 baseColor = mix(dirtBaseColor.rgb, dirtRoadBaseColor.rgb, roadMask);
     vec3 normalMap = mix(dirtNormalMap.rgb, dirtRoadNormalMap.rgb, roadMask);
     vec3 rma = mix(dirtRma.rgb, dirtRoadRma.rgb, roadMask);

@@ -69,6 +69,7 @@ namespace Editor {
     void InitLeftPanel();
     void BeginLeftPanel();
     void EndLeftPanel();
+    void UpdateOutliner();
 
     // New/Open
     void ShowNewMapWindow();
@@ -98,7 +99,10 @@ namespace Editor {
     float GetMapHeightMaxPaintHeight();
     
     std::string GetNextEditorName(const std::string& desiredName, ObjectType objectType);
+
     std::string GetNextAvailableTreeName(TreeType type);
+
+    std::vector<std::string> GetTreeNames();
 
     //void InitMapEditor();
     void OpenMapEditor();

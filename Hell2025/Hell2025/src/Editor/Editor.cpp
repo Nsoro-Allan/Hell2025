@@ -11,6 +11,7 @@
 #include "Imgui/ImguiBackEnd.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
+#include "Managers/MapManager.h"
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
@@ -135,6 +136,8 @@ namespace Editor {
             ExitObjectPlacement();
         }
 
+        UpdateOutliner(); // make this nicer
+
         switch (GetEditorMode()) {
             case EditorMode::HOUSE_EDITOR:      UpdateHouseEditor();       break;
             case EditorMode::MAP_HEIGHT_EDITOR: UpdateMapHeightEditor();   break;
@@ -174,14 +177,20 @@ namespace Editor {
         SetHoveredObjectType(ObjectType::NONE);
         SetHoveredObjectId(0);
 
+        if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
+            // nothing as of yet
+        }
         if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
-            World::LoadMapInstanceObjects("Shit", SpawnOffset());
             Renderer::RecalculateAllHeightMapData(false);
         } 
-
         if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
-            World::LoadMapInstanceObjects("Shit", SpawnOffset());
+            // nothing as of yet
         }
+
+        MapManager::UpdateCreateInfoCollectionFromWorld("Shit");
+        World::ClearAllObjects();
+        World::LoadMapInstanceObjects("Shit", SpawnOffset());
+
         g_isOpen = false;
     }
 

@@ -39,6 +39,17 @@ namespace Physics {
         return matrix;
     }
 
+    glm::vec3 GetHeightMapPositionAtXZ(float x, float z) {
+        ActivateAllHeightFields(); // TODO: Rewrite this function to only activate the heightfield that is beneath this ray origin
+
+        PhysXRayResult rayResult = Physics::CastPhysXRayHeightMap(glm::vec3(x, 200, z), glm::vec3(0.0f, -1.0f, 0.0f), 250);
+        if (rayResult.hitFound) {
+            return rayResult.hitPosition;
+        }
+        else {
+            return glm::vec3(0.0f);
+        }
+    }
 
     PhysXRayResult CastPhysXRayStaticEnvironment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength) {
         PxScene* scene = Physics::GetPxScene();

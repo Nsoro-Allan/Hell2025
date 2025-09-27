@@ -35,6 +35,7 @@ namespace OpenGLRenderer {
     void RenderGame();
 
     // Compute passes
+    void BlitRoads();
     void ComputeLightVolumeMask();
     void ComputeProbeLighting();
     void ComputeOceanFFTPass();

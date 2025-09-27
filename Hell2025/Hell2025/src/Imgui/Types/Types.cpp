@@ -638,14 +638,48 @@ namespace EditorUI {
         m_types[name] = std::vector<std::string>();
     }
 
-    void Outliner::SetItems(const std::string name, std::vector<std::string>& items) {
+    void Outliner::SetItems(const std::string name, const std::vector<std::string>& items) {
         m_types[name] = items;
-        //for (auto it = m_types.begin(); it != m_types.end(); ++it) {
-        //    if (it->first == name) {
-        //        it->second = items;
-        //        return;
-        //    }
-        //}
+    }
+
+    bool Outliner::CreateImGuiElements(float height) {
+        const float objectIndent = 60.0f;
+        ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
+
+        ImGuiWindowFlags childFlags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NavFlattened;
+        ImGui::BeginChild("OutlinerScroll", ImVec2(0.0f, height), false, childFlags);
+
+        for (auto& kv : m_types) {
+            const std::string& type = kv.first;
+            const std::vector<std::string>& items = kv.second;
+            if (items.empty()) continue;
+
+            if (ImGui::TreeNodeEx(type.c_str(), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth)) {
+                ImGui::Indent(objectIndent);
+
+                // Optional: clip for large lists
+                ImGuiListClipper clipper;
+                clipper.Begin((int)items.size());
+                while (clipper.Step()) {
+                    for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
+                        const std::string& item = items[i];
+                        bool isSelected = (m_selectedItem == item && m_selectedType == type);
+                        if (ImGui::Selectable(item.c_str(), isSelected)) {
+                            m_selectedItem = item;
+                            m_selectedType = type;
+                            ImGui::SetScrollHereY(0.25f);
+                        }
+                    }
+                }
+
+                ImGui::Unindent(objectIndent);
+                ImGui::TreePop();
+            }
+        }
+
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+        return true;
     }
 
     bool Outliner::CreateImGuiElements() {

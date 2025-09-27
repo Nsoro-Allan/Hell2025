@@ -209,6 +209,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
   <ItemGroup>
     <ClCompile Include="src\API\OpenGL\GL_backend.cpp" />
     <ClCompile Include="src\API\OpenGL\GL_util.cpp" />
+    <ClCompile Include="src\API\OpenGL\Renderer\ComputePasses\GL_blit_road.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\ComputePasses\GL_compute_ftt.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\ComputePasses\GL_compute_skinning.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\ComputePasses\GL_gaussian_blur.cpp" />
@@ -520,6 +521,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\10.shadow_mapping_depth.frag" />
     <None Include="res\shaders\OpenGL\10.shadow_mapping_depth.geom" />
     <None Include="res\shaders\OpenGL\10.shadow_mapping_depth.vert" />
+    <None Include="res\shaders\OpenGL\GL_blit_road.comp" />
     <None Include="res\shaders\OpenGL\GL_blood_screenspace_composite.comp" />
     <None Include="res\shaders\OpenGL\GL_blood_screenspace_decals.frag" />
     <None Include="res\shaders\OpenGL\GL_blood_screenspace_decals.vert" />

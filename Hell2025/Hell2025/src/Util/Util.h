@@ -55,6 +55,7 @@ namespace Util {
     float GetCapsuleVolume(float radius, float halfHeight);
     AABB GetAABBFromPoints(std::vector<glm::vec3>& points);
     bool IsPointInTriangle2D(const glm::vec2& pt, const glm::vec2& v0, const glm::vec2& v1, const glm::vec2& v2);
+    std::vector<glm::vec3> GetBeizerPointsFromControlPoints(const std::vector<glm::vec3>& controlPoints, float spacing);
 
     // Raycasting
     CubeRayResult CastCubeRay(const glm::vec3& rayOrigin, const glm::vec3 rayDir, std::vector<Transform>& cubeTransforms, float maxDistance = 99999);
