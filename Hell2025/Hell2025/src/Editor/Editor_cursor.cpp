@@ -14,7 +14,7 @@ namespace Editor {
         }
         else if (IsVerticalDividerHovered()) {
             BackEnd::SetCursor(HELL_CURSOR_VRESIZE);
-        }        
+        }
         // Hovering dividers
         else if (GetEditorState() == EditorState::RESIZING_HORIZONTAL_VERTICAL) {
             BackEnd::SetCursor(HELL_CURSOR_CROSSHAIR);
@@ -30,7 +30,9 @@ namespace Editor {
                  GetEditorState() == EditorState::PLACE_PICTURE_FRAME ||
                  GetEditorState() == EditorState::PLACE_TREE ||
                  GetEditorState() == EditorState::PLACE_WALL ||
-                 GetEditorState() == EditorState::PLACE_WINDOW) {
+                 GetEditorState() == EditorState::PLACE_WINDOW ||
+                 GetEditorState() == EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN ||
+                 GetEditorState() == EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN) {
             BackEnd::SetCursor(HELL_CURSOR_CROSSHAIR);
         }
         // Nothing? Then the arrow

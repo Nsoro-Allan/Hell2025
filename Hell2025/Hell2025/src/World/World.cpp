@@ -49,6 +49,8 @@ namespace World {
     std::vector<Piano> g_pianos;
     std::vector<Road> g_roads;
     std::vector<Shark> g_sharks;
+    std::vector<SpawnPoint> g_spawnCampaignPoints;
+    std::vector<SpawnPoint> g_spawnDeathmatchPoints;
     std::vector<Toilet> g_toilets;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
     std::vector<Tree> g_trees;
@@ -66,15 +68,16 @@ namespace World {
     uint32_t g_worldMapChunkCountX = 0;
     uint32_t g_worldMapChunkCountZ = 0;
 
-    //std::string g_sectorNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
-    //std::string g_heightMapNames[MAX_MAP_WIDTH][MAX_MAP_DEPTH];
-
-
+    std::vector<SpawnPoint> g_fallbackSpawnPoints = {
+        SpawnPoint(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0)),
+        SpawnPoint(glm::vec3(1.5f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0)),
+        SpawnPoint(glm::vec3(3.0f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0)),
+        SpawnPoint(glm::vec3(4.5f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0))
+    };
 
     struct WorldState {
         bool oceanEnabled = true;
     } g_worldState;
-
 
     void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses);
 
@@ -129,6 +132,10 @@ namespace World {
 
             g_worldMapChunkCountX = std::max(g_worldMapChunkCountX, reachX);
             g_worldMapChunkCountZ = std::max(g_worldMapChunkCountZ, reachZ);
+
+            // Add spawn points
+            g_spawnCampaignPoints.insert(g_spawnCampaignPoints.end(), map->GetAdditionalMapData().playerCampaignSpawns.begin(), map->GetAdditionalMapData().playerCampaignSpawns.end());
+            g_spawnDeathmatchPoints.insert(g_spawnDeathmatchPoints.end(), map->GetAdditionalMapData().playerDeathmatchSpawns.begin(), map->GetAdditionalMapData().playerDeathmatchSpawns.end());
         }
 
         // Create heightmap chunks
@@ -189,6 +196,14 @@ namespace World {
         createInfo2.modelName = "RuralSet";
         AddGameObject(createInfo2);
         g_gameObjects[1].m_meshNodes.SetMeshMaterials("RuralSet0");
+
+        // Init all spawn points (creates the physics shapes you need to detect hover in the editor)
+        for (SpawnPoint& spawnPoint : g_spawnCampaignPoints) {
+            spawnPoint.Init();
+        }
+        for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints) {
+            spawnPoint.Init();
+        }
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
@@ -732,6 +747,8 @@ namespace World {
         for (Piano& piano : g_pianos)                                   piano.CleanUp();
         for (PickUp& pickUp : g_pickUps)                                pickUp.CleanUp();
         for (Shark& shark : g_sharks)                                   shark.CleanUp();
+        for (SpawnPoint& spawnPoint : g_spawnCampaignPoints)            spawnPoint.CleanUp();
+        for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints)          spawnPoint.CleanUp();
         for (Tree& tree : g_trees)                                      tree.CleanUp();
         for (Wall& wall : g_walls)                                      wall.CleanUp();
         for (Window& window : g_windows)                                window.CleanUp();
@@ -754,6 +771,8 @@ namespace World {
         g_planes.clear();
         g_pictureFrames.clear();
         g_sharks.clear();
+        g_spawnCampaignPoints.clear();
+        g_spawnDeathmatchPoints.clear();
         g_toilets.clear();
         g_trees.clear();
         g_walls.clear();
@@ -925,6 +944,61 @@ namespace World {
         return wall.GetObjectId();
     }
 
+    SpawnPoint GetRandomCampaignSpawnPoint() {
+        SpawnPoint spawnPoint;
+        if (g_spawnCampaignPoints.size()) {
+            int rand = Util::RandomInt(0, g_spawnCampaignPoints.size() - 1); g_spawnCampaignPoints[rand];
+            spawnPoint = g_spawnCampaignPoints[rand];
+        }
+        else {
+            int rand = Util::RandomInt(0, g_fallbackSpawnPoints.size() - 1); g_fallbackSpawnPoints[rand];
+            spawnPoint = g_fallbackSpawnPoints[rand];
+        }
+
+        // Check you didn't just spawn on another player
+        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
+            Player* player = Game::GetLocalPlayerByIndex(i);
+            float distanceToOtherPlayer = glm::distance(spawnPoint.GetPosition(), player->GetFootPosition());
+            if (distanceToOtherPlayer < 1.0f) {
+                return GetRandomCampaignSpawnPoint();
+            }
+        }
+
+        return spawnPoint;
+    }
+
+    SpawnPoint GetRandomDeathmanSpawnPoint() {
+        SpawnPoint spawnPoint;
+        if (g_spawnDeathmatchPoints.size()) {
+            int rand = Util::RandomInt(0, g_spawnDeathmatchPoints.size() - 1); g_spawnDeathmatchPoints[rand];
+            spawnPoint = g_spawnDeathmatchPoints[rand];
+        }
+        else {
+            int rand = Util::RandomInt(0, g_fallbackSpawnPoints.size() - 1); g_fallbackSpawnPoints[rand];
+            spawnPoint = g_fallbackSpawnPoints[rand];
+        }
+
+        // Check you didn't just spawn on another player
+        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
+            Player* player = Game::GetLocalPlayerByIndex(i);
+            float distanceToOtherPlayer = glm::distance(spawnPoint.GetPosition(), player->GetFootPosition());
+            if (distanceToOtherPlayer < 1.0f) {
+                return GetRandomCampaignSpawnPoint();
+            }
+        }
+
+        return spawnPoint;
+    }
+
+    void UpdateWorldSpawnPointsFromMap(Map* map) {
+        if (!map) {
+            Logging::Error() << "World::UpdateWorldSpawnPointsFromMap() failed coz map param was nullptr";
+            return;
+        }
+        g_spawnCampaignPoints = map->GetAdditionalMapData().playerCampaignSpawns;
+        g_spawnDeathmatchPoints = map->GetAdditionalMapData().playerDeathmatchSpawns;
+    }
+
     void EnableOcean() {
         g_worldState.oceanEnabled = true;
     }
@@ -1069,6 +1143,8 @@ namespace World {
     std::vector<Piano>& GetPianos()                                     { return g_pianos; }
     std::vector<PickUp>& GetPickUps()                                   { return g_pickUps; }
     std::vector<PictureFrame>& GetPictureFrames()                       { return g_pictureFrames; }
+    std::vector<SpawnPoint>& GetCampaignSpawnPoints()                   { return g_spawnCampaignPoints; }
+    std::vector<SpawnPoint>& GetDeathmatchSpawnPoints()                 { return g_spawnDeathmatchPoints; }
     std::vector<Transform>& GetDoorAndWindowCubeTransforms()            { return g_doorAndWindowCubeTransforms; }
     std::vector<Toilet>& GetToilets()                                   { return g_toilets; }
     std::vector<Road>& GetRoads()                                       { return g_roads; }

@@ -64,6 +64,10 @@ void Map::SetCreateInfoCollection(CreateInfoCollection& createInfoCollection) {
     m_createInfoCollection = createInfoCollection;
 }
 
+void Map::SetAdditionalMapData(AdditionalMapData& additionalMapData) {
+    m_additionalMapData = additionalMapData;
+}
+
 const glm::ivec2 Map::GetHeightMapTextureSize() {
     if (BackEnd::GetAPI() == API::OPENGL) {
         return glm::ivec2(m_heightMapGLTexture.GetWidth(), m_heightMapGLTexture.GetHeight());
@@ -72,4 +76,14 @@ const glm::ivec2 Map::GetHeightMapTextureSize() {
         std::cout << "Vulkan TODO: Map::GetHeightMapTextureSize()\n";
         return glm::ivec2(0, 0);
     }
+}
+
+void Map::AddPlayerCampaignSpawn(glm::vec3 position) {
+    SpawnPoint& spawnPoint = m_additionalMapData.playerCampaignSpawns.emplace_back();
+    spawnPoint = SpawnPoint(position, glm::vec3(0.0f));
+}
+
+void Map::AddPlayerDeathmatchSpawn(glm::vec3 position) {
+    SpawnPoint& spawnPoint = m_additionalMapData.playerDeathmatchSpawns.emplace_back();
+    spawnPoint = SpawnPoint(position, glm::vec3(0.0f));
 }

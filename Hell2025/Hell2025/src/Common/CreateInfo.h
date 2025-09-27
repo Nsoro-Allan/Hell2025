@@ -2,6 +2,7 @@
 #include "HellEnums.h"
 #include "HellTypes.h"
 #include "HellDefines.h"
+#include "Types/Game/SpawnPoint.h"
 #include <map>
 
 enum class DrawersType {
@@ -249,4 +250,6 @@ struct CreateInfoCollection {
 
 struct AdditionalMapData {
     std::vector<HouseLocation> houseLocations;
+    std::vector<SpawnPoint> playerCampaignSpawns;
+    std::vector<SpawnPoint> playerDeathmatchSpawns;
 };

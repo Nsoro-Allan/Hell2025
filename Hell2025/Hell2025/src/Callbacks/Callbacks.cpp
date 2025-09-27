@@ -67,6 +67,14 @@ namespace Callbacks {
         Editor::SetEditorState(EditorState::PLACE_HOUSE);
     }
 
+    void BeginAddingPlayerCampaignSpawn() {
+        Editor::SetEditorState(EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN);
+    }
+
+    void BeginAddingPlayerDeathMatchSpawn() {
+        Editor::SetEditorState(EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN);
+    }
+
     void BeginAddingPictureFrame() {
         Editor::SetEditorState(EditorState::PLACE_PICTURE_FRAME);
     }

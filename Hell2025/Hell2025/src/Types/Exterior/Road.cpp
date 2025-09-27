@@ -39,12 +39,15 @@ void Road::Update() {
 }
 
 void Road::DrawPoints() {
+    
     for (glm::vec3& point : m_worldPoints) {
         Renderer::DrawPoint(point, GREEN);
     }
     for (glm::vec3& point : m_controlPoints3D) {
         Renderer::DrawPoint(point, RED);
     }
+
+    return;
 
     std::vector<ViewportData> viewportData = RenderDataManager::GetViewportData();
     if (viewportData.empty()) return;

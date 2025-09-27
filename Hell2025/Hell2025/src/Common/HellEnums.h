@@ -87,6 +87,7 @@ enum class ObjectType {
     RAGDOLL_ENEMY,
     RAGDOLL_PLAYER,
     SHARK,
+    SPAWN_POINT,
     TOILET,
     TOILET_SEAT,
     TOILET_LID,
@@ -144,7 +145,9 @@ enum struct EditorState {
     PLACE_PICTURE_FRAME,
     PLACE_TREE,
     PLACE_WALL,
-    PLACE_WINDOW
+    PLACE_WINDOW,
+    PLACE_PLAYER_CAMPAIGN_SPAWN,
+    PLACE_PLAYER_DEATHMATCH_SPAWN
 };
 
 enum WeaponAction {

@@ -66,6 +66,13 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const SpawnPoint& spawnPoint) {
+        j = nlohmann::json{
+            {"Position", spawnPoint.GetPosition()},
+            {"CamEuler", spawnPoint.GetCamEuler()},
+        };
+    }
+
     void to_json(nlohmann::json& j, const WallCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Height", createInfo.height},
@@ -175,6 +182,12 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, WindowCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
+    }
+
+    void from_json(const nlohmann::json& j, SpawnPoint& spawnPoint) {
+        glm::vec3 position = j.value("Position", glm::vec3(0.0f));
+        glm::vec3 camEuler = j.value("CamEuler", glm::vec3(0.0f));
+        spawnPoint = SpawnPoint(position, camEuler);
     }
 
     void from_json(const nlohmann::json& j, glm::vec3& v) {

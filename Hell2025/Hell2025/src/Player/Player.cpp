@@ -2,13 +2,14 @@
 #include "HellDefines.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "BackEnd/BackEnd.h"
 #include "Audio/Audio.h"
+#include "BackEnd/BackEnd.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
-#include "Viewport/ViewportManager.h"
 #include "Ocean/Ocean.h"
+#include "Viewport/ViewportManager.h"
 #include "UniqueID.h"
 
 // Get me out of here
@@ -18,8 +19,7 @@
 void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex) {
     m_playerId = UniqueID::GetNext();
 
-    m_position = position;
-    m_camera.SetPosition(m_position + glm::vec3(0.0f, m_viewHeightStanding, 0.0f));
+    m_camera.SetPosition(position + glm::vec3(0.0f, m_viewHeightStanding, 0.0f));
     m_camera.SetEulerRotation(rotation);
     m_viewportIndex = viewportIndex;
 
@@ -37,7 +37,7 @@ void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex)
     createInfo.renderingEnabled = false;
     m_muzzleFlash.Init(createInfo);
 
-    CreateCharacterController(m_position);
+    CreateCharacterController(position);
     InitCharacterModel();
     InitRagdoll();
 }
@@ -194,11 +194,6 @@ void Player::Update(float deltaTime) {
     }
 }
 
-struct SpawnPoint {
-    glm::vec3 position;
-    glm::vec3 camEuler;
-};
-
 void Player::Respawn() {
     WeaponManager::Init();
     m_inventory.CloseInventory();
@@ -212,62 +207,29 @@ void Player::Respawn() {
     m_inventory.AddItem("BlackSkull");
     m_inventory.AddItem("SmallKey");
 
-    World::GetKangaroos()[0].Respawn();
+    //World::GetKangaroos()[0].Respawn();
 
-    if (m_viewportIndex == 0) {
+    Logging::Debug() << "Spawning player " << m_viewportIndex;
+    SpawnPoint spawnPoint = World::GetRandomCampaignSpawnPoint();
+    //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
+    SetFootPosition(spawnPoint.GetPosition());
 
-        std::vector<SpawnPoint> spawnPoints;
-        spawnPoints.push_back({ glm::vec3(25.0f, 30.7f, 38.5f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0) });
-        spawnPoints.push_back({ glm::vec3(17.0f, 30.7f, 41.5f), glm::vec3(-0.162, 0.002, 0) });
-        spawnPoints.push_back({ glm::vec3(17.103, 30.7209, 37.7175), glm::vec3(-0.184, -3.124, 0) });
-        spawnPoints.push_back({ glm::vec3(21.7034, 30.7429, 45.7712), glm::vec3(-0.228, 0.00400294, 0) });
-        spawnPoints.push_back({ glm::vec3(20.1269, 30.6869, 41.3917), glm::vec3(-0.3, -0.725997, 0) });
+    //GetCamera().SetEulerRotation(spawnPoint.m_camEuler);
 
-        spawnPoints.push_back({ glm::vec3(52.6439, 30.8008, 22.1873), glm::vec3(-0.158, -3.536, 0) });
-        spawnPoints.push_back({ glm::vec3(38.4154, 30.6024, 53.6721), glm::vec3(-0.0679997, -0.497999, 0) });
-        spawnPoints.push_back({ glm::vec3(57.9582, 30.574, 31.0938), glm::vec3(-0.154, 1.894, 0) });
-        spawnPoints.push_back({ glm::vec3(18.8848, 30.5776, 34.2176), glm::vec3(-0.134, -1.996, 0) });
-
-        int rand = Util::RandomInt(0, spawnPoints.size() - 1);
-
-        SpawnPoint& spawnPoint = spawnPoints[rand];
-
-        // First time u spawn is always at first spawn location
-        if (m_respawnCount == 0) {
-            spawnPoint = spawnPoints[0];
-        }
-
-        //spawnPoint.position = glm::vec3(44.21f, 32.3, 35.15);
-        //spawnPoint.camEuler = glm::vec3(-0.2f, -2.99, 0.0f);
-
-        // Check you didn't just spawn on another player
-        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
-            Player* otherPlayer = Game::GetLocalPlayerByIndex(i);
-            if (this != otherPlayer) {
-                float distanceToOtherPlayer = glm::distance(spawnPoint.position, otherPlayer->GetFootPosition());
-                if (distanceToOtherPlayer < 1.0f) {
-                    Respawn();
-                    return;
-                }
-            }
-        }
-        SetFootPosition(spawnPoint.position);
-        GetCamera().SetEulerRotation(spawnPoint.camEuler);
-    }
-    else {
-        if (m_viewportIndex == 1) {
-            SetFootPosition(glm::vec3(12.5f, 30.6f, 45.5f));
-            m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
-        }
-        if (m_viewportIndex == 2) {
-            SetFootPosition(glm::vec3(12.5f, 30.6f, 55.5f));
-            m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
-        }
-        if (m_viewportIndex == 3) {
-            SetFootPosition(glm::vec3(12.5f, 30.6f, 605.5f));
-            m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
-        }
-    }
+   // else {
+   //     if (m_viewportIndex == 1) {
+   //         SetFootPosition(glm::vec3(12.5f, 30.6f, 45.5f));
+   //         m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
+   //     }
+   //     if (m_viewportIndex == 2) {
+   //         SetFootPosition(glm::vec3(12.5f, 30.6f, 55.5f));
+   //         m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
+   //     }
+   //     if (m_viewportIndex == 3) {
+   //         SetFootPosition(glm::vec3(12.5f, 30.6f, 605.5f));
+   //         m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
+   //     }
+   // }
 
     m_alive = true;
 
@@ -388,17 +350,16 @@ const glm::vec3 Player::GetFootPosition() const {
     CharacterController* characterControler = Physics::GetCharacterControllerById(m_characterControllerId);
     if (characterControler) {
         m_characterController = characterControler->GetPxController();
+        PxExtendedVec3 pxPos = m_characterController->getFootPosition();
+        return glm::vec3(
+            static_cast<float>(pxPos.x),
+            static_cast<float>(pxPos.y),
+            static_cast<float>(pxPos.z)
+        );
     }
-
-
-    PxExtendedVec3 pxPos = m_characterController->getFootPosition();
-    return glm::vec3(
-        static_cast<float>(pxPos.x),
-        static_cast<float>(pxPos.y),
-        static_cast<float>(pxPos.z)
-    );
-
-    //return m_position;
+    else {
+        return glm::vec3(0.0f, 0.0f, 0.0f);
+    }
 }
 
 Camera& Player::GetCamera() {

@@ -5,6 +5,7 @@
 #include "Audio/Audio.h"
 #include "Core/JSON.h"
 #include "Editor/Gizmo.h"
+#include "Managers/MapManager.h"
 #include "Renderer/Renderer.h"
 #include "World/SectorManager.h"
 #include "World/World.h"
@@ -174,7 +175,7 @@ namespace Editor {
         float h = 30.0f;
         float w = World::GetWorldSpaceWidth();
         float d = World::GetWorldSpaceDepth();
-        
+
         // Draw perimeter
         glm::vec3 p0 = glm::vec3(0.0f, h, 0.0f);
         glm::vec3 p1 = glm::vec3(w, h, 0.0f);
@@ -184,6 +185,16 @@ namespace Editor {
         Renderer::DrawLine(p0, p2, GRID_COLOR, true);
         Renderer::DrawLine(p2, p3, GRID_COLOR, true);
         Renderer::DrawLine(p1, p3, GRID_COLOR, true);
+
+        Map* map = MapManager::GetMapByName(GetEditorMapName());
+        if (map) {
+            for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerCampaignSpawns) {
+                Renderer::DrawPoint(spawnPoints.GetPosition(), GREEN);
+            }
+            for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerDeathmatchSpawns) {
+                Renderer::DrawPoint(spawnPoints.GetPosition(), YELLOW);
+            }
+        }
     }
 }
 

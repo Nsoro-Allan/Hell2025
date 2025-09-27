@@ -451,4 +451,23 @@ namespace Util {
 
         return result;
     }
+
+    float DistancePointToSegmentSquared(const glm::vec2 p, const glm::vec2 a, const glm::vec2 b) {
+        const glm::vec2 ab = b - a;
+        const float abLen2 = glm::dot(ab, ab);
+        if (abLen2 == 0.0f) return glm::dot(p - a, p - a);
+        const float t = std::clamp(glm::dot(p - a, ab) / abLen2, 0.0f, 1.0f);
+        const glm::vec2 closest = a + t * ab;
+        const glm::vec2 d = p - closest;
+        return glm::dot(d, d);
+    }
+
+    bool HoveredLine(glm::ivec2 mouseCoords, glm::ivec2 p1, glm::ivec2 p2, float threshold) {
+        const glm::vec2 m = glm::vec2(mouseCoords);
+        const glm::vec2 a = glm::vec2(p1);
+        const glm::vec2 b = glm::vec2(p2);
+        const float dist2 = DistancePointToSegmentSquared(m, a, b);
+        const float thresh2 = threshold * threshold;
+        return dist2 <= thresh2;
+    }
 }

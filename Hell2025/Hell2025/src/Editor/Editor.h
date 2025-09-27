@@ -126,12 +126,18 @@ namespace Editor {
     // Object placement
     void UpdateDoorPlacement();
     void UpdatePictureFramePlacement();
+    void UpdatePlayerCampaignSpawnPlacement();
+    void UpdatePlayerDeathmatchSpawnPlacement();
     void UpdateTreePlacement();
     void UpdateWallPlacement();
     void UpdateWindowPlacement();
     void UpdateObjectPlacement();
     void ExitObjectPlacement();
     void SetPlacementObjectId(uint64_t objectId);
+
+    // Util
+    PhysXRayResult GetMouseRayPhsyXHitPosition();
+
     uint64_t GetPlacementObjectId();
 
     // Ray intersections

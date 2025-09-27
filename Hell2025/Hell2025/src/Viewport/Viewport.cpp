@@ -120,7 +120,7 @@ glm::ivec2 Viewport::GetLocalMouseCoords() {
     int my = Input::GetMouseY();
     int x = mx - GetLeftPixel();
     int y = GetTopPixel() - my;
-    y = my + GetTopPixel() - h;
+    //y = my + GetTopPixel() - h;
 
     return glm::ivec2(x, y);
 }

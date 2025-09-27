@@ -12,12 +12,12 @@ void Player::UpdateMovement(float deltaTime) {
     // Hack to move camera height debug keys faster when pressing SHIFT and the logic to do so
     float speedBoost = Input::KeyDown(GLFW_KEY_LEFT_SHIFT) ? 1.5f : 1.0f;
     float heightSpeed = 3.0f;
-    if (Input::KeyDown(HELL_KEY_EQUAL)) {
-        m_position.y += deltaTime * heightSpeed * speedBoost;
-    }
-    if (Input::KeyDown(GLFW_KEY_MINUS)) {
-        m_position.y -= deltaTime * heightSpeed * speedBoost;
-    }
+    //if (Input::KeyDown(HELL_KEY_EQUAL)) {
+    //    m_position.y += deltaTime * heightSpeed * speedBoost;
+    //}
+    //if (Input::KeyDown(GLFW_KEY_MINUS)) {
+    //    m_position.y -= deltaTime * heightSpeed * speedBoost;
+    //}
 
     if (Editor::IsClosed() && m_controlEnabled) {
         if (World::HasOcean() && GetCameraPosition().y < Ocean::GetWaterHeightAtPlayer(m_viewportIndex) + 0.1f) {
@@ -123,7 +123,7 @@ void Player::UpdateWalkingMovement(float deltaTime) {
 
         // Update character controller
         Physics::MoveCharacterController(m_characterControllerId, displacement);
-        m_position = Physics::GetCharacterControllerPosition(m_characterControllerId);
+        //m_position = Physics::GetCharacterControllerPosition(m_characterControllerId);
 
         // Check grounded state
         m_grounded = false;
@@ -244,7 +244,7 @@ void Player::UpdateSwimmingMovement(float deltaTime) {
 
     // Update character controller
     Physics::MoveCharacterController(m_characterControllerId, displacement);
-    m_position = Physics::GetCharacterControllerPosition(m_characterControllerId);
+    //m_position = Physics::GetCharacterControllerPosition(m_characterControllerId);
 
     Physics::ClearCharacterControllerCollsionReports();
 

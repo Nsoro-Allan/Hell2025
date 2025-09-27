@@ -26,6 +26,7 @@
 #include "Types/House/Plane.h"
 #include "Types/House/Wall.h"
 #include "Types/House/Window.h"
+#include "Types/Map/Map.h"
 #include "Types/Map/MapInstance.h"
 #include "Types/Misc/PictureFrame.h"
 #include "Types/Misc/Piano.h"
@@ -154,6 +155,11 @@ namespace World {
     void UpdateHouseMeshBuffer();
     void UpdateWeatherBoardMeshBuffer();
 
+    // Spawns
+    SpawnPoint GetRandomCampaignSpawnPoint();
+    SpawnPoint GetRandomDeathmanSpawnPoint();
+    void UpdateWorldSpawnPointsFromMap(Map* map);
+
     MeshBuffer& GetHouseMeshBuffer();
     MeshBuffer& GetWeatherBoardMeshBuffer();
     Mesh* GetHouseMeshByIndex(uint32_t meshIndex);
@@ -206,6 +212,8 @@ namespace World {
     std::vector<Piano>& GetPianos();
     std::vector<PickUp>& GetPickUps();
     std::vector<PictureFrame>& GetPictureFrames();
+    std::vector<SpawnPoint>& GetCampaignSpawnPoints();
+    std::vector<SpawnPoint>& GetDeathmatchSpawnPoints();
     std::vector<Transform>& GetDoorAndWindowCubeTransforms();
     std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();

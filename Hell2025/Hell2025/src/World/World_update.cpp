@@ -58,6 +58,10 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
+        for (SpawnPoint& spawnPoint : GetCampaignSpawnPoints()) {
+            spawnPoint.DrawDebugCube();
+        }
+
         std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
         std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
         std::vector<Bullet>& bullets = GetBullets();

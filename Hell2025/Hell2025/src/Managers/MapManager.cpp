@@ -150,7 +150,9 @@ namespace MapManager {
 
         // Load Create Info Collection from JSON string
         CreateInfoCollection createInfoCollection = Util::CreateInfoCollectionFromJSON(createInfoJson);
+        AdditionalMapData additionalMapData = Util::AdditionalMapDataFromJSON(additionalJson);
         map.SetCreateInfoCollection(createInfoCollection);
+        map.SetAdditionalMapData(additionalMapData);
 
         Logging::Debug()
             << "Loaded map: " << mapName << "\n"

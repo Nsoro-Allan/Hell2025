@@ -26,8 +26,8 @@ namespace Editor {
 
             EditorUI::FileMenuNode& locations = insert.AddChild("Locations", nullptr);
             locations.AddChild("House", Callbacks::BeginAddingHouse);
-            locations.AddChild("Player Spawn (Campaign)", nullptr);
-            locations.AddChild("Player Spawn (Deathmatch)", nullptr);
+            locations.AddChild("Player Spawn (Campaign)", Callbacks::BeginAddingPlayerCampaignSpawn);
+            locations.AddChild("Player Spawn (Deathmatch)", Callbacks::BeginAddingPlayerDeathMatchSpawn);
 
             EditorUI::FileMenuNode& nature = insert.AddChild("Nature", nullptr);
             nature.AddChild("BlackBerries", Callbacks::BeginAddingBlackBerries);

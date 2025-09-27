@@ -42,5 +42,5 @@ namespace Logging {
     inline MessageStream Warning()  { return MessageStream(Level::WARNING); }
     inline MessageStream Error()    { return MessageStream(Level::ERROR); }
     inline MessageStream Fatal()    { return MessageStream(Level::FATAL); }
-    inline MessageStream ToDo()     { return MessageStream(Level::FATAL); }
+    inline MessageStream ToDo()     { return MessageStream(Level::TODO); }
 }

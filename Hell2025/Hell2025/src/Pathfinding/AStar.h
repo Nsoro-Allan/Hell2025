@@ -22,16 +22,14 @@ struct AStar {
     bool m_searchInProgress = false;
     int m_maxCellsSearchedPerFrame = 100;
 
-    Cell* m_start;
-    Cell* m_destination;
-    Cell* m_current;
+    Cell* m_start = nullptr;
+    Cell* m_destination = nullptr;
+    Cell* m_current = nullptr;
     MinHeap m_openList;
     std::vector<Cell> m_cells;
     std::vector<Cell*> m_finalPath;
     std::vector<glm::vec2> m_intersectionPoints;
     std::vector<bool> m_closedFlags;
-
-
 
     const std::vector<bool>& GetClosedFlags() { return m_closedFlags; }
 

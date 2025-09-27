@@ -550,11 +550,11 @@ struct PhysicsUserData {
 
 struct PhysXRayResult {
     PhysicsUserData userData;
-    std::string hitObjectName;
-    glm::vec3 hitPosition;
-    glm::vec3 hitNormal;
-    glm::vec3 rayDirection;
-    bool hitFound;
+    std::string hitObjectName = UNDEFINED_STRING;
+    glm::vec3 hitPosition = glm::vec3(0.0f);
+    glm::vec3 hitNormal = glm::vec3(0.0f);
+    glm::vec3 rayDirection = glm::vec3(0.0f);
+    bool hitFound = false;
 };
 
 struct PhysXOverlapResult {

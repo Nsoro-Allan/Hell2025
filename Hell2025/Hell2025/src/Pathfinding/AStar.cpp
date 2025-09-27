@@ -92,8 +92,7 @@ bool AStar::SearchInitilized() {
 }
 
 void AStar::FindPath() {
-
-    if (m_destination->obstacle) {
+    if (m_destination && m_destination->obstacle) {
         return;
     }
     if (m_openList.IsEmpty()) {

@@ -24,4 +24,7 @@ namespace Callbacks {
     void BeginAddingBlackBerries();
     void BeginAddingWall();
     void BeginAddingWindow();
+
+    void BeginAddingPlayerCampaignSpawn();
+    void BeginAddingPlayerDeathMatchSpawn();
 }

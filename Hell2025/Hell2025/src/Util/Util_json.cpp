@@ -79,14 +79,18 @@ namespace Util {
 
         AdditionalMapData additionalMapData;
         additionalMapData.houseLocations = json["HouseLocations"];
+        additionalMapData.playerCampaignSpawns = json["CampaignSpawns"];
+        additionalMapData.playerDeathmatchSpawns = json["DeathmatchSpawns"];
 
         return additionalMapData;
     }
 
     std::string AdditionalMapDataToJSON(AdditionalMapData& additionalMapData) {
         nlohmann::json json;
-        
+
         json["HouseLocations"] = additionalMapData.houseLocations;
+        json["CampaignSpawns"] = additionalMapData.playerCampaignSpawns;
+        json["DeathmatchSpawns"] = additionalMapData.playerDeathmatchSpawns;
 
         return json.dump(2);
     }

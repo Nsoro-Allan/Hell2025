@@ -91,7 +91,7 @@ void Player::UpdateCamera(float deltaTime) {
     }
 
     // Position
-    m_camera.SetPosition(m_position + glm::vec3(0, m_currentViewHeight + viewHeightModifer, 0) + m_headBob + m_breatheBob);
+    m_camera.SetPosition(GetFootPosition() + glm::vec3(0, m_currentViewHeight + viewHeightModifer, 0) + m_headBob + m_breatheBob);
    
     // Get view weapon camera matrix
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();

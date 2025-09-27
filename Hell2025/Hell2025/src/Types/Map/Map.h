@@ -11,6 +11,9 @@ struct Map {
     void SetFilename(const std::string& filename);
     void SetHeightMapData(int32_t chunkCountX, int32_t chunkCountZ, const std::vector<float>& data);
     void SetCreateInfoCollection(CreateInfoCollection& createInfoCollection);
+    void SetAdditionalMapData(AdditionalMapData& additionalMapData);
+    void AddPlayerDeathmatchSpawn(glm::vec3 position);
+    void AddPlayerCampaignSpawn(glm::vec3 position);
 
     const glm::ivec2 GetHeightMapTextureSize();
 

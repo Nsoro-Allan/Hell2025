@@ -223,7 +223,7 @@ private:
     int32_t m_deathCount = 0;
     int32_t m_respawnCount = 0;
 
-    glm::vec3 m_position = glm::vec3(0.0f);
+    //glm::vec3 m_position = glm::vec3(0.0f);
     ivecXZ m_chunkPos;
 
     // Interact

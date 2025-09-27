@@ -1,5 +1,6 @@
 #pragma once
 #include "HellTypes.h"
+#include "Types/Game/SpawnPoint.h"
 #include "CreateInfo.h"
 #include <nlohmann/json.hpp>
 #include <glm/glm.hpp>
@@ -12,6 +13,7 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const PianoCreateInfo& info);
     void to_json(nlohmann::json& j, const PictureFrameCreateInfo& info);
     void to_json(nlohmann::json& j, const PlaneCreateInfo& info);
+    void to_json(nlohmann::json& j, const SpawnPoint& spawnPoint);
     void to_json(nlohmann::json& j, const WallCreateInfo& info);
     void to_json(nlohmann::json& j, const WindowCreateInfo& info);
 
@@ -22,6 +24,7 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, PianoCreateInfo& info);
     void from_json(const nlohmann::json& j, PictureFrameCreateInfo& info);
     void from_json(const nlohmann::json& j, PlaneCreateInfo& info);
+    void from_json(const nlohmann::json& j, SpawnPoint& info);
     void from_json(const nlohmann::json& j, WallCreateInfo& info);
     void from_json(const nlohmann::json& j, WindowCreateInfo& info);
 

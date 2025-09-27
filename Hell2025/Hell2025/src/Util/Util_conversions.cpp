@@ -150,6 +150,7 @@ namespace Util {
             case ObjectType::RAGDOLL_ENEMY:                 return "RAGDOLL_ENEMY";
             case ObjectType::RAGDOLL_PLAYER:                return "RAGDOLL_PLAYER";
             case ObjectType::SHARK:                         return "SHARK";
+            case ObjectType::SPAWN_POINT:                   return "SPAWN_POINT";
             case ObjectType::TOILET:                        return "TOILET";
             case ObjectType::TOILET_LID:                    return "TOILET_LID";
             case ObjectType::TOILET_SEAT:                   return "TOILET_SEAT";
@@ -317,20 +318,22 @@ namespace Util {
 
     std::string EditorStateToString(const EditorState& editorState) {
         switch (editorState) {
-            case EditorState::IDLE:                         return "IDLE";
-            case EditorState::RESIZING_HORIZONTAL:          return "RESIZING_HORIZONTAL";
-            case EditorState::RESIZING_VERTICAL:            return "RESIZING_VERTICAL";
-            case EditorState::RESIZING_HORIZONTAL_VERTICAL: return "RESIZING_HORIZONTAL_VERTICAL";
-            case EditorState::GIZMO_TRANSLATING:            return "GIZMO_TRANSLATING";
-            case EditorState::GIZMO_SCALING:                return "GIZMO_SCALING";
-            case EditorState::GIZMO_ROTATING:               return "GIZMO_ROTATING";
-            case EditorState::DRAGGING_SELECT_RECT:         return "DRAGGING_SELECT_RECT";
-            case EditorState::PLACE_DOOR:               return "DOOR_PLACEMENT";
-            case EditorState::PLACE_PICTURE_FRAME:      return "PICTURE_FRAME_PLACEMENT";
-            case EditorState::PLACE_TREE:               return "TREE_PLACEMENT";
-            case EditorState::PLACE_WALL:               return "WALL_PLACEMENT";
-            case EditorState::PLACE_WINDOW:             return "WINDOW_PLACEMENT";
-            default:                                        return "UNDEFINED";
+            case EditorState::IDLE:                             return "IDLE";
+            case EditorState::RESIZING_HORIZONTAL:              return "RESIZING_HORIZONTAL";
+            case EditorState::RESIZING_VERTICAL:                return "RESIZING_VERTICAL";
+            case EditorState::RESIZING_HORIZONTAL_VERTICAL:     return "RESIZING_HORIZONTAL_VERTICAL";
+            case EditorState::GIZMO_TRANSLATING:                return "GIZMO_TRANSLATING";
+            case EditorState::GIZMO_SCALING:                    return "GIZMO_SCALING";
+            case EditorState::GIZMO_ROTATING:                   return "GIZMO_ROTATING";
+            case EditorState::DRAGGING_SELECT_RECT:             return "DRAGGING_SELECT_RECT";
+            case EditorState::PLACE_DOOR:                       return "PLACE_DOOR";
+            case EditorState::PLACE_PICTURE_FRAME:              return "PLACE_PICTURE_FRAME";
+            case EditorState::PLACE_TREE:                       return "PLACE_TREE";
+            case EditorState::PLACE_WALL:                       return "PLACE_WALL";
+            case EditorState::PLACE_WINDOW:                     return "PLACE_WINDOW";
+            case EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN:      return "PLACE_PLAYER_CAMPAIGN_SPAWN";
+            case EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN:    return "PLACE_PLAYER_DEATHMATCH_SPAWN";
+            default:                                            return "UNDEFINED";
         }
     }
 
