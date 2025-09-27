@@ -8,6 +8,7 @@
 #include "Types/Christmas/ChristmasPresent.h"
 #include "Types/Christmas/ChristmasTree.h"
 #include "Types/Exterior/Road.h"
+#include "Types/Exterior/PowerPoleSet.h"
 #include "Types/Exterior/Tree.h"
 #include "Types/Game/AnimatedGameObject.h"
 #include "Types/Game/Bullet.h"
@@ -212,6 +213,7 @@ namespace World {
     std::vector<Piano>& GetPianos();
     std::vector<PickUp>& GetPickUps();
     std::vector<PictureFrame>& GetPictureFrames();
+    std::vector<PowerPoleSet>& GetPowerPoleSets();
     std::vector<SpawnPoint>& GetCampaignSpawnPoints();
     std::vector<SpawnPoint>& GetDeathmatchSpawnPoints();
     std::vector<Transform>& GetDoorAndWindowCubeTransforms();

@@ -122,6 +122,10 @@ namespace World {
             piano.Update(deltaTime);
         }
 
+        for (PowerPoleSet& powerPoleSet : GetPowerPoleSets()) {
+            powerPoleSet.Update();
+        }
+
         for (Road& road : GetRoads()) {
             road.Update();
         }

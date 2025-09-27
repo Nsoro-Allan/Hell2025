@@ -183,6 +183,17 @@ namespace OpenGLRenderer {
                    glBindVertexArray(mesh.GetVAO());
                    glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, 0);
                }
+
+               // Draw power pole wires
+               for (PowerPoleSet& powerPoleSet : World::GetPowerPoleSets()) {
+                   std::vector<Wire>& wires = powerPoleSet.GetWires();
+                   for (Wire& wire : wires) {
+                       MeshBuffer& meshBuffer = wire.GetMeshBuffer();
+                       OpenGLMeshBuffer& glMeshBuffer = meshBuffer.GetGLMeshBuffer();
+                       glBindVertexArray(glMeshBuffer.GetVAO());
+                       glDrawElements(GL_TRIANGLES, glMeshBuffer.GetIndexCount(), GL_UNSIGNED_INT, 0);
+                   }
+               }
            }
        }
 

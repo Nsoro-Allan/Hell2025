@@ -7,6 +7,7 @@
 #define NEAR_PLANE 0.005f
 #define FAR_PLANE 256.0f
 
+#define PINK                glm::vec4(0.98f, 0.06f, 0.75f, 1.0f)
 #define ORANGE              glm::vec4(1.00f, 0.65f, 0.00f, 1.0f)
 #define BLACK               glm::vec4(0.00f, 0.00f, 0.00f, 1.0f)
 #define WHITE               glm::vec4(1.00f, 1.00f, 1.00f, 1.0f)

@@ -74,46 +74,6 @@ void ChristmasLights::Update(float deltaTime) {
 
 }
 
-float ChristmasLerp(float start, float end, float t) {
-    return start + t * (end - start);
-}
-
-std::vector<glm::vec3> GenerateSagPoints(const glm::vec3& start, const glm::vec3& end, int numPoints, float sagAmount) {
-    std::vector<glm::vec3> points;
-    float totalDistanceX = end.x - start.x;
-    float totalDistanceZ = end.z - start.z;
-    for (int i = 0; i < numPoints; ++i) {
-        float t = static_cast<float>(i) / (numPoints - 1);
-        float x = start.x + t * totalDistanceX;
-        float z = start.z + t * totalDistanceZ;
-        float y = ChristmasLerp(start.y, end.y, t);
-        float sag = sagAmount * (4.0f * (t - 0.5f) * (t - 0.5f) - 1.0f);
-        y += sag;
-        points.push_back(glm::vec3(x, y, z));
-    }
-    return points;
-}
-
-std::vector<glm::vec3> GenerateCirclePoints(const glm::vec3& center, const glm::vec3& forward, float radius, int numPoints) {
-    std::vector<glm::vec3> points;
-    points.reserve(numPoints);
-
-    // Normalize forward vector and compute orthogonal vectors
-    glm::vec3 normalizedForward = glm::normalize(forward);
-    glm::vec3 arbitrary = glm::abs(normalizedForward.x) < 0.9f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
-    glm::vec3 right = glm::normalize(glm::cross(normalizedForward, arbitrary));
-    glm::vec3 up = glm::normalize(glm::cross(right, normalizedForward));
-
-    // Generate points around the circle
-    for (int i = 0; i < numPoints; ++i) {
-        float angle = (2.0f * glm::pi<float>() * i) / numPoints;
-        glm::vec3 offset = radius * (std::cos(angle) * right + std::sin(angle) * up);
-        points.push_back(center + offset);
-    }
-
-    return points;
-}
-
 // ShaderToy Simple Spiral
 // https://www.shadertoy.com/view/MslyWB 
 std::vector<glm::vec3> GenerateSpiralPoints(glm::vec3 spiralCenter, float radius, int numPoints, float numCycles, float spiralPower) {
@@ -147,8 +107,8 @@ ChristmasLights::ChristmasLights(const ChristmasLightsCreateInfo& createInfo, co
     float wireCircleSegments = 5;
 
     if (!m_spiral) {
-        m_wireSegmentPoints = GenerateSagPoints(m_start, m_end, numPoints, m_sag);
-        m_lightSpawnPoints = GenerateSagPoints(m_start, m_end, numOfLights, m_sag);
+        m_wireSegmentPoints = Util::GenerateSagPoints(m_start, m_end, numPoints, m_sag);
+        m_lightSpawnPoints = Util::GenerateSagPoints(m_start, m_end, numOfLights, m_sag);
     } 
     else {
         // Draw spiral
@@ -172,8 +132,8 @@ ChristmasLights::ChristmasLights(const ChristmasLightsCreateInfo& createInfo, co
         glm::vec3& p0 = m_wireSegmentPoints[j];
         glm::vec3& p1 = m_wireSegmentPoints[j+1];
         glm::vec3 forward = p0 - p1;
-        const std::vector<glm::vec3>& circle1 = GenerateCirclePoints(p0, forward, wireRadius, wireCircleSegments);
-        const std::vector<glm::vec3>& circle2 = GenerateCirclePoints(p1, forward, wireRadius, wireCircleSegments);
+        const std::vector<glm::vec3>& circle1 = Util::GenerateCirclePoints(p0, forward, wireRadius, wireCircleSegments);
+        const std::vector<glm::vec3>& circle2 = Util::GenerateCirclePoints(p1, forward, wireRadius, wireCircleSegments);
         size_t pointCount = circle1.size();
         glm::vec3 center1(0.0f), center2(0.0f);
         for (const auto& p : circle1) center1 += p;

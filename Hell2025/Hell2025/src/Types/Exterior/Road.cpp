@@ -35,7 +35,7 @@ void Road::Init() {
 }
 
 void Road::Update() {
-    DrawPoints();
+    //DrawPoints();
 }
 
 void Road::DrawPoints() {

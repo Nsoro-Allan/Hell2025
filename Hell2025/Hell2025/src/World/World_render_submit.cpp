@@ -2,6 +2,7 @@
 #include "AssetManagement/AssetManager.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
@@ -11,19 +12,7 @@ namespace World {
     std::vector<RenderItem> g_skinnedRenderItems;
 
     void SubmitRenderItems() {
-        std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
-        std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
-        std::vector<Decal>& decals = GetDecals();
-        std::vector<Door>& doors = GetDoors();
-        std::vector<GameObject>& gameObjects = GetGameObjects();
-        std::vector<Light>& lights = GetLights();
-        std::vector<PickUp>& pickUps = GetPickUps();
-        std::vector<Piano>& pianos = GetPianos();
-        std::vector<Tree>& trees = GetTrees();
-        std::vector<Wall>& walls = GetWalls();
-        std::vector<Window>& windows = GetWindows();
-
-        for (GameObject& gameObject : gameObjects) {
+        for (GameObject& gameObject : GetGameObjects()) {
             gameObject.UpdateRenderItems();
             RenderDataManager::SubmitRenderItems(gameObject.GetRenderItems());
             RenderDataManager::SubmitRenderItemsBlended(gameObject.GetRenderItemsBlended());
@@ -42,7 +31,7 @@ namespace World {
         // Clear global render item vectors
         g_skinnedRenderItems.clear();
 
-        for (PickUp& pickUp : pickUps) {
+        for (PickUp& pickUp : GetPickUps()) {
             RenderDataManager::SubmitRenderItems(pickUp.GetRenderItems());
         }
 
@@ -59,10 +48,9 @@ namespace World {
             RenderDataManager::SubmitRenderItemsAlphaDiscard(mermaid.GetRenderItemsAlphaDiscarded());
             RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(mermaid.GetRenderItemsHairTopLayer());
             RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(mermaid.GetRenderItemsHairBottomLayer());
-
         }
 
-        for (Decal& decal : decals) {
+        for (Decal& decal : GetDecals()) {
             decal.SubmitRenderItem();
         }
 
@@ -71,11 +59,11 @@ namespace World {
         }
 
         // Doors
-        for (Door& door : doors) {
+        for (Door& door : GetDoors()) {
             door.SubmitRenderItems();
         }
-
-        for (Piano& piano : pianos) {
+        
+        for (Piano& piano : GetPianos()) {
             RenderDataManager::SubmitRenderItems(piano.GetRenderItems());
             if (Editor::GetSelectedObjectId() == piano.GetObjectId()) {
                 RenderDataManager::SubmitOutlineRenderItems(piano.GetRenderItems());
@@ -99,12 +87,12 @@ namespace World {
         }
 
         // Window
-        for (Window& window : windows) {
+        for (Window& window : GetWindows()) {
             window.SubmitRenderItems();
         }
 
         // Trees
-        for (Tree& tree : trees) {
+        for (Tree& tree : GetTrees()) {
             RenderDataManager::SubmitRenderItems(tree.GetRenderItems());
             RenderDataManager::SubmitRenderItemsBlended(tree.GetRenderItemsBlended());
             RenderDataManager::SubmitRenderItemsAlphaDiscard(tree.GetRenderItemsAlphaDiscarded());
@@ -118,16 +106,16 @@ namespace World {
         }
 
         // Lights
-        for (Light& light : lights) {
+        for (Light& light : GetLights()) {
             RenderDataManager::SubmitRenderItems(light.GetRenderItems());
         }
 
-        for (BulletCasing& bulletCasing : bulletCasings) {
+        for (BulletCasing& bulletCasing : GetBulletCasings()) {
             bulletCasing.SubmitRenderItem();
         }
 
         RenderDataManager::ResetBaseSkinnedVertex();
-        for (AnimatedGameObject& animatedGameObject : animatedGameObjects) {
+        for (AnimatedGameObject& animatedGameObject : GetAnimatedGameObjects()) {
             animatedGameObject.UpdateRenderItems();
             animatedGameObject.SubmitForSkinning();
             g_skinnedRenderItems.insert(g_skinnedRenderItems.end(), animatedGameObject.GetRenderItems().begin(), animatedGameObject.GetRenderItems().end());
@@ -136,6 +124,10 @@ namespace World {
         for (Wall& wall : GetWalls()) {
             wall.SubmitRenderItems();
             RenderDataManager::SubmitRenderItems(wall.GetWeatherBoardstopRenderItems());
+        }
+
+        for (PowerPoleSet& powerPoleSet : GetPowerPoleSets()) {
+            RenderDataManager::SubmitRenderItems(powerPoleSet.GetRenderItems());
         }
 
         for (GenericBouncable& genericBouncable : GetGenericBouncables()) {

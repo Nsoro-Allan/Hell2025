@@ -470,4 +470,45 @@ namespace Util {
         const float thresh2 = threshold * threshold;
         return dist2 <= thresh2;
     }
+
+    float ChristmasLerp(float start, float end, float t) {
+        return start + t * (end - start);
+    }
+
+    std::vector<glm::vec3> GenerateSagPoints(const glm::vec3& start, const glm::vec3& end, int numPoints, float sagAmount) {
+        std::vector<glm::vec3> points;
+        float totalDistanceX = end.x - start.x;
+        float totalDistanceZ = end.z - start.z;
+        for (int i = 0; i < numPoints; ++i) {
+            float t = static_cast<float>(i) / (numPoints - 1);
+            float x = start.x + t * totalDistanceX;
+            float z = start.z + t * totalDistanceZ;
+            float y = ChristmasLerp(start.y, end.y, t);
+            float sag = sagAmount * (4.0f * (t - 0.5f) * (t - 0.5f) - 1.0f);
+            y += sag;
+            points.push_back(glm::vec3(x, y, z));
+        }
+        return points;
+    }
+
+    std::vector<glm::vec3> GenerateCirclePoints(const glm::vec3& center, const glm::vec3& forward, float radius, int numPoints) {
+        std::vector<glm::vec3> points;
+        points.reserve(numPoints);
+
+        // Normalize forward vector and compute orthogonal vectors
+        glm::vec3 normalizedForward = glm::normalize(forward);
+        glm::vec3 arbitrary = glm::abs(normalizedForward.x) < 0.9f ? glm::vec3(1, 0, 0) : glm::vec3(0, 1, 0);
+        glm::vec3 right = glm::normalize(glm::cross(normalizedForward, arbitrary));
+        glm::vec3 up = glm::normalize(glm::cross(right, normalizedForward));
+
+        // Generate points around the circle
+        for (int i = 0; i < numPoints; ++i) {
+            float angle = (2.0f * glm::pi<float>() * i) / numPoints;
+            glm::vec3 offset = radius * (std::cos(angle) * right + std::sin(angle) * up);
+            points.push_back(center + offset);
+        }
+
+        return points;
+    }
+
 }

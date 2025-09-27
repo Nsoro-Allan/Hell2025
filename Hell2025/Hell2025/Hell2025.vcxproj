@@ -333,7 +333,9 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Inventory\Inventory_render_submit.cpp" />
     <ClCompile Include="src\Inventory\inventory_update.cpp" />
     <ClCompile Include="src\Managers\MapManager.cpp" />
+    <ClCompile Include="src\Types\Exterior\PowerPoleSet.cpp" />
     <ClCompile Include="src\Types\Game\SpawnPoint.cpp" />
+    <ClCompile Include="src\Types\Generics\Wire.cpp" />
     <ClCompile Include="src\Types\Map\Map.cpp" />
     <ClCompile Include="src\Types\Map\MapInstance.cpp" />
     <ClCompile Include="src\Pathfinding\AStarMap.cpp" />
@@ -724,9 +726,11 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Physics\CollisionReports.h" />
     <ClInclude Include="src\Physics\Types\D6Joint.h" />
     <ClInclude Include="src\Physics\Types\Ragdoll.h" />
+    <ClInclude Include="src\Types\Exterior\PowerPoleSet.h" />
     <ClInclude Include="src\Types\Exterior\Road.h" />
     <ClInclude Include="src\Types\Game\SpawnPoint.h" />
     <ClInclude Include="src\Types\Generics\GenericBouncable.h" />
+    <ClInclude Include="src\Types\Generics\Wire.h" />
     <ClInclude Include="src\Types\House\WeatherBoards.h" />
     <ClInclude Include="src\Types\Generics\GenericStatic.h" />
     <ClInclude Include="src\Types\Interior\Drawers.h" />

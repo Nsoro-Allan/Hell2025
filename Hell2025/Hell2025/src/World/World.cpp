@@ -46,6 +46,7 @@ namespace World {
     std::vector<Plane> g_planes;
     std::vector<PickUp> g_pickUps;
     std::vector<PictureFrame> g_pictureFrames;
+    std::vector<PowerPoleSet> g_powerPoleSets;
     std::vector<Piano> g_pianos;
     std::vector<Road> g_roads;
     std::vector<Shark> g_sharks;
@@ -183,20 +184,20 @@ namespace World {
             World::AddHouse(*houseCreateInfo, houseSpawnOffset);
         }
 
-        GameObjectCreateInfo createInfo2;
-        createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "RuralSet";
-        AddGameObject(createInfo2);
-        g_gameObjects[0].m_meshNodes.SetMeshMaterials("RuralSet0");
-
-
-        createInfo2.position = glm::vec3(21.0f, 30.4f, 14.25f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "RuralSet";
-        AddGameObject(createInfo2);
-        g_gameObjects[1].m_meshNodes.SetMeshMaterials("RuralSet0");
-
+       // GameObjectCreateInfo createInfo2;
+       // createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
+       // createInfo2.scale = glm::vec3(1.0f);
+       // createInfo2.modelName = "RuralSet";
+       // AddGameObject(createInfo2);
+       // g_gameObjects[0].m_meshNodes.SetMeshMaterials("RuralSet0");
+       //
+       //
+       // createInfo2.position = glm::vec3(21.0f, 30.4f, 14.25f);
+       // createInfo2.scale = glm::vec3(1.0f);
+       // createInfo2.modelName = "RuralSet";
+       // AddGameObject(createInfo2);
+       // g_gameObjects[1].m_meshNodes.SetMeshMaterials("RuralSet0");
+       //
         // Init all spawn points (creates the physics shapes you need to detect hover in the editor)
         for (SpawnPoint& spawnPoint : g_spawnCampaignPoints) {
             spawnPoint.Init();
@@ -204,6 +205,11 @@ namespace World {
         for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints) {
             spawnPoint.Init();
         }
+
+        // remove meeeeeeeeeeeeeeeee
+        PowerPoleSet& powerPoleSet = g_powerPoleSets.emplace_back();
+        powerPoleSet.Init();
+
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
@@ -238,6 +244,8 @@ namespace World {
     }
 
     void NewRun() {
+        ResetWorld();
+
         //std::string sectorName = "TestSector";
         //SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
         //if (sectorCreateInfo) {
@@ -353,77 +361,6 @@ namespace World {
         else {
             return nullptr;
         }
-    }
-
-    void LoadMap(MapCreateInfo* mapCreateInfo) {
-        //// // Handle failed map load
-        //// if (!mapCreateInfo) {
-        ////     std::cout << "World::LoadMap() failed: mapCreateInfo was nullptr\n";
-        ////     return;
-        //// }
-        //// 
-        //// // It loaded successfully so reset the world...
-        //// ResetWorld();
-        //// 
-        //// g_mapName = mapCreateInfo->name;
-        //// std::string sectorName = mapCreateInfo->m_sectorNames[0][0];
-        //// SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-        //// if (sectorCreateInfo) {
-        ////     g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
-        //// 
-        ////     SpawnOffset spawnOffset;
-        ////     spawnOffset.translation.x = SECTOR_SIZE_WORLD_SPACE;
-        ////     spawnOffset.translation.z = SECTOR_SIZE_WORLD_SPACE;
-        ////     AddSectorAtLocation(*sectorCreateInfo, spawnOffset, true);
-        //// }
-        //// 
-        //// std::cout << "Loaded map: " << g_mapName << "\n";
-    }
-
-    void LoadSingleSector(SectorCreateInfo* sectorCreateInfo, bool loadHouses) {
-        ///// if (!sectorCreateInfo) return;
-        ///// 
-        ///// ResetWorld();
-        ///// 
-        ///// g_mapName = "SectorEditorMap";
-        ///// g_sectorNames[0][0] = sectorCreateInfo->sectorName;
-        ///// g_heightMapNames[0][0] = sectorCreateInfo->heightMapName;
-        ///// //g_mapWidth = 1;
-        ///// //g_mapDepth = 1;
-        ///// 
-        ///// AddSectorAtLocation(*sectorCreateInfo, SpawnOffset(), loadHouses);
-        ///// 
-        ///// 
-        ///// std::cout << "Loaded Single Sector: '" << g_sectorNames[0][0] << "' with height map '" << g_heightMapNames[0][0] << "'\n";
-        ///// 
-        ///// // TEST REMOVE ME!
-        ///// g_gameObjects.clear();
-        ///// 
-        ///// GameObjectCreateInfo createInfo2;
-        ///// createInfo2.position = glm::vec3(22.0f, 30.5f, 38.25f);
-        ///// createInfo2.scale = glm::vec3(1.0f);
-        ///// createInfo2.modelName = "Bunny";
-        ///// AddGameObject(createInfo2);
-        ///// g_gameObjects[0].m_meshNodes.m_materialIndices[0] = AssetManager::GetMaterialIndexByName("Leopard");
-        ///// g_gameObjects[0].m_meshNodes.m_materialIndices[1] = AssetManager::GetMaterialIndexByName("Leopard");
-        ///// 
-        ///// 
-        ///// //createInfo2.position = glm::vec3(30.0f, 30.3f, 38.25f);
-        ///// //createInfo2.scale = glm::vec3(1.0f);
-        ///// //createInfo2.modelName = "PowerPole";
-        ///// //AddGameObject(createInfo2);
-        ///// //
-        ///// //
-        ///// //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        ///// //createInfo2.scale = glm::vec3(1.0f);
-        ///// //createInfo2.modelName = "Reflector";
-        ///// //AddGameObject(createInfo2);
-        ///// //
-        ///// //createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-        ///// //createInfo2.scale = glm::vec3(1.0f);
-        ///// //createInfo2.modelName = "Fence";
-        ///// //AddGameObject(createInfo2);
-
     }
 
     void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
@@ -1143,6 +1080,7 @@ namespace World {
     std::vector<Piano>& GetPianos()                                     { return g_pianos; }
     std::vector<PickUp>& GetPickUps()                                   { return g_pickUps; }
     std::vector<PictureFrame>& GetPictureFrames()                       { return g_pictureFrames; }
+    std::vector<PowerPoleSet>& GetPowerPoleSets()                       { return g_powerPoleSets; }
     std::vector<SpawnPoint>& GetCampaignSpawnPoints()                   { return g_spawnCampaignPoints; }
     std::vector<SpawnPoint>& GetDeathmatchSpawnPoints()                 { return g_spawnDeathmatchPoints; }
     std::vector<Transform>& GetDoorAndWindowCubeTransforms()            { return g_doorAndWindowCubeTransforms; }
