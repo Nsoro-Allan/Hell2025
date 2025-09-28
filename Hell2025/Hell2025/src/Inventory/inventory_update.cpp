@@ -8,6 +8,14 @@
 #include "Renderer/Renderer.h"
 
 void Inventory::Update(float deltaTime) {
+
+    //if (Input::KeyPressed(HELL_KEY_M)) {
+    //    SetGridCountX(6);
+    //}
+    //if (Input::KeyPressed(HELL_KEY_7)) {
+    //    MoveItem(5, 4, 2, true);
+    //}
+
     //SetGridCountX(6);
     ////SetGridCountY(4);
     //MoveItem(5, 4, 2, true);

@@ -5,24 +5,25 @@
 #include "World/World.h"
 
 void Player::UpdateShotgunGunLogic(float deltaTime) {
-    if (PressingFire() && CanFireShotgun()) {
-        FireShotgun();
-    }
-    if (PressingFire() && CanDryFireShotgun()) {
-        DryFireShotgun();
-    }
-    if (PressedReload() && CanReloadShotgun()) {
-        ReloadShotgun();
-    }
-    if (PressedWeaponMiscFunction() && CanUnloadShotgun()) {
-        UnloadShotgun();
-    }
-    if (PressedADS() && CanToggleShotgunAuto()) {
-        ToggleAutoShotgun();
-    }
-
-    if (PressedMelee()) {
-        ShotgunMelee();
+    if (InventoryIsClosed()) {
+        if (PressingFire() && CanFireShotgun()) {
+            FireShotgun();
+        }
+        if (PressingFire() && CanDryFireShotgun()) {
+            DryFireShotgun();
+        }
+        if (PressedReload() && CanReloadShotgun()) {
+            ReloadShotgun();
+        }
+        if (PressedWeaponMiscFunction() && CanUnloadShotgun()) {
+            UnloadShotgun();
+        }
+        if (PressedADS() && CanToggleShotgunAuto()) {
+            ToggleAutoShotgun();
+        }
+        if (PressedMelee()) {
+            ShotgunMelee();
+        }
     }
 
     UpdateShotgunReloadLogic();

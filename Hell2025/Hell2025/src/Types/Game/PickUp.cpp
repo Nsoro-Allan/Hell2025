@@ -55,7 +55,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
         m_meshNodes.InitFromModel("World_Remington870");
         m_meshNodes.SetMeshMaterials("Shotgun");
         mass = 3.2f;
-        physicsModel = AssetManager::GetModelByName("Shotgun_PickUpConvexMesh");
+        physicsModel = AssetManager::GetModelByName("World_Remington870_Collision_Mesh");
     }
 
     // SPAS
@@ -65,14 +65,14 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
         m_meshNodes.SetMaterialByMeshName("SPAS12_Moving", "SPAS_Moving");
         m_meshNodes.SetMaterialByMeshName("SPAS12_Stamped", "SPAS_Stamped");
         mass = 3.3f;
-        physicsModel = AssetManager::GetModelByName("SPAS_ConvexMesh");
+        physicsModel = AssetManager::GetModelByName("World_SPAS_Collision_Mesh");
     }
 
     else if (m_pickUpType == PickUpType::GLOCK || m_pickUpType == PickUpType::GOLDEN_GLOCK) {
         m_meshNodes.InitFromModel("World_Glock");
         m_meshNodes.SetMeshMaterials("Glock");
         mass = 0.7f;
-        physicsModel = AssetManager::GetModelByName("Glock_Isolated_ConvexMesh");
+        physicsModel = AssetManager::GetModelByName("World_Glock_Collision_Mesh");
     }
 
 
@@ -81,7 +81,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
         m_meshNodes.SetMaterialByMeshName("TokarevBody", "Tokarev");
         m_meshNodes.SetMaterialByMeshName("TokarevGripPolymer", "TokarevGrip");
         mass = 0.7f;
-        physicsModel = AssetManager::GetModelByName("Glock_Isolated_ConvexMesh");
+        physicsModel = AssetManager::GetModelByName("World_Glock_Collision_Mesh");
     }
 
 

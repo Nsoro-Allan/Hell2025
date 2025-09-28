@@ -38,6 +38,7 @@ public:
     ShadingMode GetViewportMode() const;
     SpaceCoords GetWindowSpaceCoords() const;
     SpaceCoords GetGBufferSpaceCoords() const;
+    SpaceCoords GetUISpaceCoords() const;
 
     Frustum& GetFrustum() { return m_frustum; }
     int GetLeftPixel()    { return m_leftPixel; }
@@ -68,5 +69,6 @@ private:
     ShadingMode m_viewportMode;
     SpaceCoords m_windowSpaceCoords;
     SpaceCoords m_gBufferSpaceCoords;
+    SpaceCoords m_uiSpaceCoords;
     void UpdateProjectionMatrices();
 };

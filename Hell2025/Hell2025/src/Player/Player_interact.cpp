@@ -77,6 +77,9 @@ void Player::UpdateInteract() {
 
     if (!ViewportIsVisible()) return;
 
+    // Probably make this cleaner, but for now this handles the fact you can interact while inventory is open. 
+    if (InventoryIsOpen()) return;
+
     // If ray hit object is intractable, store it
     if (World::ObjectTypeIsInteractable(m_rayHitObjectType, m_rayhitObjectId, GetCameraPosition(), m_rayHitPosition)) {
         m_interactObjectType = m_rayHitObjectType;

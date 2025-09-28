@@ -13,8 +13,17 @@
 void Player::UpdateWeaponLogic(float deltaTime) {
     if (IsDead()) return;
 
-    if (PressedNextWeapon()) {
-        NextWeapon();
+    if (InventoryIsOpen()) {
+        if (m_weaponAction == ADS_IN ||
+            m_weaponAction == ADS_IDLE ||
+            m_weaponAction == ADS_FIRE) {
+            LeaveADS();
+        }
+    }
+    if (InventoryIsClosed()) {
+        if (PressedNextWeapon()) {
+            NextWeapon();
+        }
     }
 
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
@@ -24,13 +33,11 @@ void Player::UpdateWeaponLogic(float deltaTime) {
     if (!viewWeapon) return;
     if (!weaponInfo) return;
 
-    if (HasControl()) {
-        switch (GetCurrentWeaponType()) {
-            case WeaponType::MELEE:     UpdateMeleeLogic(deltaTime);        break;
-            case WeaponType::PISTOL:    UpdateGunLogic(deltaTime);          break;
-            case WeaponType::AUTOMATIC: UpdateGunLogic(deltaTime);          break;
-            case WeaponType::SHOTGUN:   UpdateShotgunGunLogic(deltaTime);   break;
-        }
+    switch (GetCurrentWeaponType()) {
+        case WeaponType::MELEE:     UpdateMeleeLogic(deltaTime);        break;
+        case WeaponType::PISTOL:    UpdateGunLogic(deltaTime);          break;
+        case WeaponType::AUTOMATIC: UpdateGunLogic(deltaTime);          break;
+        case WeaponType::SHOTGUN:   UpdateShotgunGunLogic(deltaTime);   break;
     }
 
     // Need to initiate draw animation?
@@ -93,6 +100,17 @@ void Player::UpdateWeaponLogic(float deltaTime) {
 }
 
 void Player::GiveDefaultLoadout() {
+    // Always give knife
+    m_inventory.AddItem("Knife");
+    m_inventory.AddItem("Glock");
+    m_inventory.AddItem("GoldenGlock");
+    m_inventory.AddItem("Tokarev");
+    m_inventory.AddItem("Remington870");
+    m_inventory.AddItem("SPAS");
+    m_inventory.AddItem("BlackSkull");
+    m_inventory.AddItem("SmallKey");
+
+
     GiveWeapon("Knife");
     GiveWeapon("SPAS");
     GiveWeapon("Remington870");
@@ -105,7 +123,7 @@ void Player::GiveDefaultLoadout() {
     GiveAmmo("Tokarev", 200);
 
     GiveSilencer("Glock");
-    GiveSight("GoldenGlock");
+    GiveSight("GoldenGlock");    
 }
 
 void Player::NextWeapon() {
@@ -187,6 +205,7 @@ void Player::GiveWeapon(const std::string& name) {
     if (state && weaponInfo) {
         state->has = true;
         state->ammoInMag = weaponInfo->magSize;
+
     }
 }
 

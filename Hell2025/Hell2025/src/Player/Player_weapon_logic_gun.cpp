@@ -3,17 +3,19 @@
 #include "Viewport/ViewportManager.h"
 
 void Player::UpdateGunLogic(float deltaTime) {
-    if (PressingADS() && CanEnterADS()) {
-        EnterADS();
-    }
-    if (!PressingADS() && CanLeaveADS()) {
-        LeaveADS();
-    }
-    if (PressingFire() && CanFireGun()) {
-        FireGun();
-    }
-    if (PressedReload() && CanReloadGun()) {
-        ReloadGun();
+    if (InventoryIsClosed()) {
+        if (PressingADS() && CanEnterADS()) {
+            EnterADS();
+        }
+        if (!PressingADS() && CanLeaveADS()) {
+            LeaveADS();
+        }
+        if (PressingFire() && CanFireGun()) {
+            FireGun();
+        }
+        if (PressedReload() && CanReloadGun()) {
+            ReloadGun();
+        }
     }
     UpdateGunReloadLogic();
     UpdateSlideLogic();
@@ -169,8 +171,7 @@ bool Player::CanEnterADS() {
     WeaponState* weaponState = GetCurrentWeaponState();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
 
-    if (!weaponInfo->hasADS)
-        return false;
+    if (!weaponInfo->hasADS) return false;
 
     return (
         (m_weaponAction != RELOAD && m_weaponAction != RELOAD_FROM_EMPTY && !IsInADS()) ||

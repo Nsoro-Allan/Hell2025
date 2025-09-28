@@ -2,8 +2,10 @@
 #include "Audio/Audio.h"
 
 void Player::UpdateMeleeLogic(float deltaTime) {
-    if (PressingFire() && CanFireMelee()) {
-        FireMelee();
+    if (InventoryIsClosed()) {
+        if (PressingFire() && CanFireMelee()) {
+            FireMelee();
+        }
     }
 }
 

@@ -157,12 +157,12 @@ void Player::UpdateUI() {
             }
 
             // Movement
-            if (true) {
+            if (false) {
                 text += "IsMoving: " + Util::BoolToString(IsMoving()) + "\n";
             }
 
             // Weapons
-            if (false) {
+            if (true) {
                 text += "Weapon Action: " + Util::WeaponActionToString(GetCurrentWeaponAction()) + "\n";
             }
 
@@ -172,7 +172,7 @@ void Player::UpdateUI() {
             }
 
             // Rays
-            if (true) {
+            if (false) {
                 text += "BVH ray: " + Util::ObjectTypeToString(m_bvhRayResult.objectType) + " " + std::to_string(m_bvhRayResult.objectId) + "\n";
                 text += "PhysX ray: " + Util::ObjectTypeToString(m_physXRayResult.userData.objectType) + " " + std::to_string(m_physXRayResult.userData.objectId) + " " + Util::PhysicsTypeToString(m_physXRayResult.userData.physicsType) + " " + std::to_string(m_physXRayResult.userData.physicsId) + "\n";
                 text += "Ray hit found: " + Util::BoolToString(m_rayHitFound) + " " + Util::ObjectTypeToString(m_rayHitObjectType) + " " + std::to_string(m_rayhitObjectId) + "\n";

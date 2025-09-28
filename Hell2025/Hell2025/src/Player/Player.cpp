@@ -198,14 +198,6 @@ void Player::Respawn() {
     WeaponManager::Init();
     m_inventory.CloseInventory();
     m_inventory.ClearInventory();
-    m_inventory.AddItem("Knife");
-    m_inventory.AddItem("Glock");
-    m_inventory.AddItem("GoldenGlock");
-    m_inventory.AddItem("Tokarev");
-    m_inventory.AddItem("Remington870");
-    m_inventory.AddItem("SPAS");
-    m_inventory.AddItem("BlackSkull");
-    m_inventory.AddItem("SmallKey");
 
     //World::GetKangaroos()[0].Respawn();
 

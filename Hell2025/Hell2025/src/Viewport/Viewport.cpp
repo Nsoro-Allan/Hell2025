@@ -40,6 +40,12 @@ void Viewport::Update() {
     m_gBufferSpaceCoords.localMouseX = Util::MapRange(Input::GetMouseX(), m_leftPixel, m_rightPixel, 0, m_gBufferSpaceCoords.width);
     m_gBufferSpaceCoords.localMouseY = Util::MapRange(Input::GetMouseY(), m_bottomPixel, m_topPixel, 0, m_gBufferSpaceCoords.height);
 
+    // GBuffer space co-ordinates
+    m_uiSpaceCoords.width = resolutions.ui.x * m_size.x;
+    m_uiSpaceCoords.height = resolutions.ui.y * m_size.y;
+    m_uiSpaceCoords.localMouseX = Util::MapRange(Input::GetMouseX(), m_leftPixel, m_rightPixel, 0, m_uiSpaceCoords.width);
+    m_uiSpaceCoords.localMouseY = Util::MapRange(Input::GetMouseY(), m_bottomPixel, m_topPixel, 0, m_uiSpaceCoords.height);
+
     // Viewport mouse hover state
     m_hasHover = (
         Input::GetMouseX() > m_leftPixel &&
@@ -156,6 +162,10 @@ SpaceCoords Viewport::GetWindowSpaceCoords() const {
 
 SpaceCoords Viewport::GetGBufferSpaceCoords() const {
     return m_gBufferSpaceCoords;
+}
+
+SpaceCoords Viewport::GetUISpaceCoords() const {
+    return m_uiSpaceCoords;
 }
 
 void Viewport::SetPosition(const glm::vec2& position) {

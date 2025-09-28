@@ -1,9 +1,13 @@
 #include "Inventory.h"
 #include "AssetManagement/AssetManager.h"
+#include "Config/Config.h"
 #include "Core/Bible.h"
+#include "Core/Game.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
 #include "UI/TextBlitter.h"
 #include "UI/UiBackend.h"
+#include "Viewport/ViewportManager.h"
 
 void Inventory::SubmitRenderItems() {
     if (m_state == InventoryState::MAIN_SCREEN) {
@@ -16,6 +20,33 @@ void Inventory::SubmitRenderItems() {
 
         int width = GetItemGridSize().x + (m_style.gridMargin * 2);
         int height = 880;
+
+        if (Game::GetSplitscreenMode() == SplitscreenMode::TWO_PLAYER) {
+            const Resolutions& resolutions = Config::GetResolutions();
+            int halfScreenHeight = resolutions.ui.y * 0.5f;
+
+            int magicExtraWidth = 400;
+            width = GetItemGridSize().x + (m_style.gridMargin * 2) + magicExtraWidth;
+            height = GetItemGridSize().y + (m_style.gridMargin * 2);
+
+            int newInvOriginX = (halfScreenHeight - height) * 0.5f;
+            int newInvOriginY = (halfScreenHeight - height) * 0.5f;
+
+            if (m_localPlayerIndex == 0) {
+                m_locations.background = glm::ivec2(newInvOriginX, newInvOriginY);
+            }
+            if (m_localPlayerIndex == 1) {
+                m_locations.background = glm::ivec2(newInvOriginX, newInvOriginY + (halfScreenHeight));
+            }
+
+            m_locations.itemGrid = m_locations.background + glm::ivec2(m_style.gridMargin);
+            m_locations.theLine = m_locations.itemGrid + glm::ivec2(GetItemGridSize().x + m_style.theLinePadding, 0);
+            m_locations.itemHeading = m_locations.theLine + glm::ivec2(0, m_style.itemHeadingTopPadding);
+            m_locations.itemDescription = m_locations.itemHeading + glm::ivec2(0, GetSelectedItemHeadingSize().y + m_style.itemDescriptionTopPadding);
+            m_locations.itemButtons = m_locations.itemDescription + glm::ivec2(0, GetSelectedItemDescriptionSize().y + m_style.itemButtonsTopPadding);
+        }
+
+
 
         BlitInventoryBackground(m_locations.background, width, height);
         BlitItemGrid(m_locations.itemGrid);
