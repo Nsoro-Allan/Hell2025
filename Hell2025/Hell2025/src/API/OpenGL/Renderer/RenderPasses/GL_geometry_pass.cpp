@@ -83,15 +83,17 @@ namespace OpenGLRenderer {
             clearIndex = 1;
         }
         if (clearIndex != -1) {
-            int baseWidth = woundMaskArray->GetWidth();
-            int baseHeight = woundMaskArray->GetHeight();
-            const GLubyte black[4] = { 0, 0, 0, 0 };
-            int layer = clearIndex;
-            int mipmapLevel = 0;
-            int w = std::max(1, baseWidth >> mipmapLevel);
-            int h = std::max(1, baseHeight >> mipmapLevel);
-            glClearTexSubImage(woundMaskArray->GetHandle(), mipmapLevel, 0, 0, layer, w, h, 1, GL_RGBA, GL_UNSIGNED_BYTE, black);
-            std::cout << "Cleared " << clearIndex << "\n";
+
+            woundMaskArray->Clear(0, 0, 0, 0, clearIndex);
+         //  int baseWidth = woundMaskArray->GetWidth();
+         //  int baseHeight = woundMaskArray->GetHeight();
+         //  const GLubyte black[4] = { 0, 0, 0, 0 };
+         //  int layer = clearIndex;
+         //  int mipmapLevel = 0;
+         //  int w = std::max(1, baseWidth >> mipmapLevel);
+         //  int h = std::max(1, baseHeight >> mipmapLevel);
+         //  glClearTexSubImage(woundMaskArray->GetHandle(), mipmapLevel, 0, 0, layer, w, h, 1, GL_RGBA, GL_UNSIGNED_BYTE, black);
+         //  std::cout << "Cleared " << clearIndex << "\n";
         }
         
 

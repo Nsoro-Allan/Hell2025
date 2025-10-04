@@ -66,10 +66,13 @@ public:
     void SetAdditiveTransform(const std::string& nodeName, const glm::mat4& matrix);
     void PauseAllAnimationLayers();
     void SetGoldFlag(bool flag);
+    void SetRagdollV2Id(uint64_t ragdollV2Id);
 
     bool AnimationIsPastFrameNumber(const std::string& animationLayerName, int frameNumber);
     bool AnimationByNameIsComplete(const std::string& name);
     bool IsAllAnimationsComplete();
+    void EnableRendering();
+    void DisableRendering();
 
     const glm::mat4 GetModelMatrix();
     const glm::mat4 GetBindPoseByBoneName(const std::string& name);
@@ -79,10 +82,9 @@ public:
     const uint32_t GetAnimationFrameNumber(const std::string& animationLayerName);
     const uint32_t GetBoneIndex(const std::string& boneName);
     const uint32_t GetVerteXCount();
-
-    uint64_t m_ragdollV2Id = 0;
-
+        
     SkinnedModel* GetSkinnedModel()                                 { return m_skinnedModel; }
+    bool RenderingEnabled()                                         { return m_renderingEnabled; }
     bool IsGold() const                                             { return m_isGold; }
     const uint64_t& GetObjectId() const                             { return m_objectId; }
     const uint64_t& GetRagdollId() const                            { return m_ragdollId; }
@@ -112,10 +114,12 @@ private:
     std::vector<int32_t> m_woundMaskTextureIndices;
     std::unordered_map<std::string, unsigned int> m_boneMapping;
     uint64_t m_objectId = 0;
-    uint64_t m_ragdollId = 0;
+    uint64_t m_ragdollId = 0;   // REMOVE ME WHEN U CAN
+    uint64_t m_ragdollV2Id = 0;
     uint32_t m_ignoredViewportIndex = -1;
     uint32_t m_exclusiveViewportIndex = -1;
     uint32_t baseTransformIndex = -1;
     bool m_useCameraMatrix = false;
     bool m_isGold = false;
+    bool m_renderingEnabled = true;
 };

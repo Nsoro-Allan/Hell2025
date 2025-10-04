@@ -29,6 +29,14 @@ void AnimatedGameObject::SetMeshWoundMaskTextureIndex(const std::string& meshNam
     }
 }
 
+void AnimatedGameObject::EnableRendering() {
+    m_renderingEnabled = true;
+}
+
+void AnimatedGameObject::DisableRendering() {
+    m_renderingEnabled = false;
+}
+
 void AnimatedGameObject::SetRagdoll(const std::string& ragdollName, float ragdollTotalWeight) {
     m_ragdollId = Physics::CreateRagdollByName(ragdollName, ragdollTotalWeight);
 }
@@ -182,12 +190,10 @@ void AnimatedGameObject::Update(float deltaTime) {
         }
 
         if (m_ragdollV2Id != 0) {
-            Logging::Debug() << "hello";
             RagdollV2* ragdollV2 = RagdollManager::GetRagdollV2ById(m_ragdollV2Id);
             if (ragdollV2) {
                 ragdollV2->SetRigidGlobalPosesFromAnimatedGameObject(this);
             }
-            Logging::Debug() << "bye";
         }
     }
     //if (m_animationMode != AnimationMode::RAGDOLL_V2) {
@@ -633,4 +639,8 @@ void AnimatedGameObject::SetBaseTransfromIndex(int index) {
 
 void AnimatedGameObject::SetGoldFlag(bool flag) {
     m_isGold = flag;
+}
+
+void AnimatedGameObject::SetRagdollV2Id(uint64_t ragdollV2Id) {
+    m_ragdollV2Id = ragdollV2Id;
 }

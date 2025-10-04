@@ -25,5 +25,6 @@ private:
     uint32_t m_format = 0;
     uint32_t m_internalFormat = 0;
     uint32_t m_mipmapLevelCount = 0;
+    uint32_t m_type = 0;
     bool m_memoryAllocated = false;
 };

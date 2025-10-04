@@ -1,5 +1,6 @@
 #include "RagdollV2.h"
 #include "Audio/Audio.h"
+#include "Input/Input.h"
 #include "RagdollManager.h"
 #include "HellLogging.h"
 #include "Renderer/Renderer.h"
@@ -692,12 +693,40 @@ void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* an
         return;
     }
 
+    if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
+        Logging::Error() << "SetRigidGlobalPosesFromAnimatedGameObject()";
+
+        Logging::Debug() << "Skinned model name: " << animatedGameObject->GetSkinnedModel()->GetName();
+        Logging::Debug() << "RagdollV2 name:     " << m_ragdollName;
+        Logging::Debug() << "RagdollV2 Id:       " << m_ragdollId;
+
+
+        for (int i = 0; i < m_markerBoneNames.size(); i++) {
+            Logging::Debug() << i << ": " << m_markerBoneNames[i];
+        }
+
+        Logging::Debug() << "       ";
+        Logging::Debug() << "animatedGameObject->GetSkinnedModel()->m_boneMapping.size(): " << animatedGameObject->GetSkinnedModel()->m_boneMapping.size();
+        Logging::Debug() << "       ";
+    }
+
+
     for (int i = 0; i < m_markerBoneNames.size(); i++) {
         const std::string& markerBoneName = m_markerBoneNames[i];
+
+
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
+            Logging::Debug() << "Searching for " << markerBoneName;
+        }
 
         for (const auto& entry : animatedGameObject->GetSkinnedModel()->m_boneMapping) {
             const std::string& boneName = entry.first;
             unsigned int boneIndex = entry.second;
+
+
+            if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
+                Logging::Debug() << " -" << boneName;
+            }
 
             if (markerBoneName == boneName) {
                 PxRigidDynamic* pxRigidDynamic = m_pxRigidDynamics[i];
@@ -710,6 +739,9 @@ void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* an
                     PxTransform pxTransform = PxTransform(Physics::GlmMat4ToPxMat44(boneMatrixWorld));
                     pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
                     pxRigidDynamic->setGlobalPose(pxTransform);
+
+                    //Logging::Debug() << i << " found PxRigidDyanmaic match for bone name " << boneName;
+
                     break;
                 }
                 else {
@@ -718,4 +750,12 @@ void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* an
             }
         }
     }
+}
+
+void RagdollV2::EnableRendering() {
+    m_renderingEnabled = true;
+}
+
+void RagdollV2::DisableRendering() {
+    m_renderingEnabled = false;
 }

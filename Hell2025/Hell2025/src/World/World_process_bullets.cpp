@@ -45,6 +45,13 @@ namespace World {
                 uint64_t physicsId = rayResult.userData.physicsId;
                 uint64_t objectId = rayResult.userData.objectId;
 
+                // Did you hit a dobermann?
+                for (Dobermann& dobermann : GetDobermanns()) {
+                    if (objectId == dobermann.GetRagdollV2Id()) {
+                        dobermann.TakeDamage(bullet.GetDamage());
+                    }
+                }
+
                 // Blood
                 if (objectType == ObjectType::RAGDOLL_PLAYER ||
                     objectType == ObjectType::RAGDOLL_ENEMY ||

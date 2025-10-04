@@ -86,9 +86,13 @@ namespace World {
 
     void Init() {
         KangarooCreateInfo kangarooCreateInfo;
+
         kangarooCreateInfo.position = glm::vec3(45, 32.6, 39);
         kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
+        AddKangaroo(kangarooCreateInfo);
 
+        kangarooCreateInfo.position = glm::vec3(41.37, 32.6, 40.17);
+        kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
         AddKangaroo(kangarooCreateInfo);
 
         NewRun();
@@ -223,8 +227,8 @@ namespace World {
 
 
         DobermannCreateInfo dobermannCreateInfo;
-        dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
-        AddDobermann(dobermannCreateInfo);
+        //dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
+        //AddDobermann(dobermannCreateInfo);
         
         dobermannCreateInfo.position = glm::vec3(37.25f, 31.0f, 35.5f);
         AddDobermann(dobermannCreateInfo);

@@ -20,6 +20,7 @@ void OpenGLTextureArray::AllocateMemory(uint32_t width, uint32_t height, uint32_
     m_count = count;
     m_memoryAllocated = true;
     m_format = OpenGLUtil::GLInternalFormatToGLFormat(m_internalFormat);
+    m_type = OpenGLUtil::GLInternalFormatToGLType(m_internalFormat);
 }
 
 void OpenGLTextureArray::SetLayerDataR16(uint32_t layerIndex, const std::vector<float>& data) {
@@ -57,21 +58,12 @@ void OpenGLTextureArray::SetMagFilter(TextureFilter filter) {
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, OpenGLUtil::TextureFilterToGLEnum(filter));
 }
 
-
 void OpenGLTextureArray::Clear(float r, float g, float b, float a, int layerIndex) {
-
-    // THIS ENTIRE FUCKING FUNCITON IS FUCKED
-
-  int xOffset = 0;
-  int yOffset = 0;
-  int zOffset = layerIndex;
-  GLuint clearColor[4] = { r, g, b, a };
-  int depth = 1; // number of layers to be cleared
-
-  GLenum format = GL_RED;
-  GLenum type = GL_FLOAT; // WARNNING NAUGHTYYYYYYYYYYYYYYYYYYYYYYYYYYY
-  glClearTexSubImage(m_handle, 0, xOffset, yOffset, zOffset, m_width, m_height, depth, format, type, clearColor);
-  //GL_TEXTURE_2D_ARRAY
-
-  std::cout << "CLEAR\n";
+        int baseWidth = GetWidth();
+        int baseHeight = GetHeight();
+        const GLubyte clearColor[4] = { r, g, b, a };
+        int mipmapLevel = 0;
+        int w = std::max(1, baseWidth >> mipmapLevel);
+        int h = std::max(1, baseHeight >> mipmapLevel);
+        glClearTexSubImage(m_handle, mipmapLevel, 0, 0, layerIndex, w, h, 1, m_format, m_type, clearColor);
 }

@@ -229,24 +229,39 @@ namespace RagdollManager {
             ragdollMarker.isKinematic = isKinematic;
             ragdollMarker.enableCCD = enableCCD;
 
-            const std::string src = markerUI.getString("sourceTransform");
+            //const std::string src = markerUI.getString("sourceTransform");
+            //const std::vector<std::string> dst = markerUI.getStrings("destinationTransforms");
+            //
+            //std::string chosenPath;
+            //if (!src.empty()) {
+            //    chosenPath = src;
+            //}
+            //else if (!dst.empty()) {
+            //    // Pick the longest (and usually deepest) destination path
+            //    chosenPath = *std::max_element(
+            //        dst.begin(), dst.end(),
+            //        [](const std::string& a, const std::string& b) { return a.size() < b.size(); });
+            //}
+            //
+            //sanitizePath(chosenPath);
+
+            //ragdollMarker.bonePath = chosenPath;
+
             const std::vector<std::string> dst = markerUI.getStrings("destinationTransforms");
+            for (const std::string& string : dst) {
+                std::string boneName = UNDEFINED_STRING;
 
-            std::string chosenPath;
-            if (!src.empty()) {
-                chosenPath = src;
+                size_t pos = string.rfind("|");
+                if (pos != std::string::npos) {
+                    boneName = string.substr(pos + 1);
+                }
+
+                Logging::Error() << "string:      " << string;
+                Logging::Error() << "pos:      " << pos;
+                Logging::Error() << "boneName: " << boneName;
+
+                ragdollMarker.boneName = lastSegment(boneName);
             }
-            else if (!dst.empty()) {
-                // Pick the longest (and usually deepest) destination path
-                chosenPath = *std::max_element(
-                    dst.begin(), dst.end(),
-                    [](const std::string& a, const std::string& b) { return a.size() < b.size(); });
-            }
-
-            sanitizePath(chosenPath);
-
-            ragdollMarker.bonePath = chosenPath;
-            ragdollMarker.boneName = lastSegment(chosenPath);
         }
     }
 

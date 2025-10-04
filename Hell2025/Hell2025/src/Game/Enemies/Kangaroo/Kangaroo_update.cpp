@@ -25,8 +25,8 @@ void Kangaroo::Update(float deltaTime) {
 
     FindPathToTarget();
 
-    UpdateAnimationStateMachine();
-    UpdateMovementLogic(deltaTime);
+    //UpdateAnimationStateMachine();
+    //UpdateMovementLogic(deltaTime);
     UpdateAnimatedGameObjectPositionRotation();
 
     UpdateAudio();

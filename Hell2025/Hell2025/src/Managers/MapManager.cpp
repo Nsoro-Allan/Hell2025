@@ -154,14 +154,14 @@ namespace MapManager {
         map.SetCreateInfoCollection(createInfoCollection);
         map.SetAdditionalMapData(additionalMapData);
 
-        Logging::Debug()
-            << "Loaded map: " << mapName << "\n"
-            << "- signature:     " << header.signature << "\n"
-            << "- version:       " << header.version << "\n"
-            << "- chunk count x: " << header.chunkCountX << "\n"
-            << "- chunk count z: " << header.chunkCountZ << "\n"
-            << createInfoJson << "\n"
-            << additionalJson;
+        // Logging::Debug()
+        //     << "Loaded map: " << mapName << "\n"
+        //     << "- signature:     " << header.signature << "\n"
+        //     << "- version:       " << header.version << "\n"
+        //     << "- chunk count x: " << header.chunkCountX << "\n"
+        //     << "- chunk count z: " << header.chunkCountZ << "\n"
+        //     << createInfoJson << "\n"
+        //     << additionalJson;
 
         return;
     }

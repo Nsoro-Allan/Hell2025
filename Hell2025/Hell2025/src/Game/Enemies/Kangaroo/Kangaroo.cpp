@@ -94,6 +94,7 @@ void Kangaroo::GiveDamage(int damage) {
     glm::vec3 playerPosition = player->GetCameraPosition();
     GoToTarget(playerPosition);
     PlayFleshAudio();
+    return;
     m_agroState = KanagarooAgroState::ANGRY;
 }
 

@@ -11,14 +11,16 @@ struct RagdollV2 {
     void Update();
     void DisableSimulation();
     void EnableSimulation();
-    void SetToInitialPose();
+    void SetToInitialPose();    
+    void EnableRendering();
+    void DisableRendering();
     void AddForce(uint64_t physicsId, glm::vec3 force);
 
     bool IsInMotion();
     AABB GetWorldSpaceAABB();
     void SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* animatedGameObject);
 
-    bool RenderingEnabled()                   { return m_renderingEnabled; }
+    bool RenderingEnabled()                     { return m_renderingEnabled; }
     uint64_t GetRagdollId()                     { return m_ragdollId; }
     MeshBuffer& GetMeshBuffer()                 { return m_meshBuffer; }
     const std::string& GetRagdollName() const   { return m_ragdollName; }

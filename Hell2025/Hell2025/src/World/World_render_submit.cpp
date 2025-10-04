@@ -116,9 +116,11 @@ namespace World {
 
         RenderDataManager::ResetBaseSkinnedVertex();
         for (AnimatedGameObject& animatedGameObject : GetAnimatedGameObjects()) {
-            animatedGameObject.UpdateRenderItems();
-            animatedGameObject.SubmitForSkinning();
-            g_skinnedRenderItems.insert(g_skinnedRenderItems.end(), animatedGameObject.GetRenderItems().begin(), animatedGameObject.GetRenderItems().end());
+            if (animatedGameObject.RenderingEnabled()) {
+                animatedGameObject.UpdateRenderItems();
+                animatedGameObject.SubmitForSkinning();
+                g_skinnedRenderItems.insert(g_skinnedRenderItems.end(), animatedGameObject.GetRenderItems().begin(), animatedGameObject.GetRenderItems().end());
+            }
         }
 
         for (Wall& wall : GetWalls()) {
