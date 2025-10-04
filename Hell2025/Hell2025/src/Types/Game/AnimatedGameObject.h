@@ -6,6 +6,7 @@
 struct MeshRenderingEntry {
     std::string meshName;
     int materialIndex = 0;
+    int woundMaterialIndex = 0;
     int emissiveColorTexutreIndex = -1;
     bool blendingEnabled = false;
     bool drawingEnabled = true;
@@ -45,8 +46,9 @@ public:
     void SetMeshToRenderAsGlassByMeshIndex(const std::string& materialName);
     void SetMeshFurLength(const std::string& meshName, float furLength);
     void SetMeshFurShellDistanceAttenuation(const std::string& meshName, float furShellDistanceAttenuation);
-    void SetMeshFurUVScale(const std::string& meshName, float uvScale);    
+    void SetMeshFurUVScale(const std::string& meshName, float uvScale);
     void SetMeshEmissiveColorTextureByMeshName(const std::string& meshName, const std::string& textureName);
+    void SetMeshWoundMaterialByMeshName(const std::string& meshName, const std::string& textureName);
 	void SetAllMeshMaterials(const std::string& materialName);
     void SetRagdoll(const std::string& ragdollName, float ragdollTotalWeight);
     void EnableCameraMatrix();

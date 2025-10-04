@@ -35,7 +35,12 @@ void Kangaroo::Init(KangarooCreateInfo createInfo) {
         animatedGameObject->PlayAndLoopAnimation("MainLayer", "Kangaroo_Idle", 1.0f);
 
         int32_t woundMaskIndex = Renderer::GetNextFreeWoundMaskIndexAndMarkItTaken();
+
         animatedGameObject->SetMeshWoundMaskTextureIndex("Body", woundMaskIndex);
+        animatedGameObject->SetMeshWoundMaterialByMeshName("Body", "KangarooBlood");
+               
+
+
         Logging::Debug() << "Assigned a Kangaroo a 'Body' mesh wound mask index of " << woundMaskIndex;
 
         CreateCharacterController(m_createInfo.position);

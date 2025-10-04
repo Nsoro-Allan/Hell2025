@@ -50,12 +50,17 @@ struct RenderItem {
     float furLength = 0.0f;
     float furShellDistanceAttenuation = 0.0f;
     float furUVScale = 0.0f;
-    int customFlag = 0;
+    int customFlag = 0; // THIS WAS USED AS A HACK TO TEST KANGAROO WOUND MASKS. YOU CAN USE THIS FREELY FOR SOMETHNG ELSE NOW.
 
     int blockScreenSpaceBloodDecals = 0;  // True or false
     int emissiveTextureIndex = -1;
     int padding1;
     int padding2;
+
+    int32_t woundBaseColorTextureIndex = 0;
+    int32_t woundNormalMapTextureIndex = 0;
+    int32_t woundRmaTextureIndex = 0;
+    int32_t padding3;
 };
 
 struct HouseRenderItem {

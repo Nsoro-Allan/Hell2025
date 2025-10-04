@@ -74,9 +74,12 @@ void AnimatedGameObject::UpdateRenderItems() {
             renderItem.furShellDistanceAttenuation = m_meshRenderingEntries[i].furShellDistanceAttenuation;
             renderItem.woundMaskTexutreIndex = m_woundMaskTextureIndices[i];
             renderItem.blockScreenSpaceBloodDecals = (int)true;
-
-            if (m_skinnedModel->GetName() == "Kangaroo") {
-                renderItem.customFlag = 1;
+            
+            if (m_woundMaskTextureIndices[i] != -1) {
+                Material* wouldMaterial = AssetManager::GetMaterialByIndex(m_meshRenderingEntries[i].woundMaterialIndex);
+                renderItem.woundBaseColorTextureIndex = wouldMaterial->m_basecolor;
+                renderItem.woundNormalMapTextureIndex = wouldMaterial->m_normal;
+                renderItem.woundRmaTextureIndex = wouldMaterial->m_rma;
             }
         }
     }
@@ -322,6 +325,17 @@ void AnimatedGameObject::SetMeshEmissiveColorTextureByMeshName(const std::string
     for (MeshRenderingEntry& meshRenderingEntry : m_meshRenderingEntries) {
         if (meshRenderingEntry.meshName == meshName) {
             meshRenderingEntry.emissiveColorTexutreIndex = AssetManager::GetTextureIndexByName(textureName);
+        }
+    }
+}
+
+void AnimatedGameObject::SetMeshWoundMaterialByMeshName(const std::string& meshName, const std::string& textureName) {
+    if (!m_skinnedModel) {
+        return;
+    }
+    for (MeshRenderingEntry& meshRenderingEntry : m_meshRenderingEntries) {
+        if (meshRenderingEntry.meshName == meshName) {
+            meshRenderingEntry.woundMaterialIndex = AssetManager::GetMaterialIndexByName(textureName);
         }
     }
 }

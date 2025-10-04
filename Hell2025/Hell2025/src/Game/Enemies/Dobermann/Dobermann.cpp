@@ -25,7 +25,10 @@ void Dobermann::Init(DobermannCreateInfo createInfo) {
     //animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_idle_sit", 1.0f);
     DisableRagdollRender();
 
-    Logging::Fatal() << "Dobermann::Init() m_ragdollId:" << m_ragdollV2Id;
+    int32_t woundMaskIndex = Renderer::GetNextFreeWoundMaskIndexAndMarkItTaken();
+    animatedGameObject->SetMeshWoundMaskTextureIndex("Body", woundMaskIndex);
+    animatedGameObject->SetMeshWoundMaterialByMeshName("Body", "DobermannFullBlood");
+    Logging::Debug() << "Assigned a Dobermann a 'Body' mesh wound mask index of " << woundMaskIndex;
 }
 
 void Dobermann::EnableRagdollRender() {

@@ -39,6 +39,10 @@ in flat int WoundMaskTextureIndex;
 in flat int BlockScreenSpaceBloodDecalsFlag;
 in flat int EmissiveTextureIndex; 
 
+in flat int WoundBaseColorTextureIndex;  // WARNING! this doens't work when bindless textures are disabled
+in flat int WoundNormalTextureIndex;     // WARNING! this doens't work when bindless textures are disabled
+in flat int WoundRMATextureIndex;        // WARNING! this doens't work when bindless textures are disabled
+
 uniform bool u_alphaDiscard;
 
 //layout (binding = 6) uniform sampler2D woundMaskTexture; // remove me
@@ -75,18 +79,28 @@ void main() {
         }    
     }
 
+    // Sensible defaults for wound texture
+    vec4 woundBaseColor = vec4(0,0,0,0);
+    vec3 woundNormalMap = vec3(0,0,0);
+    vec3 woundRma = vec3(0,0,0);
+
+
     // If this mesh has a wound mask, then sample it
     float woundMask = 0;
     if (WoundMaskTextureIndex != -1) {
-        woundMask  = texture(woundMaskTextureArray, vec3(TexCoord, WoundMaskTextureIndex)).r;
+        woundMask  = texture(woundMaskTextureArray, vec3(TexCoord, WoundMaskTextureIndex)).r;        
+
+        //woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
+        //woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;
+        //woundRma = texture2D(woundRmaTexture, TexCoord).rgb;
+
+        woundBaseColor = texture(sampler2D(textureSamplers[WoundBaseColorTextureIndex]), TexCoord);
+        woundNormalMap = texture(sampler2D(textureSamplers[WoundNormalTextureIndex]), TexCoord).rgb;   
+        woundRma = texture(sampler2D(textureSamplers[WoundRMATextureIndex]), TexCoord).rgb;
     }
 
-    vec4 woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
-    vec3 woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;
-    vec3 woundRma = texture2D(woundRmaTexture, TexCoord).rgb;
-
-
-     woundMask *= 2;
+    woundMask *= 2;
+//    woundMask = 1;
 
    // if (WoundMaskTextureIndex == 0) {
    //     woundMask = 0;

@@ -42,6 +42,10 @@ out flat int EmissiveTextureIndex; // WARNING! this doens't work when bindless t
 out flat int WoundMaskTextureIndex;
 out flat int BlockScreenSpaceBloodDecalsFlag;
 
+out flat int WoundBaseColorTextureIndex;  // WARNING! this doens't work when bindless textures are disabled
+out flat int WoundNormalTextureIndex;     // WARNING! this doens't work when bindless textures are disabled
+out flat int WoundRMATextureIndex;        // WARNING! this doens't work when bindless textures are disabled
+
 void main() {
 
 #if ENABLE_BINDLESS
@@ -53,6 +57,10 @@ void main() {
 	NormalTextureIndex = renderItems[globalInstanceIndex].normalMapTextureIndex;
 	RMATextureIndex = renderItems[globalInstanceIndex].rmaTextureIndex;   
     EmissiveTextureIndex = renderItems[globalInstanceIndex].emissiveTextureIndex;   
+        
+    WoundBaseColorTextureIndex = renderItems[globalInstanceIndex].woundBaseColorTextureIndex;
+	WoundNormalTextureIndex = renderItems[globalInstanceIndex].woundNormalMapTextureIndex;
+	WoundRMATextureIndex = renderItems[globalInstanceIndex].woundRmaTextureIndex;   
 
 #else
     int globalInstanceIndex = u_globalInstanceIndex;
