@@ -2,12 +2,12 @@
 
 layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
-layout(rgba8, binding = 0) uniform image2D MaskOutputImage;
+layout(rgba8, binding = 0) uniform image2D MaskOutputImage; // remove me
+layout(rgba8, binding = 1) uniform image2DArray MaskOutputImageArray;
+uniform int u_layer;
+
 layout (binding = 1) uniform sampler2D UVTexture;
 layout (binding = 2) uniform sampler2D DecalTexture;
-
-//layout(r8, binding = 1) uniform image2D outlineMask;
-//layout(r8, binding = 2) uniform image2D outlineResult;
 
 void main() {
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);    
@@ -43,24 +43,12 @@ void main() {
     vec4 outputColor = vec4(oldValue + decalValue, 0, 0, 1);
 
     imageStore(MaskOutputImage, outputPixelCoords, outputColor);
+
+    // Array version
+    int u_layer = 0;
+    ivec3 outputArrayPixelCoords = ivec3(outputPixelCoords, u_layer);
+    float oldValue2 = imageLoad(MaskOutputImageArray, outputArrayPixelCoords).r;
+    vec4 outputColor2 = vec4(oldValue2 + decalValue, 0, 0, 1);
+    outputColor2 = vec4(oldValue2 + decalValue * 0.5, 0, 0, 1); // test for less brutal painting
+    imageStore(MaskOutputImageArray, outputArrayPixelCoords, outputColor2);
 }
-
-
-
-    //
-    //
-
-    //
-    //vec4 outputColor = vec4(baseColor.r, 0, 0, 1);
-    //
-    //int size = 1;
-    //
-    //if (baseColor.r > 0) {
-    //    for (int x = -size; x < size; x++) {
-    //        for (int y = -size; y < size; y++) {
-    //            ivec2 offset = ivec2(x, y);
-    //            ivec2 coords = clamp( outputPixelCoords + offset, ivec2(0, 0), outputImageSize);
-    //            imageStore(OutputImage, coords, outputColor);
-    //        }
-    //    }
-    //}

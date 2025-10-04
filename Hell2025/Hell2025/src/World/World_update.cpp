@@ -1,11 +1,14 @@
 #include "World.h"
 #include "Audio/Audio.h"
 #include "Core/Game.h"
-#include "Pathfinding/AStarMap.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
+#include "Pathfinding/AStarMap.h"
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
+
+#include "Ragdoll/RagdollManager.h"
 
 namespace World {
 
@@ -13,15 +16,74 @@ namespace World {
     void CalculateGPULights();
 
     // REMOVE ME!
-   //uint64_t g_rooAnimatedGameObject = 0;
-   //AnimatedGameObject* GetRooTest() {
-   //    return GetAnimatedGameObjectByObjectId(g_rooAnimatedGameObject);
-   //}
-    // 
+    uint64_t g_testAnimatedGameObject = 0;
+    AnimatedGameObject* GetDobermannTest() {
+        return GetAnimatedGameObjectByObjectId(g_testAnimatedGameObject);
+    }
+    
 
 
 
     void Update(float deltaTime) {
+
+        if (g_testAnimatedGameObject == 0) {
+            g_testAnimatedGameObject = CreateAnimatedGameObject();
+            AnimatedGameObject* dobermann = GetDobermannTest();
+
+            bool found = false;
+            for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+                if (ragdoll.GetRagdollName() == "dobermann") {
+                    dobermann->m_ragdollV2Id = ragdoll.GetRagdollId();
+                    found = true;
+                }
+            }
+            if (!found) {
+                Logging::Error() << "Failed to set ragdoll by name 'dobermann'";
+            }
+            else {
+                Logging::Debug() << "Successfuly set ragdollV2Id to " << dobermann->m_ragdollV2Id;
+            }
+
+            dobermann->SetSkinnedModel("Dobermann_RIG");
+            //dobermann->PrintMeshNames();
+            //dobermann->PrintNodeNames();
+            dobermann->SetAnimationModeToBindPose();
+            //dobermann->SetMeshMaterialByMeshName("Body", "DobermannMouthBlood");
+            dobermann->SetPosition(glm::vec3(36.8f, 31.0f, 37.23f));
+            dobermann->PlayAndLoopAnimation("Main", "Dobermann_idle_loop", 1.0f);
+        }
+
+        if (Input::KeyPressed(HELL_KEY_I)) {
+            AnimatedGameObject* dobermann = GetDobermannTest();
+            dobermann->SetAnimationModeToRagdollV2();
+        }
+      
+        for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+            ragdoll.Update();
+
+            if (Input::KeyPressed(HELL_KEY_Y)) {
+                ragdoll.SetToInitialPose(); 
+                ragdoll.DisableSimulation();
+                
+                for (Light& light : GetLights()) {
+                    AABB aabb = ragdoll.GetWorldSpaceAABB();
+                    if (aabb.IntersectsSphere(light.GetPosition(), light.GetRadius())) {
+                        light.ForceDirty();
+                    }
+                }
+            }
+
+            if (Input::KeyPressed(HELL_KEY_O)) {
+                ragdoll.EnableSimulation();
+
+                for (Light& light : GetLights()) {
+                    AABB aabb = ragdoll.GetWorldSpaceAABB();
+                    if (aabb.IntersectsSphere(light.GetPosition(), light.GetRadius())) {
+                        light.ForceDirty();
+                    }
+                }
+            }
+        }
 
 
         //auto pos = glm::vec3(31.0f, 30.4f, 38.25f);

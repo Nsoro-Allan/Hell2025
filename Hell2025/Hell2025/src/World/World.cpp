@@ -185,35 +185,40 @@ namespace World {
             World::AddHouse(*houseCreateInfo, houseSpawnOffset);
         }
 
-       // GameObjectCreateInfo createInfo2;
-       // createInfo2.position = glm::vec3(32.0f, 30.4f, 38.25f);
-       // createInfo2.scale = glm::vec3(1.0f);
-       // createInfo2.modelName = "RuralSet";
-       // AddGameObject(createInfo2);
-       // g_gameObjects[0].m_meshNodes.SetMeshMaterials("RuralSet0");
-       //
-       //
-       // createInfo2.position = glm::vec3(21.0f, 30.4f, 14.25f);
-       // createInfo2.scale = glm::vec3(1.0f);
-       // createInfo2.modelName = "RuralSet";
-       // AddGameObject(createInfo2);
-       // g_gameObjects[1].m_meshNodes.SetMeshMaterials("RuralSet0");
-       //
-        // Init all spawn points (creates the physics shapes you need to detect hover in the editor)
-        for (SpawnPoint& spawnPoint : g_spawnCampaignPoints) {
-            spawnPoint.Init();
-        }
-        for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints) {
-            spawnPoint.Init();
-        }
 
-        // remove meeeeeeeeeeeeeeeee
+        // REMOVE ME BELOW TO MAP FILE
         PowerPoleSet& powerPoleSet = g_powerPoleSets.emplace_back();
         powerPoleSet.Init();
 
         Fence& fence = g_fences.emplace_back();
         fence.Init();
 
+        GameObjectCreateInfo createInfo2;
+        createInfo2.position = glm::vec3(41.0f, 31.0f, 35.0f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "DobermannTest";
+        AddGameObject(createInfo2);
+        g_gameObjects[0].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
+        g_gameObjects[0].SetMeshMaterial("Iris", "DobermannIris");
+        g_gameObjects[0].SetMeshMaterial("Tongue", "DobermannMouthBlood");
+        g_gameObjects[0].SetMeshMaterial("Jaw", "DobermannMouthBlood");
+
+        createInfo2.position = glm::vec3(37.25f, 31.0f, 35.5f);
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "DobermannTest";
+        AddGameObject(createInfo2);
+        g_gameObjects[1].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
+        g_gameObjects[1].SetMeshMaterial("Iris", "DobermannIris");
+        g_gameObjects[1].SetMeshMaterial("Tongue", "DobermannMouthBlood");
+        g_gameObjects[1].SetMeshMaterial("Jaw", "DobermannMouthBlood");
+
+        createInfo2.position = glm::vec3(32.45f, 30.52f, 10.22f);
+        createInfo2.rotation.y = -HELL_PI * 0.5f;
+        createInfo2.scale = glm::vec3(1.0f);
+        createInfo2.modelName = "Reflector";
+        AddGameObject(createInfo2);
+        g_gameObjects[2].SetMeshMaterial("ReflectorPole", "Fence");
+        g_gameObjects[2].SetMeshMaterial("ReflectorRed", "Red");
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
@@ -244,7 +249,21 @@ namespace World {
             Logging::Error() << "World::LoadMapInstanceObjects() failed coz '" << mapName << "' was not found";
             return;
         }
+
+        // Add EVERYTHING: doors, walls, draws, toilets, pianos, etc...
         AddCreateInfoCollection(map->GetCreateInfoCollection(), spawnOffset);
+
+        // Load campaign spawn points
+        for (SpawnPoint& spawnPoint : map->GetAdditionalMapData().playerCampaignSpawns) {
+            SpawnPoint& addedSpawnPoint = g_spawnCampaignPoints.emplace_back(spawnPoint);
+            addedSpawnPoint.Init();
+        }
+
+        // Load deathmatch spawn points
+        for (SpawnPoint& spawnPoint : map->GetAdditionalMapData().playerDeathmatchSpawns) {
+            SpawnPoint& addedSpawnPoint = g_spawnDeathmatchPoints.emplace_back(spawnPoint);
+            addedSpawnPoint.Init();
+        }
     }
 
     void NewRun() {
@@ -649,8 +668,6 @@ namespace World {
         g_validChunks.clear();
         g_mapInstances.clear();
 
-        ResetWeatherboardMeshBuffer();
-
         // Cleanup all objects
         ClearAllObjects();
 
@@ -658,6 +675,13 @@ namespace World {
         mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
         mermaidCreateInfo.rotation.y = 0.25f;
         AddMermaid(mermaidCreateInfo);
+
+        // remove meeeeeeeeeeeeeeeee
+        // remove meeeeeeeeeeeeeeeee
+
+
+        // remove meeeeeeeeeeeeeeeee
+        // remove meeeeeeeeeeeeeeeee
 
         //AnimatedGameObject* animatedGameObject = nullptr;
         //uint64_t id = World::CreateAnimatedGameObject();
@@ -673,12 +697,15 @@ namespace World {
     }
 
     void ClearAllObjects() {
-        // Clean up
+        ResetWeatherboardMeshBuffer();
+
         for (BulletCasing& bulletCasing : g_bulletCasings)              bulletCasing.CleanUp();
         for (ChristmasLights& christmasLights : g_christmasLights)      christmasLights.CleanUp();
         for (ChristmasPresent& christmasPresent : g_christmasPresents)  christmasPresent.CleanUp();
         for (ChristmasTree& christmasTree : g_christmasTrees)           christmasTree.CleanUp();
         for (Door& door : g_doors)                                      door.CleanUp();
+        for (Drawers& drawer : g_drawers)                               drawer.CleanUp();
+        for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
         //for (GenericBouncable& genericBouncable : g_genericBouncables) genericStatic.CleanUp();
         for (GenericStatic& genericStatic : g_genericStatics)           genericStatic.CleanUp();
@@ -687,6 +714,7 @@ namespace World {
         for (Plane& housePlane : g_planes)                              housePlane.CleanUp();
         for (Piano& piano : g_pianos)                                   piano.CleanUp();
         for (PickUp& pickUp : g_pickUps)                                pickUp.CleanUp();
+        for (PowerPoleSet& powerPoleSet: g_powerPoleSets)               powerPoleSet.CleanUp();
         for (Shark& shark : g_sharks)                                   shark.CleanUp();
         for (SpawnPoint& spawnPoint : g_spawnCampaignPoints)            spawnPoint.CleanUp();
         for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints)          spawnPoint.CleanUp();
@@ -702,6 +730,8 @@ namespace World {
         g_christmasTrees.clear();
         g_decals.clear();
         g_doors.clear();
+        g_drawers.clear();
+        g_fences.clear();
         g_gameObjects.clear();
         g_genericStatics.clear();
         //g_kangaroos.clear();
@@ -711,6 +741,7 @@ namespace World {
         g_pickUps.clear();
         g_planes.clear();
         g_pictureFrames.clear();
+        g_powerPoleSets.clear();
         g_sharks.clear();
         g_spawnCampaignPoints.clear();
         g_spawnDeathmatchPoints.clear();
@@ -795,7 +826,6 @@ namespace World {
         createInfo.p3 += spawnOffset.translation;
         Plane& housePlane = g_planes.emplace_back();
         housePlane.Init(createInfo);
-        //return housePlane.GetObjectId();
     }
 
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset) {

@@ -333,6 +333,10 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Inventory\Inventory_render_submit.cpp" />
     <ClCompile Include="src\Inventory\inventory_update.cpp" />
     <ClCompile Include="src\Managers\MapManager.cpp" />
+    <ClCompile Include="src\Ragdoll\Api.cpp" />
+    <ClCompile Include="src\Ragdoll\RagdollInfo.cpp" />
+    <ClCompile Include="src\Ragdoll\RagdollManager.cpp" />
+    <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
     <ClCompile Include="src\Types\Exterior\Fence.cpp" />
     <ClCompile Include="src\Types\Exterior\PowerPoleSet.cpp" />
     <ClCompile Include="src\Types\Game\SpawnPoint.cpp" />
@@ -538,6 +542,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\GL_christmas_light_wire.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_point_cloud.frag" />
     <None Include="res\shaders\OpenGL\GL_debug_point_cloud.vert" />
+    <None Include="res\shaders\OpenGL\GL_debug_ragdoll.frag" />
+    <None Include="res\shaders\OpenGL\GL_debug_ragdoll.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_solid_color.frag" />
     <None Include="res\shaders\OpenGL\GL_debug_solid_color.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_textured.frag" />
@@ -704,6 +710,11 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Pathfinding\NavMesh.h" />
     <ClInclude Include="src\Pathfinding\Pathfinding.h" />
     <ClInclude Include="src\Physics\Types\CharacterController.h" />
+    <ClInclude Include="src\Ragdoll\Api.h" />
+    <ClInclude Include="src\Ragdoll\RagdollInfo.h" />
+    <ClInclude Include="src\Ragdoll\RagdollManager.h" />
+    <ClInclude Include="src\Ragdoll\RagdollV2.h" />
+    <ClInclude Include="src\Ragdoll\Types.h" />
     <ClInclude Include="src\Renderer\GlobalIllumination.h" />
     <ClInclude Include="src\Types\Animation\Animator.h" />
     <ClInclude Include="src\Types\Christmas\ChristmasLights.h" />

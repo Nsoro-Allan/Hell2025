@@ -85,6 +85,7 @@ enum class ObjectType {
     PIANO_SHEET_SUSTAIN_PEDAL,
     PICTURE_FRAME,
     RAGDOLL_ENEMY,
+    RAGDOLL_V2,
     RAGDOLL_PLAYER,
     SHARK,
     SPAWN_POINT,

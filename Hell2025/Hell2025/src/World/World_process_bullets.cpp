@@ -4,6 +4,8 @@
 #include "Viewport/ViewportManager.h"
 #include "Renderer/RenderDataManager.h"
 
+#include "Ragdoll/RagdollManager.h"
+
 namespace World {
     void EvaluatePianoKeyBulletHit(Bullet& bullet);
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction);
@@ -46,8 +48,9 @@ namespace World {
                 // Blood
                 if (objectType == ObjectType::RAGDOLL_PLAYER ||
                     objectType == ObjectType::RAGDOLL_ENEMY ||
+                    objectType == ObjectType::RAGDOLL_V2 ||
                     objectType == ObjectType::SHARK) {
-                    SpawnBlood(rayResult.hitPosition, bullet.GetDirection());
+                    SpawnBlood(rayResult.hitPosition, -bullet.GetDirection());
                 }
 
                 // Shot a player ragdoll?
@@ -68,6 +71,13 @@ namespace World {
                     if (shark) {
                         shark->GiveDamage(bullet.GetOwnerObjectId(), bullet.GetDamage());
                     }
+                }
+
+
+                if (objectType == ObjectType::RAGDOLL_V2) {
+                    float strength = 100000.0f;
+                    glm::vec3 force = bullet.GetDirection() * strength;
+                    RagdollManager::AddForce(rayResult.userData.physicsId, force);
                 }
 
                 // Shot enemy ragdoll?
@@ -93,9 +103,9 @@ namespace World {
                     }
 
                     // Spawn volumetric blood
-                    glm::vec3 position = rayResult.hitPosition;
-                    glm::vec3 front = bullet.GetDirection() * glm::vec3(-1);
-                    World::AddVATBlood(position, -bullet.GetDirection());
+                    //glm::vec3 position = rayResult.hitPosition;
+                    //glm::vec3 front = bullet.GetDirection() * glm::vec3(-1);
+                    //World::AddVATBlood(position, -bullet.GetDirection());
                 }
 
 

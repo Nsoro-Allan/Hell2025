@@ -1,6 +1,7 @@
 #include "AnimatedGameObject.h"
 #include "AssetManagement/AssetManager.h"
 #include "Core/Game.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
 #include "Physics/Physics.h"
 #include "Renderer/Renderer.h"
@@ -9,6 +10,7 @@
 #include "Util.h"
 
 #include <unordered_set>
+#include <Ragdoll/RagdollManager.h>
 
 void AnimatedGameObject::Init() {
     m_objectId = UniqueID::GetNext();
@@ -110,11 +112,41 @@ void AnimatedGameObject::UpdateBoneTransformsFromRagdoll() {
     }
 }
 
+void AnimatedGameObject::UpdateBoneTransformsFromRagdollV2() {
+    RagdollV2* ragdoll = RagdollManager::GetRagdollById(m_ragdollV2Id);
+    if (!ragdoll) return;
+    if (!m_skinnedModel) return;
+
+    int nodeCount = m_skinnedModel->m_nodes.size();
+    m_animator.m_globalBlendedNodeTransforms.resize(nodeCount);
+
+    for (int i = 0; i < m_skinnedModel->m_nodes.size(); i++) {
+        std::string NodeName = m_skinnedModel->m_nodes[i].name;
+        glm::mat4 nodeTransformation = glm::mat4(1);
+        nodeTransformation = m_skinnedModel->m_nodes[i].inverseBindTransform;
+        unsigned int parentIndex = m_skinnedModel->m_nodes[i].parentIndex;
+        glm::mat4 ParentTransformation = (parentIndex == -1) ? glm::mat4(1) : m_animator.m_globalBlendedNodeTransforms[parentIndex];
+        glm::mat4 GlobalTransformation = ParentTransformation * nodeTransformation;
+
+        for (int j = 0; j < ragdoll->m_markerBoneNames.size(); j++) {
+            if (ragdoll->m_markerBoneNames[j] == NodeName) {
+                PxRigidDynamic* pxRigidDynamic = ragdoll->m_pxRigidDynamics[j];
+                GlobalTransformation = Physics::PxMat44ToGlmMat4(pxRigidDynamic->getGlobalPose());
+            }
+        }
+
+        m_animator.m_globalBlendedNodeTransforms[i] = GlobalTransformation;
+    }
+}
+
 void AnimatedGameObject::Update(float deltaTime) {
     if (!m_skinnedModel) return;
 
     if (m_animationMode == AnimationMode::RAGDOLL) {
         UpdateBoneTransformsFromRagdoll();
+    }
+    else if (m_animationMode == AnimationMode::RAGDOLL_V2) {
+        UpdateBoneTransformsFromRagdollV2();
     }
     else {
         if (m_animationMode == AnimationMode::BINDPOSE) {
@@ -141,12 +173,25 @@ void AnimatedGameObject::Update(float deltaTime) {
     }
 
     // If it has a ragdoll
-    if (m_animationMode != AnimationMode::RAGDOLL) {
+    if (m_animationMode == AnimationMode::BINDPOSE || 
+        m_animationMode == AnimationMode::ANIMATION) {
+        
         Ragdoll* ragdoll = Physics::GetRagdollById(m_ragdollId);
         if (ragdoll) {
             ragdoll->SetRigidGlobalPosesFromAnimatedGameObject(this);
         }
+
+        RagdollV2* ragdollV2 = RagdollManager::GetRagdollById(m_ragdollV2Id);
+        if (ragdollV2) {
+            ragdollV2->SetRigidGlobalPosesFromAnimatedGameObject(this);
+        }
     }
+    //if (m_animationMode != AnimationMode::RAGDOLL_V2) {
+    //    
+    //    
+    //    
+    //    
+    //}
 
     Ragdoll* ragdoll = Physics::GetRagdollById(m_ragdollId);
     if (ragdoll && false) {
@@ -323,6 +368,20 @@ void AnimatedGameObject::SetAnimationModeToRagdoll() {
     }
 }
 
+void AnimatedGameObject::SetAnimationModeToRagdollV2() {
+    RagdollV2* ragdoll = RagdollManager::GetRagdollById(m_ragdollV2Id);
+    if (!ragdoll) {
+        Logging::Error() << "AnimatedGameObject::SetAnimationModeToRagdollV2() failed because m_ragdollId [" << m_ragdollV2Id << "] was not found in the RagdollManager";
+        return;
+    }
+
+    if (m_animationMode != AnimationMode::RAGDOLL_V2) {
+        m_animationMode = AnimationMode::RAGDOLL_V2;
+        m_animator.ClearAllAnimations();
+        ragdoll->EnableSimulation();
+    }
+}
+
 void AnimatedGameObject::SetAnimationModeToAnimated() {
     m_animationMode = AnimationMode::ANIMATION;
     m_animator.ClearAllAnimations();
@@ -351,7 +410,7 @@ const glm::mat4 AnimatedGameObject::GetModelMatrix() {
         return m_cameraMatrix;
     }
 
-    if (m_animationMode == AnimationMode::RAGDOLL) {
+    if (m_animationMode == AnimationMode::RAGDOLL || m_animationMode == AnimationMode::RAGDOLL_V2) {
         return glm::mat4(1);
     }
     else {

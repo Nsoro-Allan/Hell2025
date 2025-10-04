@@ -558,7 +558,7 @@ void main() {
 
    // finalColor = indirect;
 
-    vec3 ambientTerm = baseColor.rgb * vec3(0.0025);
+    vec3 ambientTerm = baseColor.rgb * vec3(0.00325);
 
     finalColor = directLighting. rgb + moonLighting  + ambientTerm;
 

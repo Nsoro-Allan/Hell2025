@@ -41,12 +41,11 @@ in flat int EmissiveTextureIndex;
 
 uniform bool u_alphaDiscard;
 
-//layout (binding = 6) uniform sampler2DArray woundMaskTextureArray;
-layout (binding = 6) uniform sampler2D woundMaskTexture;
-
+layout (binding = 6) uniform sampler2D woundMaskTexture; // remove me
 layout (binding = 7) uniform sampler2D woundBaseColorTexture;
 layout (binding = 8) uniform sampler2D woundNormalTexture;
 layout (binding = 9) uniform sampler2D woundRmaTexture;
+layout (binding = 10) uniform sampler2DArray woundMaskTextureArray;
 
 void main() {
     vec3 emissiveColor = EmissiveColor;
@@ -76,9 +75,13 @@ void main() {
         }    
     }
 
-    //int layerIndex = 0;
-    //float woundMask = texture(woundMaskTextureArray, vec3(TexCoord, layerIndex)).r;
     float woundMask = texture2D(woundMaskTexture, TexCoord).r;
+
+    int layerIndex = 0;
+
+    if (baseColor.r > 0) { // hack so u can examine in renderdoc
+        woundMask = texture(woundMaskTextureArray, vec3(TexCoord, layerIndex)).r;
+    }
 
     vec4 woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
     vec3 woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;

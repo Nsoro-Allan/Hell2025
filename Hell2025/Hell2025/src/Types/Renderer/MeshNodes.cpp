@@ -267,14 +267,6 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         //    material = AssetManager::GetMaterialByName("TreeLarge_0");
         //}
 
-
-        if (mesh->GetName() == "ReflectorPole") {
-            material = AssetManager::GetMaterialByName("White");
-        }
-        if (mesh->GetName() == "ReflectorRed") {
-            material = AssetManager::GetMaterialByName("Red");
-        }
-
         RenderItem renderItem;
         renderItem.objectType = (int)m_objectTypes[i];
         renderItem.modelMatrix = worldMatrix * meshModelMatrix;

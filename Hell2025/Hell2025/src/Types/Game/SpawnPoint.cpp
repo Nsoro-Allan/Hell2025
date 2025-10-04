@@ -5,7 +5,7 @@
 
 SpawnPoint::SpawnPoint(glm::vec3 position, glm::vec3 camEuler) {
     m_position = position;
-    m_position = position;
+    m_camEuler = camEuler;
 }
 
 void SpawnPoint::Init() {

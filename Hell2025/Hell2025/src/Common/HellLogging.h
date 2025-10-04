@@ -21,11 +21,20 @@ namespace Logging {
         MessageStream(MessageStream&&) noexcept;
         MessageStream& operator=(MessageStream&&) noexcept;
 
-        template<class T>
+        //template<class T>
+        //MessageStream& operator<<(const T& v) { if (m_enabled) m_ss << v; return *this; }
+        //
+        //using Manip = std::ostream& (*)(std::ostream&);
+        //MessageStream& operator<<(Manip m) { if (m_enabled) m_ss << m; return *this; }
+
+        template<class T, std::enable_if_t<!std::is_enum_v<T>, int> = 0>
         MessageStream& operator<<(const T& v) { if (m_enabled) m_ss << v; return *this; }
 
-        using Manip = std::ostream& (*)(std::ostream&);
-        MessageStream& operator<<(Manip m) { if (m_enabled) m_ss << m; return *this; }
+        template<class E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
+        MessageStream& operator<<(E e) {
+            if (m_enabled) m_ss << static_cast<std::underlying_type_t<E>>(e);
+            return *this;
+        }
 
     private:
         Level m_level;

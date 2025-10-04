@@ -6,7 +6,7 @@
 
 void PowerPoleSet::Init() {
     m_meshNodes.InitFromModel("PowerPole");
-    m_meshNodes.SetMeshMaterials("RuralSet0");
+    m_meshNodes.SetMeshMaterials("PowerPole");
     m_meshNodes.UpdateHierachy();
     m_meshNodes.UpdateRenderItems(glm::mat4(1.0f));
 
@@ -27,6 +27,12 @@ void PowerPoleSet::Init() {
 
     float spacing = 7.0f;
     m_finalPositions = Util::GetBeizerPointsFromControlPoints(controlPoints3D, spacing);
+
+    // Error check
+    if (m_finalPositions.size() < 2) {
+        Logging::Error() << "PowerPoleSet::Init() failed because there were less than 2 final positions";
+        return;
+    }
 
     std::vector<RenderItem> meshNodeRenderItems = m_meshNodes.GetRenderItems();
 
@@ -82,15 +88,12 @@ void PowerPoleSet::Init() {
 
 
 void PowerPoleSet::Update() {
-    //for (glm::vec3& position : m_wirePositionsBackA) {
-    //    Renderer::DrawPoint(position, PINK);
-    //}
-    //for (glm::vec3& position : m_wirePositionsFrontA) {
-    //    Renderer::DrawPoint(position, ORANGE);
-    //}
+    // Nothing as of yet
+}
 
-    
-    //m_wire.Update();
+
+void PowerPoleSet::CleanUp() {
+    // Nothing as of yet
 }
 
 const std::vector<RenderItem>& const PowerPoleSet::GetRenderItems() {

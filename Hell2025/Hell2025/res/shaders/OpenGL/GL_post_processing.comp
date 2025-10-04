@@ -14,14 +14,147 @@ layout(rgba8, binding = 3) uniform image2D RaytracedSceneImage;
 readonly restrict layout(std430, binding = 1) buffer rendererDataBuffer { RendererData rendererData; };
 readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer { ViewportData viewportData[]; };
 
+// ACES tonemap
+vec3 ACES(vec3 x){
+    const float a=2.51,b=0.03,c=2.43,d=0.59,e=0.14;
+    return clamp((x*(a*x+b))/(x*(c*x+d)+e),0.0,1.0);
+}
+
+float luma(vec3 c){ return dot(c, vec3(0.2126,0.7152,0.0722)); }
+vec3  sat(vec3 c, float s){ float Y=luma(c); return mix(vec3(Y), c, s); }
+
+// soft contrast around mid gray
+vec3 softContrast(vec3 c, float k){
+    float m = 0.5;
+    return mix(m + (c - m)*(1.0 + (k-1.0)), c, 0.0); // simple, controllable
+}
+
+vec3 RE();
+vec3 OG();
+
 void main() {
+
+    ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    vec2 outputImageSize = vec2(rendererData.gBufferWidth, rendererData.gBufferHeight);
+    vec2 uv_screenspace = (vec2(pixelCoords) + 0.5) / vec2(outputImageSize);
+
+    // bounds check
+    if (pixelCoords.x >= outputImageSize.x || pixelCoords.y >= outputImageSize.y) {
+        return;
+    }
+
+    vec3 re = RE() * 0.85;
+    vec3 og = OG();
+    
+    vec3 finalColor = mix(re, og, 0.5);
+    finalColor = og;
+
+    imageStore(LightingImage, pixelCoords, vec4(finalColor, 1));
+}
+
+vec3 RE() {
+    ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    vec2 outputImageSize = vec2(rendererData.gBufferWidth, rendererData.gBufferHeight);
+    vec2 uv_screenspace = (vec2(pixelCoords) + 0.5) / vec2(outputImageSize);
+
+    // bounds check
+    if (pixelCoords.x >= outputImageSize.x || pixelCoords.y >= outputImageSize.y) {
+    //    return;
+    }
+
+    vec3 lighting = imageLoad(LightingImage, pixelCoords).rgb;
+    vec3 normal = imageLoad(NormalImage, pixelCoords).rgb;
+    uint viewportIndex = imageLoad(ViewportIndexImage, pixelCoords).r;
+
+    vec3 finalColor = lighting;
+
+    vec3 colorTint = viewportData[viewportIndex].colorTint.rgb;
+    //colorTint *= vec3(1, 0.925, 0.925);
+
+    // tonemap and gamma
+    finalColor = Tonemap_ACES(lighting);
+    finalColor = pow(finalColor, vec3(1.0 / 2.2));
+    finalColor = clamp(finalColor, 0.0, 1.0);
+
+    // RE2 like grade with black preservation
+    float Y  = dot(finalColor, vec3(0.2126, 0.7152, 0.0722));
+    float sh = smoothstep(0.60, 0.20, Y);
+    float mi = smoothstep(0.15, 0.65, Y) * (1.0 - smoothstep(0.70, 0.95, Y));
+    float hi = smoothstep(0.55, 0.95, Y);
+
+    float blackProtectEdge = 0.2;//406;
+    float protect = smoothstep(0.0, blackProtectEdge, Y);
+
+    vec3  shadowTint    = vec3(0.20, 0.30, 0.55);
+    vec3  highlightTint = vec3(1.03, 0.98, 0.95);
+    float bleach        = 0.2;
+    float blueAir       = 0.48;
+
+    vec3 delta = vec3(0.0);
+
+    // cool shadows, fade out toward deep black
+    delta += (shadowTint * 0.22) * sh * protect;
+
+    // mild highlight warmth
+    finalColor *= mix(vec3(1.0), highlightTint, hi * 0.12 * protect);
+
+    // gentle bleach toward max channel
+    float grayBP = dot(finalColor, vec3(0.299, 0.587, 0.114));
+    vec3  maxc   = max(finalColor, vec3(grayBP));
+    finalColor   = mix(finalColor, maxc, bleach * protect);
+
+    // blue air only in mids
+    delta += vec3(0.10, 0.16, 0.35) * blueAir * mi;
+
+    // apply delta with protection
+    finalColor += delta * protect;
+
+    // soft mid contrast without touching deep blacks
+    float k = 0.92;
+    float m = 0.18;
+    finalColor = mix(finalColor, m + (finalColor - m) * (1.0 + (k - 1.0)), protect);
+
+    // your original color tint and contrast
+    finalColor *= colorTint;
+    finalColor.rgb = AdjustContrast(finalColor.rgb, viewportData[viewportIndex].colorContrast);
+
+    // film like noise
+    vec2 uv = uv_screenspace;
+    float time = rendererData.time;
+    vec2 coord = pixelCoords;
+    vec2 rest = modf(uv * outputImageSize, coord);
+    vec3 noise00 = FilmPixel(coord / outputImageSize, time);
+    vec3 noise01 = FilmPixel((coord + vec2(0, 1)) / outputImageSize, time);
+    vec3 noise10 = FilmPixel((coord + vec2(1, 0)) / outputImageSize, time);
+    vec3 noise11 = FilmPixel((coord + vec2(1, 1)) / outputImageSize, time);
+    vec3 noise = mix(mix(noise00, noise01, rest.y), mix(noise10, noise11, rest.y), rest.x) * vec3(0.7, 0.6, 0.8);
+    float noiseSpeed = 15.0;
+    float x = Rand(uv + Rand(vec2(int(time * noiseSpeed), int(-time * noiseSpeed))));
+    float noiseFactor = 0.035;
+    finalColor = finalColor + (x * -noiseFactor) + (noiseFactor / 2.0);
+
+    // saturation block
+    float saturationAmount = 1.0;
+    float gray = dot(finalColor.rgb, vec3(0.299, 0.587, 0.114));
+    vec3 desaturatedColor = vec3(gray);
+    float desaturationFactor = 1.0 - saturationAmount;
+    float curvedDesaturationFactor = pow(desaturationFactor, 2.2);
+    finalColor.rgb = mix(finalColor.rgb, desaturatedColor, curvedDesaturationFactor);
+
+    return finalColor;
+    //imageStore(LightingImage, pixelCoords, vec4(finalColor, 1));
+}
+
+
+
+vec3 OG() {
 	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);   
 	vec2 outputImageSize = vec2(rendererData.gBufferWidth, rendererData.gBufferHeight);
     vec2 uv_screenspace = (vec2(pixelCoords) + 0.5) / vec2(outputImageSize);
 
     // Don't process out of bounds pixels
     if (pixelCoords.x >= outputImageSize.x || pixelCoords.y >= outputImageSize.y) {
-        return;
+    //    return;
     }    
 
 	//ivec2 texCoord = ivec2(gl_GlobalInvocationID.xy);
@@ -67,8 +200,6 @@ void main() {
 	float noiseFactor = 0.035;
 	finalColor = finalColor + (x * -noiseFactor) + (noiseFactor / 2);
     
-    
-
     // Saturation
     float saturationAmount = 1.0;
     float gray = dot(finalColor.rgb, vec3(0.299, 0.587, 0.114));
@@ -77,24 +208,7 @@ void main() {
     float curvedDesaturationFactor = pow(desaturationFactor, 2.2);
     finalColor.rgb = mix(finalColor.rgb, desaturatedColor, curvedDesaturationFactor);
 
-
-   //finalColor = lighting;
-
-    imageStore(LightingImage, pixelCoords, vec4(finalColor, 1));
-
-    
-
-    
-    
-    //vec3 raytracedSceneColor = imageLoad(RaytracedSceneImage, texCoord).rgb;
-	//imageStore(LightingImage, texCoord, vec4(raytracedSceneColor, 1));
-
-
-
-
-    // Don't apply lighting to skybox
-    //float skyboxFlag = float(normal.x == 0.0 && normal.y == 0.0 && normal.z == 0.0);
-    //finalColor.rgb = mix(finalColor.rgb, lighting.rgb, skyboxFlag);
-	//imageStore(LightingImage, texCoord, vec4(finalColor, 1));
+    return finalColor.rgb;
+    //imageStore(LightingImage, pixelCoords, vec4(finalColor, 1));
 }
 

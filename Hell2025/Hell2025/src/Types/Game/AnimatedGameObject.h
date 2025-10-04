@@ -17,7 +17,7 @@ struct MeshRenderingEntry {
 };
 
 struct AnimatedGameObject {
-    enum class AnimationMode { BINDPOSE, ANIMATION, RAGDOLL };
+    enum class AnimationMode { BINDPOSE, ANIMATION, RAGDOLL, RAGDOLL_V2 };
 
 public:
     void Init();
@@ -39,6 +39,7 @@ public:
     void SetAnimationModeToAnimated();
     void SetAnimationModeToBindPose();
     void SetAnimationModeToRagdoll();
+    void SetAnimationModeToRagdollV2();
     void SetMeshMaterialByMeshName(const std::string& meshName, const std::string& materialName);
     void SetMeshMaterialByMeshIndex(int meshIndex, const std::string& materialName);
     void SetMeshToRenderAsGlassByMeshIndex(const std::string& materialName);
@@ -79,6 +80,8 @@ public:
     const uint32_t GetBoneIndex(const std::string& boneName);
     const uint32_t GetVerteXCount();
 
+    uint64_t m_ragdollV2Id = 0;
+
     SkinnedModel* GetSkinnedModel()                                 { return m_skinnedModel; }
     bool IsGold() const                                             { return m_isGold; }
     const uint64_t& GetObjectId() const                             { return m_objectId; }
@@ -94,6 +97,7 @@ public:
 
 private:
     void UpdateBoneTransformsFromRagdoll();
+    void UpdateBoneTransformsFromRagdollV2();
 
     AnimationMode m_animationMode = AnimationMode::BINDPOSE;
     Animator m_animator;

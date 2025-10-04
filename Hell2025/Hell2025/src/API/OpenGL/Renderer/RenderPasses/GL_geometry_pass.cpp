@@ -9,6 +9,9 @@
 #include "Modelling/Unused/Modelling.h"
 #include "World/World.h"
 
+#include "Ragdoll/RagdollManager.h"
+#include "Input/Input.h"
+
 namespace OpenGLRenderer {
 
     void HouseGeometryPass() {
@@ -56,16 +59,41 @@ namespace OpenGLRenderer {
         }
     }
 
+
     void GeometryPass() {
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
 
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("GBuffer");
         OpenGLShader* editorMeshShader = GetShader("EditorMesh");
+        OpenGLTextureArray* woundMaskArray = GetTextureArray("WoundMasks");
 
         if (!gBuffer) return;
         if (!shader) return;
         if (!editorMeshShader) return;
+        if (!woundMaskArray) return;
+
+
+        // Test clear
+        int clearIndex = -1;
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_0)) {
+            clearIndex = 0;
+        }
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_1)) {
+            clearIndex = 1;
+        }
+        if (clearIndex != -1) {
+            int baseWidth = woundMaskArray->GetWidth();
+            int baseHeight = woundMaskArray->GetHeight();
+            const GLubyte black[4] = { 0, 0, 0, 0 };
+            int layer = clearIndex;
+            int mipmapLevel = 0;
+            int w = std::max(1, baseWidth >> mipmapLevel);
+            int h = std::max(1, baseHeight >> mipmapLevel);
+            glClearTexSubImage(woundMaskArray->GetHandle(), mipmapLevel, 0, 0, layer, w, h, 1, GL_RGBA, GL_UNSIGNED_BYTE, black);
+            std::cout << "Cleared " << clearIndex << "\n";
+        }
+        
 
         gBuffer->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition" });
@@ -87,6 +115,9 @@ namespace OpenGLRenderer {
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_NRM")->GetGLTexture().GetHandle());
         glActiveTexture(GL_TEXTURE9);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_RMA")->GetGLTexture().GetHandle());
+        glActiveTexture(GL_TEXTURE10);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, woundMaskArray->GetHandle());
+  
 
         //glActiveTexture(GL_TEXTURE7);
         //glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooFlesh_ALB")->GetGLTexture().GetHandle());
@@ -192,6 +223,41 @@ namespace OpenGLRenderer {
                        OpenGLMeshBuffer& glMeshBuffer = meshBuffer.GetGLMeshBuffer();
                        glBindVertexArray(glMeshBuffer.GetVAO());
                        glDrawElements(GL_TRIANGLES, glMeshBuffer.GetIndexCount(), GL_UNSIGNED_INT, 0);
+                   }
+               }
+           }
+       }
+
+       OpenGLShader* ragdollShader = GetShader("DebugRagdoll");
+       ragdollShader->Bind();
+       SetRasterizerState("GeometryPass_NonBlended");
+
+
+
+       for (int i = 0; i < 4; i++) {
+           Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+           if (viewport->IsVisible()) {
+               OpenGLRenderer::SetViewport(gBuffer, viewport);
+
+               ragdollShader->SetInt("u_playerIndex", i);
+               ragdollShader->SetMat4("u_projectionView", viewportData[i].projectionView);
+               ragdollShader->SetMat4("u_projection", viewportData[i].projection);
+               ragdollShader->SetMat4("u_view", viewportData[i].view);
+
+               // Ragdoll
+               for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+                   MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+                   glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+
+                   for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+                       if (meshBuffer.GetIndices().size() == 0) continue;
+
+                       Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+                       glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+                       ragdollShader->SetMat4("u_model", modelMatrix);
+                       ragdollShader->SetVec3("u_color", ragdoll.GetMarkerColorByRigidIndex(j));
+
+                      //glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
                    }
                }
            }

@@ -6,22 +6,22 @@
 
 void Fence::Init() {
     m_meshNodesThin.InitFromModel("FencePostThin");
-    m_meshNodesThin.SetMeshMaterials("RuralSet0");
+    m_meshNodesThin.SetMeshMaterials("Fence");
     m_meshNodesThin.UpdateHierachy();
     m_meshNodesThin.UpdateRenderItems(glm::mat4(1.0f));
 
     m_meshNodesFat.InitFromModel("FencePost");
-    m_meshNodesFat.SetMeshMaterials("RuralSet0");
+    m_meshNodesFat.SetMeshMaterials("Fence");
     m_meshNodesFat.UpdateHierachy();
     m_meshNodesFat.UpdateRenderItems(glm::mat4(1.0f));
 
-    m_meshNodesWireBarbed.InitFromModel("WireBarbed");
-    m_meshNodesWireBarbed.SetMeshMaterials("RuralSet0");
+    m_meshNodesWireBarbed.InitFromModel("FenceWireBarbed");
+    m_meshNodesWireBarbed.SetMeshMaterials("Fence");
     m_meshNodesWireBarbed.UpdateHierachy();
     m_meshNodesWireBarbed.UpdateRenderItems(glm::mat4(1.0f));
 
-    m_meshNodesWire.InitFromModel("Wire");
-    m_meshNodesWire.SetMeshMaterials("RuralSet0");
+    m_meshNodesWire.InitFromModel("FenceWire");
+    m_meshNodesWire.SetMeshMaterials("Fence");
     m_meshNodesWire.UpdateHierachy();
     m_meshNodesWire.UpdateRenderItems(glm::mat4(1.0f));
 
@@ -44,6 +44,12 @@ void Fence::Init() {
 
     float spacing = 1.0f;
     m_finalPositions = Util::GetBeizerPointsFromControlPoints(controlPoints3D, spacing);
+
+    // Error check
+    if (m_finalPositions.size() < 2) {
+        Logging::Error() << "Fence::Init() failed because there were less than 2 final positions";
+        return;
+    }
 
     std::vector<RenderItem> meshNodeRenderItemsThin = m_meshNodesThin.GetRenderItems();
     std::vector<RenderItem> meshNodeRenderItemsFat = m_meshNodesFat.GetRenderItems();
@@ -126,28 +132,12 @@ void Fence::Init() {
     }
 }
 
-
 void Fence::Update() {
-    //for (glm::vec3& position : m_wirePositionsA) {
-    //    //Renderer::DrawPoint(position, ORANGE);
-    //}
-    //for (glm::vec3& position : m_wirePositionsFrontA) {
-    //    Renderer::DrawPoint(position, ORANGE);
-    //}
+    // Nothing as of yet
+}
 
-    //m_wire.Update();
-
-
-   //
-   // int i = 0;
-   // glm::vec3& position = m_wirePositionsA[i];
-   // glm::vec3& nextPosition = m_wirePositionsA[i + 1];
-   // glm::vec3 forwardToNext = glm::normalize(nextPosition - position);
-   //
-   // glm::vec3 test = position + (forwardToNext * 0.5f);
-   //
-   // Renderer::DrawLine(position, test, WHITE);
-   // Renderer::DrawPoint(nextPosition, ORANGE);
+void Fence::CleanUp() {
+    // Nothing as of yet
 }
 
 RenderItem Fence::CreateWireRenderItem(RenderItem& localSpaceRenderItem, glm::vec3& position, glm::vec3 nextPosition) {
@@ -161,8 +151,6 @@ RenderItem Fence::CreateWireRenderItem(RenderItem& localSpaceRenderItem, glm::ve
 
     // Scale
     Transform scale;
-    scale.scale.y = 1.5;
-    scale.scale.z = 1.5;
     scale.scale.x = glm::distance(position, nextPosition);
 
     RenderItem renderItem = localSpaceRenderItem;

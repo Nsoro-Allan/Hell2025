@@ -30,6 +30,8 @@ int main2() {
     return 0;
 }*/
 
+#include "Ragdoll/RagdollManager.h"
+
 int main() {
     std::cout << "We are all alone on life's journey, held captive by the limitations of human consciousness.\n";
 
@@ -59,6 +61,7 @@ int main() {
             // Loading complete?
             if (AssetManager::LoadingComplete()) {
                 Game::Create();
+                RagdollManager::Init();
             }
         }
         // Update/render game

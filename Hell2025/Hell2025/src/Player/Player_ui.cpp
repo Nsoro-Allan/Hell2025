@@ -132,7 +132,9 @@ void Player::UpdateUI() {
         if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER) {
 
 
+
             std::string text = "";
+            text += "Feet Pos: " + Util::Vec3ToString(GetFootPosition()) + "\n";
             text += "Cam Pos: " + Util::Vec3ToString(GetCameraPosition()) + "\n";
             text += "Cam Euler: " + Util::Vec3ToString(GetCameraRotation()) + "\n";
 
@@ -172,7 +174,7 @@ void Player::UpdateUI() {
             }
 
             // Rays
-            if (false) {
+            if (true) {
                 text += "BVH ray: " + Util::ObjectTypeToString(m_bvhRayResult.objectType) + " " + std::to_string(m_bvhRayResult.objectId) + "\n";
                 text += "PhysX ray: " + Util::ObjectTypeToString(m_physXRayResult.userData.objectType) + " " + std::to_string(m_physXRayResult.userData.objectId) + " " + Util::PhysicsTypeToString(m_physXRayResult.userData.physicsType) + " " + std::to_string(m_physXRayResult.userData.physicsId) + "\n";
                 text += "Ray hit found: " + Util::BoolToString(m_rayHitFound) + " " + Util::ObjectTypeToString(m_rayHitObjectType) + " " + std::to_string(m_rayhitObjectId) + "\n";
@@ -224,21 +226,6 @@ void Player::UpdateUI() {
                     }
                 }
             }
-
-            //text += "CanReloadShotgun: " + Util::BoolToString(CanReloadShotgun()) + "\n";
-            // text += "ShellInChamber: " + Util::BoolToString(IsShellInShotgunChamber()) + "\n";
-            // text += "CanFireShotgun: " + Util::BoolToString(CanFireShotgun()) + "\n";
-            //
-            // WeaponState* weaponState = GetCurrentWeaponState();
-            // AmmoState* ammoState = GetCurrentAmmoState();
-            // text += "AwaitingPumpAudio: " + Util::BoolToString(weaponState->shotgunAwaitingPumpAudio) + "\n";
-            // text += "ShotgunInAuto: " + Util::BoolToString(weaponState->shotgunInAutoMode) + "\n";
-            //
-            //
-            // text += "\n";
-            // text += "Grounded: " + Util::BoolToString(m_grounded) + "\n";
-            //text += "Grounded: " + Util::BoolToString(m_grounded) +  "\n";
-            //text += "GroundedLastFrame: " + Util::BoolToString(m_groundedLastFrame) + "\n";
 
             UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);
         }

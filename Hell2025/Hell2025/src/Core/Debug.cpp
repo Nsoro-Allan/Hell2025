@@ -118,7 +118,7 @@ namespace Debug {
                 Player* player = Game::GetLocalPlayerByIndex(i);
                 //player->GetCharacterModelAnimatedGameObject()->DrawBones(RED, i);
                 player->GetViewWeaponAnimatedGameObject()->DrawBones(i);
-                player->GetCharacterModelAnimatedGameObject()->DrawBones();
+                //player->GetCharacterModelAnimatedGameObject()->DrawBones();
             }
         }
         if (g_debugRenderMode == DebugRenderMode::BONE_TANGENTS) {
@@ -129,7 +129,7 @@ namespace Debug {
                 Player* player = Game::GetLocalPlayerByIndex(i);
                 //player->GetCharacterModelAnimatedGameObject()->DrawBoneTangentVectors(0.001f, i);
                 player->GetViewWeaponAnimatedGameObject()->DrawBoneTangentVectors(0.001f, i);
-                player->GetCharacterModelAnimatedGameObject()->DrawBoneTangentVectors(0.001f, i);
+                //player->GetCharacterModelAnimatedGameObject()->DrawBoneTangentVectors(0.001f, i);
             }
         }
         if (g_debugRenderMode == DebugRenderMode::CLIPPING_CUBES) {

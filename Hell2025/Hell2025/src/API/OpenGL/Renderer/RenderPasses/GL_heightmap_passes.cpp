@@ -84,7 +84,7 @@ namespace OpenGLRenderer {
         int textureWidth = (World::GetChunkCountX() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
         int textureHeight = (World::GetChunkCountZ() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
 
-        const glm::ivec2 textureSize = glm::ivec2(textureWidth, textureHeight);
+        const glm::uvec2 textureSize = glm::uvec2(textureWidth, textureHeight);
 
         // Resize world framebuffer if it is too small for the heightmap
         if (worldFramebuffer->GetWidth() != textureSize.x || worldFramebuffer->GetHeight() != textureSize.y) {

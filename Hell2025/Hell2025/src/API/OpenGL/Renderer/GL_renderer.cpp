@@ -80,9 +80,6 @@ namespace OpenGLRenderer {
         g_3dTextures["PerlinNoise"] = OpenGLTexture3D();
         g_3dTextures["PerlinNoise"].Create(128, GL_R32F);
 
-        g_textureArrays["WoundMasks"] = OpenGLTextureArray();
-        g_textureArrays["WoundMasks"].AllocateMemory(WOUND_MASK_TEXTURE_SIZE, WOUND_MASK_TEXTURE_SIZE, GL_RGBA8, 1, 6);
-
         g_frameBuffers["GaussianBlur"] = OpenGLFrameBuffer("GaussianBlur", resolutions.gBuffer.x / 2, resolutions.gBuffer.y / 2);
         g_frameBuffers["GaussianBlur"].CreateAttachment("ColorA", GL_RGBA16F, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
         g_frameBuffers["GaussianBlur"].CreateAttachment("ColorB", GL_RGBA16F, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE);
@@ -91,7 +88,11 @@ namespace OpenGLRenderer {
         g_frameBuffers["DecalPainting"].CreateAttachment("UVMap", GL_RGBA8, GL_LINEAR, GL_LINEAR);
         g_frameBuffers["DecalPainting"].CreateDepthAttachment(GL_DEPTH_COMPONENT24);
 
-        g_frameBuffers["DecalMasks"] = OpenGLFrameBuffer("DecalMasks", 256, 256);
+
+        g_textureArrays["WoundMasks"] = OpenGLTextureArray();
+        g_textureArrays["WoundMasks"].AllocateMemory(WOUND_MASK_TEXTURE_SIZE, WOUND_MASK_TEXTURE_SIZE, GL_RGBA8, 1, WOUND_MASK_TEXTURE_ARRAY_SIZE); // consider adding mipmaps
+
+        g_frameBuffers["DecalMasks"] = OpenGLFrameBuffer("DecalMasks", WOUND_MASK_TEXTURE_SIZE, WOUND_MASK_TEXTURE_SIZE);
         g_frameBuffers["DecalMasks"].CreateAttachment("DecalMask0", GL_RGBA8, GL_LINEAR, GL_LINEAR);
 
         //g_frameBuffers["KanagarooDecalMap"].CreateAttachment("DecalMask", GL_RGBA8, GL_LINEAR, GL_LINEAR);
@@ -288,6 +289,7 @@ namespace OpenGLRenderer {
         g_shaders["DebugLightVolume"] = OpenGLShader({ "GL_debug_light_volume.vert", "GL_debug_light_volume.frag" });
         g_shaders["DebugPointCloud"] = OpenGLShader({ "GL_debug_point_cloud.vert", "GL_debug_point_cloud.frag" });
         g_shaders["DebugSolidColor"] = OpenGLShader({ "GL_debug_solid_color.vert", "GL_debug_solid_color.frag" });
+        g_shaders["DebugRagdoll"] = OpenGLShader({ "GL_debug_ragdoll.vert", "GL_debug_ragdoll.frag" });
         g_shaders["DebugTextureBlit"] = OpenGLShader({ "GL_debug_texture_blit.vert", "GL_debug_texture_blit.frag" });
         g_shaders["DebugTextured"] = OpenGLShader({ "GL_debug_textured.vert", "GL_debug_textured.frag" });
         g_shaders["DebugView"] = OpenGLShader({ "GL_debug_view.comp" });
@@ -520,7 +522,7 @@ namespace OpenGLRenderer {
         TextureReadBackPass();
         LightCullingPass();
         LightingPass();
-        FurPass();
+        //FurPass();
         OceanGeometryPass();
         OceanSurfaceCompositePass();
         GlassPass();

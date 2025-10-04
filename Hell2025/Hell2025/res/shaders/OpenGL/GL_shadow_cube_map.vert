@@ -13,10 +13,11 @@ out vec3 FragPos;
 uniform mat4 shadowMatrices[6];
 uniform int faceIndex;
 uniform bool u_useInstanceData;
+uniform mat4 u_modelMatrix;
 
 void main() {
 
-	vec4 worldPos = vec4(vPosition, 1.0);
+	vec4 worldPos = u_modelMatrix * vec4(vPosition, 1.0);
 
     if (u_useInstanceData) {
         int instanceOffset = gl_BaseInstance & ((1 << VIEWPORT_INDEX_SHIFT) - 1);
@@ -24,7 +25,7 @@ void main() {
     
         RenderItem renderItem = renderItems[globalInstanceIndex]; 
         mat4 modelMatrix = renderItem.modelMatrix;
-        worldPos = modelMatrix * worldPos;
+        worldPos = modelMatrix * vec4(vPosition, 1.0);
     }
 
     FragPos = worldPos.xyz;

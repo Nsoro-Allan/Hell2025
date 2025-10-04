@@ -11,6 +11,7 @@ struct Light {
     void Update(float deltaTime);
     void SetPosition(glm::vec3 position);
     void UpdateMatricesAndFrustum();
+    void ForceDirty();
 
     Frustum* GetFrustumByFaceIndex(uint32_t faceIndex);
 
@@ -28,6 +29,7 @@ private:
     void UpdateRenderItems();
     void UpdateDirtyState();
 
+    bool m_forcedDirty = false;
     bool m_dirty = true;
     uint64_t m_objectId = 0;
     glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);

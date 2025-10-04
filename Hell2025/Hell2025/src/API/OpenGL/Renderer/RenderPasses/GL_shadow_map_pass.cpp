@@ -6,6 +6,8 @@
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
 
+#include "Ragdoll/RagdollManager.h"
+
 namespace OpenGLRenderer {
 
     void RenderFlashLightShadowMaps();
@@ -86,6 +88,20 @@ namespace OpenGLRenderer {
                 int baseVertex = renderItem.baseVertex;
                 int baseIndex = renderItem.baseIndex;
                 glDrawElementsBaseVertex(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * baseIndex), baseVertex);
+            }
+
+            // Ragdoll
+            for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+                MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+                if (meshBuffer.GetIndices().size() == 0) continue;
+
+                glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+                for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+                    Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+                    glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+                    shader->SetMat4("u_modelMatrix", modelMatrix);
+                    glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+                }
             }
         }
 
@@ -169,6 +185,7 @@ namespace OpenGLRenderer {
         OpenGLMeshBuffer& houseMeshBuffer = World::GetHouseMeshBuffer().GetGLMeshBuffer();
         glBindVertexArray(houseMeshBuffer.GetVAO());
         shader->SetBool("u_useInstanceData", false);
+        shader->SetMat4("u_modelMatrix", glm::mat4(1.0f));
 
         for (int i = 0; i < gpuLightsHighRes.size(); i++) {
             const GPULight& gpuLight = gpuLightsHighRes[i];
@@ -204,6 +221,56 @@ namespace OpenGLRenderer {
                     int baseVertex = renderItem.baseVertex;
                     int baseIndex = renderItem.baseIndex; 
                     glDrawElementsBaseVertex(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * baseIndex), baseVertex);
+                }
+            }
+        }
+
+
+
+
+        // Ragdoll
+        //RagdollInfo& ragdoll = RagdollManager::GetRagdoll();
+        //MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+        //glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+        shader->SetBool("u_useInstanceData", false);
+
+        for (int i = 0; i < gpuLightsHighRes.size(); i++) {
+            const GPULight& gpuLight = gpuLightsHighRes[i];
+
+            Light* light = World::GetLightByIndex(gpuLight.lightIndex);
+            if (!light || !light->IsDirty()) continue;
+
+            shader->SetFloat("farPlane", light->GetRadius());
+            shader->SetVec3("lightPosition", light->GetPosition());
+            shader->SetMat4("shadowMatrices[0]", light->GetProjectionView(0));
+            shader->SetMat4("shadowMatrices[1]", light->GetProjectionView(1));
+            shader->SetMat4("shadowMatrices[2]", light->GetProjectionView(2));
+            shader->SetMat4("shadowMatrices[3]", light->GetProjectionView(3));
+            shader->SetMat4("shadowMatrices[4]", light->GetProjectionView(4));
+            shader->SetMat4("shadowMatrices[5]", light->GetProjectionView(5));
+
+            for (int face = 0; face < 6; ++face) {
+                shader->SetInt("faceIndex", face);
+                int shadowMapIndex = i;
+                GLuint layer = shadowMapIndex * 6 + face;
+
+                glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, hiResShadowMaps->GetDepthTexture(), 0, layer);
+
+                Frustum* frustum = light->GetFrustumByFaceIndex(face);
+                if (!frustum) return;
+
+                // Ragdoll
+                for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+                    MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+                    if (meshBuffer.GetIndices().size() == 0) continue;
+
+                    glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+                    for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+                        Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+                        glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+                        shader->SetMat4("u_modelMatrix", modelMatrix);
+                        glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+                    }
                 }
             }
         }

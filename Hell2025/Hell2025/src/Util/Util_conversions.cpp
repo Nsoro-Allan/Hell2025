@@ -148,6 +148,7 @@ namespace Util {
             case ObjectType::PIANO_SHEET_SUSTAIN_PEDAL:     return "PIANO_SHEET_SUSTAIN_PEDAL";
             case ObjectType::PICTURE_FRAME:                 return "PICTURE_FRAME";
             case ObjectType::RAGDOLL_ENEMY:                 return "RAGDOLL_ENEMY";
+            case ObjectType::RAGDOLL_V2:                    return "RAGDOLL_V2";
             case ObjectType::RAGDOLL_PLAYER:                return "RAGDOLL_PLAYER";
             case ObjectType::SHARK:                         return "SHARK";
             case ObjectType::SPAWN_POINT:                   return "SPAWN_POINT";

@@ -7,7 +7,7 @@ void OpenGLTextureArray::AllocateMemory(uint32_t width, uint32_t height, uint32_
 
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &m_handle);
     glTextureStorage3D(m_handle, mipmapLevelCount, internalFormat, width, height, count);
-    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTextureParameteri(m_handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);// GL_LINEAR_MIPMAP_LINEAR);
     glTextureParameteri(m_handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(m_handle, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -5,6 +5,8 @@
 #include "Util.h"
 #include "UniqueID.h"
 
+#include "Ragdoll/RagdollManager.h"
+
 Light::Light(LightCreateInfo createInfo) {   
     m_createInfo = createInfo;
 
@@ -50,6 +52,12 @@ void Light::Update(float deltaTime) {
 
 
 void Light::UpdateDirtyState() {
+    if (m_forcedDirty) {
+        m_forcedDirty = false;
+        m_dirty = true;
+        return;
+    }
+
     m_dirty = false;
 
     // Doors
@@ -70,6 +78,17 @@ void Light::UpdateDirtyState() {
         if (toilet.MovedThisFrame()) {
             m_dirty = true;
             return;
+        }
+    }
+
+    // Ragdolls
+    for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
+        if (ragdoll.IsInMotion()) {
+            AABB aabb = ragdoll.GetWorldSpaceAABB();
+            if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
+                m_dirty = true;
+                return;
+            }
         }
     }
 }
@@ -156,6 +175,10 @@ Frustum* Light::GetFrustumByFaceIndex(uint32_t faceIndex) {
     if (faceIndex < 0 || faceIndex >= 6) return nullptr;
 
     return &m_frustum[faceIndex];
+}
+
+void Light::ForceDirty() {
+    m_forcedDirty = true;
 }
 
 void Light::UpdateMatricesAndFrustum() {

@@ -20,4 +20,6 @@ void main() {
     if (u_isPath) {    
         FragOut.rgb = vec3(1, 1, 1);
     }
+    
+        FragOut.rgb = vec3(1, 1, 1);
 }

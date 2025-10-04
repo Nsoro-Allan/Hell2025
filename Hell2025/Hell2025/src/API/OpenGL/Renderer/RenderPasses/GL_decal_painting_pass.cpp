@@ -21,11 +21,13 @@ namespace OpenGLRenderer {
             OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
             OpenGLShader* uvShader = GetShader("DecalPaintUVs");
             OpenGLShader* maskShader = GetShader("DecalPaintMask");
+            OpenGLTextureArray* woundMaskArray = GetTextureArray("WoundMasks");
 
             if (!decalPaintingFBO) return;
             if (!decalMasksFBO) return;
             if (!uvShader) return;
             if (!maskShader) return;
+            if (!woundMaskArray) return;
 
             decalMasksFBO->Bind();
             decalMasksFBO->SetViewport();
@@ -124,6 +126,7 @@ namespace OpenGLRenderer {
 
 
             glBindImageTexture(0, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+            glBindImageTexture(1, woundMaskArray->GetHandle(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
 
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, decalPaintingFBO->GetColorAttachmentHandleByName("UVMap"));
@@ -140,12 +143,7 @@ namespace OpenGLRenderer {
 
     }
 
-    glm::mat4 makeDecalProjView(
-        const glm::vec3& rayOrigin,
-        const glm::vec3& rayDir,
-        const glm::vec2& decalSize, // width, height in world-units
-        float   nearZ,              // e.g. 0.0f
-        float   farZ)               // how deep you'll stamp
+    glm::mat4 makeDecalProjView(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec2& decalSize, float nearZ, float farZ)  
     {
         // pick an up that isn't collinear with rayDir
         glm::vec3 worldUp = glm::vec3(0, 1, 0);

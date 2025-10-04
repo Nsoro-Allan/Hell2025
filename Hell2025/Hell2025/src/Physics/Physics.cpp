@@ -88,7 +88,7 @@ namespace Physics {
         PxFilterData filterData;
         filterData.word0 = RaycastGroup::RAYCAST_ENABLED; // must be disabled or it causes crash in scene::update when it tries to retrieve rigid body flags from this actor
         filterData.word1 = CollisionGroup::ENVIROMENT_OBSTACLE;
-        filterData.word2 = CollisionGroup::BULLET_CASING | CollisionGroup::GENERIC_BOUNCEABLE | CollisionGroup::CHARACTER_CONTROLLER;
+        filterData.word2 = CollisionGroup::BULLET_CASING | CollisionGroup::GENERIC_BOUNCEABLE | CollisionGroup::CHARACTER_CONTROLLER | CollisionGroup::RAGDOLL_ENEMY;
         groundShape->setQueryFilterData(filterData);
         groundShape->setSimulationFilterData(filterData); // sim is for ragz
 
@@ -103,6 +103,7 @@ namespace Physics {
         PxScene* pxScene = GetPxScene();
         pxScene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
         pxScene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
+        pxScene->setFlag(PxSceneFlag::eENABLE_STABILIZATION, true);
         // This may not work!
 
         LoadRagdollsFromDisk();

@@ -10,7 +10,6 @@ Drawers::Drawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
     m_transform.position = m_createInfo.position + spawnOffset.translation;
     m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-
     static Model* model = nullptr;
 
     if (createInfo.type == DrawersType::LARGE) {
@@ -20,11 +19,9 @@ Drawers::Drawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
         model = AssetManager::GetModelByName("DrawersSmall");
     }
 
-
     if (!model) {
         std::cout << "Drawers() constructor failed because your hack to load the model into a static Model pointer failed the first time around\n";
     }
-
 
     m_meshNodes.InitFromModel(model);
 
@@ -66,82 +63,14 @@ Drawers::Drawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
 
         m_meshNodes.m_objectIds[i] = UniqueID::GetNext();
         m_meshNodes.m_materialIndices[i] = materialIndex;
-
-
-   
-
-       // if (mesh->GetName() == "Body") {
-       //     m_meshNodes.m_materialIndices[i] = materialIndex;
-       //     m_meshNodes.m_objectTypes[i] = ObjectType::TOILET;
-       // }
-       // if (mesh->GetName() == "Lid") {
-       //     m_meshNodes.m_materialIndices[i] = materialIndex;
-       //     m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_LID;
-       // }
-       // if (mesh->GetName() == "Seat") {
-       //     m_meshNodes.m_materialIndices[i] = materialIndex;
-       //     m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_SEAT;
-       // }
-       // if (mesh->GetName() == "ToiletWater") {
-       //     // TODO
-       // }
     }
-
-  // Init handlers
-  // m_lidOpenHandler.openState = OpenState::OPEN;
-  // m_lidOpenHandler.minOpenValue = 0.0f;
-  // m_lidOpenHandler.maxOpenValue = 1.7f;
-  // m_lidOpenHandler.openSpeed = 6.825f;
-  // m_lidOpenHandler.closeSpeed = 6.825f;
-  // m_lidOpenHandler.openedAudio = "Piano_LidClose.wav";
-  // m_lidOpenHandler.closedAudio = "Piano_LidClose.wav";
-  //
-  // m_seatOpenHandler.openState = OpenState::CLOSED;
-  // m_seatOpenHandler.minOpenValue = 0.0f;
-  // m_seatOpenHandler.maxOpenValue = 1.7;
-  // m_seatOpenHandler.openSpeed = 7.25f;
-  // m_seatOpenHandler.closeSpeed = 7.25f;
-  // m_seatOpenHandler.openedAudio = "Piano_LidClose.wav";
-  // m_seatOpenHandler.closedAudio = "Piano_LidClose.wav";
 }
 
 void Drawers::Update(float deltaTime) {
-   //m_lidOpenHandler.Update(deltaTime);
-   //m_seatOpenHandler.Update(deltaTime);
-   //
-   //Transform lidNodeTransform;
-   //lidNodeTransform.rotation.x = -m_lidOpenHandler.currentOpenValue;
-   //m_meshNodes.SetTransformByMeshName("Lid", lidNodeTransform);
-   //
-   //Transform seatNodeTransform;
-   //seatNodeTransform.rotation.x = m_seatOpenHandler.currentOpenValue;
-   //m_meshNodes.SetTransformByMeshName("Seat", seatNodeTransform);
-   //
    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
-   //
-   //m_movedThisFrame = m_lidOpenHandler.movedThisFrame || m_seatOpenHandler.movedThisFrame;
-
    m_movedThisFrame = false; // WANRING I AM ONLY TEMPORATYIY HERE
-
-  // std::cout << "m_meshNodes.GetNodeCount(): " << m_meshNodes.GetNodeCount() << "\n";
-  // std::cout << "position: " << m_transform.position << "\n";
-  // std::cout << "rotation: " << m_transform.rotation << "\n";
-  // std::cout << "scale: " << m_transform.scale << "\n";
-
 }
 
 void Drawers::CleanUp() {
 
 }
-
-//void Drawers::InteractWithSeat() {
-//    if (m_lidOpenHandler.openState == OpenState::CLOSED) {
-//        m_seatOpenHandler.Interact();
-//    }
-//}
-//
-//void Drawers::InteractWithLid() {
-//    if (m_seatOpenHandler.openState == OpenState::CLOSED) {
-//        m_lidOpenHandler.Interact();
-//    }
-//}

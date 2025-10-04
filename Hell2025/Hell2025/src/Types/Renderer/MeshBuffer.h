@@ -16,6 +16,7 @@ struct MeshBuffer {
     VulkanDetachedMesh& GetVKMesh()         { return m_vulkanDetachedMesh; }
     std::vector<Vertex>& GetVertices()      { return m_vertices; }
     std::vector<uint32_t>& GetIndices()     { return m_indices; }
+    int GetMeshCount()                      { return (int)m_meshes.size(); }
 
     glm::vec3 m_aabbMin = glm::vec3(std::numeric_limits<float>::max());
     glm::vec3 m_aabbMax = glm::vec3(-std::numeric_limits<float>::max());

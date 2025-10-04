@@ -6,6 +6,7 @@
 struct PowerPoleSet {
     void Init();
     void Update();
+    void CleanUp();
     const std::vector<RenderItem>& const GetRenderItems();
 
     std::vector<Wire>& GetWires() { return m_wires; }
