@@ -94,9 +94,6 @@ namespace OpenGLRenderer {
         g_textureArrays["WoundMasks"].AllocateMemory(WOUND_MASK_TEXTURE_SIZE, WOUND_MASK_TEXTURE_SIZE, GL_RGBA8, 1, WOUND_MASK_TEXTURE_ARRAY_SIZE); // consider adding mipmaps
 
         g_frameBuffers["DecalMasks"] = OpenGLFrameBuffer("DecalMasks", WOUND_MASK_TEXTURE_SIZE, WOUND_MASK_TEXTURE_SIZE);
-        g_frameBuffers["DecalMasks"].CreateAttachment("DecalMask0", GL_RGBA8, GL_LINEAR, GL_LINEAR);
-
-        //g_frameBuffers["KanagarooDecalMap"].CreateAttachment("DecalMask", GL_RGBA8, GL_LINEAR, GL_LINEAR);
 
         g_frameBuffers["GBuffer"] = OpenGLFrameBuffer("GBuffer", resolutions.gBuffer);
         g_frameBuffers["GBuffer"].CreateAttachment("BaseColor", GL_RGBA8);

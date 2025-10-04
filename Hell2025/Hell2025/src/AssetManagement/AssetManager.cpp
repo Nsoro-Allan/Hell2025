@@ -107,6 +107,7 @@ namespace AssetManager {
             HouseManager::Init();
             MapManager::Init();
             SectorManager::LoadSectorsFromDisk();
+            Renderer::InitWoundMaskArray();
             World::Init();
 
             if (BackEnd::GetAPI() == API::OPENGL) {

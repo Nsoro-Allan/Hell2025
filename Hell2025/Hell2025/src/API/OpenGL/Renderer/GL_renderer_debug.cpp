@@ -9,7 +9,7 @@ namespace OpenGLRenderer {
         // Render decal painting shit
         if (false) {
             DebugBlitFrameBufferTexture("DecalPainting", "UVMap", 0, 0, 480, 480);
-            DebugBlitFrameBufferTexture("DecalMasks", "DecalMask0", 0, 480, 480, 480);
+            //DebugBlitFrameBufferTexture("DecalMasks", "DecalMask0", 0, 480, 480, 480);
         }
 
         // World heightmap

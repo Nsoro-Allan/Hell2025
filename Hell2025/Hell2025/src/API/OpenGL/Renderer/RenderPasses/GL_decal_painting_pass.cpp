@@ -34,9 +34,6 @@ namespace OpenGLRenderer {
            
             decalPaintingFBO->Bind();
             decalPaintingFBO->SetViewport();
-            decalPaintingFBO->ClearTexImage("UVMap", 0, 0, 0, 1);
-
-            glClear(GL_DEPTH_BUFFER_BIT);
 
             Player* player = Game::GetLocalPlayerByIndex(0);
 
@@ -80,26 +77,7 @@ namespace OpenGLRenderer {
 
             projectionView = proj * view;
 
-            uvShader->Bind();
-            uvShader->SetMat4("u_projectionView", projectionView);
-
-            // Regular mesh VAO
-            // glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-
-            // Bind skinned mesh VAO shit
-            glBindVertexArray(OpenGLBackEnd::GetSkinnedVertexDataVAO());
-            glBindBuffer(GL_ARRAY_BUFFER, OpenGLBackEnd::GetSkinnedVertexDataVBO());
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, OpenGLBackEnd::GetWeightedVertexDataEBO());
-
             RenderDataManager::GetAnimatedGameObjectToSkin();
-
-
-
-
-
-            //OpenGLTextureArray* woundMaskTextureArray = GetTextureArray("WoundMasks");
-            //int layerIndex = 0;
-            //glFramebufferTextureLayer(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, woundMaskTextureArray->GetHandle(), 0, layerIndex);
 
 
 
@@ -107,39 +85,54 @@ namespace OpenGLRenderer {
 
             for (const RenderItem& renderItem : skinnedRenderItems) {
 
-                if (renderItem.customFlag == 1) {
+                if (renderItem.woundMaskTexutreIndex != -1) {
+
+
+                    decalPaintingFBO->ClearTexImage("UVMap", 0, 0, 0, 1);
+
+                    glClear(GL_DEPTH_BUFFER_BIT);
+
+                    uvShader->Bind();
+                    uvShader->SetMat4("u_projectionView", projectionView);
+
+                    // Render in the UV mask to determine what co-ordinates you need to paint the decal
+                    glBindVertexArray(OpenGLBackEnd::GetSkinnedVertexDataVAO());
+                    glBindBuffer(GL_ARRAY_BUFFER, OpenGLBackEnd::GetSkinnedVertexDataVBO());
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, OpenGLBackEnd::GetWeightedVertexDataEBO());
                     uint32_t meshIndex = renderItem.meshIndex;
                     glm::mat4 modelMatrix = renderItem.modelMatrix;
                     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
                     SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(meshIndex);
                     uvShader->SetMat4("u_model", modelMatrix);
-                    //glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, mesh->baseVertex);
-
                     glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, renderItem.baseSkinnedVertex);
+
+                    std::cout << "Decal Texture Painting into index " << renderItem.woundMaskTexutreIndex << " and the mesh name is " << mesh->name << "\n";
+
+
+                    // Compute pass to paint the actual decal into the appropriate wound mask texture array index
+                    maskShader->Bind();
+                    maskShader->SetInt("u_layerIndex", renderItem.woundMaskTexutreIndex);
+                    //glBindImageTexture(0, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+                    glBindImageTexture(1, woundMaskArray->GetHandle(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
+                    glActiveTexture(GL_TEXTURE1);
+                    glBindTexture(GL_TEXTURE_2D, decalPaintingFBO->GetColorAttachmentHandleByName("UVMap"));
+                    glActiveTexture(GL_TEXTURE2);
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("Decal_Wound0")->GetGLTexture().GetHandle());
+                    glDispatchCompute((decalPaintingFBO->GetWidth() + 7) / 8, (decalPaintingFBO->GetHeight() + 7) / 8, 1);
+
                 }
             }
 
+
+
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-            // Calculate mask
-            maskShader->Bind();
 
-
-            glBindImageTexture(0, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
-            glBindImageTexture(1, woundMaskArray->GetHandle(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
-
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, decalPaintingFBO->GetColorAttachmentHandleByName("UVMap"));
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("Decal_Wound0")->GetGLTexture().GetHandle());
-
-            glDispatchCompute((decalPaintingFBO->GetWidth() + 7) / 8, (decalPaintingFBO->GetHeight() + 7) / 8, 1);
         }       
-
-        OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
-        if (Input::MiddleMousePressed()) {
-            decalMasksFBO->ClearTexImage("DecalMask0", 0, 0, 0, 1);
-        }
+        //OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
+        //if (Input::MiddleMousePressed()) {
+        //    decalMasksFBO->ClearTexImage("DecalMask0", 0, 0, 0, 1);
+        //}
 
     }
 

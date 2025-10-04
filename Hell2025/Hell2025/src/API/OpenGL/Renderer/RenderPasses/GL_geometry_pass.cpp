@@ -109,8 +109,8 @@ namespace OpenGLRenderer {
         SetRasterizerState("GeometryPass_NonBlended");
 
         OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"));
+        //glActiveTexture(GL_TEXTURE6);
+        //glBindTexture(GL_TEXTURE_2D, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"));
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_ALB")->GetGLTexture().GetHandle());
         glActiveTexture(GL_TEXTURE8);

@@ -4,6 +4,8 @@
 #include "Pathfinding/AStarMap.h"
 #include "World/World.h"
 #include "Core/Game.h"
+#include "Renderer/Renderer.h"
+#include "HellLogging.h"
 #include "Timer.hpp"
 
 void Kangaroo::Init(KangarooCreateInfo createInfo) {
@@ -24,7 +26,6 @@ void Kangaroo::Init(KangarooCreateInfo createInfo) {
         animatedGameObject->SetMeshMaterialByMeshName("RightEye_Iris", "KangarooIris");
         animatedGameObject->DisableDrawingForMeshByMeshName("LeftEye_Sclera");
         animatedGameObject->DisableDrawingForMeshByMeshName("RightEye_Sclera");
-        animatedGameObject->SetMeshWoundMaskTextureIndex("Body", 1);
 
         Ragdoll* ragdoll = Physics::GetRagdollById(animatedGameObject->GetRagdollId());
         if (ragdoll) {
@@ -33,7 +34,9 @@ void Kangaroo::Init(KangarooCreateInfo createInfo) {
 
         animatedGameObject->PlayAndLoopAnimation("MainLayer", "Kangaroo_Idle", 1.0f);
 
-        m_woundMaskIndex = 1;
+        int32_t woundMaskIndex = Renderer::GetNextFreeWoundMaskIndexAndMarkItTaken();
+        animatedGameObject->SetMeshWoundMaskTextureIndex("Body", woundMaskIndex);
+        Logging::Debug() << "Assigned a Kangaroo a 'Body' mesh wound mask index of " << woundMaskIndex;
 
         CreateCharacterController(m_createInfo.position);
     }

@@ -8,7 +8,7 @@ void Kangaroo::UpdateAudio() {
 
     // Start ambient loop
     if (m_ambientLoopAudioHandle == 0) {
-        m_ambientLoopAudioHandle = Audio::LoopAudioIfNotPlaying("Kangaroo_AmbientLoop.wav", 1.0f);
+    //    m_ambientLoopAudioHandle = Audio::LoopAudioIfNotPlaying("Kangaroo_AmbientLoop.wav", 1.0f);
     }
 
     // Set ambient loop volume based on player proximity

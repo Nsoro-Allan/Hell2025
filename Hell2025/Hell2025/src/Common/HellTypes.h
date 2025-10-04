@@ -33,7 +33,7 @@ struct RenderItem {
     int32_t rmaTextureIndex = 0;
 
     int32_t objectType = 0;
-    int32_t woundMaskTexutreIndex = 0;
+    int32_t woundMaskTexutreIndex = -1;
     int32_t baseSkinnedVertex = 0;
     int32_t ignoredViewportIndex = -1;
 

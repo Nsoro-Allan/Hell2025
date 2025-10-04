@@ -88,7 +88,7 @@ private:
     bool m_alive = true;
     int m_maxHealth = KANGAROO_MAX_HEALTH;
     int m_health = 500;
-    int32_t m_woundMaskIndex = -1;
+    //int32_t m_woundMaskIndex = -1;
 
     glm::vec3 m_position;
     glm::vec3 m_rotation;

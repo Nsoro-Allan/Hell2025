@@ -15,6 +15,8 @@ namespace Renderer {
         RendererSettings mapObjectEditor;
     } g_rendererSettingsSet;
 
+    std::vector<bool> g_freeWoundMaskIndices;
+
     void InitMain() {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::InitMain();
@@ -139,5 +141,40 @@ namespace Renderer {
         int i = static_cast<int>(rendererSettings.rendererOverrideState);
         i = (i + 1) % static_cast<int>(RendererOverrideState::STATE_COUNT);
         rendererSettings.rendererOverrideState = static_cast<RendererOverrideState>(i);
+    }
+
+    int32_t GetNextFreeWoundMaskIndexAndMarkItTaken() {
+        std::cout << "GetNextFreeWoundMaskIndexAndMarkItTaken(): array is of size " << g_freeWoundMaskIndices.size() << "\n";
+        for (int i = 0; i < g_freeWoundMaskIndices.size(); i++) {
+            if (g_freeWoundMaskIndices[i] == true) {
+                std::cout << "found free array index " << i << "\n";
+                g_freeWoundMaskIndices[i] = false;
+                return i;
+            }
+        }
+
+        // Should never happen, unless you ran out of array levels, in which case you need to increase the size of the array/
+
+        for (int i = 0; i < g_freeWoundMaskIndices.size(); i++) {
+            std::cout << i << ": " << g_freeWoundMaskIndices[i] << "\n";
+        }
+        return -1;
+    }
+
+    void InitWoundMaskArray() {
+        // Create and init all wound mask indices to true, aka available
+        g_freeWoundMaskIndices.resize(4);
+        for (int i = 0; i < 4; i++) {
+            g_freeWoundMaskIndices[i] = true;
+        }
+
+    }
+
+    void MarkWoundMaskIndexAsAvailable(int32_t index) {
+        if (index < 0 || index >= g_freeWoundMaskIndices.size()) {
+            Logging::Error() << "Renderer::MarkWoundMaskIndexAsAvailable() failed. Index '" << index << "' is out of range of size '" << g_freeWoundMaskIndices.size() << "'";
+            return;
+        }
+        g_freeWoundMaskIndices[index] = true;
     }
 }

@@ -5,11 +5,15 @@
 
 namespace Renderer {
     void InitMain();
+    void InitWoundMaskArray();
     void RenderLoadingScreen();
     void PreGameLogicComputePasses();
     void RenderGame();
     void HotloadShaders();
     void NextRendererOverrideState();
+
+    int32_t GetNextFreeWoundMaskIndexAndMarkItTaken();
+    void MarkWoundMaskIndexAsAvailable(int32_t index);
 
     void RecalculateAllHeightMapData(bool blitWorldMap);
 

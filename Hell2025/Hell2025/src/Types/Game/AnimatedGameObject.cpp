@@ -452,6 +452,9 @@ void AnimatedGameObject::SetSkinnedModel(std::string name) {
             MeshRenderingEntry& meshRenderingEntry = m_meshRenderingEntries.emplace_back();
             meshRenderingEntry.meshName = skinnedMesh->name;
             meshRenderingEntry.meshIndex = m_skinnedModel->GetMeshIndices()[i];
+
+
+            m_woundMaskTextureIndices[i] = -1;
         }
 
         // Store bone indices

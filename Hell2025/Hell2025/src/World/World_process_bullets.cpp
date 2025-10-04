@@ -103,7 +103,7 @@ namespace World {
 
                             for (Kangaroo& kangaroo : GetKangaroos()) {
                                 if (kangaroo.GetAnimatedGameObject() == &animatedGameObject) {
-                                    kangaroo.GiveDamage(bullet.GetDamage());
+                                    //kangaroo.GiveDamage(bullet.GetDamage());
                                 }
                             }
                         }
