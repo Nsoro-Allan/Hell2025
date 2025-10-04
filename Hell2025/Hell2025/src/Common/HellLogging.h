@@ -9,7 +9,8 @@ namespace Logging {
         WARNING,
         DEBUG,
         FATAL,
-        TODO
+        TODO,
+        FUNCTION
     };
     
     struct MessageStream {
@@ -46,10 +47,11 @@ namespace Logging {
     void EnableLevel(Level level);
     MessageStream Message(Level level);
 
-    inline MessageStream Init()     { return MessageStream(Level::INIT); }
-    inline MessageStream Debug()    { return MessageStream(Level::DEBUG); }
-    inline MessageStream Warning()  { return MessageStream(Level::WARNING); }
-    inline MessageStream Error()    { return MessageStream(Level::ERROR); }
-    inline MessageStream Fatal()    { return MessageStream(Level::FATAL); }
-    inline MessageStream ToDo()     { return MessageStream(Level::TODO); }
+    inline MessageStream Init()             { return MessageStream(Level::INIT); }
+    inline MessageStream Debug()            { return MessageStream(Level::DEBUG); }
+    inline MessageStream Warning()          { return MessageStream(Level::WARNING); }
+    inline MessageStream Error()            { return MessageStream(Level::ERROR); }
+    inline MessageStream Fatal()            { return MessageStream(Level::FATAL); }
+    inline MessageStream ToDo()             { return MessageStream(Level::TODO); }
+    inline MessageStream Function()     { return MessageStream(Level::FUNCTION); }
 }

@@ -74,6 +74,8 @@ void Light::UpdateDirtyState() {
     }
 
     // TODO: make this only actually affect lights in range
+    // TODO: make this only actually affect lights in range
+    // TODO: make this only actually affect lights in range
     for (Toilet& toilet : World::GetToilets()) {
         if (toilet.MovedThisFrame()) {
             m_dirty = true;
@@ -81,15 +83,21 @@ void Light::UpdateDirtyState() {
         }
     }
 
+
+    bool m_renderEnabled = true;
+
     // Ragdolls
-    for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
-        if (ragdoll.IsInMotion()) {
+    auto& ragdolls = RagdollManager::GetRagdolls();
+    for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
+        RagdollV2& ragdoll = it->second;
+        if (ragdoll.RenderingEnabled() && ragdoll.IsInMotion()) {
             AABB aabb = ragdoll.GetWorldSpaceAABB();
             if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
                 m_dirty = true;
                 return;
             }
         }
+        it++;
     }
 }
 

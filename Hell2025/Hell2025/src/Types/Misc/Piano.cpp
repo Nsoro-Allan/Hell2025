@@ -182,7 +182,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     PhysicsFilterData filterData;
     filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
     filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    filterData.collidesWith = (CollisionGroup)(CHARACTER_CONTROLLER | BULLET_CASING | ITEM_PICK_UP);
+    filterData.collidesWith = (CollisionGroup)(CHARACTER_CONTROLLER | BULLET_CASING | ITEM_PICK_UP | RAGDOLL_ENEMY);
     m_rigidStaticId = Physics::CreateRigidStaticConvexMeshFromModel(m_transform, "PianoConvexMesh", filterData);
 
     PhysicsUserData userData;

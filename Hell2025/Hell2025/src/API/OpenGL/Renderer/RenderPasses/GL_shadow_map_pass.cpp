@@ -91,18 +91,24 @@ namespace OpenGLRenderer {
             }
 
             // Ragdoll
-            for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
-                MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
-                if (meshBuffer.GetIndices().size() == 0) continue;
-
-                glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
-                for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
-                    Mesh* mesh = meshBuffer.GetMeshByIndex(j);
-                    glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
-                    shader->SetMat4("u_modelMatrix", modelMatrix);
-                    glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
-                }
-            }
+            //auto& ragdolls = RagdollManager::GetRagdolls();
+            //for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
+            //    RagdollV2& ragdoll = it->second;
+            //    std::cout << "hi\n";
+            //    if (ragdoll.RenderingEnabled()) {
+            //        MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+            //        if (meshBuffer.GetIndices().size() == 0) continue;
+            //
+            //        glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+            //        for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+            //            Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+            //            glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+            //            shader->SetMat4("u_modelMatrix", modelMatrix);
+            //            glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+            //        }
+            //    }
+            //    ++it;
+            //}
         }
 
         glBindVertexArray(0);
@@ -260,18 +266,24 @@ namespace OpenGLRenderer {
                 if (!frustum) return;
 
                 // Ragdoll
-                for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
-                    MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
-                    if (meshBuffer.GetIndices().size() == 0) continue;
-
-                    glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
-                    for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
-                        Mesh* mesh = meshBuffer.GetMeshByIndex(j);
-                        glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
-                        shader->SetMat4("u_modelMatrix", modelMatrix);
-                        glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
-                    }
-                }
+                //auto& ragdolls = RagdollManager::GetRagdolls();
+                //for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
+                //    RagdollV2& ragdoll = it->second;
+                //
+                //    if (ragdoll.RenderingEnabled()) {
+                //        MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+                //        if (meshBuffer.GetIndices().size() == 0) continue;
+                //
+                //        glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+                //        for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+                //            Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+                //            glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+                //            shader->SetMat4("u_modelMatrix", modelMatrix);
+                //            glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+                //        }
+                //    }
+                //    ++it;
+                //}
             }
         }
 

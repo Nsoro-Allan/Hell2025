@@ -40,6 +40,7 @@ int main() {
     Logging::EnableLevel(Logging::Level::ERROR);
     Logging::EnableLevel(Logging::Level::FATAL);
     Logging::EnableLevel(Logging::Level::TODO);
+    //Logging::EnableLevel(Logging::Level::FUNCTION);
 
     // Init the back-end, sub-systems, and the minimum to render loading screen
     if (!BackEnd::Init(API::OPENGL, WindowedMode::WINDOWED)) {
@@ -61,7 +62,6 @@ int main() {
             // Loading complete?
             if (AssetManager::LoadingComplete()) {
                 Game::Create();
-                RagdollManager::Init();
             }
         }
         // Update/render game

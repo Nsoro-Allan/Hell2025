@@ -14,6 +14,7 @@
 #include "rapidjson/schema.h"
 
 #include "RagdollV2.h"
+#include "UniqueID.h"
 
 inline RdEnum toInputType(std::string type) {
     return type == "Inherit" ? static_cast<short>(RdBehaviour::kInherit) : type == "Kinematic" ? static_cast<short>(RdBehaviour::kKinematic) : static_cast<short>(RdBehaviour::kDynamic);
@@ -50,7 +51,7 @@ inline std::string lastSegment(std::string s) {
 
 namespace RagdollManager {
     std::unordered_map<std::string, RagdollInfo> g_ragdollInfoSet; // Maps RagdollInfo to filename
-    std::vector<RagdollV2> g_ragdolls;
+    std::unordered_map<uint64_t, RagdollV2> g_ragdolls;
     MeshBuffer g_meshBuffer;
 
     void LoadFile(const FileInfo& fileInfo);
@@ -59,17 +60,15 @@ namespace RagdollManager {
     void LoadSolver(RagdollInfo& ragdoll, rapidjson::Document& doc);
 
     void Init() {
+        Logging::Init() << "RagdollManager::Init()";
         for (FileInfo& fileInfo : Util::IterateDirectory("res/", { "rag" })) {
             LoadFile(fileInfo);
         }
+
         SpawnRagdoll(glm::vec3(36, 31, 36), glm::vec3(0.0f, 0.2f, 0.0f), "manikin");
-        SpawnRagdoll(glm::vec3(37, 31, 36), glm::vec3(0.0f, -0.4f, 0.0f), "dobermann");
-
-        std::cout << g_ragdolls.size() << " ragdolls\n";
-        for (RagdollV2& ragdoll : g_ragdolls) {
-            std::cout << "'" << ragdoll.GetRagdollName() << "'\n";
-        }
-
+        SpawnRagdoll(glm::vec3(37, 31, 36), glm::vec3(0.0f, -0.4f, 0.0f), "manikin");
+        //SpawnRagdoll(glm::vec3(37, 31, 36), glm::vec3(0.0f, -0.4f, 0.0f), "dobermann");
+        //Logging::Init() << "RagdollManager::Init()";
     }
 
     void LoadFile(const FileInfo& fileInfo) {
@@ -376,32 +375,45 @@ namespace RagdollManager {
         }
     }
 
-    void SpawnRagdoll(glm::vec3 position, glm::vec3 eulerRotation, const std::string& ragdollName) {
-        RagdollV2& ragdoll = g_ragdolls.emplace_back();
-        ragdoll.Init(position, eulerRotation, ragdollName);
+    uint64_t SpawnRagdoll(glm::vec3 position, glm::vec3 eulerRotation, const std::string& ragdollName) {
+        Logging::Function() << "RagdollManager::SpawnRagdoll()";
+        uint64_t ragdollId = UniqueID::GetNext();
+
+        RagdollV2& ragdoll = g_ragdolls[ragdollId] = RagdollV2();
+        ragdoll.Init(position, eulerRotation, ragdollName, ragdollId);
+        Logging::Debug() << "Created ragdoll '" << ragdollName << "' at " << position << " with id '" << ragdollId << "'";
+
+        return ragdollId;
     }
 
     void AddForce(uint64_t physicsId, glm::vec3 force) {
-        for (RagdollV2& ragdoll : g_ragdolls) {
+        // diirity. fix mee
+        for (auto it = g_ragdolls.begin(); it != g_ragdolls.end(); ) {
+            RagdollV2& ragdoll = it->second;
             ragdoll.AddForce(physicsId, force);
+            it++;
         }
     }
 
-    RagdollInfo* RagdollManager::GetRagdollInfoByName(const std::string& filename) {
+    RagdollInfo* GetRagdollInfoByName(const std::string& filename) {
         auto it = g_ragdollInfoSet.find(filename);
         return it != g_ragdollInfoSet.end() ? &it->second : nullptr;
     }
 
-    RagdollV2* GetRagdollById(uint64_t ragdollId) {
-        //std::cout << "Looking for " << ragdollId << "\n";
-        for (RagdollV2& ragdoll : g_ragdolls) {
-            //std::cout << "-" << ragdoll.GetRagdollId() << "\n";
+    RagdollV2* GetRagdollV2ById(uint64_t ragdollId) {
+        for (auto it = g_ragdolls.begin(); it != g_ragdolls.end(); ) {
+            RagdollV2& ragdoll = it->second;   
             if (ragdoll.GetRagdollId() == ragdollId) {
                 return &ragdoll;
             }
+            it++;
         }
+
+        Logging::Error() << "RagdollManager::GetRagdollById() failed to get by id '" << ragdollId << "'";
         return nullptr;
     }
 
-    std::vector<RagdollV2>& GetRagdolls() { return g_ragdolls; }
+    std::unordered_map<uint64_t, RagdollV2>& GetRagdolls() {
+        return g_ragdolls;
+    }
 }

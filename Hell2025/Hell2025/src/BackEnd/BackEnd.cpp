@@ -24,6 +24,7 @@
 #include "Input/InputMulti.h"
 #include "Modelling/Unused/Modelling.h"
 #include "Physics/Physics.h"
+#include "Ragdoll/RagdollManager.h"
 #include "Renderer/GlobalIllumination.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
@@ -85,6 +86,7 @@ namespace BackEnd {
         Bible::Init();
         Logging::Init() << "Bible::Init()";
 
+
         Input::Init(BackEnd::GetWindowPointer());
         Logging::Init() << "Input::Init()";
 
@@ -111,7 +113,7 @@ namespace BackEnd {
         Logging::Init() << "WeaponManager::Init()";
 
         Physics::Init();
-        Logging::Init() << "Physics::Init()";
+        RagdollManager::Init();
 
         ImGuiBackEnd::Init();
         Logging::Init() << "ImGuiBackEnd::Init()";

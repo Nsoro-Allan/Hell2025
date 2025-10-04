@@ -1,4 +1,5 @@
 #include "Mermaid.h"
+#include "Input/Input.h"
 
 void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
     m_createInfo = createInfo;
@@ -33,6 +34,10 @@ void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
 
 void Mermaid::Update(float deltaTime) {
     UpdateRenderItems();
+
+    //if (Input::KeyDown(HELL_KEY_I)) {
+    //    m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
+    //}
 }
 
 void Mermaid::UpdateRenderItems() {

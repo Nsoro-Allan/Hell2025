@@ -31,7 +31,7 @@ void Kangaroo::UpdateAudio() {
         volume = glm::mix(1.0f, 0.0f, t);
     }
 
-    Audio::SetVolume(m_ambientLoopAudioHandle, volume);
+    Audio::SetVolume(m_ambientLoopAudioHandle, volume * 0.25F);
 
     // Hop steps
     if (m_animationState == KanagarooAnimationState::HOP) {

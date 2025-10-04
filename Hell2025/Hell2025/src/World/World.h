@@ -2,6 +2,7 @@
 #include "HellTypes.h"
 #include "Core/Debug.h"
 #include "Game/Allies/Mermaid/Mermaid.h"
+#include "Game/Enemies/Dobermann/Dobermann.h"
 #include "Game/Enemies/Kangaroo/Kangaroo.h"
 #include "Game/Enemies/Shark/Shark.h"
 #include "Types/Christmas/ChristmasLights.h"
@@ -90,6 +91,7 @@ namespace World {
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset());
     void AddDecal(const DecalCreateInfo& createInfo);
+    void AddDobermann(DobermannCreateInfo& createInfo);
     void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -202,6 +204,7 @@ namespace World {
     std::vector<Decal>& GetDecals();
     std::vector<Drawers>& GetDrawers();
     std::vector<Door>& GetDoors();
+    std::vector<Dobermann>& GetDobermanns();
     std::vector<Fence>& GetFences();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();

@@ -33,6 +33,7 @@ namespace World {
     std::vector<ChristmasTree> g_christmasTrees;
     std::vector<ClippingCube> g_clippingCubes;
     std::vector<Door> g_doors;
+    std::vector<Dobermann> g_dobermanns;
     std::vector<Decal> g_decals;
     std::vector<Drawers> g_drawers;
     std::vector<Fence> g_fences;
@@ -194,31 +195,39 @@ namespace World {
         fence.Init();
 
         GameObjectCreateInfo createInfo2;
-        createInfo2.position = glm::vec3(41.0f, 31.0f, 35.0f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "DobermannTest";
-        AddGameObject(createInfo2);
-        g_gameObjects[0].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
-        g_gameObjects[0].SetMeshMaterial("Iris", "DobermannIris");
-        g_gameObjects[0].SetMeshMaterial("Tongue", "DobermannMouthBlood");
-        g_gameObjects[0].SetMeshMaterial("Jaw", "DobermannMouthBlood");
-
-        createInfo2.position = glm::vec3(37.25f, 31.0f, 35.5f);
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "DobermannTest";
-        AddGameObject(createInfo2);
-        g_gameObjects[1].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
-        g_gameObjects[1].SetMeshMaterial("Iris", "DobermannIris");
-        g_gameObjects[1].SetMeshMaterial("Tongue", "DobermannMouthBlood");
-        g_gameObjects[1].SetMeshMaterial("Jaw", "DobermannMouthBlood");
+        //createInfo2.position = glm::vec3(41.0f, 31.0f, 35.0f);
+        //createInfo2.scale = glm::vec3(1.0f);
+        //createInfo2.modelName = "DobermannTest";
+        //AddGameObject(createInfo2);
+        //g_gameObjects[0].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
+        //g_gameObjects[0].SetMeshMaterial("Iris", "DobermannIris");
+        //g_gameObjects[0].SetMeshMaterial("Tongue", "DobermannMouthBlood");
+        //g_gameObjects[0].SetMeshMaterial("Jaw", "DobermannMouthBlood");
+        //
+        //createInfo2.position = glm::vec3(37.25f, 31.0f, 35.5f);
+        //createInfo2.scale = glm::vec3(1.0f);
+        //createInfo2.modelName = "DobermannTest";
+        //AddGameObject(createInfo2);
+        //g_gameObjects[1].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
+        //g_gameObjects[1].SetMeshMaterial("Iris", "DobermannIris");
+        //g_gameObjects[1].SetMeshMaterial("Tongue", "DobermannMouthBlood");
+        //g_gameObjects[1].SetMeshMaterial("Jaw", "DobermannMouthBlood");
 
         createInfo2.position = glm::vec3(32.45f, 30.52f, 10.22f);
         createInfo2.rotation.y = -HELL_PI * 0.5f;
         createInfo2.scale = glm::vec3(1.0f);
         createInfo2.modelName = "Reflector";
         AddGameObject(createInfo2);
-        g_gameObjects[2].SetMeshMaterial("ReflectorPole", "Fence");
-        g_gameObjects[2].SetMeshMaterial("ReflectorRed", "Red");
+        g_gameObjects[0].SetMeshMaterial("ReflectorPole", "Fence");
+        g_gameObjects[0].SetMeshMaterial("ReflectorRed", "Red");
+
+
+        DobermannCreateInfo dobermannCreateInfo;
+        dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
+        AddDobermann(dobermannCreateInfo);
+        
+        dobermannCreateInfo.position = glm::vec3(37.25f, 31.0f, 35.5f);
+        AddDobermann(dobermannCreateInfo);
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
@@ -802,6 +811,11 @@ namespace World {
         decal.Init(createInfo);
     }
 
+    void AddDobermann(DobermannCreateInfo& createInfo) {
+        Dobermann& dobermann = g_dobermanns.emplace_back();
+        dobermann.Init(createInfo);
+    }
+
     void AddKangaroo(const KangarooCreateInfo& createInfo) {
         Kangaroo& kangaroo = g_kangaroos.emplace_back();
         kangaroo.Init(createInfo);        
@@ -1102,6 +1116,7 @@ namespace World {
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
     std::vector<Door>& GetDoors()                                       { return g_doors; }
+    std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
     std::vector<Fence>& GetFences()                                     { return g_fences; }
     std::vector<Drawers>& GetDrawers()                                  { return g_drawers; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }

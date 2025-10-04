@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include "HellDefines.h"
 #include "HellEnums.h"
+#include "HellLogging.h"
 #include <iostream>
 
 PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0, PxFilterObjectAttributes attributes1, PxFilterData filterData1, PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize) {
@@ -49,6 +50,8 @@ namespace Physics {
     #define PVD_HOST "127.0.0.1"
 
     void Init() {
+        Logging::Init() << "Physics::Init()";
+
         g_foundation = PxCreateFoundation(PX_PHYSICS_VERSION, g_allocator, gErrorCallback);
         g_pvd = physx::PxCreatePvd(*g_foundation);
         physx::PxPvdTransport* transport = physx::PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);

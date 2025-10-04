@@ -113,7 +113,7 @@ void AnimatedGameObject::UpdateBoneTransformsFromRagdoll() {
 }
 
 void AnimatedGameObject::UpdateBoneTransformsFromRagdollV2() {
-    RagdollV2* ragdoll = RagdollManager::GetRagdollById(m_ragdollV2Id);
+    RagdollV2* ragdoll = RagdollManager::GetRagdollV2ById(m_ragdollV2Id);
     if (!ragdoll) return;
     if (!m_skinnedModel) return;
 
@@ -181,9 +181,13 @@ void AnimatedGameObject::Update(float deltaTime) {
             ragdoll->SetRigidGlobalPosesFromAnimatedGameObject(this);
         }
 
-        RagdollV2* ragdollV2 = RagdollManager::GetRagdollById(m_ragdollV2Id);
-        if (ragdollV2) {
-            ragdollV2->SetRigidGlobalPosesFromAnimatedGameObject(this);
+        if (m_ragdollV2Id != 0) {
+            Logging::Debug() << "hello";
+            RagdollV2* ragdollV2 = RagdollManager::GetRagdollV2ById(m_ragdollV2Id);
+            if (ragdollV2) {
+                ragdollV2->SetRigidGlobalPosesFromAnimatedGameObject(this);
+            }
+            Logging::Debug() << "bye";
         }
     }
     //if (m_animationMode != AnimationMode::RAGDOLL_V2) {
@@ -369,7 +373,7 @@ void AnimatedGameObject::SetAnimationModeToRagdoll() {
 }
 
 void AnimatedGameObject::SetAnimationModeToRagdollV2() {
-    RagdollV2* ragdoll = RagdollManager::GetRagdollById(m_ragdollV2Id);
+    RagdollV2* ragdoll = RagdollManager::GetRagdollV2ById(m_ragdollV2Id);
     if (!ragdoll) {
         Logging::Error() << "AnimatedGameObject::SetAnimationModeToRagdollV2() failed because m_ragdollId [" << m_ragdollV2Id << "] was not found in the RagdollManager";
         return;

@@ -22,11 +22,11 @@ inline physx::PxMat44 RdMatrixToPxMat44(const RdMatrix& M) {
     return physx::PxMat44(tmp);
 }
 
-void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, const std::string& ragdollName) {
+void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, const std::string& ragdollName, uint64_t ragdollId) {
     RagdollInfo* ragdollInfo = RagdollManager::GetRagdollInfoByName(ragdollName);
     if (!ragdollInfo) return;
 
-    m_ragdollId = UniqueID::GetNext();
+    m_ragdollId = ragdollId;
     m_scale = ragdollInfo->m_solver.sceneScale;
     m_ragdollName = ragdollName;
     m_spawnTransform.position = spawnPosition;
@@ -286,7 +286,6 @@ void RagdollV2::Update() {
         PxTransform pxTransform = pxRigidDynamic->getGlobalPose();
         PxMat44 pxMatrix(pxTransform);
         glm::mat4 matrix = Physics::PxMat44ToGlmMat4(pxMatrix);
-
         //Renderer::DrawPoint(matrix[3], PINK);
     }
 }

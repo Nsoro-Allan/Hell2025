@@ -71,6 +71,7 @@ namespace Logging {
             case Level::WARNING:    return yellow;
             case Level::FATAL:      return red_fatal;
             case Level::TODO:       return green_lime;
+            case Level::FUNCTION:   return blk_on_br;
             default:                return bwhite;
         }
     }
@@ -83,6 +84,7 @@ namespace Logging {
             case Level::WARNING:    return "WARNING";
             case Level::FATAL:      return "FATAL";
             case Level::TODO:       return "TODO";
+            case Level::FUNCTION:   return "FUNCTION";
         }
         return "UNDEFINED";
     }

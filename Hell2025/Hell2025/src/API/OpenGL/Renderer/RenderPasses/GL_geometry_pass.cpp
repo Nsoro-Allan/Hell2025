@@ -245,20 +245,27 @@ namespace OpenGLRenderer {
                ragdollShader->SetMat4("u_view", viewportData[i].view);
 
                // Ragdoll
-               for (RagdollV2& ragdoll : RagdollManager::GetRagdolls()) {
-                   MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
-                   glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
+               auto& ragdolls = RagdollManager::GetRagdolls();
 
-                   for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
-                       if (meshBuffer.GetIndices().size() == 0) continue;
+               for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
+                   RagdollV2& ragdoll = it->second;
 
-                       Mesh* mesh = meshBuffer.GetMeshByIndex(j);
-                       glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
-                       ragdollShader->SetMat4("u_model", modelMatrix);
-                       ragdollShader->SetVec3("u_color", ragdoll.GetMarkerColorByRigidIndex(j));
+                   if (ragdoll.RenderingEnabled()) {
+                       MeshBuffer& meshBuffer = ragdoll.GetMeshBuffer();
+                       glBindVertexArray(meshBuffer.GetGLMeshBuffer().GetVAO());
 
-                      //glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+                       for (int j = 0; j < meshBuffer.GetMeshCount(); j++) {
+                           if (meshBuffer.GetIndices().size() == 0) continue;
+
+                           Mesh* mesh = meshBuffer.GetMeshByIndex(j);
+                           glm::mat4 modelMatrix = ragdoll.GetModelMatrixByRigidIndex(j);
+                           ragdollShader->SetMat4("u_model", modelMatrix);
+                           ragdollShader->SetVec3("u_color", ragdoll.GetMarkerColorByRigidIndex(j));
+
+                           glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * mesh->baseIndex), mesh->baseVertex);
+                       }
                    }
+                   it++;
                }
            }
        }

@@ -30,6 +30,7 @@
 #include "API/OpenGL/Types/GL_texture_readback.h"
 #include "Tools/ImageTools.h"
 
+#include "HellLogging.h"
 #include "World/World.h"
 
 namespace OpenGLRenderer {
@@ -492,6 +493,8 @@ namespace OpenGLRenderer {
 
 
     void RenderGame() {
+        Logging::Function() << "OpenGLRenderer::RenderGame()";
+
         OpenGLFrameBuffer& gBuffer = g_frameBuffers["GBuffer"];
         OpenGLFrameBuffer& hairFrameBuffer = g_frameBuffers["Hair"];
         OpenGLFrameBuffer& finalImageBuffer = g_frameBuffers["FinalImage"];

@@ -6,7 +6,7 @@
 #include "Types/Game/AnimatedGameObject.h"
 
 struct RagdollV2 {
-    void Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, const std::string& ragdollName);
+    void Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, const std::string& ragdollName, uint64_t ragdollId);
     void CleanUp();
     void Update();
     void DisableSimulation();
@@ -16,9 +16,9 @@ struct RagdollV2 {
 
     bool IsInMotion();
     AABB GetWorldSpaceAABB();
-
     void SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* animatedGameObject);
 
+    bool RenderingEnabled()                   { return m_renderingEnabled; }
     uint64_t GetRagdollId()                     { return m_ragdollId; }
     MeshBuffer& GetMeshBuffer()                 { return m_meshBuffer; }
     const std::string& GetRagdollName() const   { return m_ragdollName; }
@@ -39,4 +39,5 @@ private:
     uint64_t m_ragdollId;
     float m_scale = 1.0f;
     bool m_simulationEnabled = false;
+    bool m_renderingEnabled = true;
 };

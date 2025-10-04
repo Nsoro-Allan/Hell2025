@@ -82,6 +82,11 @@ struct ScreenSpaceBloodDecalCreateInfo {
     int type = 0;
 };
 
+struct DobermannCreateInfo {
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 eulerDirection = glm::vec3(0.0f);
+};
+
 struct MermaidCreateInfo {
     glm::vec3 position;
     glm::vec3 rotation;
