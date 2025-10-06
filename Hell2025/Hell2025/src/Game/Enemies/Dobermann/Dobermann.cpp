@@ -67,16 +67,16 @@ void Dobermann::DisableRagdollRender() {
 
 
 void Dobermann::Update(float deltaTime) {
-    Renderer::DrawPoint(GetPosition(), PINK);
+    //Renderer::DrawPoint(GetPosition(), PINK);
 
-    if (Input::KeyPressed(HELL_KEY_I)) {
-        if (m_renderRagdoll) {        
-            DisableRagdollRender();
-        }
-        else {
-            EnableRagdollRender();
-        }
-    }
+   // if (Input::KeyPressed(HELL_KEY_I)) {
+   //     if (m_renderRagdoll) {        
+   //         DisableRagdollRender();
+   //     }
+   //     else {
+   //         EnableRagdollRender();
+   //     }
+   // }
 }
 
 AnimatedGameObject* Dobermann::GetAnimatedGameObject() {

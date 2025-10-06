@@ -89,6 +89,7 @@ namespace OpenGLRenderer {
     // Utility passes
     void RecalculateAllHeightMapData(bool blitWorldMap);
     void ReadBackHeightMapData(Map* map);
+    void ClearAllWoundMasks();
 
     // Render tasks
     void RenderShadowMaps();
@@ -154,7 +155,7 @@ namespace OpenGLRenderer {
 
     // Drawing
     void MultiDrawIndirect(const std::vector<DrawIndexedIndirectCommand>& commands);
-    void SplitMultiDrawIndirect(OpenGLShader* shader, const std::vector<DrawIndexedIndirectCommand>& commands);
+    void SplitMultiDrawIndirect(OpenGLShader* shader, const std::vector<DrawIndexedIndirectCommand>& commands, bool bindMaterial, bool bindWoundMaterial);
 
     // Util
     void SetViewport(OpenGLFrameBuffer* framebuffer, Viewport* viewport);

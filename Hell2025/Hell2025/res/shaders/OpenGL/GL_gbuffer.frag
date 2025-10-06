@@ -12,12 +12,20 @@
     in flat int BaseColorTextureIndex;
     in flat int NormalTextureIndex;
     in flat int RMATextureIndex;
+    in flat int WoundBaseColorTextureIndex;
+    in flat int WoundNormalTextureIndex;
+    in flat int WoundRMATextureIndex;
 
 #else
     layout (binding = 0) uniform sampler2D baseColorTexture;
     layout (binding = 1) uniform sampler2D normalTexture;
     layout (binding = 2) uniform sampler2D rmaTexture;
+    layout (binding = 3) uniform sampler2D woundBaseColorTexture;
+    layout (binding = 4) uniform sampler2D woundNormalTexture;
+    layout (binding = 5) uniform sampler2D woundRmaTexture;
 #endif
+
+layout (binding = 6) uniform sampler2DArray woundMaskTextureArray;
 
 #include "../common/lighting.glsl"
 #include "../common/post_processing.glsl"
@@ -35,21 +43,12 @@ in vec3 BiTangent;
 in vec4 WorldPos;
 in vec3 ViewPos;
 in vec3 EmissiveColor;
+
 in flat int WoundMaskTextureIndex;
 in flat int BlockScreenSpaceBloodDecalsFlag;
 in flat int EmissiveTextureIndex; 
 
-in flat int WoundBaseColorTextureIndex;  // WARNING! this doens't work when bindless textures are disabled
-in flat int WoundNormalTextureIndex;     // WARNING! this doens't work when bindless textures are disabled
-in flat int WoundRMATextureIndex;        // WARNING! this doens't work when bindless textures are disabled
-
 uniform bool u_alphaDiscard;
-
-//layout (binding = 6) uniform sampler2D woundMaskTexture; // remove me
-layout (binding = 7) uniform sampler2D woundBaseColorTexture;
-layout (binding = 8) uniform sampler2D woundNormalTexture;
-layout (binding = 9) uniform sampler2D woundRmaTexture;
-layout (binding = 10) uniform sampler2DArray woundMaskTextureArray;
 
 void main() {
     vec3 emissiveColor = EmissiveColor;
@@ -63,9 +62,8 @@ void main() {
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
     vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
     vec3 rma = texture2D(rmaTexture, TexCoord).rgb;
-    vec3 emissiveMap = vec3(0, 0, 0);
+    vec3 emissiveMap = vec3(0, 0, 0); // This means no emissive colors in RenderDoc. Fix that!
 #endif
-
 
     // Emissive
     if (EmissiveTextureIndex != -1) {
@@ -84,27 +82,30 @@ void main() {
     vec3 woundNormalMap = vec3(0,0,0);
     vec3 woundRma = vec3(0,0,0);
 
-
     // If this mesh has a wound mask, then sample it
     float woundMask = 0;
     if (WoundMaskTextureIndex != -1) {
+        #if ENABLE_BINDLESS == 1
+            woundBaseColor = texture(sampler2D(textureSamplers[WoundBaseColorTextureIndex]), TexCoord);
+            woundNormalMap = texture(sampler2D(textureSamplers[WoundNormalTextureIndex]), TexCoord).rgb;   
+            woundRma = texture(sampler2D(textureSamplers[WoundRMATextureIndex]), TexCoord).rgb;
+        #else
+            woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
+            woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;
+            woundRma = texture2D(woundRmaTexture, TexCoord).rgb;
+        #endif  
         woundMask  = texture(woundMaskTextureArray, vec3(TexCoord, WoundMaskTextureIndex)).r;        
 
-        //woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
-        //woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;
-        //woundRma = texture2D(woundRmaTexture, TexCoord).rgb;
-
-        woundBaseColor = texture(sampler2D(textureSamplers[WoundBaseColorTextureIndex]), TexCoord);
-        woundNormalMap = texture(sampler2D(textureSamplers[WoundNormalTextureIndex]), TexCoord).rgb;   
-        woundRma = texture(sampler2D(textureSamplers[WoundRMATextureIndex]), TexCoord).rgb;
+        // Hack to make the center of wounds black
+        const float woundK = 0.1;
+        const float woundDarkenStrength = 0.3;
+        const float woundGamma = 0.1;
+        woundMask = clamp(woundMask * 1.25, 0, 1);
+        float t = clamp(pow(woundMask, woundGamma) * woundDarkenStrength, 0.0, 1.0);
+        woundBaseColor.rgb = mix(woundBaseColor.rgb, vec3(0.0), t);
+        woundRma.r = mix(woundRma.r, 0.0, t * 2);
+        woundRma.b = mix(woundRma.b, 0.0, t * 2);
     }
-
-    woundMask *= 2;
-//    woundMask = 1;
-
-   // if (WoundMaskTextureIndex == 0) {
-   //     woundMask = 0;
-   // }
     
     baseColor = mix(baseColor, woundBaseColor, woundMask);
     normalMap = mix(normalMap, woundNormalMap, woundMask);
@@ -114,7 +115,6 @@ void main() {
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
     normalMap = normalize(normalMap);
     vec3 normal = normalize(tbn * (normalMap));
-
 
     BaseColorOut = vec4(baseColor);
     NormalOut = vec4(normal, 1.0);   

@@ -206,6 +206,12 @@ void Player::Respawn() {
     //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
     SetFootPosition(spawnPoint.GetPosition());
 
+    if (m_viewportIndex == 0) {
+
+        SetFootPosition(glm::vec3(36.18, 31, 37.26));
+        m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
+    }
+
     //GetCamera().SetEulerRotation(spawnPoint.m_camEuler);
 
    // else {

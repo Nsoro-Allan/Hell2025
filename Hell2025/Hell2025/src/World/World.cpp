@@ -87,11 +87,11 @@ namespace World {
     void Init() {
         KangarooCreateInfo kangarooCreateInfo;
 
-        kangarooCreateInfo.position = glm::vec3(45, 32.6, 39);
+        kangarooCreateInfo.position = glm::vec3(48, 32.6, 39);
         kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
         AddKangaroo(kangarooCreateInfo);
 
-        kangarooCreateInfo.position = glm::vec3(41.37, 32.6, 40.17);
+        kangarooCreateInfo.position = glm::vec3(48, 32.6, 36);
         kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
         AddKangaroo(kangarooCreateInfo);
 
@@ -198,15 +198,16 @@ namespace World {
         Fence& fence = g_fences.emplace_back();
         fence.Init();
 
-        GameObjectCreateInfo createInfo2;
-        //createInfo2.position = glm::vec3(41.0f, 31.0f, 35.0f);
-        //createInfo2.scale = glm::vec3(1.0f);
-        //createInfo2.modelName = "DobermannTest";
-        //AddGameObject(createInfo2);
-        //g_gameObjects[0].SetMeshMaterial("Dobermann", "DobermannMouthBlood");
-        //g_gameObjects[0].SetMeshMaterial("Iris", "DobermannIris");
-        //g_gameObjects[0].SetMeshMaterial("Tongue", "DobermannMouthBlood");
-        //g_gameObjects[0].SetMeshMaterial("Jaw", "DobermannMouthBlood");
+        GameObjectCreateInfo createInfo;
+        createInfo.position = glm::vec3(40.65f, 31.0f, 34.1f);
+        createInfo.modelName = "Drawers2";
+
+        AddGameObject(createInfo);
+        g_gameObjects[0].SetMeshMaterial("Frame", "T_Main_01a");
+        g_gameObjects[0].SetMeshMaterial("Drawers", "T_Drawers_01a");
+        g_gameObjects[0].SetMeshMaterial("Handles", "T_Handles_01a");
+        g_gameObjects[0].SetMeshMaterial("Key", "T_SmallKey_01a");
+
         //
         //createInfo2.position = glm::vec3(37.25f, 31.0f, 35.5f);
         //createInfo2.scale = glm::vec3(1.0f);
@@ -217,13 +218,13 @@ namespace World {
         //g_gameObjects[1].SetMeshMaterial("Tongue", "DobermannMouthBlood");
         //g_gameObjects[1].SetMeshMaterial("Jaw", "DobermannMouthBlood");
 
-        createInfo2.position = glm::vec3(32.45f, 30.52f, 10.22f);
-        createInfo2.rotation.y = -HELL_PI * 0.5f;
-        createInfo2.scale = glm::vec3(1.0f);
-        createInfo2.modelName = "Reflector";
-        AddGameObject(createInfo2);
-        g_gameObjects[0].SetMeshMaterial("ReflectorPole", "Fence");
-        g_gameObjects[0].SetMeshMaterial("ReflectorRed", "Red");
+        createInfo.position = glm::vec3(32.45f, 30.52f, 10.22f);
+        createInfo.rotation.y = -HELL_PI * 0.5f;
+        createInfo.scale = glm::vec3(1.0f);
+        createInfo.modelName = "Reflector";
+        AddGameObject(createInfo);
+        g_gameObjects[1].SetMeshMaterial("ReflectorPole", "Fence");
+        g_gameObjects[1].SetMeshMaterial("ReflectorRed", "Red");
 
 
         DobermannCreateInfo dobermannCreateInfo;

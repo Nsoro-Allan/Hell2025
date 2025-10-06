@@ -26,6 +26,14 @@ namespace World {
 
     void Update(float deltaTime) {
 
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
+
+            GetGameObjects()[0].SetPosition(Game::GetLocalPlayerByIndex(0)->GetFootPosition());
+            for (Light& light : GetLights()) {
+                light.ForceDirty();
+            }
+        }
+
       //if (g_testAnimatedGameObject == 0) {
       //    g_testAnimatedGameObject = CreateAnimatedGameObject();
       //    AnimatedGameObject* dobermann = GetDobermannTest();

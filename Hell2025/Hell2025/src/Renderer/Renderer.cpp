@@ -163,11 +163,14 @@ namespace Renderer {
 
     void InitWoundMaskArray() {
         // Create and init all wound mask indices to true, aka available
-        g_freeWoundMaskIndices.resize(4);
-        for (int i = 0; i < 4; i++) {
-            g_freeWoundMaskIndices[i] = true;
+        g_freeWoundMaskIndices.assign(WOUND_MASK_TEXTURE_ARRAY_SIZE, true);
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::ClearAllWoundMasks();
         }
-
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan TODO: Renderer::ClearAllWoundMasks()";
+            //VulkanRenderer::ClearAllWoundMasks();
+        }
     }
 
     void MarkWoundMaskIndexAsAvailable(int32_t index) {

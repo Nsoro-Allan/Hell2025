@@ -1,4 +1,5 @@
 #include "Mermaid.h"
+#include "Audio/Audio.h"
 #include "Input/Input.h"
 
 void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -35,9 +36,17 @@ void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
 void Mermaid::Update(float deltaTime) {
     UpdateRenderItems();
 
-    //if (Input::KeyDown(HELL_KEY_I)) {
-    //    m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
-    //}
+    static bool titties = false;
+    if (Input::KeyPressed(HELL_KEY_I)) {
+        titties = !titties;
+        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+    }
+    if (titties) {
+        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
+    }
+    else {
+        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::BLEND_DISABLED);
+    }
 }
 
 void Mermaid::UpdateRenderItems() {

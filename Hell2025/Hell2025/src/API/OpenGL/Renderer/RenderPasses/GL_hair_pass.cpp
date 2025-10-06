@@ -141,7 +141,7 @@ namespace OpenGLRenderer {
                     hairFrameBuffer->DrawBuffer("ViewspaceDepth");
 
                     if (BackEnd::RenderDocFound()) {
-                        SplitMultiDrawIndirect(depthPeelShader, (*drawCommands)[i]);
+                        SplitMultiDrawIndirect(depthPeelShader, (*drawCommands)[i], false, false);
                     }
                     else {
                         MultiDrawIndirect((*drawCommands)[i]);
@@ -163,7 +163,7 @@ namespace OpenGLRenderer {
                     OpenGLRenderer::SetViewport(hairFrameBuffer, viewport);
 
                     if (BackEnd::RenderDocFound()) {
-                        SplitMultiDrawIndirect(hairLightingShader, (*drawCommands)[i]);
+                        SplitMultiDrawIndirect(hairLightingShader, (*drawCommands)[i], true, false);
                     }
                     else {
                         MultiDrawIndirect((*drawCommands)[i]);

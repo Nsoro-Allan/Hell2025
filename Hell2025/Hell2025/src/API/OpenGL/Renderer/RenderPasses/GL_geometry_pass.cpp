@@ -83,20 +83,12 @@ namespace OpenGLRenderer {
             clearIndex = 1;
         }
         if (clearIndex != -1) {
-
             woundMaskArray->Clear(0, 0, 0, 0, clearIndex);
-         //  int baseWidth = woundMaskArray->GetWidth();
-         //  int baseHeight = woundMaskArray->GetHeight();
-         //  const GLubyte black[4] = { 0, 0, 0, 0 };
-         //  int layer = clearIndex;
-         //  int mipmapLevel = 0;
-         //  int w = std::max(1, baseWidth >> mipmapLevel);
-         //  int h = std::max(1, baseHeight >> mipmapLevel);
-         //  glClearTexSubImage(woundMaskArray->GetHandle(), mipmapLevel, 0, 0, layer, w, h, 1, GL_RGBA, GL_UNSIGNED_BYTE, black);
-         //  std::cout << "Cleared " << clearIndex << "\n";
+        }
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_2)) {
+            ClearAllWoundMasks();
         }
         
-
         gBuffer->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition" });
 
@@ -109,32 +101,16 @@ namespace OpenGLRenderer {
         SetRasterizerState("GeometryPass_NonBlended");
 
         OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
-        //glActiveTexture(GL_TEXTURE6);
-        //glBindTexture(GL_TEXTURE_2D, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"));
-        glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_ALB")->GetGLTexture().GetHandle());
-        glActiveTexture(GL_TEXTURE8);
-        glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_NRM")->GetGLTexture().GetHandle());
-        glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooBlood_RMA")->GetGLTexture().GetHandle());
-        glActiveTexture(GL_TEXTURE10);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D_ARRAY, woundMaskArray->GetHandle());
   
-
-        //glActiveTexture(GL_TEXTURE7);
-        //glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooFlesh_ALB")->GetGLTexture().GetHandle());
-        //glActiveTexture(GL_TEXTURE8);
-        //glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooFlesh_NRM")->GetGLTexture().GetHandle());
-        //glActiveTexture(GL_TEXTURE9);
-        //glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("KangarooFlesh_RMA")->GetGLTexture().GetHandle());
-
         // Non blended
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
                 if (BackEnd::RenderDocFound()) {
-                    SplitMultiDrawIndirect(shader, drawInfoSet.geometry[i]);
+                    SplitMultiDrawIndirect(shader, drawInfoSet.geometry[i], true, false);
                 }
                 else {
                     MultiDrawIndirect(drawInfoSet.geometry[i]);
@@ -148,7 +124,7 @@ namespace OpenGLRenderer {
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
                 if (BackEnd::RenderDocFound()) {
-                    SplitMultiDrawIndirect(shader, drawInfoSet.geometryAlphaDiscarded[i]);
+                    SplitMultiDrawIndirect(shader, drawInfoSet.geometryAlphaDiscarded[i], true, false);
                 }
                 else {
                     MultiDrawIndirect(drawInfoSet.geometryAlphaDiscarded[i]);
@@ -165,7 +141,7 @@ namespace OpenGLRenderer {
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
                 if (BackEnd::RenderDocFound()) {
-                    SplitMultiDrawIndirect(shader, drawInfoSet.geometryBlended[i]);
+                    SplitMultiDrawIndirect(shader, drawInfoSet.geometryBlended[i], true, false);
                 }
                 else {
                     MultiDrawIndirect(drawInfoSet.geometryBlended[i]);
@@ -186,16 +162,13 @@ namespace OpenGLRenderer {
            if (viewport->IsVisible()) {
                OpenGLRenderer::SetViewport(gBuffer, viewport);
                if (BackEnd::RenderDocFound()) {
-                   SplitMultiDrawIndirect(shader, drawInfoSet.skinnedGeometry.perViewport[i]);
+                   SplitMultiDrawIndirect(shader, drawInfoSet.skinnedGeometry.perViewport[i], true, true);
                }
                else {
                    MultiDrawIndirect(drawInfoSet.skinnedGeometry.perViewport[i]);
                }
            }
        }
-
-        // Render Christmas lights
-       //const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 
        OpenGLShader* christmasLightWireShader = GetShader("ChristmasLightsWire");
        christmasLightWireShader->Bind();
@@ -234,8 +207,6 @@ namespace OpenGLRenderer {
        ragdollShader->Bind();
        SetRasterizerState("GeometryPass_NonBlended");
 
-
-
        for (int i = 0; i < 4; i++) {
            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
            if (viewport->IsVisible()) {
@@ -272,75 +243,7 @@ namespace OpenGLRenderer {
            }
        }
 
-//
-//
-//   OpenGLShader* shader2 = GetShader("GBuffer_DEBUG");
-//   shader2->Bind();
-//   gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
-//   SetRasterizerState("GeometryPass_NonBlended");
-//
-//   glBindVertexArray(OpenGLBackEnd::GetSkinnedVertexDataVAO());
-//   glBindBuffer(GL_ARRAY_BUFFER, OpenGLBackEnd::GetSkinnedVertexDataVBO());
-//   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, OpenGLBackEnd::GetWeightedVertexDataEBO());
-//
-//   glFinish();
-//   for (int i = 0; i < 4; i++) {
-//       Viewport* viewport = ViewportManager::GetViewportByIndex(i);
-//       if (viewport->IsVisible()) {
-//           OpenGLRenderer::SetViewport(gBuffer, viewport);
-//
-//           const std::vector<RenderItem>& instanceData = RenderDataManager::GetInstanceData();
-//
-//           auto commands = drawInfoSet.skinnedGeometry.perViewport[i];
-//
-//           for (const DrawIndexedIndirectCommand& command : commands) {
-//               int viewportIndex = command.baseInstance >> VIEWPORT_INDEX_SHIFT;
-//               int instanceOffset = command.baseInstance & ((1 << VIEWPORT_INDEX_SHIFT) - 1);
-//
-//               for (GLuint j = 0; j < command.instanceCount; ++j) {
-//                   const RenderItem& renderItem = instanceData[instanceOffset + j];
-//
-//                   shader2->SetInt("u_viewportIndex", viewportIndex);
-//                   shader2->SetInt("u_globalInstanceIndex", instanceOffset + j);
-//                   shader2->SetMat4("u_modelMatrix", renderItem.modelMatrix);
-//                   shader2->SetMat4("u_inverseModelMatrix", renderItem.inverseModelMatrix);
-//
-//                   SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(renderItem.meshIndex);
-//
-//
-//
-//                   std::cout << "[" << i << "] instance: " << j;
-//                   std::cout << " count: " << command.instanceCount << "";
-//                   std::cout << " viewportIndex: " << renderItem.exclusiveViewportIndex << "";
-//                   std::cout << " meshIdx: " << renderItem.meshIndex << " " << mesh->name << "\n";
-//
-//
-//                   glActiveTexture(GL_TEXTURE0);
-//                   glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.baseColorTextureIndex)->GetGLTexture().GetHandle());
-//                   glActiveTexture(GL_TEXTURE1);
-//                   glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.normalMapTextureIndex)->GetGLTexture().GetHandle());
-//                   glActiveTexture(GL_TEXTURE2);
-//                   glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.rmaTextureIndex)->GetGLTexture().GetHandle());
-//
-//                   glDrawElementsBaseVertex(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (GLvoid*)(command.firstIndex * sizeof(GLuint)), command.baseVertex);
-//               }
-//           }
-//
-//
-//           //if (BackEnd::RenderDocFound()) {
-//           //    SplitMultiDrawIndirect(shader2, drawInfoSet.skinnedGeometry.perViewport[i]);
-//           //}
-//           //else {
-//           //    MultiDrawIndirect(drawInfoSet.skinnedGeometry.perViewport[i]);
-//           //}
-//       }
-//   }
-//
-//   std::cout << " \n";
-
-        glBindVertexArray(0);
-
-        
+       glBindVertexArray(0);  
     }
 }
 

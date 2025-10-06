@@ -48,16 +48,6 @@ namespace OpenGLRenderer {
             glm::vec3 bulletOrigin = decalPaintingInfo.rayOrigin;
             glm::vec3 bulletDir = -decalPaintingInfo.rayDirection; // FIND OUT WHY THIS NEEDS TO BE NEGATED
 
-        //    glm::vec3 bulletOrigin = viewportData[0].viewPos;
-        //    glm::vec3 bulletDir = viewportData[0].cameraForward;
-
-         // std::cout << "viewportData[0].viewPos: " << viewportData[0].viewPos << "\n";
-         // std::cout << "viewportData[0].cameraForward: " << viewportData[0].cameraForward << "\n";
-         // std::cout << "\n";
-         // std::cout << "decalPaintingInfo.rayOrigin: " << decalPaintingInfo.rayOrigin << "\n";
-         // std::cout << "decalPaintingInfo.rayDirection: " << decalPaintingInfo.rayDirection << "\n";
-         // std::cout << "\n";
-
             glm::vec3 eye = bulletOrigin;
             glm::vec3 forward = glm::normalize(bulletDir);
             glm::vec3 worldUp = glm::vec3(0, 1, 0);
@@ -77,17 +67,11 @@ namespace OpenGLRenderer {
 
             projectionView = proj * view;
 
-            RenderDataManager::GetAnimatedGameObjectToSkin();
-
-
-
             std::vector<RenderItem>& skinnedRenderItems = World::GetSkinnedRenderItems();
 
             for (const RenderItem& renderItem : skinnedRenderItems) {
 
                 if (renderItem.woundMaskTexutreIndex != -1) {
-
-
                     decalPaintingFBO->ClearTexImage("UVMap", 0, 0, 0, 1);
 
                     glClear(GL_DEPTH_BUFFER_BIT);
@@ -108,18 +92,15 @@ namespace OpenGLRenderer {
 
                     std::cout << "Decal Texture Painting into index " << renderItem.woundMaskTexutreIndex << " and the mesh name is " << mesh->name << "\n";
 
-
                     // Compute pass to paint the actual decal into the appropriate wound mask texture array index
                     maskShader->Bind();
                     maskShader->SetInt("u_layerIndex", renderItem.woundMaskTexutreIndex);
-                    //glBindImageTexture(0, decalMasksFBO->GetColorAttachmentHandleByName("DecalMask0"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
-                    glBindImageTexture(1, woundMaskArray->GetHandle(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8);
+                    glBindImageTexture(1, woundMaskArray->GetHandle(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8);
                     glActiveTexture(GL_TEXTURE1);
                     glBindTexture(GL_TEXTURE_2D, decalPaintingFBO->GetColorAttachmentHandleByName("UVMap"));
                     glActiveTexture(GL_TEXTURE2);
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByName("Decal_Wound0")->GetGLTexture().GetHandle());
                     glDispatchCompute((decalPaintingFBO->GetWidth() + 7) / 8, (decalPaintingFBO->GetHeight() + 7) / 8, 1);
-
                 }
             }
 

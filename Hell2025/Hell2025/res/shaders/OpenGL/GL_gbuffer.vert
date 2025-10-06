@@ -33,6 +33,9 @@ out vec3 EmissiveColor;
 out flat int BaseColorTextureIndex;
 out flat int NormalTextureIndex;
 out flat int RMATextureIndex;
+out flat int WoundBaseColorTextureIndex;
+out flat int WoundNormalTextureIndex;
+out flat int WoundRMATextureIndex;
 #else
 uniform int u_viewportIndex;
 uniform int u_globalInstanceIndex;
@@ -42,9 +45,6 @@ out flat int EmissiveTextureIndex; // WARNING! this doens't work when bindless t
 out flat int WoundMaskTextureIndex;
 out flat int BlockScreenSpaceBloodDecalsFlag;
 
-out flat int WoundBaseColorTextureIndex;  // WARNING! this doens't work when bindless textures are disabled
-out flat int WoundNormalTextureIndex;     // WARNING! this doens't work when bindless textures are disabled
-out flat int WoundRMATextureIndex;        // WARNING! this doens't work when bindless textures are disabled
 
 void main() {
 
