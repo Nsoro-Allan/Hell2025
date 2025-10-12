@@ -60,7 +60,7 @@ enum class TextureFilter {
     UNDEFINED
 };
 
-enum class ObjectType {
+enum class ObjectType : uint16_t {
     NONE = 0,
     CHARACTER_CONTROLLER,
     DECAL,
@@ -76,7 +76,7 @@ enum class ObjectType {
     LIGHT,
     PICK_UP,
     TREE,
-    UNDEFINED,
+    OPENABLE,
     PIANO,
     PIANO_KEY,
     PIANO_KEYBOARD_COVER,
@@ -94,7 +94,9 @@ enum class ObjectType {
     TOILET_LID,
     WALL,
     WALL_SEGMENT,
-    WINDOW
+    WINDOW,
+
+    UNDEFINED
 };
 
 enum class Axis {

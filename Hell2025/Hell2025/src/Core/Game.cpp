@@ -108,6 +108,7 @@ namespace Game {
             player.Update(g_deltaTime);
         }
 
+        OpenableManager::Update(g_deltaTime);
         World::Update(g_deltaTime);
 
         // Physics

@@ -443,9 +443,9 @@
                 ]
             ],
             "TextureOffsetU": 0.0,
-            "TextureOffsetV": -0.2,
+            "TextureOffsetV": -0.20000000298023224,
             "TextureRotation": 0.0,
-            "TextureScale": 0.4,
+            "TextureScale": 0.4000000059604645,
             "TrimTypeCeiling": "TIMBER",
             "TrimTypeFloor": "TIMBER",
             "UseReversePointOrder": false,
@@ -548,7 +548,7 @@
             ],
             "Rotation": [
                 0.0,
-                4.712389024096079,
+                4.71238899230957,
                 0.0
             ]
         }

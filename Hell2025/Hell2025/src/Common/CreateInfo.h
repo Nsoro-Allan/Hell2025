@@ -249,8 +249,15 @@ struct MapCreateInfo {
 };
 
 struct CreateInfoCollection {
+    std::vector<DoorCreateInfo> doors;
+    std::vector<PlaneCreateInfo> planes;
+    std::vector<LightCreateInfo> lights;
+    std::vector<PianoCreateInfo> pianos;
     std::vector<PickUpCreateInfo> pickUps;
+    std::vector<PictureFrameCreateInfo> pictureFrames;
     std::vector<TreeCreateInfo> trees;
+    std::vector<WallCreateInfo> walls;
+    std::vector<WindowCreateInfo> windows;
 };
 
 struct AdditionalMapData {

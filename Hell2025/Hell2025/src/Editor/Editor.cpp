@@ -11,6 +11,7 @@
 #include "Imgui/ImguiBackEnd.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
+#include "Managers/HouseManager.h"
 #include "Managers/MapManager.h"
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
@@ -35,7 +36,8 @@ namespace Editor {
     ShadingMode g_shadingModes[4];
     EditorViewportSplitMode g_editorViewportSplitMode = EditorViewportSplitMode::SINGLE;
     Axis g_axisConstraint = Axis::NONE;
-    
+
+    std::string g_editorHouseName = UNDEFINED_STRING;
     std::string g_editorMapName = UNDEFINED_STRING;
 
     float g_orthoCameraDistances[4];
@@ -50,6 +52,65 @@ namespace Editor {
         InitMapHeightEditor();
         InitHouseEditor();
     }
+
+    void OpenEditor() {
+        Audio::PlayAudio("UI_Select.wav", 1.0f);
+        Editor::SetEditorState(EditorState::IDLE);
+        Editor::ResetAxisConstraint();
+        Input::ShowCursor();
+        Input::CenterMouseCursor();
+
+        // Load default map
+        if (GetEditorMapName() != "Shit") {
+            SetEditorMapName("Shit");
+        }
+
+        // Load default house
+        if (GetEditorHouseName() != "TestHouse") {
+            SetEditorHouseName("TestHouse");
+        }
+
+        g_isOpen = true;
+    }
+
+    void CloseEditor() {
+        Audio::PlayAudio("UI_Select.wav", 1.0f);
+        Input::DisableCursor();
+
+        UnselectAnyObject();
+        SetHoveredObjectType(ObjectType::NONE);
+        SetHoveredObjectId(0);
+
+        if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
+            // Update the house file with everything in the world
+            HouseManager::UpdateCreateInfoCollectionFromWorld(Editor::GetEditorHouseName());
+
+            // Reload the single editor house
+            World::ClearAllObjects();
+            World::LoadSingleHouse(Editor::GetEditorHouseName());
+        }
+        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
+            // Reload everything from the editor map file
+            Renderer::RecalculateAllHeightMapData(false);
+            World::ClearAllObjects();
+            World::LoadMapInstanceObjects(Editor::GetEditorMapName(), SpawnOffset());
+            World::LoadMapInstanceHouses(Editor::GetEditorMapName(), SpawnOffset());
+            World::RecreateHouseMesh();
+        }
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            // Update the map file with everything in the world
+            MapManager::UpdateCreateInfoCollectionFromWorld(Editor::GetEditorMapName());
+
+            // Reload everything from the editor map file, except the heightmap
+            World::ClearAllObjects();
+            World::LoadMapInstanceObjects(Editor::GetEditorMapName(), SpawnOffset());
+            World::LoadMapInstanceHouses(Editor::GetEditorMapName(), SpawnOffset());
+            World::RecreateHouseMesh();
+        }
+
+        g_isOpen = false;
+    }
+
 
     void ResetViewports() {
 
@@ -90,24 +151,11 @@ namespace Editor {
     }
 
     void Update(float deltaTime) {
-
-        // Toggle editor
-        if (Input::KeyPressed(HELL_KEY_J)) {
+        // Close editor
+        if (Input::KeyPressed(HELL_KEY_TAB)) {
+            InputMulti::ClearKeyStates();
             Audio::PlayAudio(AUDIO_SELECT, 1.0f);
-            Editor::ToggleEditorOpenState();
-        }
-
-        if (Input::KeyPressed(HELL_KEY_F1)) {
-            Callbacks::NewRun();
-        }
-        if (Input::KeyPressed(HELL_KEY_F4)) {
-            Callbacks::OpenHouseEditor();
-        }
-        if (Input::KeyPressed(HELL_KEY_F6)) {
-            Callbacks::OpenMapHeightEditor();
-        }
-        if (Input::KeyPressed(HELL_KEY_F5)) {
-            Callbacks::OpenMapObjectEditor();
+            CloseEditor();
         }
 
         if (!IsOpen()) {
@@ -155,55 +203,45 @@ namespace Editor {
                 std::cout << "single\n";
             }
         }
-    }
 
-    void OpenEditor() {
-        std::cout << "Entered editor\n";
-        Audio::PlayAudio("UI_Select.wav", 1.0f);
-        Input::ShowCursor();
-        Input::CenterMouseCursor();
+        // Draw grid and spawn points
+        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR || GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            float h = 30.0f;
+            float w = World::GetWorldSpaceWidth();
+            float d = World::GetWorldSpaceDepth();
 
-        Editor::SetEditorState(EditorState::IDLE);
-        Editor::ResetAxisConstraint();
+            // Draw perimeter
+            glm::vec3 p0 = glm::vec3(0.0f, h, 0.0f);
+            glm::vec3 p1 = glm::vec3(w, h, 0.0f);
+            glm::vec3 p2 = glm::vec3(0.0f, h, d);
+            glm::vec3 p3 = glm::vec3(w, h, d);
+            Renderer::DrawLine(p0, p1, GRID_COLOR, true);
+            Renderer::DrawLine(p0, p2, GRID_COLOR, true);
+            Renderer::DrawLine(p2, p3, GRID_COLOR, true);
+            Renderer::DrawLine(p1, p3, GRID_COLOR, true);
 
-        g_isOpen = true;
-    }
+            // Draw spawn points as little dots
+            Map* map = MapManager::GetMapByName(GetEditorMapName());
+            if (map) {
+                for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerCampaignSpawns) {
+                    Renderer::DrawPoint(spawnPoints.GetPosition(), GREEN);
+                }
+                for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerDeathmatchSpawns) {
+                    Renderer::DrawPoint(spawnPoints.GetPosition(), YELLOW);
+                }
+            }
 
-    void CloseEditor() {
-        Audio::PlayAudio("UI_Select.wav", 1.0f);
-        Input::DisableCursor();
-
-        UnselectAnyObject();
-        SetHoveredObjectType(ObjectType::NONE);
-        SetHoveredObjectId(0);
-
-        if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
-            // nothing as of yet
+            // Draw cubes around spawn points
+            for (SpawnPoint& spawnPoint : World::GetCampaignSpawnPoints()) {
+                spawnPoint.DrawDebugCube();
+            }
         }
-        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
-            Renderer::RecalculateAllHeightMapData(false);
-        } 
-        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
-            // nothing as of yet
-        }
-
-        MapManager::UpdateCreateInfoCollectionFromWorld("Shit");
-        World::ClearAllObjects();
-        World::LoadMapInstanceObjects("Shit", SpawnOffset());
-
-        g_isOpen = false;
     }
 
     void ToggleEditorOpenState() {
         g_isOpen = !g_isOpen;
         if (g_isOpen) {
             OpenEditor();
-            switch (GetEditorMode()) {
-                case EditorMode::HOUSE_EDITOR:      OpenHouseEditor();      break;
-                case EditorMode::MAP_HEIGHT_EDITOR: OpenMapHeightEditor();  break;
-                case EditorMode::MAP_OBJECT_EDITOR: OpenMapObjectEditor();  break;
-                default:                            OpenMapObjectEditor();  break;
-            }
         }
         else {
             CloseEditor();
@@ -420,8 +458,16 @@ namespace Editor {
         CloseAllMapObjectEditorWindows();
     }
 
+    void SetEditorHouseName(const std::string& houseName) {
+        g_editorHouseName = houseName;
+    }
+
     void SetEditorMapName(const std::string& mapName) {
         g_editorMapName = mapName;
+    }
+
+    const std::string& GetEditorHouseName() {
+        return g_editorHouseName;
     }
 
     const std::string& GetEditorMapName() {

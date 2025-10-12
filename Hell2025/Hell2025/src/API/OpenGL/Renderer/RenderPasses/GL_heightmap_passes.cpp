@@ -80,7 +80,6 @@ namespace OpenGLRenderer {
         if (!shader) return;
         if (!worldFramebuffer) return;
 
-
         int textureWidth = (World::GetChunkCountX() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
         int textureHeight = (World::GetChunkCountZ() * HEIGHT_MAP_CHUNK_PIXEL_SIZE) + 1;
 

@@ -48,7 +48,7 @@ namespace World {
                 // Did you hit a dobermann?
                 for (Dobermann& dobermann : GetDobermanns()) {
                     if (objectId == dobermann.GetRagdollV2Id()) {
-                        //dobermann.TakeDamage(bullet.GetDamage());
+                        dobermann.TakeDamage(bullet.GetDamage());
                     }
 
                     // Find a way to abstract this a bit nicer

@@ -54,6 +54,7 @@ namespace Util {
     float GetSphereVolume(float radius);
     float GetCapsuleVolume(float radius, float halfHeight);
     AABB GetAABBFromPoints(std::vector<glm::vec3>& points);
+    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b, float eps);
     bool IsPointInTriangle2D(const glm::vec2& pt, const glm::vec2& v0, const glm::vec2& v1, const glm::vec2& v2);
     std::vector<glm::vec3> GetBeizerPointsFromControlPoints(const std::vector<glm::vec3>& controlPoints, float spacing);
     bool HoveredLine(glm::ivec2 mouseCoords, glm::ivec2 p1, glm::ivec2 p2, float threshold);

@@ -1,6 +1,7 @@
 #include "AssetManager.h"
 #include "Bvh/Cpu/CpuBvh.h"
 #include "File/AssimpImporter.h"
+#include "HellLogging.h"
 #include "Util/Util.h"
 #include <future>
 
@@ -216,7 +217,7 @@ namespace AssetManager {
         if (it != modelIndexMap.end()) {
             return it->second;
         }
-        std::cout << "AssetManager::GetModelIndexByName() failed because name '" << name << "' was not found in g_models!\n";
+        Logging::Error() << "AssetManager::GetModelIndexByName() failed because name '" << name << "' was not found in g_models!";
         return -1;
     }
 

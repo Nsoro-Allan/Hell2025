@@ -35,6 +35,35 @@ namespace Editor {
     void InitMapObjectEditorPropertiesElements();
     void ReconfigureMapObjectEditorImGuiElements();
 
+    void OpenMapObjectEditor() {
+        // If it's closed, open it
+        if (IsClosed()) {
+            OpenEditor();
+        }
+        // If it's already open, do nothing
+        else if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            return;
+        }
+        SetEditorMode(EditorMode::MAP_OBJECT_EDITOR);
+
+        // World state
+        MapInstanceCreateInfo mapInstanceCreateInfo;
+        mapInstanceCreateInfo.mapName = Editor::GetEditorMapName();
+        mapInstanceCreateInfo.spawnOffsetChunkX = 0;
+        mapInstanceCreateInfo.spawnOffsetChunkZ = 0;
+        World::ClearAllObjects();
+        World::LoadMapInstancesHeightMapData({ mapInstanceCreateInfo });
+        World::LoadMapInstanceObjects(Editor::GetEditorMapName(), SpawnOffset());
+        World::EnableOcean();
+
+        // Init UI
+        InitFileMenuImGuiElements();
+        InitLeftPanel();
+        ReconfigureMapObjectEditorImGuiElements();
+
+        Audio::PlayAudio(AUDIO_SELECT, 1.0f);
+    }
+
     void InitMapObjectEditor() {
         InitMapObjectEditorFileMenu();
         InitMapObjectEditorPropertiesElements();
@@ -150,57 +179,8 @@ namespace Editor {
         elements.openFileWindow.Close();
     }
 
-    void OpenMapObjectEditor() {
-        if (IsClosed()) {
-            OpenEditor();
-        }
-        
-        if (GetEditorMode() != EditorMode::MAP_OBJECT_EDITOR) {
-            SetEditorMode(EditorMode::MAP_OBJECT_EDITOR);
-
-            if (GetEditorMapName() != "Shit") {
-                SetEditorMapName("Shit");
-                World::LoadMapInstance("Shit");
-            }
-
-            InitFileMenuImGuiElements();
-            InitLeftPanel();
-            ReconfigureMapObjectEditorImGuiElements();
-
-            Audio::PlayAudio(AUDIO_SELECT, 1.0f);
-        }
-    }
-
     void UpdateMapObjectEditor() {
-        float h = 30.0f;
-        float w = World::GetWorldSpaceWidth();
-        float d = World::GetWorldSpaceDepth();
-
-        // Draw perimeter
-        glm::vec3 p0 = glm::vec3(0.0f, h, 0.0f);
-        glm::vec3 p1 = glm::vec3(w, h, 0.0f);
-        glm::vec3 p2 = glm::vec3(0.0f, h, d);
-        glm::vec3 p3 = glm::vec3(w, h, d);
-        Renderer::DrawLine(p0, p1, GRID_COLOR, true);
-        Renderer::DrawLine(p0, p2, GRID_COLOR, true);
-        Renderer::DrawLine(p2, p3, GRID_COLOR, true);
-        Renderer::DrawLine(p1, p3, GRID_COLOR, true);
-
-        // Draw spawn points as little dots
-        Map* map = MapManager::GetMapByName(GetEditorMapName());
-        if (map) {
-            for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerCampaignSpawns) {
-                Renderer::DrawPoint(spawnPoints.GetPosition(), GREEN);
-            }
-            for (SpawnPoint& spawnPoints : map->GetAdditionalMapData().playerDeathmatchSpawns) {
-                Renderer::DrawPoint(spawnPoints.GetPosition(), YELLOW);
-            }
-        }
-
-        // Draw cubes around spawn points
-        for (SpawnPoint& spawnPoint : World::GetCampaignSpawnPoints()) {
-            spawnPoint.DrawDebugCube();
-        }
+        // Nothing as of yet
     }
 }
 

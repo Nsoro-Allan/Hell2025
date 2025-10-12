@@ -291,6 +291,44 @@ namespace OpenGLRenderer {
         DrawLine(FrontBottomRight, BackBottomRight, color);
     }
 
+    void DrawCircle(const glm::vec3 center, float radius, const glm::vec3 axisU, const glm::vec3 axisV, int segments, const glm::vec3 color) {
+        const float step = glm::two_pi<float>() / float(segments);
+        glm::vec3 prev = center + radius * axisU;
+        for (int i = 1; i <= segments; ++i) {
+            float a = step * float(i);
+            glm::vec3 p = center + radius * (axisU * cos(a) + axisV * sin(a));
+            DrawLine(prev, p, color);
+            prev = p;
+        }
+    }
+
+    void DrawSphere(glm::vec3 position, float radius, glm::vec3 color) {
+        const int numLongitudes = 12;
+        const int numLatitudes = 8;
+        const int segsPerCircle = 96;
+
+        const glm::vec3 up = glm::vec3(0, 1, 0);
+        glm::vec3 right = glm::vec3(1, 0, 0);
+        glm::vec3 axisA = glm::normalize(glm::cross(up, right));
+        glm::vec3 axisB = glm::normalize(glm::cross(up, axisA));
+
+        // Longitudes
+        for (int m = 0; m < numLongitudes; ++m) {
+            float theta = glm::two_pi<float>() * float(m) / float(numLongitudes);
+            glm::vec3 dir = axisA * cos(theta) + axisB * sin(theta);
+            DrawCircle(position, radius, up, dir, segsPerCircle, color);
+        }
+
+        // Latitudes
+        for (int j = 1; j < numLatitudes; ++j) {
+            float t = float(j) / float(numLatitudes);
+            float phi = glm::pi<float>() * (t - 0.5f);
+            float z = radius * sin(phi);
+            float r = radius * cos(phi);
+            DrawCircle(position + up * z, r, axisA, axisB, segsPerCircle, color);
+        }
+    }
+
     void UpdateDebugMesh() {
         g_debugMeshPoints.UpdateVertexData(g_points);
         g_debugMeshDepthAwarePoints.UpdateVertexData(g_pointsDepthAware);

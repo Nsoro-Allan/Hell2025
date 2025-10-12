@@ -23,7 +23,6 @@ namespace World {
     
 
 
-
     void Update(float deltaTime) {
 
         if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
@@ -32,6 +31,10 @@ namespace World {
             for (Light& light : GetLights()) {
                 light.ForceDirty();
             }
+        }
+
+        if (Input::KeyPressed(HELL_KEY_J)) {
+            PrintObjectCounts();
         }
 
       //if (g_testAnimatedGameObject == 0) {

@@ -14,7 +14,6 @@
 #include "Audio/Synth.h"
 #include "Core/Bible.h"
 #include "Core/Debug.h"
-#include "Core/OpenStateHandlerManager.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "Editor/Gizmo.h"
@@ -22,6 +21,8 @@
 #include "ImGui/ImGuiBackend.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
+#include "Managers/OpenableManager.h"
+#include "Managers/HouseManager.h"
 #include "Modelling/Unused/Modelling.h"
 #include "Physics/Physics.h"
 #include "Ragdoll/RagdollManager.h"
@@ -31,7 +32,6 @@
 #include "UI/UIBackEnd.h"
 #include "Viewport/ViewportManager.h"
 #include "Weapon/WeaponManager.h"
-#include "World/HouseManager.h"
 #include "World/World.h"
 
 #include "GLFWIntegration.h"
@@ -151,10 +151,13 @@ namespace BackEnd {
         float deltaTime = Game::GetDeltaTime();
 
         ViewportManager::Update();
-        Editor::Update(deltaTime);
+
+        if (Editor::IsOpen()) {
+            Editor::Update(deltaTime);
+        }
+    
         AStarMap::Update();
         Game::Update();
-        OpenStateHandlerManager::Update(deltaTime);
 
         Physics::UpdateAllRigidDynamics(deltaTime);
         Physics::UpdateActiveRigidDynamicAABBList();
@@ -340,6 +343,19 @@ namespace BackEnd {
         //      return;
         //}
 
+        if (Input::KeyPressed(HELL_KEY_F1)) {
+            Callbacks::NewRun();
+        }
+        if (Input::KeyPressed(HELL_KEY_F4)) {
+            Callbacks::OpenHouseEditor();
+        }
+        if (Input::KeyPressed(HELL_KEY_F6)) {
+            Callbacks::OpenMapHeightEditor();
+        }
+        if (Input::KeyPressed(HELL_KEY_F5)) {
+            Callbacks::OpenMapObjectEditor();
+        }
+
         if (Input::KeyPressed(HELL_KEY_K)) {
             Game::RespawnPlayers();
         }
@@ -401,8 +417,8 @@ namespace BackEnd {
             }
         }
 
-        if (Input::KeyPressed(HELL_KEY_F11)) {
-            HouseManager::LoadAllHouseFilesFromDisk();
-        }
+        //if (Input::KeyPressed(HELL_KEY_F11)) {
+        //    HouseManager::LoadAllHouseFilesFromDisk();
+        //}
     }
 }

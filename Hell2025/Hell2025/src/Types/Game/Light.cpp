@@ -41,7 +41,7 @@ Light::Light(LightCreateInfo createInfo) {
         }
     }
 
-    m_objectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
 }
 
 void Light::Update(float deltaTime) {
@@ -83,6 +83,13 @@ void Light::UpdateDirtyState() {
         }
     }
 
+    // Drawers
+    for (Drawers& drawers: World::GetDrawers()) {
+        if (drawers.MovedThisFrame()) {
+            m_dirty = true;
+            return;
+        }
+    }
 
     bool m_renderEnabled = true;
 

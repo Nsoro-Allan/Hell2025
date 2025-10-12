@@ -24,7 +24,7 @@ namespace OpenGLRenderer {
         OpenGLShader* shader = GetShader("ShadowMap");
         OpenGLShadowMap* shadowMapsFBO = GetShadowMap("FlashlightShadowMaps");
         OpenGLHeightMapMesh& heightMapMesh = OpenGLBackEnd::GetHeightMapMesh();
-        const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
+        //const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         const FlashLightShadowMapDrawInfo& flashLightShadowMapDrawInfo = RenderDataManager::GetFlashLightShadowMapDrawInfo();
         
         glm::mat4 heightMapModelMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(HEIGHTMAP_SCALE_XZ, HEIGHTMAP_SCALE_Y, HEIGHTMAP_SCALE_XZ)); // move to heightmap manager

@@ -1,8 +1,35 @@
 #pragma once
-#include <string>
-#include <filesystem>
-#include <unordered_map>
+#include "Physics/Physics.h"
 #include "magnum/MagnumMath.hpp"
+#include <filesystem>
+#include <string>
+#include <unordered_map>
+
+enum struct RdBehaviour {
+    kInherit,
+    kKinematic,
+    kDynamic,
+};
+
+enum struct RdConvexDecomposition {
+    Off,
+    MeshIslands,
+    Automatic
+};
+
+enum struct RdGeometryType {
+    kBox,
+    kSphere,
+    kCapsule,
+    kConvexHull
+};
+
+enum struct RdMotion {
+    RdMotionInherit,
+    RdMotionLocked,
+    RdMotionLimited,
+    RdMotionFree
+};
 
 using RdMatrix3 = Magnum::Math::Matrix3<double>;
 using RdMatrix = Magnum::Math::Matrix4<double>;
@@ -19,9 +46,7 @@ using RdDegrees = Magnum::Math::Deg<double>;
 using RdDegreesF = Magnum::Math::Deg<float>;
 using RdRadians = Magnum::Math::Rad<double>;
 using RdRadiansF = Magnum::Math::Rad<float>;
-using RdColorHsv = Magnum::Math::ColorHsv<float>;
-using RdColorHex = unsigned int;
-using RdPlane = Magnum::Math::Vector4<double>;
+using RdColor = Magnum::Math::Color4<float>;
 using RdBoolean = bool;
 using RdInteger = int;
 using RdUint = unsigned int;
@@ -45,24 +70,16 @@ using RdEdges = std::vector<RdEdge>;
 using RdPoint = RdVector;
 using RdReference = void*;
 
+using RdPoints = std::vector<RdPoint>;
+using RdVectors = std::vector<RdVector>;
+using RdIntegers = std::vector<RdInteger>;
+using RdIndices = std::vector<RdIndex>;
+using RdColors = std::vector<RdColor>;
+using RdUints = std::vector<RdUint>;
+using RdPaths = std::vector<RdPath>;
+using RdStrings = std::vector<RdString>;
+
 inline auto RdIdentityInit = Magnum::Math::IdentityInit;
-
-enum class RdBehaviour : short {
-    kInherit = 0,
-    kKinematic = 2,
-    kDynamic = 3,
-};
-
-enum RdStatus : RdEnum {
-    kSuccess = 0,
-    kFailure,
-    kInvalid,
-    kDisabled,
-    kUninitialised,
-    kIgnored,
-    kSceneError,
-    kClean,
-};
 
 struct RdEulerRotation : public RdVector {
     enum RotateOrder : RdEnum {
@@ -72,83 +89,14 @@ struct RdEulerRotation : public RdVector {
 
     using RdVector::RdVector;
 
-    /**
-     * @brief Return the rotation as a quaternion
-     *
-     */
     RdQuaternion asQuaternion() const {
-        //assert(rotateOrder == eXYZ && "Unsupported rotate order");
         return RdQuaternion::rotation((RdRadians)this->z(), RdVector::zAxis()) *
             RdQuaternion::rotation((RdRadians)this->y(), RdVector::yAxis()) *
             RdQuaternion::rotation((RdRadians)this->x(), RdVector::xAxis());
     }
 
-    /**
-     * @brief Return rotation as an RdMatrix
-     *
-     */
     RdMatrix asMatrix() const {
         return RdMatrix(this->asQuaternion().toMatrix());
-    }
-};
-
-// Alias
-using RdEuler = RdEulerRotation;
-
-class RdColor : public Magnum::Math::Color4<float> {
-public:
-    // Inherit the base Color4<float> constructors
-    using Magnum::Math::Color4<float>::Color4;
-    static RdColor fromHex(RdColorHex color) {
-        static const float s = 1.0f / 255.0f;
-        return {
-            ((color >> 0) & 0xFF) * s,
-            ((color >> 8) & 0xFF) * s,
-            ((color >> 16) & 0xFF) * s,
-            ((color >> 24) & 0xFF) * s
-        };
-    }
-
-    static RdColorHex toHex(RdColor color) {
-        // Ensure the values are within the range [0.0, 1.0]
-        auto rf = std::min(1.0f, std::max(0.0f, color.r()));
-        auto gf = std::min(1.0f, std::max(0.0f, color.g()));
-        auto bf = std::min(1.0f, std::max(0.0f, color.b()));
-        auto af = std::min(1.0f, std::max(0.0f, color.a()));
-
-        // Convert to the range [0, 255]
-        uint8_t r = static_cast<uint8_t>(rf * 255.0f);
-        uint8_t g = static_cast<uint8_t>(gf * 255.0f);
-        uint8_t b = static_cast<uint8_t>(bf * 255.0f);
-        uint8_t a = static_cast<uint8_t>(af * 255.0f);
-
-        RdColorHex out = (a << 24) | (b << 16) | (g << 8) | r;
-        return out;
-    }
-
-    RdColor operator*(const float other) const {
-        return _multHelper(other);
-    }
-
-    RdColor operator*(const RdScalar other) const {
-        return *this * static_cast<float>(other);
-    }
-
-    RdColor& operator*=(const float other) {
-        *this = _multHelper(other);
-        return *this;
-    }
-
-    RdColor& operator*=(const RdScalar other) {
-        *this *= static_cast<float>(other);
-        return *this;
-    }
-
-private:
-    inline RdColor _multHelper(float factor) const {
-        const auto [hue, sat, val] = toHsv();
-        const RdColorHsv hsv{ hue, sat, std::min(1.0f, val * factor) };
-        return RdColor::fromHsv(hsv);
     }
 };
 
@@ -161,107 +109,115 @@ inline RdEulerRotation toEulerRotation(const RdQuaternion& quat) {
     );
 }
 
-inline RdEulerRotation RdToEulerRotation(const RdQuaternion& quat) { return toEulerRotation(quat); }
-
-#include <type_traits>
-
-template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
-constexpr E operator~(E e) {
-    using U = std::underlying_type_t<E>;
-    return static_cast<E>(~static_cast<U>(e));
-}
-template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
-constexpr E operator|(E a, E b) {
-    using U = std::underlying_type_t<E>;
-    return static_cast<E>(static_cast<U>(a) | static_cast<U>(b));
-}
-template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
-constexpr E operator&(E a, E b) {
-    using U = std::underlying_type_t<E>;
-    return static_cast<E>(static_cast<U>(a) & static_cast<U>(b));
-}
-template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
-constexpr E& operator|=(E& a, E b) { return a = (a | b); }
-template<typename E, std::enable_if_t<std::is_enum_v<E>, int> = 0>
-constexpr E& operator&=(E& a, E b) { return a = (a & b); }
-
-template<typename T>
-void setBit(T& value, T bit, bool state = true) {
-    if (state) value = static_cast<T>(value | bit);
-    else value = static_cast<T>(value & (~bit));
+inline RdEulerRotation RdToEulerRotation(const RdQuaternion& quat) { 
+    return toEulerRotation(quat); 
 }
 
-template<typename T>
-bool hasBit(const T value, const T bit) {
-    return (static_cast<int>(value) & static_cast<int>(bit)) != 0;
+inline RdQuaternion RdEulerToRdQuaternion(const RdEulerRotation& euler) {
+    return RdQuaternion::rotation((RdRadians)euler.z(), RdVector::zAxis()) *
+           RdQuaternion::rotation((RdRadians)euler.y(), RdVector::yAxis()) *
+           RdQuaternion::rotation((RdRadians)euler.x(), RdVector::xAxis());
 }
 
-using RdPoints = std::vector<RdPoint>;
-using RdVectors = std::vector<RdVector>;
-using RdIntegers = std::vector<RdInteger>;
-using RdIndices = std::vector<RdIndex>;
-using RdColors = std::vector<RdColor>;
-using RdFrames = std::vector<RdFrame>;
-using RdUints = std::vector<RdUint>;
-using RdPaths = std::vector<RdPath>;
-using RdStrings = std::vector<RdString>;
-using RdPlanes = std::vector<RdPlane>;
-using RdInts = RdIntegers; // Shorthand, unused?
+inline PxQuat RdEulerToPxQuat(RdEulerRotation euler) {
+    const RdQuaternion quat = RdEulerToRdQuaternion(euler);
+    const RdVector vec = quat.vector();
+    return PxQuat(
+        static_cast<float>(vec.x()),
+        static_cast<float>(vec.y()),
+        static_cast<float>(vec.z()),
+        static_cast<float>(quat.scalar())
+    );
+}
 
-struct RdMesh {
-    RdPoints      vertices;
-    RdUints       indices;
-    RdVectors     normals;
-    RdColors      colors;
-
-    // A unqiue and persistent ID for each index,
-    // used for skinning whereby existing vertices retain
-    // an original ID when other vertices change. Unlike
-    // the `indices` vector which is more or less random
-    RdIntegers    vertexIds;
-};
-
-constexpr float FLT_MAX_{ 1e+37f };
-constexpr int   INT_MAX_{ 2147483647 };
-
-enum RdMotion : RdEnum {
-    RdMotionInherit = -1,
-    RdMotionLocked,
-    RdMotionLimited,
-    RdMotionFree
-};
-
-enum RdGeometryType : short {
-    kBox = 0,
-    kSphere = 1,
-    kCapsule = 2,
-    kCylinder = 3,
-    kConvexHull = 4,
-    kMesh = 4,        // Alias for convex hull
-    kPlane = 5,
-    kTaperedCapsule = 6,
-    kCSphere = 7,
-    kLast
-};
-
-struct RdBoundingBox {
-    RdPoint minPos{ 0, 0, 0 };
-    RdPoint maxPos{ 0, 0, 0 };
-
-    bool operator==(const RdBoundingBox& other) const {
-        return (minPos == other.minPos) && (maxPos == other.maxPos);
+inline const RdString RdConvexDecompositionTypeToString(RdConvexDecomposition convexDecomposition) {
+    switch (convexDecomposition) {
+        case RdConvexDecomposition::Off:           return "Off";
+        case RdConvexDecomposition::MeshIslands:   return "MeshIslands";
+        case RdConvexDecomposition::Automatic:     return "Automatic";
+        default:                                   return "Unknown";
     }
+}
 
-    bool operator!=(const RdBoundingBox& other) const {
-        return !(*this == other);
+inline const RdString RdGeometryTypeToString(RdGeometryType type) {
+    switch (type) {
+        case RdGeometryType::kBox:          return "Box";
+        case RdGeometryType::kSphere:       return "Sphere";
+        case RdGeometryType::kCapsule:      return "Capsule";
+        case RdGeometryType::kConvexHull:   return "ConvexHull";
+        default:                            return "Unknown";
     }
+}
+
+inline const RdString RdMotionToString(RdMotion motion) {
+    switch (motion) {
+        case RdMotion::RdMotionInherit:     return "RdMotionInherit";
+        case RdMotion::RdMotionLocked:      return "RdMotionLocked";
+        case RdMotion::RdMotionLimited:     return "RdMotionLimited";
+        case RdMotion::RdMotionFree:        return "RdMotionFree";
+        default:                            return "Unknown";
+    }
+}
+inline RdConvexDecomposition StringToRdConvexDecomposition(const RdString& str) {
+    if (str == "Off")                   return RdConvexDecomposition::Off;
+    if (str == "MeshIslands")           return RdConvexDecomposition::MeshIslands;
+    if (str == "Automatic")             return RdConvexDecomposition::Automatic;
+    return RdConvexDecomposition::Off;
+}
+
+inline RdGeometryType StringToRdGeometryType(const RdString& str) {
+    if (str == "Box")                   return RdGeometryType::kBox;
+    if (str == "Sphere")                return RdGeometryType::kSphere;
+    if (str == "Capsule")               return RdGeometryType::kCapsule;
+    if (str == "ConvexHull")            return RdGeometryType::kConvexHull;
+    return RdGeometryType::kSphere;
+}
+
+inline RdMotion StringToRdMotion(const RdString& str) {
+    if (str == "Inherit")               return RdMotion::RdMotionInherit;
+    if (str == "Locked")                return RdMotion::RdMotionLocked;
+    if (str == "Limited")               return RdMotion::RdMotionLimited;
+    if (str == "Free")                  return RdMotion::RdMotionFree;
+    return RdMotion::RdMotionLocked;
+}
+
+inline glm::mat4 RdMatrixToGlmMat4(const RdMatrix& matrix) {
+    glm::mat4 result(1.0f);
+    for (int r = 0; r < 4; ++r) {
+        for (int c = 0; c < 4; ++c) {
+            result[c][r] = matrix[c][r];
+        }
+    }
+    return result;
 };
 
-inline RdMotion StringToMotion(const RdString& s) {
-    if (s == "Inherit") return RdMotionInherit;
-    if (s == "Locked")  return RdMotionLocked;
-    if (s == "Limited") return RdMotionLimited;
-    if (s == "Free")    return RdMotionFree;
-    // sensible default for ragdolls
-    return RdMotionLocked;
+inline physx::PxMat44 RdMatrixToPxMat44(const RdMatrix& matrix) {
+    float result[16];
+    for (int c = 0; c < 4; ++c)
+        for (int r = 0; r < 4; ++r)
+            result[c * 4 + r] = static_cast<float>(matrix[c][r]);
+
+    return physx::PxMat44(result);
+}
+
+inline std::ostream& operator<<(std::ostream& os, const RdMatrix& matrix) {
+    os.setf(std::ios::fixed, std::ios::floatfield);
+    os << std::setprecision(6);
+    for (int r = 0; r < 4; ++r) {
+        os << '[';
+        for (int c = 0; c < 4; ++c) {
+            os << matrix[c][r]; // Magnum matrices are column major
+            if (c < 3) os << ' ';
+        }
+        os << ']';
+        if (r < 3) os << '\n';
+    }
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const RdVector& v) {
+    os.setf(std::ios::fixed, std::ios::floatfield);
+    os << std::setprecision(6)
+        << '[' << v[0] << ' ' << v[1] << ' ' << v[2] << ']';
+    return os;
 }

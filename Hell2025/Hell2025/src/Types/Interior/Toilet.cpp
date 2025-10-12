@@ -24,7 +24,7 @@ Toilet::Toilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
         Mesh* mesh = AssetManager::GetMeshByIndex(m_meshNodes.m_globalMeshIndices[i]);
         if (!mesh) continue;
 
-        m_meshNodes.m_objectIds[i] = UniqueID::GetNext();
+        m_meshNodes.m_objectIds[i] = UniqueID::GetNextGlobal();
 
         if (mesh->GetName() == "Body") {
             m_meshNodes.m_materialIndices[i] = materialIndex;

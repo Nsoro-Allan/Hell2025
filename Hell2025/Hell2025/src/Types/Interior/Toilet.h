@@ -1,6 +1,6 @@
 #pragma once
 #include "CreateInfo.h"
-#include "Handlers/OpenHandler.h"
+#include "Handlers/Openable.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 
@@ -17,8 +17,8 @@ struct Toilet {
     const std::vector<RenderItem>& GetRenderItems() const { return m_meshNodes.GetRenderItems(); }
     const MeshNodes& GetMeshNodes() const                 { return m_meshNodes; }
 
-    OpenStateHandler m_lidOpenHandler;
-    OpenStateHandler m_seatOpenHandler;
+    Openable m_lidOpenHandler;
+    Openable m_seatOpenHandler;
 
 private:
     ToiletCreateInfo m_createInfo;

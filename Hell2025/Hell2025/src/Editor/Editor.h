@@ -104,14 +104,6 @@ namespace Editor {
 
     std::vector<std::string> GetTreeNames();
 
-    //void InitMapEditor();
-    void OpenMapEditor();
-    //void UpdateMapEditor();
-    
-    
-    //void CloseAllMapEditorWindows();
-    //void CreateMapEditorImGuiElements();
-
     // Sector Editor
     void InitMapObjectEditor();
     void OpenMapObjectEditor();
@@ -166,12 +158,10 @@ namespace Editor {
     EditorMode& GetEditorMode();
     Axis GetAxisConstraint();
 
+    void SetEditorHouseName(const std::string& houseName);
     void SetEditorMapName(const std::string& mapName);
+    const std::string& GetEditorHouseName();
     const std::string& GetEditorMapName();
-
-    // Saving/Loading
-    //void SaveSector();
-    //void LoadSectorFromDisk(const std::string& sectorName);
 
     // Dividers
     bool IsVerticalDividerHovered();

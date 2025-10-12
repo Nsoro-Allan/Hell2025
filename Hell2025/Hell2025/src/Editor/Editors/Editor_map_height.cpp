@@ -47,6 +47,34 @@ namespace Editor {
     void InitMapHeightEditorPropertiesElements();
     void ReconfigureMapHeightEditorImGuiElements();
 
+    void OpenMapHeightEditor() {
+        // If it's closed, open it
+        if (IsClosed()) {
+            OpenEditor();
+        }
+        // If it's already open, do nothing
+        else if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
+            return;
+        }
+        SetEditorMode(EditorMode::MAP_HEIGHT_EDITOR);
+
+        // World state
+        MapInstanceCreateInfo mapInstanceCreateInfo;
+        mapInstanceCreateInfo.mapName = Editor::GetEditorMapName();
+        mapInstanceCreateInfo.spawnOffsetChunkX = 0;
+        mapInstanceCreateInfo.spawnOffsetChunkZ = 0;
+        World::ClearAllObjects();
+        World::LoadMapInstancesHeightMapData({ mapInstanceCreateInfo });
+        World::EnableOcean();
+
+        // Init UI
+        InitFileMenuImGuiElements();
+        InitLeftPanel();
+        ReconfigureMapHeightEditorImGuiElements();
+
+        Audio::PlayAudio(AUDIO_SELECT, 1.0f);
+    }
+
     void InitMapHeightEditor() {
         InitMapHeightEditorPropertiesElements();
     }
@@ -183,68 +211,8 @@ namespace Editor {
         }
     }
 
-    void OpenMapHeightEditor() {
-        if (IsClosed()) {
-            OpenEditor();
-        }
-
-        if (GetEditorMode() != EditorMode::MAP_HEIGHT_EDITOR) {
-            SetEditorMode(EditorMode::MAP_HEIGHT_EDITOR);
-
-            if (GetEditorMapName() != "Shit") {
-                SetEditorMapName("Shit");
-                World::LoadMapInstance("Shit");
-            }
-
-            InitFileMenuImGuiElements();
-            InitLeftPanel();
-            ReconfigureMapHeightEditorImGuiElements();
-
-            Audio::PlayAudio(AUDIO_SELECT, 1.0f);
-        }
-    }
-
     void UpdateMapHeightEditor() {
-        int mapWidth = World::GetWorldSpaceWidth();
-        int mapDepth = World::GetWorldSpaceDepth();
-
-        int viewportIndex = Editor::GetHoveredViewportIndex();
-        const Viewport* viewport = ViewportManager::GetViewportByIndex(viewportIndex);
-        const glm::vec3 rayOrigin = Editor::GetMouseRayOriginByViewportIndex(viewportIndex);
-        const glm::vec3 rayDir = Editor::GetMouseRayDirectionByViewportIndex(viewportIndex);
-
-        ivecXZ hovered = ivecXZ(-1, -1);
-
-        // Draw grid and check for mouse hover
-        for (int x = 0; x < mapWidth; x++) {
-            for (int z = 0; z < mapDepth; z++) {
-                glm::vec3 p0 = glm::vec3((x + 0) * 64.0f, 0.0f, (z + 0) * 64.0f);
-                glm::vec3 p1 = glm::vec3((x + 0) * 64.0f, 0.0f, (z + 1) * 64.0f);
-                glm::vec3 p2 = glm::vec3((x + 1) * 64.0f, 0.0f, (z + 0) * 64.0f);
-                glm::vec3 p3 = glm::vec3((x + 1) * 64.0f, 0.0f, (z + 1) * 64.0f);
-                float t = 0;
-                if (Util::RayIntersectsTriangle(rayOrigin, rayDir, p0, p1, p2, t) ||
-                    Util::RayIntersectsTriangle(rayOrigin, rayDir, p1, p3, p2, t)) {
-                    hovered = ivecXZ(x, z);
-                }
-                Renderer::DrawLine(p0, p1, GRID_COLOR, true);
-                Renderer::DrawLine(p0, p2, GRID_COLOR, true);
-                Renderer::DrawLine(p2, p3, GRID_COLOR, true);
-                Renderer::DrawLine(p1, p3, GRID_COLOR, true);
-            }
-        }
-
-        // Draw hovered
-        if (hovered != ivecXZ(-1, -1)) {
-            glm::vec3 p0 = glm::vec3((hovered.x + 0) * 64.0f, 0.0f, (hovered.z + 0) * 64.0f);
-            glm::vec3 p1 = glm::vec3((hovered.x + 0) * 64.0f, 0.0f, (hovered.z + 1) * 64.0f);
-            glm::vec3 p2 = glm::vec3((hovered.x + 1) * 64.0f, 0.0f, (hovered.z + 0) * 64.0f);
-            glm::vec3 p3 = glm::vec3((hovered.x + 1) * 64.0f, 0.0f, (hovered.z + 1) * 64.0f);
-            Renderer::DrawLine(p0, p1, WHITE, true);
-            Renderer::DrawLine(p0, p2, WHITE, true);
-            Renderer::DrawLine(p2, p3, WHITE, true);
-            Renderer::DrawLine(p1, p3, WHITE, true);
-        }
+        // Nothing as of yet
     }
 
     void ShowNewMapWindow() {

@@ -1,6 +1,6 @@
 #pragma once
 #include "HellTypes.h"
-#include "Handlers/OpenHandler.h"
+#include "Handlers/Openable.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 #include <unordered_map>
@@ -12,13 +12,11 @@ struct PianoKey {
     float m_xRotation = 0;
     float m_yTranslation = 0;
     bool m_isSharp = false;
-    //glm::mat4 m_localOffsetMatrix = glm::mat4(1.0f);
     float m_timeRemaining = 0.0f;
     bool m_sustain = false;
     std::string m_meshName = "";
 
     void Update(float deltaTime);
-    //void UpdateWorldSpaceCenter(glm::mat4 parentPianoModelMatrix);
     void PressKey(int velocity = 127, float duration = 0.05f);
 
     enum struct State {
@@ -38,9 +36,9 @@ struct Piano {
     void TriggerInternalNoteFromExternalBulletHit(glm::vec3 bulletHitPositon);
     void CalculatePianoKeyWorldspaceCenters();
 
-    OpenStateHandler m_keyboardCoverOpenHandler;
-    OpenStateHandler m_topCoverOpenHandler;
-    OpenStateHandler m_sheetMusicRestOpenHandler;
+    Openable m_keyboardCoverOpenHandler;
+    Openable m_topCoverOpenHandler;
+    Openable m_sheetMusicRestOpenHandler;
 
     void InteractWithKeyboardCover();
     void InteractWithTopCover();

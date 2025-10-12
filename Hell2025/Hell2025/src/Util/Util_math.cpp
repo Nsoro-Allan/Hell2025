@@ -511,4 +511,10 @@ namespace Util {
         return points;
     }
 
+    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b, float eps) {
+        for (int c = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                if (glm::abs(a[c][r] - b[c][r]) > eps) return false;
+        return true;
+    }
 }

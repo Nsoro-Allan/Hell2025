@@ -154,14 +154,15 @@ namespace MapManager {
         map.SetCreateInfoCollection(createInfoCollection);
         map.SetAdditionalMapData(additionalMapData);
 
-        // Logging::Debug()
-        //     << "Loaded map: " << mapName << "\n"
-        //     << "- signature:     " << header.signature << "\n"
-        //     << "- version:       " << header.version << "\n"
-        //     << "- chunk count x: " << header.chunkCountX << "\n"
-        //     << "- chunk count z: " << header.chunkCountZ << "\n"
-        //     << createInfoJson << "\n"
-        //     << additionalJson;
+        Logging::Debug()
+            << "Loaded map: " << mapName << ".map\n"
+            //<< "- signature:     " << header.signature << "\n"
+            //<< "- version:       " << header.version << "\n"
+            //<< "- chunk count x: " << header.chunkCountX << "\n"
+            //<< "- chunk count z: " << header.chunkCountZ << "\n"
+            //<< createInfoJson << "\n"
+            //<< additionalJson;
+            << "";
 
         return;
     }
@@ -169,7 +170,7 @@ namespace MapManager {
     void UpdateCreateInfoCollectionFromWorld(const std::string& mapName) {
         Map* map = GetMapByName(mapName);
         if (!map) {
-            Logging::Error() << "UpdateCreateInfoCollectionFromWorld(): failed because '" << mapName << "' was not found.";
+            Logging::Error() << "MapManager::UpdateCreateInfoCollectionFromWorld(): failed because '" << mapName << "' was not found.";
             return;
         }
 

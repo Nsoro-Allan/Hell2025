@@ -2,7 +2,6 @@
 #include "HellTypes.h"
 
 struct MapInstance {
-
     uint32_t m_mapIndex = 0;
     int32_t spawnOffsetChunkX = 0;
     int32_t spawnOffsetChunkZ = 0;

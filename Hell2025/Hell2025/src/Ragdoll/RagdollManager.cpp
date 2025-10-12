@@ -14,6 +14,7 @@
 #include "rapidjson/schema.h"
 
 #include "RagdollV2.h"
+#include "Ragdoll_util.h"
 #include "UniqueID.h"
 
 inline RdEnum toInputType(std::string type) {
@@ -65,7 +66,7 @@ namespace RagdollManager {
             LoadFile(fileInfo);
         }
 
-        SpawnRagdoll(glm::vec3(36, 31, 36), glm::vec3(0.0f, 0.2f, 0.0f), "manikin");
+        SpawnRagdoll(glm::vec3(36, 31, 36), glm::vec3(0.0f, 0.2f, 0.0f), "manikin2");
         SpawnRagdoll(glm::vec3(37, 31, 36), glm::vec3(0.0f, -0.4f, 0.0f), "manikin");
         //SpawnRagdoll(glm::vec3(37, 31, 36), glm::vec3(0.0f, -0.4f, 0.0f), "dobermann");
         //Logging::Init() << "RagdollManager::Init()";
@@ -86,14 +87,6 @@ namespace RagdollManager {
         LoadSolver(ragdollInfo, doc);
         LoadMarkers(ragdollInfo, doc);
         LoadJoints(ragdollInfo, doc);
-
-        //if (fileInfo.name == "dobermann") {
-        //    for (RagdollMarker& marker : ragdollInfo.m_markers) {
-        //        ragdollInfo.PrintMarkerInfo(marker);
-        //    }
-        //}
-        //ragdollInfo.PrintSolverInfo();
-        //Logging::Debug() << "Loaded " << fileInfo.path << "\n";
     }
 
 
@@ -142,33 +135,31 @@ namespace RagdollManager {
             if (registry.has(entity, "SolverComponent")) continue;
             if (!registry.has(entity, "MarkerUIComponent")) continue;
 
-            JsonComponent NameComponent = registry.get(entity, "NameComponent");
-            RdString name = NameComponent.getString("value");
-            JsonComponent ScaleComponent = registry.get(entity, "ScaleComponent");
-            JsonComponent RestComponent = registry.get(entity, "RestComponent");
-            RdMatrix mtx = RestComponent.getMatrix("matrix");
-
-            RdMatrix originMtx{ RdIdentityInit };
-            if (registry.has(entity, "OriginComponent")) {
-                auto OriginComponent = registry.get(entity, "OriginComponent");
-                originMtx = OriginComponent.getMatrix("matrix");
-            }
-            else {
-                // Otherwise it's safe to assume  the rest matrix
-                originMtx = mtx;
-            }
-
-            JsonComponent geometryDescription = registry.get(entity, "GeometryDescriptionComponent");
-            JsonComponent convexMesh = registry.get(entity, "ConvexMeshComponents");
             JsonComponent color = registry.get(entity, "ColorComponent");
+            JsonComponent convexMesh = registry.get(entity, "ConvexMeshComponents");
+            JsonComponent geometryDescription = registry.get(entity, "GeometryDescriptionComponent");
+            JsonComponent markerUI = registry.get(entity, "MarkerUIComponent");
+            JsonComponent nameComponent = registry.get(entity, "NameComponent");
+            JsonComponent restComponent = registry.get(entity, "RestComponent");
+            JsonComponent rigid = registry.get(entity, "RigidComponent");
+            JsonComponent scaleComponent = registry.get(entity, "ScaleComponent");
+            JsonComponent sceneComponent = registry.get(entity, "SceneComponent");
             JsonComponent subs = registry.get(entity, "SubEntitiesComponent");
+
             RdString relEntity = subs.getEntity("relative");
             JsonComponent limit = registry.get(relEntity, "LimitComponent");
-            JsonComponent rigid = registry.get(entity, "RigidComponent");
             JsonComponent drive = registry.get(relEntity, "DriveComponent");
             JsonComponent joint = registry.get(relEntity, "JointComponent");
-            JsonComponent markerUI = registry.get(entity, "MarkerUIComponent");
-            JsonComponent sceneComponent = registry.get(entity, "SceneComponent");
+
+            RdMatrix originMatrix{ RdIdentityInit };
+            if (registry.has(entity, "OriginComponent")) {
+                JsonComponent originComponent = registry.get(entity, "OriginComponent");
+                originMatrix = originComponent.getMatrix("matrix");
+            }
+            else {
+                // Otherwise it's safe to assume the rest matrix
+                originMatrix = restComponent.getMatrix("matrix");
+            }
 
             bool isKinematic = false;
             bool enableCCD = false;
@@ -188,79 +179,63 @@ namespace RagdollManager {
             if (rigid.has("friction"))          friction = rigid.getFloat("friction");
             if (rigid.has("restitution"))       restitution = rigid.getFloat("restitution");
 
-            if (geometryDescription.has("convexDecomposition")) Logging::ToDo() << "You haven't implemented convexDecomposition parsing, apparently you need it";
-             
+            RdGeometryDescriptionComponent geometryDescriptionComponent;
+            geometryDescriptionComponent.type = StringToRdGeometryType(geometryDescription.getString("type"));
+            geometryDescriptionComponent.extents = geometryDescription.getVector("extents");
+            geometryDescriptionComponent.offset = geometryDescription.getVector("offset");
+            geometryDescriptionComponent.rotation = RdToEulerRotation(geometryDescription.getQuaternion("rotation"));
+            geometryDescriptionComponent.radius = geometryDescription.getFloat("radius");
+            geometryDescriptionComponent.length = geometryDescription.getFloat("length");
+
+            if (geometryDescription.has("convexDecomposition")) {
+                geometryDescriptionComponent.convexDecomposition = StringToRdConvexDecomposition(geometryDescription.getString("convexDecomposition"));
+            }
+
             if (isKinematic) {
-                Logging::Debug() << "Skipping ground marker";
+                // Skip the ground marker
                 continue;
             }
 
-            RagdollMarker& ragdollMarker = ragdoll.m_markers.emplace_back();
-            ragdollMarker.name = name;
-            ragdollMarker.inputMatrix = mtx;
-            ragdollMarker.originMatrix = originMtx;
-            ragdollMarker.parentFrame = joint.getMatrix("parentFrame");
-            ragdollMarker.childFrame = joint.getMatrix("childFrame");
-            ragdollMarker.shapeType = geometryDescription.getString("type");
-            ragdollMarker.limitRange = { limit.getFloat("twist"), limit.getFloat("swing1"), limit.getFloat("swing2") };
-            ragdollMarker.extents = geometryDescription.getVector("extents");
-            ragdollMarker.shapeOffset = geometryDescription.getVector("offset");
-            ragdollMarker.shapeRadius = geometryDescription.getFloat("radius");
-            ragdollMarker.shapeLength = geometryDescription.getFloat("length");
-            ragdollMarker.shapeRotation = RdToEulerRotation(geometryDescription.getQuaternion("rotation"));
-            ragdollMarker.convexMeshVertices = convexMesh.getPoints("vertices");
-            ragdollMarker.convexMeshIndices = convexMesh.getUints("indices");
-            ragdollMarker.driveSlerp = drive.getBoolean("slerp");
-            ragdollMarker.driveSpringType = (int)drive.getBoolean("acceleration");
-            ragdollMarker.mass = markerUI.getFloat("mass");
-            ragdollMarker.linearStiffness = markerUI.getFloat("linearStiffness");
-            ragdollMarker.linearDampingRatio = markerUI.getFloat("linearDampingRatio");
-            ragdollMarker.angularStiffness = markerUI.getFloat("angularStiffness");
-            ragdollMarker.angularDampingRatio = markerUI.getFloat("angularDampingRatio");
-            ragdollMarker.inputType = toInputType(markerUI.getString("inputType"));
-            ragdollMarker.collisionGroup = markerUI.getInteger("collisionGroup");
-            ragdollMarker.useRootStiffness = markerUI.getBoolean("useRootStiffness", false);
-            ragdollMarker.useLinearAngularStiffness = markerUI.getBoolean("useLinearAngularStiffness");
-            ragdollMarker.color = color.getColor("value");
-            ragdollMarker.contactStiffness = contactStiffness;
-            ragdollMarker.contactDamping = contactDamping;
-            ragdollMarker.friction = friction;
-            ragdollMarker.restitution = restitution;
-            ragdollMarker.isKinematic = isKinematic;
-            ragdollMarker.enableCCD = enableCCD;
+            RagdollMarker& marker = ragdoll.m_markers.emplace_back();
+            marker.name = nameComponent.getString("value");
+            marker.inputMatrix = restComponent.getMatrix("matrix");
+            marker.originMatrix = originMatrix;
+            marker.parentFrame = joint.getMatrix("parentFrame");
+            marker.childFrame = joint.getMatrix("childFrame");
+            marker.limitRange = { limit.getFloat("twist"), limit.getFloat("swing1"), limit.getFloat("swing2") };
+            marker.convexMeshVertices = convexMesh.getPoints("vertices");
+            marker.convexMeshIndices = convexMesh.getUints("indices");
+            marker.driveSlerp = drive.getBoolean("slerp");
+            marker.driveSpringType = (int)drive.getBoolean("acceleration");
+            marker.mass = markerUI.getFloat("mass");
+            marker.linearStiffness = markerUI.getFloat("linearStiffness");
+            marker.linearDampingRatio = markerUI.getFloat("linearDampingRatio");
+            marker.angularStiffness = markerUI.getFloat("angularStiffness");
+            marker.angularDampingRatio = markerUI.getFloat("angularDampingRatio");
+            marker.inputType = toInputType(markerUI.getString("inputType"));
+            marker.collisionGroup = markerUI.getInteger("collisionGroup");
+            marker.useRootStiffness = markerUI.getBoolean("useRootStiffness", false);
+            marker.useLinearAngularStiffness = markerUI.getBoolean("useLinearAngularStiffness");
+            marker.color = color.getColor("value");
+            marker.contactStiffness = contactStiffness;
+            marker.contactDamping = contactDamping;
+            marker.friction = friction;
+            marker.restitution = restitution;
+            marker.isKinematic = isKinematic;
+            marker.enableCCD = enableCCD;
+            marker.geometryDescriptionComponent = geometryDescriptionComponent;
 
-            //const std::string src = markerUI.getString("sourceTransform");
-            //const std::vector<std::string> dst = markerUI.getStrings("destinationTransforms");
-            //
-            //std::string chosenPath;
-            //if (!src.empty()) {
-            //    chosenPath = src;
-            //}
-            //else if (!dst.empty()) {
-            //    // Pick the longest (and usually deepest) destination path
-            //    chosenPath = *std::max_element(
-            //        dst.begin(), dst.end(),
-            //        [](const std::string& a, const std::string& b) { return a.size() < b.size(); });
-            //}
-            //
-            //sanitizePath(chosenPath);
-
-            //ragdollMarker.bonePath = chosenPath;
-
+            marker.scaleComponent.absolute = scaleComponent.getVector("absolute");
+            marker.scaleComponent.value = scaleComponent.getVector("value");
+            
+            // Find corresponding bone name
             const std::vector<std::string> dst = markerUI.getStrings("destinationTransforms");
             for (const std::string& string : dst) {
-                std::string boneName = UNDEFINED_STRING;
-
                 size_t pos = string.rfind("|");
                 if (pos != std::string::npos) {
-                    boneName = string.substr(pos + 1);
+                    marker.boneName = string.substr(pos + 1);
+                    break;
                 }
-
-                Logging::Error() << "string:      " << string;
-                Logging::Error() << "pos:      " << pos;
-                Logging::Error() << "boneName: " << boneName;
-
-                ragdollMarker.boneName = lastSegment(boneName);
             }
         }
     }
@@ -300,7 +275,7 @@ namespace RagdollManager {
                 continue;
             }
 
-            // Joint ub-entity that carries Joint/Limit/Drive data
+            // Joint sub entity that carries joint/limit/drive data
             if (!registry.has(childId, "SubEntitiesComponent")) {
                 continue;
             }
@@ -321,7 +296,6 @@ namespace RagdollManager {
             RdString parentName = entityToMarkerName.count(parentId) ? entityToMarkerName[parentId] : parentId;
 
             auto MarkerUI = registry.get(childId, "MarkerUIComponent");
-            RdMotion linearMotion = StringToMotion(MarkerUI.getString("linearMotion"));
 
             RagdollJoint& ragdollJoint = ragdoll.m_joints.emplace_back();
             ragdollJoint.name = childName + "_to_" + parentName;
@@ -336,8 +310,7 @@ namespace RagdollManager {
             ragdollJoint.driveSpringType = static_cast<int>(Drive.getBoolean("acceleration"));
             ragdollJoint.driveAngularAmountTwist = Drive.getFloat("angularAmountTwist", 0.0f);
             ragdollJoint.driveAngularAmountSwing = Drive.getFloat("angularAmountSwing", 0.0f);
-            ragdollJoint.linearMotion = linearMotion;
-            ragdollJoint.linearMotionString = MarkerUI.getString("linearMotion");
+            ragdollJoint.linearMotion = StringToRdMotion(MarkerUI.getString("linearMotion"));
             ragdollJoint.relativeJsonId = jJoint;
             ragdollJoint.driveLinearAmount = Drive.getVector("linearAmount");
 
@@ -392,7 +365,7 @@ namespace RagdollManager {
 
     uint64_t SpawnRagdoll(glm::vec3 position, glm::vec3 eulerRotation, const std::string& ragdollName) {
         Logging::Function() << "RagdollManager::SpawnRagdoll()";
-        uint64_t ragdollId = UniqueID::GetNext();
+        uint64_t ragdollId = UniqueID::GetNextGlobal();
 
         RagdollV2& ragdoll = g_ragdolls[ragdollId] = RagdollV2();
         ragdoll.Init(position, eulerRotation, ragdollName, ragdollId);

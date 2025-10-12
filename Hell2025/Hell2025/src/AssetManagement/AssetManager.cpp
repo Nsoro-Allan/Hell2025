@@ -12,8 +12,8 @@
 #include "Util/Util.h"
 #include "World/World.h"
 
+#include "Managers/HouseManager.h"
 #include "Managers/MapManager.h"
-#include "World/HouseManager.h"
 #include "World/SectorManager.h"
 
 #include <unordered_map>

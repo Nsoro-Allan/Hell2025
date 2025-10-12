@@ -131,9 +131,6 @@ namespace World {
             }
             Bvh::Cpu::UpdateSceneBvh(viewportBvhData.sceneBvhId, viewportBvhData.instances);
         }
-
-        //BVH::RenderSceneBvh(g_viewportBvhData[0].sceneBvhId, BLUE);
-        
     }
 
     BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance, int viewportIndex) {
@@ -144,4 +141,12 @@ namespace World {
         }
         return Bvh::Cpu::ClosestHit(sceneBvhId, rayOrigin, rayDir, maxRayDistance);;
     }
+
+    //void RemoveAllHouseBvhs() {
+    //    
+    //}
+    //
+    //void AddHouseBvh() {
+    //
+    //}
 }

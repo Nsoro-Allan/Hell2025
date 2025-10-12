@@ -139,6 +139,7 @@ namespace Util {
             case ObjectType::HEIGHT_MAP:                    return "HEIGHT_MAP";
             case ObjectType::PLANE:                         return "HOUSE_PLANE";
             case ObjectType::LIGHT:                         return "LIGHT";
+            case ObjectType::OPENABLE:                      return "OPENABLE";
             case ObjectType::PICK_UP:                       return "PICK_UP";
             case ObjectType::PIANO:                         return "PIANO";
             case ObjectType::PIANO_KEY:                     return "PIANO_KEY";

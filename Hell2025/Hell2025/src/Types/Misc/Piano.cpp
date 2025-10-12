@@ -17,7 +17,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     m_transform.position = createInfo.position;
     m_transform.rotation = createInfo.rotation;
 
-    m_pianoObjectId = UniqueID::GetNext();
+    m_pianoObjectId = UniqueID::GetNextGlobal();
 
     m_model = AssetManager::GetModelByName("Piano");
     m_meshNodes.InitFromModel(m_model);
@@ -33,7 +33,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
         Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
         if (!mesh) continue;
 
-        uint64_t localObjectId = UniqueID::GetNext();
+        uint64_t localObjectId = UniqueID::GetNextGlobal();
 
         if (mesh->GetName() == "Yamaha_Key_A0" ||
             mesh->GetName() == "Yamaha_Key_A0#" ||

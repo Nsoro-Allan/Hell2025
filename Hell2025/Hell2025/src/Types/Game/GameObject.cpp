@@ -24,7 +24,7 @@ GameObject::GameObject(GameObjectCreateInfo createInfo) {
         m_physicsId = Physics::CreateRigidStaticConvexMeshFromModel(m_transform, "Bench_ConvexHulls", filterData);
     }
 
-    m_objectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
 }
 
 GameObjectCreateInfo GameObject::GetCreateInfo() {

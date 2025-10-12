@@ -133,7 +133,7 @@ namespace Audio {
             }
         }
 
-        uint64_t uniqueId = UniqueID::GetNext();
+        uint64_t uniqueId = UniqueID::GetNextGlobal();
         AudioHandle& handle = g_playingAudio[uniqueId];
         handle.state = AudioHandle::State::PLAYING;
         handle.sound = g_loadedAudio[filename];
@@ -189,7 +189,7 @@ namespace Audio {
         // Load if needed
         if (g_loadedAudio.find(filename) == g_loadedAudio.end()) LoadAudio(filename);
 
-        uint64_t id = UniqueID::GetNext();
+        uint64_t id = UniqueID::GetNextGlobal();
         AudioHandle& h = g_playingAudio[id];
         h.state = AudioHandle::State::LOOPING;
         h.sound = g_loadedAudio[filename];

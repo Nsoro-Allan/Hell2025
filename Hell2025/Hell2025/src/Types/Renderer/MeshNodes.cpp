@@ -1,9 +1,10 @@
 #include "MeshNodes.h"
 #include "AssetManagement/AssetManager.h"
-#include "Core/OpenStateHandlerManager.h"
-#include "Renderer/RenderDataManager.h"
-#include "Input/Input.h"
 #include "HellLogging.h"
+#include "Input/Input.h"
+#include "Renderer/RenderDataManager.h"
+#include "Renderer/Renderer.h"
+#include "UniqueID.h"
 #include "Util.h"
 
 void MeshNodes::InitFromModel(const std::string & modelName) {
@@ -35,7 +36,7 @@ void MeshNodes::InitFromModel(Model* model) {
     m_modelMatrices.resize(m_nodeCount, glm::mat4(1.0f));
     m_objectTypes.resize(m_nodeCount, ObjectType::UNDEFINED);
     m_objectIds.resize(m_nodeCount, 0);
-    m_openHandlerStateIds.resize(m_nodeCount, 0);
+    m_worldspaceAabbs.resize(m_nodeCount);
 
     // Map mesh names to their local index and extra parent index and transforms
     for (int i = 0; i < m_nodeCount; i++) {
@@ -177,6 +178,42 @@ void MeshNodes::SetBlendingModeByMeshName(const std::string& meshName, BlendingM
     }
 }
 
+void MeshNodes::SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType) {
+    if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
+        int nodeIndex = m_localIndexMap[meshName];
+
+        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+            m_objectTypes[nodeIndex] = objectType;
+        }
+    }
+}
+
+void MeshNodes::SetObjectIdByMeshName(const std::string& meshName, uint64_t id) {
+    if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
+        int nodeIndex = m_localIndexMap[meshName];
+
+        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+            m_objectIds[nodeIndex] = id;
+        }
+    }
+}
+
+void MeshNodes::SetOpenableByMeshName(const std::string& meshName, uint64_t openableId) {
+    SetObjectIdByMeshName(meshName, openableId);
+    SetObjectTypeByMeshName(meshName, ObjectType::OPENABLE);
+}
+
+
+void MeshNodes::DrawWorldspaceAABB(glm::vec4 color) {
+    Renderer::DrawAABB(m_worldspaceAABB, color);
+}
+
+void MeshNodes::DrawWorldspaceAABBs(glm::vec4 color) {
+    for (AABB& aabb : m_worldspaceAabbs) {
+        Renderer::DrawAABB(aabb, color);
+    }
+}
+
 RenderItem* MeshNodes::GetRenderItemByNodeIndex(int nodeIndex) {
     if (nodeIndex >= 0 && nodeIndex < m_renderItems.size()) {
         return &m_renderItems[nodeIndex];
@@ -223,25 +260,32 @@ glm::mat4 MeshNodes::GetInverseBindTransform(int nodeIndex) {
 }
 
 void MeshNodes::UpdateHierachy() {
-    for (int i = 0; i < GetNodeCount(); i++) {
+    m_hierarchyChanged = false;
+    const float eps = 1e-5f;
+
+    for (int i = 0; i < GetNodeCount(); ++i) {
         int32_t parentIndex = m_localParentIndices[i];
 
-        // If this node has an open state handler Id, then retrieve it's transform from the opens state handler hive mind
-        if (m_openHandlerStateIds[i] != 0) { // 0 means no handler
-            m_transforms[i] = OpenStateHandlerManager::GetOpenStateHandleTransformById(m_openHandlerStateIds[i]);
+        glm::mat4 newM = (parentIndex != -1)
+            ? m_modelMatrices[parentIndex] * m_localTransforms[i] * m_transforms[i].to_mat4()
+            : m_localTransforms[i] * m_transforms[i].to_mat4();
+
+        if (!m_hierarchyChanged) {
+            if (!Util::Mat4NearlyEqual(newM, m_modelMatrices[i], eps)) {
+                m_hierarchyChanged = true;
+            }
         }
 
-        if (parentIndex != -1) {
-            m_modelMatrices[i] = m_modelMatrices[parentIndex] * m_localTransforms[i] * m_transforms[i].to_mat4();
-        }
-        else {
-            m_modelMatrices[i] = m_localTransforms[i] * m_transforms[i].to_mat4();
-        }
+        m_modelMatrices[i] = newM;
     }
 }
 
 void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
     UpdateHierachy();
+
+    //if (m_hierarchyChanged) {
+        UpdateAABBs(worldMatrix);
+    //}
 
     m_renderItems.clear();
     m_renderItemsBlended.clear();
@@ -259,14 +303,6 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
 
         glm::mat4 meshModelMatrix = GetMeshModelMatrix(i);
 
-        //if (mesh->GetName() == "Wire" || mesh->GetName() == "WireBarbed" || mesh->GetName() == "WireDemo") {
-        //    material = AssetManager::GetMaterialByName("Tokarev");
-        //}
-        //if (mesh->GetName() == "FencePoleA" || mesh->GetName() == "FencePoleB" ||
-        //    mesh->GetName() == "FenceInnerPoleA" || mesh->GetName() == "FenceInnerPoleB") {
-        //    material = AssetManager::GetMaterialByName("TreeLarge_0");
-        //}
-
         RenderItem renderItem;
         renderItem.objectType = (int)m_objectTypes[i];
         renderItem.modelMatrix = worldMatrix * meshModelMatrix;
@@ -275,7 +311,8 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         renderItem.baseColorTextureIndex = material->m_basecolor;
         renderItem.normalMapTextureIndex = material->m_normal;
         renderItem.rmaTextureIndex = material->m_rma;
-
+        renderItem.aabbMin = glm::vec4(m_worldspaceAabbs[i].GetBoundsMin(), 0.0f);
+        renderItem.aabbMax = glm::vec4(m_worldspaceAabbs[i].GetBoundsMax(), 0.0f);
 
         // If this object is gold, replace basecolor and rma textures with that of gold material, normal map does not change
         if (m_isGold) {
@@ -285,7 +322,7 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         }
 
         Util::PackUint64(m_objectIds[i], renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-        Util::UpdateRenderItemAABB(renderItem);
+        //Util::UpdateRenderItemAABB(renderItem);
 
         BlendingMode blendingMode = m_blendingModes[i];
         switch (blendingMode) {
@@ -297,6 +334,49 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
             default: break;
         }
     }
+}
+
+void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
+    m_worldspaceAabbs.resize(GetNodeCount());
+
+    glm::vec3 min(std::numeric_limits<float>::max());
+    glm::vec3 max(-std::numeric_limits<float>::max());
+    bool found = false;
+
+    for (int i = 0; i < GetNodeCount(); ++i) {
+        int32_t meshIndex = m_globalMeshIndices[i];
+        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
+        if (!mesh) continue;
+
+        glm::vec3 localMin = mesh->aabbMin;
+        glm::vec3 localMax = mesh->aabbMax;
+        glm::vec3 c = 0.5f * (localMin + localMax);
+        glm::vec3 e = 0.5f * (localMax - localMin);
+
+        glm::mat4 M = worldMatrix * m_modelMatrices[i];
+
+        glm::vec3 worldCenter = glm::vec3(M * glm::vec4(c, 1.0f));
+
+        glm::vec3 col0 = glm::vec3(M[0]);
+        glm::vec3 col1 = glm::vec3(M[1]);
+        glm::vec3 col2 = glm::vec3(M[2]);
+
+        glm::vec3 worldExtents =
+            glm::abs(col0) * e.x +
+            glm::abs(col1) * e.y +
+            glm::abs(col2) * e.z;
+
+        glm::vec3 worldMin = worldCenter - worldExtents;
+        glm::vec3 worldMax = worldCenter + worldExtents;
+
+        m_worldspaceAabbs[i] = AABB(worldMin, worldMax);
+
+        min = glm::min(min, worldMin);
+        max = glm::max(max, worldMax);
+        found = true;
+    }
+
+    m_worldspaceAABB = found ? AABB(min, max) : AABB();
 }
 
 glm::mat4 MeshNodes::GetMeshModelMatrix(int nodeIndex) {

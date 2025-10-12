@@ -102,7 +102,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     }
 
     // Get next unique ID
-    m_objectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
 
     // Set PhysX user data
     PhysicsUserData userData;

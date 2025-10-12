@@ -48,8 +48,8 @@ void Map::SetHeightMapData(int32_t chunkCountX, int32_t chunkCountZ, const std::
     m_chunkCountZ = chunkCountZ;
     m_heightMapData = data;
 
-    Logging::Debug() << "m_chunkCountX: " << m_chunkCountX;
-    Logging::Debug() << "m_chunkCountZ: " << m_chunkCountZ;
+    //Logging::Debug() << "m_chunkCountX: " << m_chunkCountX;
+    //Logging::Debug() << "m_chunkCountZ: " << m_chunkCountZ;
 
     if (BackEnd::GetAPI() == API::OPENGL) {
         m_heightMapGLTexture.Create(GetTextureWidth(), GetTextureHeight(), GL_R16F, 1);

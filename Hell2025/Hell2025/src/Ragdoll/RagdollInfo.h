@@ -3,33 +3,22 @@
 #include <iostream>
 #include "Util.h"
 
-inline std::ostream& operator<<(std::ostream& os, const RdMatrix& m) {
-    os.setf(std::ios::fixed, std::ios::floatfield);
-    os << std::setprecision(6);
-    for (int r = 0; r < 4; ++r) {
-        os << '[';
-        for (int c = 0; c < 4; ++c) {
-            os << m[c][r]; // Magnum matrices are column major
-            if (c < 3) os << ' ';
-        }
-        os << ']';
-        if (r < 3) os << '\n';
-    }
-    return os;
-}
+struct RdGeometryDescriptionComponent {
+    float length{ 1.0f };
+    float radius{ 1.0f };
+    float radiusEnd{ 1.0f };
+    RdGeometryType type{ RdGeometryType::kSphere };
+    RdVector extents{ 1.0, 1.0, 1.0 };
+    RdVector offset{ 0.0, 0.0, 0.0 };
+    RdEulerRotation rotation{ 0.0, 0.0, 0.0 };
+    bool capsuleLengthAlongY = true;
+    enum RdConvexDecomposition convexDecomposition = RdConvexDecomposition::Off;
+};
 
-inline std::ostream& operator<<(std::ostream& os, const RdVector& v) {
-    os.setf(std::ios::fixed, std::ios::floatfield);
-    os << std::setprecision(6)
-        << '[' << v[0] << ' ' << v[1] << ' ' << v[2] << ']';
-    return os;
-}
-
-inline std::string ToString(const RdVector& v) {
-    std::ostringstream ss;
-    ss << v;
-    return ss.str();
-}
+struct RdScaleComponent {
+    RdVector value{ 1.0, 1.0, 1.0 };
+    RdVector absolute{ 1.0, 1.0, 1.0 };
+};
 
 struct RagdollMarker {
     // Transforms
@@ -39,13 +28,9 @@ struct RagdollMarker {
     RdMatrix parentFrame{ RdIdentityInit };
     RdMatrix childFrame{ RdIdentityInit };
 
-    // Geometry
-    RdString shapeType = UNDEFINED_STRING;
-    RdEulerRotation shapeRotation{};
-    RdVector extents{ 0, 0, 0 };
-    RdVector shapeOffset{ 0, 0, 0 };
-    RdLinear shapeRadius{ 0.0 };
-    RdLinear shapeLength{ 0.0 };
+    RdGeometryDescriptionComponent geometryDescriptionComponent;
+    RdScaleComponent scaleComponent;
+
     RdPoints convexMeshVertices{};
     RdUints convexMeshIndices{};
 
@@ -82,8 +67,12 @@ struct RagdollMarker {
     RdScalar restitution = 0.05;
 
     // Animation
-    std::string bonePath;
-    std::string boneName;
+    std::string bonePath = UNDEFINED_STRING;
+    std::string boneName = UNDEFINED_STRING;
+
+    // ???
+    float maxContactImpulse{ -1.0f };
+    float maxDepenetrationVelocity{ -1.0f };
 };
 
 struct RagdollJoint {
@@ -103,7 +92,6 @@ struct RagdollJoint {
     RdScalar limitStiffness = 0.0;
     RdScalar limitDampingRatio = 0.0;
     RdBoolean limitAutoOrient = false;
-    RdString linearMotionString = UNDEFINED_STRING;
     RdMotion linearMotion = RdMotion::RdMotionLocked;
 
     // Drive settings
@@ -126,7 +114,8 @@ struct RagdollJoint {
 };
 
 struct RagdollSolver {
-    RdInteger positionIterations;
+    RdUint positionIterations { 1 };
+    RdUint velocityIterations { 1 };
     RdInteger substeps;
     RdVector gravity;
     RdScalar sceneScale{ 1.0 };
@@ -141,8 +130,8 @@ struct RagdollInfo {
     std::vector<RagdollMarker> m_markers;
     std::vector<RagdollJoint> m_joints;
 
-    void PrintJointInfo(const RagdollJoint& joint);     // fix to not take in a param
-    void PrintMarkerInfo(const RagdollMarker& marker);  // fix to not take in a param
+    void PrintJointInfo();
+    void PrintMarkerInfo();
     void PrintSolverInfo();
 
 private:

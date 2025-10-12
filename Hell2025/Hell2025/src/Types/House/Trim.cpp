@@ -6,7 +6,7 @@
 
 void Trim::Init(Transform transform, const std::string& modelName, const std::string& materialName) {
     m_transform = transform;
-    m_objectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
 
     Model* model = AssetManager::GetModelByName(modelName);
     Material* material = AssetManager::GetMaterialByName(materialName);

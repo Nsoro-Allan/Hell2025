@@ -173,7 +173,7 @@ namespace Physics {
 
         //std::cout << "Physics::CreateRagdollByName() " << name << "\n";
         
-        uint64_t ragdollID = UniqueID::GetNext();
+        uint64_t ragdollID = UniqueID::GetNextGlobal();
 
         Ragdoll& ragdoll = g_ragdolls[ragdollID];
         ragdoll.m_name = name;

@@ -31,7 +31,7 @@ struct RagdollV2 {
     std::vector<PxRigidDynamic*> m_pxRigidDynamics;
 
 private:
-    void AddMarkerMeshData(RagdollMarker& marker);
+    void AddMarkerMeshData(RagdollMarker& marker, RagdollSolver& solver);
 
     std::vector<PxD6Joint*> m_pxD6Joints;
     std::vector<glm::vec3> m_markerColors;

@@ -11,12 +11,12 @@
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "Input/Input.h"
+#include "Managers/HouseManager.h"
 #include "Managers/MapManager.h"
 #include "Renderer/GlobalIllumination.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Physics/Physics.h"
-#include "World/HouseManager.h"
 #include "World/SectorManager.h"
 
 #include "Pathfinding/AStarMap.h"
@@ -60,6 +60,9 @@ namespace World {
     std::vector<Wall> g_walls;
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
     std::vector<Window> g_windows;
+
+    //std::unordered_map<uint64_t, Drawers> g_drawers;
+    std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
 
     std::vector<GPULight> g_gpuLightsLowRes;
     std::vector<GPULight> g_gpuLightsMidRes;
@@ -115,81 +118,19 @@ namespace World {
     }
 
     void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
-        g_mapInstances.clear();
-        g_worldMapChunkCountX = 0;
-        g_worldMapChunkCountZ = 0;
+        LoadMapInstancesHeightMapData(mapInstanceCreateInfoSet);
 
-        // Load height map data from all map instances
         for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
-            int32_t mapIndex = MapManager::GetMapIndexByName(mapInstanceCreateInfo.mapName);
-            if (mapIndex == -1) {
-                Logging::Error() << "World::LoadMapInstances() failed coz '" << mapInstanceCreateInfo.mapName << "' was not found";
-                return;
-            }
-
-            Map* map = MapManager::GetMapByName(mapInstanceCreateInfo.mapName);
-
-            MapInstance& mapInstance = g_mapInstances.emplace_back();
-            mapInstance.m_mapIndex = mapIndex;
-            mapInstance.spawnOffsetChunkX = mapInstanceCreateInfo.spawnOffsetChunkX;
-            mapInstance.spawnOffsetChunkZ = mapInstanceCreateInfo.spawnOffsetChunkZ;
-
-            uint32_t reachX = mapInstance.spawnOffsetChunkX + map->GetChunkCountX();
-            uint32_t reachZ = mapInstance.spawnOffsetChunkZ + map->GetChunkCountZ();
-
-            g_worldMapChunkCountX = std::max(g_worldMapChunkCountX, reachX);
-            g_worldMapChunkCountZ = std::max(g_worldMapChunkCountZ, reachZ);
-
-            // Add spawn points
-            g_spawnCampaignPoints.insert(g_spawnCampaignPoints.end(), map->GetAdditionalMapData().playerCampaignSpawns.begin(), map->GetAdditionalMapData().playerCampaignSpawns.end());
-            g_spawnDeathmatchPoints.insert(g_spawnDeathmatchPoints.end(), map->GetAdditionalMapData().playerDeathmatchSpawns.begin(), map->GetAdditionalMapData().playerDeathmatchSpawns.end());
-        }
-
-        // Create heightmap chunks
-        g_heightMapChunks.clear();
-        g_validChunks.clear();
-
-        // Init heightmap chunks
-        int baseVertex = 0;
-        int baseIndex = 0;
-        for (int x = 0; x < g_worldMapChunkCountX; x++) {
-            for (int z = 0; z < g_worldMapChunkCountZ; z++) {
-                int cellX = x / 8;
-                int cellZ = z / 8;
-
-                HeightMapChunk& chunk = g_heightMapChunks.emplace_back();
-                chunk.coord.x = x;
-                chunk.coord.z = z;
-                chunk.baseVertex = baseVertex;
-                chunk.baseIndex = baseIndex;
-                baseVertex += VERTICES_PER_CHUNK;
-                baseIndex += INDICES_PER_CHUNK;
-
-                g_validChunks[chunk.coord] = g_heightMapChunks.size() - 1;
-            }
-        }
-
-        Renderer::RecalculateAllHeightMapData(true);
-
-        // Load the objects from all map instances
-        for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
-            Map* map = MapManager::GetMapByName(mapInstanceCreateInfo.mapName);
-            if (!map) {
-                Logging::Error() << "World::LoadMapInstances() failed coz '" << mapInstanceCreateInfo.mapName << "' was not found";
-                return;
-            }
             SpawnOffset spawnOffset;
             spawnOffset.translation.x = mapInstanceCreateInfo.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
             spawnOffset.translation.z = mapInstanceCreateInfo.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+
+            // Load the objects
             LoadMapInstanceObjects(mapInstanceCreateInfo.mapName, spawnOffset);
-
-            SpawnOffset houseSpawnOffset = spawnOffset;
-            houseSpawnOffset.translation += glm::vec3(34.0f, 31.0f, 36.0f);
-
-            HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
-            World::AddHouse(*houseCreateInfo, houseSpawnOffset);
+            LoadMapInstanceHouses(mapInstanceCreateInfo.mapName, spawnOffset);
         }
 
+        RecreateHouseMesh();
 
         // REMOVE ME BELOW TO MAP FILE
         PowerPoleSet& powerPoleSet = g_powerPoleSets.emplace_back();
@@ -226,34 +167,192 @@ namespace World {
         g_gameObjects[1].SetMeshMaterial("ReflectorPole", "Fence");
         g_gameObjects[1].SetMeshMaterial("ReflectorRed", "Red");
 
-
         DobermannCreateInfo dobermannCreateInfo;
         //dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
         //AddDobermann(dobermannCreateInfo);
-        
+
         dobermannCreateInfo.position = glm::vec3(37.25f, 31.0f, 35.5f);
         AddDobermann(dobermannCreateInfo);
+
+        // Add all this to the map editor tomorrow
+        // Add all this to the map editor tomorrow
+        // Add all this to the map editor tomorrow
+
+        // Hack in a Christmas tree
+        //ChristmasTreeCreateInfo christmasTreeCreateInfo;
+        //christmasTreeCreateInfo.position = glm::vec3(8.13f, 0.15f, 1.2f);
+        //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
+        //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
+        //
+        //christmasTreeCreateInfo.position = glm::vec3(0.78f, 0.15f, 2.25f);
+        //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
+        //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
+        //
+        //
+        //ChristmasLightsCreateInfo christmasLightsCreateInfo;
+        //christmasLightsCreateInfo.start = glm::vec3(4.4, 2.13241, 0.861675);
+        //christmasLightsCreateInfo.end = glm::vec3(2.99485, 2.16198, 2.9);
+        //christmasLightsCreateInfo.spiral = false;
+        //christmasLightsCreateInfo.sag = 0.6f;
+        //World::AddChristmasLights(christmasLightsCreateInfo, spawnOffset);
+        //
+        //
+        //glm::vec3 couchSpawnPosition = glm::vec3(0.02f, 0.0f, -1.5f);
+        //glm::vec3 couchSpawnRotation = glm::vec3(0.0f, HELL_PI * 0.5f, 0.0f);
+        //
+        //GenericStaticCreateInfo genericStaticCreateInfo;
+        //genericStaticCreateInfo.position = couchSpawnPosition;
+        //genericStaticCreateInfo.rotation = couchSpawnRotation;
+        //genericStaticCreateInfo.type = GenericStaticType::COUCH;
+        //World::AddGenericStatic(genericStaticCreateInfo, spawnOffset);
+        //
+        //
+        //GenericBouncableCreateInfo genericBouncableCreateInfo;
+        //genericBouncableCreateInfo.position = couchSpawnPosition;
+        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
+        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_0;
+        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
+        //
+        //genericBouncableCreateInfo.position = couchSpawnPosition;
+        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
+        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_0;
+        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
+        //
+        //genericBouncableCreateInfo.position = couchSpawnPosition;
+        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
+        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_1;
+        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
+        //
+        //genericBouncableCreateInfo.position = couchSpawnPosition;
+        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
+        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_2;
+        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
+        //
+        //genericBouncableCreateInfo.position = couchSpawnPosition;
+        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
+        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_3;
+        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
+        //
+        //ToiletCreateInfo toiletCreateInfo;
+        //toiletCreateInfo.position = glm::vec3(4.40f, 0.0f, -0.7f);
+        //toiletCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //World::AddToilet(toiletCreateInfo, spawnOffset);
+        //
+        //DrawersCreateInfo drawersCreateInfo;
+        //drawersCreateInfo.position = glm::vec3(8.65f, 0.0f, -0.6f);
+        //drawersCreateInfo.rotation.y = HELL_PI * 1.5f;
+        //drawersCreateInfo.type = DrawersType::LARGE;
+        //World::AddDrawers(drawersCreateInfo, spawnOffset);
+        //
+        //drawersCreateInfo.position = glm::vec3(4.50f, 0.0f, -0.85f);
+        //drawersCreateInfo.rotation.y = HELL_PI * 0.5f;
+        //drawersCreateInfo.type = DrawersType::SMALL;
+        //World::AddDrawers(drawersCreateInfo, spawnOffset);
+
+    }
+
+    void LoadMapInstancesHeightMapData(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
+        g_mapInstances.clear();
+        g_worldMapChunkCountX = 0;
+        g_worldMapChunkCountZ = 0;
+
+        // Load height map data from all map instances
+        for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
+            int32_t mapIndex = MapManager::GetMapIndexByName(mapInstanceCreateInfo.mapName);
+            Map* map = MapManager::GetMapByName(mapInstanceCreateInfo.mapName);
+            if (!map) {
+                Logging::Error() << "World::LoadMapInstancesHeightMapData() failed coz '" << mapInstanceCreateInfo.mapName << "' was not found";
+                return;
+            }
+
+            MapInstance& mapInstance = g_mapInstances.emplace_back();
+            mapInstance.m_mapIndex = mapIndex;
+            mapInstance.spawnOffsetChunkX = mapInstanceCreateInfo.spawnOffsetChunkX;
+            mapInstance.spawnOffsetChunkZ = mapInstanceCreateInfo.spawnOffsetChunkZ;
+
+            uint32_t reachX = mapInstance.spawnOffsetChunkX + map->GetChunkCountX();
+            uint32_t reachZ = mapInstance.spawnOffsetChunkZ + map->GetChunkCountZ();
+
+            g_worldMapChunkCountX = std::max(g_worldMapChunkCountX, reachX);
+            g_worldMapChunkCountZ = std::max(g_worldMapChunkCountZ, reachZ);
+        }
+
+        // Create heightmap chunks
+        g_heightMapChunks.clear();
+        g_validChunks.clear();
+
+        // Init heightmap chunks
+        int baseVertex = 0;
+        int baseIndex = 0;
+        for (int x = 0; x < g_worldMapChunkCountX; x++) {
+            for (int z = 0; z < g_worldMapChunkCountZ; z++) {
+                int cellX = x / 8;
+                int cellZ = z / 8;
+
+                HeightMapChunk& chunk = g_heightMapChunks.emplace_back();
+                chunk.coord.x = x;
+                chunk.coord.z = z;
+                chunk.baseVertex = baseVertex;
+                chunk.baseIndex = baseIndex;
+                baseVertex += VERTICES_PER_CHUNK;
+                baseIndex += INDICES_PER_CHUNK;
+
+                g_validChunks[chunk.coord] = g_heightMapChunks.size() - 1;
+            }
+        }
+
+        Renderer::RecalculateAllHeightMapData(true);
+    }
+
+    void LoadSingleHouse(const std::string& houseName) {
+        ResetWorld();
+        LoadHouseInstance(houseName, SpawnOffset());
+        RecreateHouseMesh();
+    }
+
+    void LoadHouseInstance(const std::string& houseName, SpawnOffset spawnOffset) {
+        House* house = HouseManager::GetHouseByName(houseName);
+        if (!house) {
+            Logging::Error() << "World::LoadHouseInstance() failed because " << houseName << " was not found";
+            return;
+        }
+
+        CreateInfoCollection& createInfoCollection = house->GetCreateInfoCollection();
+        AddCreateInfoCollection(createInfoCollection, spawnOffset);
+
+        Logging::Debug() << "World::LoadHouseInstance(): " << houseName << " at " << spawnOffset.translation;
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
-        for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps) {
-            AddPickUp(createInfo, spawnOffset);
-        }
-        for (TreeCreateInfo& createInfo : createInfoCollection.trees) {
-            AddTree(createInfo, spawnOffset);
-        }
+        for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
+        for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
+        for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
+        for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
+        for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)   AddPictureFrame(createInfo, spawnOffset);
+        for (PlaneCreateInfo& createInfo : createInfoCollection.planes)                 AddHousePlane(createInfo, spawnOffset);
+        for (TreeCreateInfo& createInfo : createInfoCollection.trees)                   AddTree(createInfo, spawnOffset);
+        for (WallCreateInfo& createInfo : createInfoCollection.walls)                   AddWall(createInfo, spawnOffset);
+        for (WindowCreateInfo& createInfo : createInfoCollection.windows)               AddWindow(createInfo, spawnOffset);
     }
 
     CreateInfoCollection GetCreateInfoCollection() {
         CreateInfoCollection createInfoCollection;
 
-        for (PickUp& pickUp : World::GetPickUps()) {
-            createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
-        }
-        for (Tree& tree : World::GetTrees()) {
-            createInfoCollection.trees.push_back(tree.GetCreateInfo());
-        }
-
+        for (Door& door : World::GetDoors())                        createInfoCollection.doors.push_back(door.GetCreateInfo());
+        for (Light& light : World::GetLights())                     createInfoCollection.lights.push_back(light.GetCreateInfo());
+        for (Piano& piano : World::GetPianos())                     createInfoCollection.pianos.push_back(piano.GetCreateInfo());
+        for (PickUp& pickUp : World::GetPickUps())                  createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
+        for (Plane& plane : World::GetPlanes())                     createInfoCollection.planes.push_back(plane.GetCreateInfo());
+        for (PictureFrame& pictureFrame: World::GetPictureFrames()) createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
+        for (Tree& tree : World::GetTrees())                        createInfoCollection.trees.push_back(tree.GetCreateInfo());
+        for (Wall& wall : World::GetWalls())                        createInfoCollection.walls.push_back(wall.GetCreateInfo());
+        for (Window& window : World::GetWindows())                  createInfoCollection.windows.push_back(window.GetCreateInfo());
+       
         return createInfoCollection;
     }
 
@@ -280,14 +379,27 @@ namespace World {
         }
     }
 
+    void LoadMapInstanceHouses(const std::string& mapName, SpawnOffset spawnOffset) {
+        Map* map = MapManager::GetMapByName(mapName);
+        if (!map) {
+            Logging::Error() << "World::LoadMapInstanceHouses() failed coz '" << mapName << "' was not found";
+            return;
+        }
+
+        for (HouseLocation& houseLocation : map->GetAdditionalMapData().houseLocations) {
+            SpawnOffset houseSpawnOffset = spawnOffset;
+            houseSpawnOffset.translation += houseLocation.position;
+            houseSpawnOffset.yRotation += houseLocation.rotation;
+
+            LoadHouseInstance("TestHouse", houseSpawnOffset);
+
+            //HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
+            //World::AddHouse(*houseCreateInfo, houseSpawnOffset);
+        }
+    }
+
     void NewRun() {
         ResetWorld();
-
-        //std::string sectorName = "TestSector";
-        //SectorCreateInfo* sectorCreateInfo = SectorManager::GetSectorCreateInfoByName(sectorName);
-        //if (sectorCreateInfo) {
-        //    World::LoadSingleSector(sectorCreateInfo, true);
-        //}
 
         Game::RespawnPlayers();
 
@@ -400,53 +512,53 @@ namespace World {
         }
     }
 
-    void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
-        if (!houseCreateInfo) {
-            std::cout << "World::LoadSingleHouse() failed: houseCreateInfo was nullptr\n";
-            return;
-        }
+    //void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
+    //    if (!houseCreateInfo) {
+    //        std::cout << "World::LoadSingleHouse() failed: houseCreateInfo was nullptr\n";
+    //        return;
+    //    }
+    //
+    //    ResetWorld();
+    //
+    //    g_mapName = "HouseEditorMap";
+    //    //g_mapWidth = 1;
+    //    //g_mapDepth = 1;
+    //
+    //    AddHouse(*houseCreateInfo, SpawnOffset());
+    //
+    //    GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
+    //}
 
-        ResetWorld();
-
-        g_mapName = "HouseEditorMap";
-        //g_mapWidth = 1;
-        //g_mapDepth = 1;
-
-        AddHouse(*houseCreateInfo, SpawnOffset());
-
-        GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
-    }
-
-    void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses) {
-        for (LightCreateInfo& createInfo : sectorCreateInfo.lights) {
-            AddLight(createInfo, spawnOffset);
-        }
-        for (GameObjectCreateInfo& createInfo : sectorCreateInfo.gameObjects) {
-            AddGameObject(createInfo, spawnOffset);
-        }
-        for (PickUpCreateInfo& createInfo : sectorCreateInfo.pickUps) {
-            AddPickUp(createInfo, spawnOffset);
-        }
-        for (TreeCreateInfo& createInfo : sectorCreateInfo.trees) {
-            AddTree(createInfo, spawnOffset);
-        }
-
-        if (loadHouses) {
-            HouseManager::LoadAllHouseFilesFromDisk();
-
-            glm::vec3 houseLocation = glm::vec3(15.0f, 30.5f, 40.0f);
-
-            SpawnOffset houseSpawnOffset = spawnOffset;
-            houseSpawnOffset.translation += houseLocation;
-
-            HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
-            if (houseCreateInfo) {
-                AddHouse(*houseCreateInfo, houseSpawnOffset);
-            }
-
-            GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
-        }
-    }
+    //void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses) {
+    //    for (LightCreateInfo& createInfo : sectorCreateInfo.lights) {
+    //        AddLight(createInfo, spawnOffset);
+    //    }
+    //    for (GameObjectCreateInfo& createInfo : sectorCreateInfo.gameObjects) {
+    //        AddGameObject(createInfo, spawnOffset);
+    //    }
+    //    for (PickUpCreateInfo& createInfo : sectorCreateInfo.pickUps) {
+    //        AddPickUp(createInfo, spawnOffset);
+    //    }
+    //    for (TreeCreateInfo& createInfo : sectorCreateInfo.trees) {
+    //        AddTree(createInfo, spawnOffset);
+    //    }
+    //
+    //    if (loadHouses) {
+    //        HouseManager::LoadAllHouseFilesFromDisk();
+    //
+    //        glm::vec3 houseLocation = glm::vec3(15.0f, 30.5f, 40.0f);
+    //
+    //        SpawnOffset houseSpawnOffset = spawnOffset;
+    //        houseSpawnOffset.translation += houseLocation;
+    //
+    //        HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
+    //        if (houseCreateInfo) {
+    //            AddHouse(*houseCreateInfo, houseSpawnOffset);
+    //        }
+    //
+    //        GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
+    //    }
+    //}
 
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectID) {
         for (AnimatedGameObject& animatedGameObject : g_animatedGameObjects) {
@@ -682,6 +794,8 @@ namespace World {
         g_validChunks.clear();
         g_mapInstances.clear();
 
+        //RemoveAllHouseBvhs();
+
         // Cleanup all objects
         ClearAllObjects();
 
@@ -735,6 +849,8 @@ namespace World {
         for (Tree& tree : g_trees)                                      tree.CleanUp();
         for (Wall& wall : g_walls)                                      wall.CleanUp();
         for (Window& window : g_windows)                                window.CleanUp();
+
+        //for (auto& [id, drawers] : g_drawers) drawers.CleanUp();
         
         // Clear all containers
         g_bulletCasings.clear();
@@ -1049,6 +1165,21 @@ namespace World {
 
     const float GetWorldSpaceDepth() {
         return g_worldMapChunkCountZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+    }
+
+    void PrintObjectCounts() {
+        Logging::Debug()
+            << "Doors:          " << g_doors.size() << "\n"
+            << "Lights:         " << g_lights.size() << "\n"
+            << "Pickups:        " << g_pickUps.size() << "\n"
+            << "Pianos:         " << g_pianos.size() << "\n"
+            << "Picture Frames: " << g_pictureFrames.size() << "\n"
+            << "Planes:         " << g_planes.size() << "\n"
+            << "Trees:          " << g_trees.size() << "\n"
+            << "Walls:          " << g_walls.size() << "\n"
+            << "Windows:        " << g_windows.size() << "\n"
+            << "";
+
     }
 
     ///// const std::string& GetSectorNameAtLocation(int x, int z) {

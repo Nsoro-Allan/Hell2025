@@ -9,8 +9,8 @@
 #include "Util.h"
 
 void Door::Init(DoorCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNext();
-    m_frameObjectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
+    m_frameObjectId = UniqueID::GetNextGlobal();
 
     m_createInfo = createInfo;
 

@@ -116,6 +116,16 @@ namespace Renderer {
         }
     }
 
+
+    void DrawSphere(glm::vec3 position, float radius, glm::vec3 color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawSphere(position, radius, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            // TODO
+        }
+    }
+
     void ReadBackHeightMapData(Map* map) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::ReadBackHeightMapData(map);
@@ -144,18 +154,16 @@ namespace Renderer {
     }
 
     int32_t GetNextFreeWoundMaskIndexAndMarkItTaken() {
-        std::cout << "GetNextFreeWoundMaskIndexAndMarkItTaken(): array is of size " << g_freeWoundMaskIndices.size() << "\n";
         for (int i = 0; i < g_freeWoundMaskIndices.size(); i++) {
             if (g_freeWoundMaskIndices[i] == true) {
-                std::cout << "found free array index " << i << "\n";
                 g_freeWoundMaskIndices[i] = false;
                 return i;
             }
         }
 
-        // Should never happen, unless you ran out of array levels, in which case you need to increase the size of the array/
-
+        // Should never happen, unless you ran out of array levels, in which case you need to increase the size of the array
         for (int i = 0; i < g_freeWoundMaskIndices.size(); i++) {
+            Logging::Error() << "GetNextFreeWoundMaskIndexAndMarkItTaken() failed because you ran out of free wound mask textures";
             std::cout << i << ": " << g_freeWoundMaskIndices[i] << "\n";
         }
         return -1;

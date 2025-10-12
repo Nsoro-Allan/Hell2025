@@ -9,7 +9,7 @@ SpawnPoint::SpawnPoint(glm::vec3 position, glm::vec3 camEuler) {
 }
 
 void SpawnPoint::Init() {
-    m_objectId = UniqueID::GetNext();
+    m_objectId = UniqueID::GetNextGlobal();
 
     // Create physics shape
     Transform transform;

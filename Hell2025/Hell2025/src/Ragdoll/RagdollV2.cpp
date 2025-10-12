@@ -2,47 +2,52 @@
 #include "Audio/Audio.h"
 #include "Input/Input.h"
 #include "RagdollManager.h"
+#include "Ragdoll_util.h"
 #include "HellLogging.h"
 #include "Renderer/Renderer.h"
 #include "UniqueID.h"
 
-inline glm::mat4 ToGlmMat4(const RdMatrix& M) {
-    glm::mat4 G(1.0f);
-    for (int r = 0; r < 4; ++r)
-        for (int c = 0; c < 4; ++c)
-            G[c][r] = M[c][r];
-    return G;
-};
+inline PxTransform PxTransformFromRest(const RdMatrix& restM, float sceneScale) {
+    PxMat44 M = RdMatrixToPxMat44(restM);
 
-inline physx::PxMat44 RdMatrixToPxMat44(const RdMatrix& M) {
-    float tmp[16];
-    for (int c = 0; c < 4; ++c)
-        for (int r = 0; r < 4; ++r)
-            tmp[c * 4 + r] = static_cast<float>(M[c][r]);
+    // Extract basis columns + translation from PxMat44
+    PxVec3 x(M.column0.x, M.column0.y, M.column0.z);
+    PxVec3 y(M.column1.x, M.column1.y, M.column1.z);
+    PxVec3 z(M.column2.x, M.column2.y, M.column2.z);
+    PxVec3 t(M.column3.x, M.column3.y, M.column3.z);
 
-    return physx::PxMat44(tmp);
+    // Descaling / orthonormalization
+    x = x.getNormalized();
+    y = (y - x * x.dot(y)).getNormalized();
+    z = x.cross(y);
+
+    // Ensure right handed basis (no mirroring)
+    if (x.cross(y).dot(z) < 0.0f) z = -z;
+
+    // Build rotation from the orthonormal columns
+    PxMat33 R(x, y, z);          // PxMat33 takes columns
+    PxQuat  q(R);                // quaternion from 3x3
+
+    // Scale TRANSLATION only
+    PxVec3 p = t * sceneScale;
+
+    return PxTransform(p, q);
 }
 
 void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, const std::string& ragdollName, uint64_t ragdollId) {
     RagdollInfo* ragdollInfo = RagdollManager::GetRagdollInfoByName(ragdollName);
     if (!ragdollInfo) return;
 
+    RagdollSolver& solver = ragdollInfo->m_solver;
+
     m_ragdollId = ragdollId;
-    m_scale = ragdollInfo->m_solver.sceneScale;
+    m_scale = solver.sceneScale;
     m_ragdollName = ragdollName;
     m_spawnTransform.position = spawnPosition;
     m_spawnTransform.rotation = spawnEulerRotation;
     m_meshBuffer.Reset();
 
     CleanUp();
-
-    // Mass scaling from JSON gravity
-    const float gScene = 9.81f; // My gravity
-    const float gx = (float)ragdollInfo->m_solver.gravity.x();
-    const float gy = (float)ragdollInfo->m_solver.gravity.y();
-    const float gz = (float)ragdollInfo->m_solver.gravity.z();
-    const float gJson = std::sqrt(gx * gx + gy * gy + gz * gz);
-    const float massScale = (gJson > 0.0f && gScene > 0.0f) ? (gJson / gScene) : 1.0f;
 
     PxTransform rootPose(Physics::GlmMat4ToPxMat44(m_spawnTransform.to_mat4()));
 
@@ -53,78 +58,23 @@ void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, cons
         // Store color for rendering
         glm::vec3 color = glm::vec3(marker.color.x(), marker.color.g(), marker.color.b());
         m_markerColors.push_back(color);
-        
+
         // Store bone name for skinning
         m_markerBoneNames.push_back(marker.boneName);
 
         // Create mesh for rendering from shape
-        AddMarkerMeshData(marker);
+        AddMarkerMeshData(marker, ragdollInfo->m_solver);
 
-        PxMat44 restMatrix = RdMatrixToPxMat44(marker.originMatrix);
-        PxTransform restTransform(restMatrix);
-        restTransform.p *= m_scale;
-
-        PxRigidDynamic* actor = physics->createRigidDynamic(rootPose.transform(restTransform));
-
-        // static friction / dynamic friction / restitution
-        PxMaterial* material = physics->createMaterial((float)marker.friction, (float)marker.friction, (float)marker.restitution);
+        PxTransform restTransform = PxTransformFromRest(marker.originMatrix, m_scale);
+        PxRigidDynamic* pxrigid = physics->createRigidDynamic(rootPose.transform(restTransform));
 
         // Kinematic/dynamic/inherit
         const bool kinematic = (marker.inputType == (RdEnum)RdBehaviour::kKinematic);
-        actor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
+        pxrigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
 
-        // Mass/inertia
-        if (!kinematic) {
-            const float adjustedMass = std::max(0.0001f, (float)marker.mass) * massScale;
-            PxRigidBodyExt::setMassAndUpdateInertia(*actor, PxReal(adjustedMass));
-        }
+        PxShape* shape = RagdollUtil::CreateShape(marker, ragdollInfo->m_solver);
 
-        PxShape* shape = nullptr;
-        if (marker.shapeType == "ConvexHull") {
-            std::vector<Vertex> vertices;
-            vertices.reserve(marker.convexMeshVertices.size());
-            for (RdPoint& point : marker.convexMeshVertices) {
-                Vertex& vertex = vertices.emplace_back();
-                vertex.position.x = point.x();
-                vertex.position.y = point.y();
-                vertex.position.z = point.z();
-            }
-            std::span<Vertex> vertexSpan(vertices.data(), vertices.size());
-            shape = Physics::CreateConvexShapeFromVertexList(vertexSpan);
-            PxMaterial* materials[] = { material };
-            shape->setMaterials(materials, 1);
-
-            PxGeometryHolder gh = shape->getGeometry();
-            PxConvexMeshGeometry g = gh.convexMesh();
-            g.scale = PxMeshScale(m_scale);
-            shape->setGeometry(g);
-
-        }
-        else if (marker.shapeType == "Box") {
-            const PxVec3 half(marker.extents.x() * m_scale / 2, marker.extents.y() * m_scale / 2, marker.extents.z() * m_scale / 2);
-            shape = physics->createShape(PxBoxGeometry(half), *material, true);
-
-        }
-        else if (marker.shapeType == "Capsule") {
-            const float radius = (float)marker.shapeRadius * m_scale;
-            const float halfHeight = 0.5f * (float)marker.shapeLength * m_scale;
-            shape = physics->createShape(PxCapsuleGeometry(radius, halfHeight), *material, true);
-        }
-        else if (marker.shapeType == "Sphere") {
-            shape = physics->createShape(PxSphereGeometry((float)marker.shapeRadius * m_scale), *material, true);
-        }
-
-        // Local pose of the shape inside the marker frame
         if (shape) {
-            if (marker.shapeType != "ConvexHull") {
-                RdVector offset = marker.shapeOffset * m_scale;
-                PxQuat qx(marker.shapeRotation.x(), PxVec3(1, 0, 0));
-                PxQuat qy(marker.shapeRotation.y(), PxVec3(0, 1, 0));
-                PxQuat qz(marker.shapeRotation.z(), PxVec3(0, 0, 1));
-                PxQuat q = qz * qy * qx;
-                PxTransform local = PxTransform(PxVec3(offset.x(), offset.y(), offset.z()), q);
-                shape->setLocalPose(local);
-            }
 
             PhysicsFilterData filterData;
             filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
@@ -138,30 +88,85 @@ void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, cons
             shape->setQueryFilterData(pxFilterData);       // ray casts
             shape->setSimulationFilterData(pxFilterData);  // collisions
 
-            actor->attachShape(*shape);
+            pxrigid->attachShape(*shape);
             shape->release();
+
+            // Kinematic/dynamic/inherit
+            const bool kinematic = (marker.inputType == (RdEnum)RdBehaviour::kKinematic);
+            pxrigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
+
+            // Mass/inertia
+            if (!kinematic) {
+                const float adjustedMass = marker.mass * 100.0f; // HACK!
+                PxRigidBodyExt::setMassAndUpdateInertia(*pxrigid, PxReal(adjustedMass));
+            }
+
+            if (marker.enableCCD) {
+                pxrigid->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+            }
+
+            pxrigid->setLinearDamping((float)marker.linearDamping);
+            pxrigid->setAngularDamping((float)marker.angularDamping);
+            pxrigid->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
+            pxrigid->setSleepThreshold(0.005f);
+            pxrigid->setStabilizationThreshold(0.01f);
+
+            scene->addActor(*pxrigid);
+            m_pxRigidDynamics.emplace_back(pxrigid);
+
+            // From Ragdoll below
+            //pxrigid->setSolverIterationCounts(
+            //    std::min(255U, solver.positionIterations * solver.positionIterations), 
+            //    std::min(255U, solver.velocityIterations * solver.velocityIterations)
+            //);
+
+            //if (marker.maxContactImpulse > 0) {
+            //    pxrigid->setMaxContactImpulse(marker.maxContactImpulse);
+            //}
+            //else {
+            //    pxrigid->setMaxContactImpulse(PX_MAX_F32);
+            //}
+            //
+            //if (marker.maxDepenetrationVelocity > 0) {
+            //    pxrigid->setMaxDepenetrationVelocity(marker.maxDepenetrationVelocity);
+            //}
+            //else {
+            //    pxrigid->setMaxDepenetrationVelocity(PX_MAX_F32);
+            //}
+
+            //PxRigidBodyExt::updateMassAndInertia(*pxrigid, marker.mass);
+
+            //float wakeCounter{ FLT_MAX };
+            //pxrigid->setSleepThreshold(marker.sleepThreshold);
+
+            //if (marker.densityCustom <= 0 && RdRegistry.all_of<RdMarkerUIComponent>(referenceEntity)) {
+            //    const auto& markerUi = RdRegistry.get<RdMarkerUIComponent>(referenceEntity);
+            //    PxRigidBodyExt::setMassAndUpdateInertia(*pxrigid, markerUi.mass);
+            //}
+            //else {
+            //    PxRigidBodyExt::updateMassAndInertia(*pxrigid, marker.densityCustom);
+            //}
+
+            //if (rigid.wakeCounter > 1) {
+            //    const auto time = RdRegistry.get<RdTimeComponent>(sceneEntity);
+            //    wakeCounter = time.fixedTimestep
+            //        * solver.timeMultiplier
+            //
+            //        // Account for first frame where the rigid is created
+            //        * (rigid.wakeCounter - 1);
+            //}
+            //
+            //pxrigid->setWakeCounter(wakeCounter);
+            //pxrigid->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, rigid.kinematic);
+
+            // User data
+            PhysicsUserData physicsUserData;
+            physicsUserData.physicsType = PhysicsType::RIGID_DYNAMIC;
+            physicsUserData.objectType = ObjectType::RAGDOLL_V2;
+            physicsUserData.physicsId = UniqueID::GetNextGlobal();
+            physicsUserData.objectId = m_ragdollId;
+            pxrigid->userData = new PhysicsUserData(physicsUserData);
         }
-
-        if (marker.enableCCD) {
-            actor->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
-        }
-
-        actor->setLinearDamping((float)marker.linearDamping); 
-        actor->setAngularDamping((float)marker.angularDamping);
-        actor->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_GYROSCOPIC_FORCES, true);
-        actor->setSleepThreshold(0.005f);
-        actor->setStabilizationThreshold(0.01f);
-
-        scene->addActor(*actor);
-        m_pxRigidDynamics.emplace_back(actor);
-
-        // User data
-        PhysicsUserData physicsUserData;
-        physicsUserData.physicsType = PhysicsType::RIGID_DYNAMIC;
-        physicsUserData.objectType = ObjectType::RAGDOLL_V2;
-        physicsUserData.physicsId = UniqueID::GetNext();
-        physicsUserData.objectId = m_ragdollId;
-        actor->userData = new PhysicsUserData(physicsUserData);
     }
 
     m_meshBuffer.UpdateBuffers();
@@ -228,8 +233,8 @@ void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, cons
         PxRigidActor* child = itC->second;
 
         // parent/child local frames from JSON, scale translation only
-        PxTransform lp(Physics::GlmMat4ToPxMat44(ToGlmMat4(j.parentFrame)));
-        PxTransform lc(Physics::GlmMat4ToPxMat44(ToGlmMat4(j.childFrame)));
+        PxTransform lp(Physics::GlmMat4ToPxMat44(RdMatrixToGlmMat4(j.parentFrame)));
+        PxTransform lc(Physics::GlmMat4ToPxMat44(RdMatrixToGlmMat4(j.childFrame)));
         if (sceneScale != 1.0f) { lp.p *= sceneScale; lc.p *= sceneScale; }
 
         PxD6Joint* d6 = PxD6JointCreate(*physics, parent, lp, child, lc);
@@ -279,7 +284,6 @@ void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, cons
     }
 
     DisableSimulation();
-
 }
 
 void RagdollV2::Update() {
@@ -287,7 +291,6 @@ void RagdollV2::Update() {
         PxTransform pxTransform = pxRigidDynamic->getGlobalPose();
         PxMat44 pxMatrix(pxTransform);
         glm::mat4 matrix = Physics::PxMat44ToGlmMat4(pxMatrix);
-        //Renderer::DrawPoint(matrix[3], PINK);
     }
 }
 
@@ -335,16 +338,13 @@ void RagdollV2::SetToInitialPose() {
     if (!ragdollInfo) return;
 
     const PxTransform spawnTransform(Physics::GlmMat4ToPxMat44(m_spawnTransform.to_mat4()));
+    PxTransform rootPose(Physics::GlmMat4ToPxMat44(m_spawnTransform.to_mat4()));
 
     const size_t count = std::min(m_pxRigidDynamics.size(), ragdollInfo->m_markers.size());
     for (size_t i = 0; i < count; ++i) {
         const RagdollMarker& marker = ragdollInfo->m_markers[i];
-
-        PxTransform restTransfrom(RdMatrixToPxMat44(marker.originMatrix));
-        restTransfrom.p *= m_scale;
-
-        const PxTransform worldXf = spawnTransform.transform(restTransfrom);
-        m_pxRigidDynamics[i]->setGlobalPose(worldXf);
+        PxTransform restTransform = PxTransformFromRest(marker.originMatrix, m_scale);
+        m_pxRigidDynamics[i]->setGlobalPose(rootPose.transform(restTransform));
         m_pxRigidDynamics[i]->setLinearVelocity(PxVec3(0));
         m_pxRigidDynamics[i]->setAngularVelocity(PxVec3(0));
     }
@@ -437,21 +437,27 @@ glm::mat4 RagdollV2::GetModelMatrixByRigidIndex(uint32_t index) const {
     return Physics::PxMat44ToGlmMat4(m_pxRigidDynamics[index]->getGlobalPose()) * scaleTransform.to_mat4();
 }
 
-void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
+void RagdollV2::AddMarkerMeshData(RagdollMarker& marker, RagdollSolver& solver) {
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
     vertices.reserve(marker.convexMeshVertices.size());
     indices.reserve(marker.convexMeshIndices.size());
 
+    const RdGeometryDescriptionComponent& desc = marker.geometryDescriptionComponent;
+
     // Apply local shape transfrm
     auto applyLocalShapeXform = [&](size_t begin) {
         glm::mat4 R(1.0f);
-        R = glm::rotate(R, (float)marker.shapeRotation.z(), glm::vec3(0, 0, 1));
-        R = glm::rotate(R, (float)marker.shapeRotation.y(), glm::vec3(0, 1, 0));
-        R = glm::rotate(R, (float)marker.shapeRotation.x(), glm::vec3(1, 0, 0));
-        glm::vec3 T((float)marker.shapeOffset.x(),
-                    (float)marker.shapeOffset.y(),
-                    (float)marker.shapeOffset.z());
+        R = glm::rotate(R, (float)desc.rotation.z(), glm::vec3(0, 0, 1));
+        R = glm::rotate(R, (float)desc.rotation.y(), glm::vec3(0, 1, 0));
+        R = glm::rotate(R, (float)desc.rotation.x(), glm::vec3(1, 0, 0));
+
+        const float s = (float)solver.sceneScale;
+        glm::vec3 T((float)desc.offset.x(),
+                    (float)desc.offset.y(),
+                    (float)desc.offset.z());
+        T /= s;
+
         for (size_t i = begin; i < vertices.size(); ++i) {
             glm::vec3 p = vertices[i].position;
             p = glm::vec3(R * glm::vec4(p, 1.0f));
@@ -459,7 +465,7 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
         }
     };
 
-    if (marker.shapeType == "ConvexHull") {
+    if (desc.type == RdGeometryType::kConvexHull) {
         for (RdPoint& point : marker.convexMeshVertices) {
             Vertex& vertex = vertices.emplace_back();
             vertex.position.x = point.x();
@@ -470,33 +476,26 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
             indices.emplace_back(index);
         }
     }
-    else if (marker.shapeType == "Box") {
-        const float hx = (float)marker.extents.x() / 2;
-        const float hy = (float)marker.extents.y() / 2;
-        const float hz = (float)marker.extents.z() / 2;
+    else if (desc.type == RdGeometryType::kBox) {
+        const float hx = (float)desc.extents.x() * 0.5f;
+        const float hy = (float)desc.extents.y() * 0.5f;
+        const float hz = (float)desc.extents.z() * 0.5f;
 
         const size_t vbase = vertices.size();
 
         auto addFace = [&](glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3) {
             const uint32_t base = (uint32_t)vertices.size();
-            Vertex v0; v0.position = p0; v0.uv = { 0,0 };
-            Vertex v1; v1.position = p1; v1.uv = { 1,0 };
-            Vertex v2; v2.position = p2; v2.uv = { 1,1 };
-            Vertex v3; v3.position = p3; v3.uv = { 0,1 };
-            vertices.push_back(v0); vertices.push_back(v1);
-            vertices.push_back(v2); vertices.push_back(v3);
+            Vertex v0; Vertex v1; Vertex v2; Vertex v3;
+            const glm::vec3 invS = glm::vec3(1.0f / (float)solver.sceneScale);
+            v0.position = p0 * invS; v1.position = p1 * invS; v2.position = p2 * invS; v3.position = p3 * invS;
+            v0.uv = { 0,0 }; v1.uv = { 1,0 }; v2.uv = { 1,1 }; v3.uv = { 0,1 };
+            vertices.push_back(v0); vertices.push_back(v1); vertices.push_back(v2); vertices.push_back(v3);
             indices.push_back(base + 0); indices.push_back(base + 1); indices.push_back(base + 2);
             indices.push_back(base + 0); indices.push_back(base + 2); indices.push_back(base + 3);
         };
 
-        const glm::vec3 v000(-hx, -hy, -hz);
-        const glm::vec3 v001(-hx, -hy, +hz);
-        const glm::vec3 v010(-hx, +hy, -hz);
-        const glm::vec3 v011(-hx, +hy, +hz);
-        const glm::vec3 v100(+hx, -hy, -hz);
-        const glm::vec3 v101(+hx, -hy, +hz);
-        const glm::vec3 v110(+hx, +hy, -hz);
-        const glm::vec3 v111(+hx, +hy, +hz);
+        const glm::vec3 v000(-hx, -hy, -hz), v001(-hx, -hy, +hz), v010(-hx, +hy, -hz), v011(-hx, +hy, +hz);
+        const glm::vec3 v100(+hx, -hy, -hz), v101(+hx, -hy, +hz), v110(+hx, +hy, -hz), v111(+hx, +hy, +hz);
 
         addFace(v100, v110, v111, v101); // +X
         addFace(v001, v011, v010, v000); // -X
@@ -508,9 +507,9 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
         applyLocalShapeXform(vbase);
     }
 
-    else if (marker.shapeType == "Capsule") {
-        const float r = (float)marker.shapeRadius;
-        const float half = 0.5f * (float)marker.shapeLength;
+    else if (desc.type == RdGeometryType::kCapsule) {
+        const float r = (float)desc.radius/ solver.sceneScale;
+        const float half = 0.5f * (float)desc.length / solver.sceneScale;
         const unsigned int hemisphereRings = 12;
         const unsigned int cylinderRings = 1;
         const unsigned int segments = 24;
@@ -628,8 +627,8 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
         applyLocalShapeXform(vbase);
     }
 
-    else if (marker.shapeType == "Sphere") {
-        const float r = (float)marker.shapeRadius;
+    else if (desc.type == RdGeometryType::kSphere) {
+        const float r = (float)desc.radius / solver.sceneScale;
         const int lat = 16, lon = 24;
 
         const size_t vbase = vertices.size();
@@ -637,24 +636,34 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
         for (int y = 0; y <= lat; ++y) {
             float v = (float)y / (float)lat;
             float a1 = v * 3.14159265359f;
-            float sy = std::cos(a1), sr = std::sin(a1);
+            float sy = std::cos(a1);
+            float sr = std::sin(a1);
+
             for (int x = 0; x <= lon; ++x) {
                 float u = (float)x / (float)lon;
                 float a2 = u * 6.28318530718f;
-                float cz = std::sin(a2), cy = std::cos(a2);
+                float cx = std::cos(a2);
+                float sx = std::sin(a2);
+
                 Vertex vert;
-                vert.position = { r * sr, r * sy * cy, r * sy * cz };
+                vert.position = { r * sr * cx, r * sy, r * sr * sx };
                 vert.uv = { u, v };
                 vertices.push_back(vert);
             }
         }
-        auto idx = [&](int x, int y) { return (uint32_t)(y * (lon + 1) + x); };
-        for (int y = 0; y < lat; ++y)
+
+        auto idx = [&](int x, int y) { return (uint32_t)(vbase + y * (lon + 1) + x); };
+
+        for (int y = 0; y < lat; ++y) {
             for (int x = 0; x < lon; ++x) {
-                uint32_t a = idx(x, y), b = idx(x + 1, y), c = idx(x + 1, y + 1), d = idx(x, y + 1);
+                uint32_t a = idx(x, y);
+                uint32_t b = idx(x + 1, y);
+                uint32_t c = idx(x + 1, y + 1);
+                uint32_t d = idx(x, y + 1);
                 indices.push_back(a); indices.push_back(b); indices.push_back(c);
                 indices.push_back(a); indices.push_back(c); indices.push_back(d);
             }
+        }
 
         applyLocalShapeXform(vbase);
     }
@@ -684,7 +693,7 @@ void RagdollV2::AddMarkerMeshData(RagdollMarker& marker) {
     }
 
     m_meshBuffer.AddMesh(vertices, indices, marker.name);
-    Logging::Debug() << "Added " << marker.shapeType << " vertex data: " << marker.name << " " << vertices.size() << " verts " << indices.size() << " indices";
+    //Logging::Debug() << "Added " << marker.shapeType << " vertex data: " << marker.name << " " << vertices.size() << " verts " << indices.size() << " indices";
 }
 
 void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* animatedGameObject) {
@@ -693,40 +702,12 @@ void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* an
         return;
     }
 
-    if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
-        Logging::Error() << "SetRigidGlobalPosesFromAnimatedGameObject()";
-
-        Logging::Debug() << "Skinned model name: " << animatedGameObject->GetSkinnedModel()->GetName();
-        Logging::Debug() << "RagdollV2 name:     " << m_ragdollName;
-        Logging::Debug() << "RagdollV2 Id:       " << m_ragdollId;
-
-
-        for (int i = 0; i < m_markerBoneNames.size(); i++) {
-            Logging::Debug() << i << ": " << m_markerBoneNames[i];
-        }
-
-        Logging::Debug() << "       ";
-        Logging::Debug() << "animatedGameObject->GetSkinnedModel()->m_boneMapping.size(): " << animatedGameObject->GetSkinnedModel()->m_boneMapping.size();
-        Logging::Debug() << "       ";
-    }
-
-
     for (int i = 0; i < m_markerBoneNames.size(); i++) {
         const std::string& markerBoneName = m_markerBoneNames[i];
-
-
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
-            Logging::Debug() << "Searching for " << markerBoneName;
-        }
 
         for (const auto& entry : animatedGameObject->GetSkinnedModel()->m_boneMapping) {
             const std::string& boneName = entry.first;
             unsigned int boneIndex = entry.second;
-
-
-            if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
-                Logging::Debug() << " -" << boneName;
-            }
 
             if (markerBoneName == boneName) {
                 PxRigidDynamic* pxRigidDynamic = m_pxRigidDynamics[i];
@@ -739,9 +720,6 @@ void RagdollV2::SetRigidGlobalPosesFromAnimatedGameObject(AnimatedGameObject* an
                     PxTransform pxTransform = PxTransform(Physics::GlmMat4ToPxMat44(boneMatrixWorld));
                     pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
                     pxRigidDynamic->setGlobalPose(pxTransform);
-
-                    //Logging::Debug() << i << " found PxRigidDyanmaic match for bone name " << boneName;
-
                     break;
                 }
                 else {

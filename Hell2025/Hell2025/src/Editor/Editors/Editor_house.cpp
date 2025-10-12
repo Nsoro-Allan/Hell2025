@@ -6,10 +6,10 @@
 #include "Core/Game.h"
 #include "ImGui/Types/Types.h"
 #include "Input/Input.h"
+#include "Managers/HouseManager.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
-#include "World/HouseManager.h"
 #include "World/World.h"
 #include <imgui/imgui.h>
 
@@ -24,16 +24,58 @@ namespace Editor {
         EditorUI::OpenFileWindow openFileWindow;
     } g_houseEditorImguiElements;
 
-    std::string g_currentFilename = "";
-
     void InitHouseEditorFileMenu();
     void InitHouseEditorPropertiesElements();
-    void ReconfigureHMapEditorImGuiElements();
+    //void ReconfigureHMapEditorImGuiElements();
 
     // Wall placement
     void BeginWall();
-    void CancelWallPlacement();
+    //void CancelWallPlacement();
     void UpdateWallPlacement();
+
+    void OpenHouseEditor() {
+        // If it's closed, open it
+        if (IsClosed()) {
+            OpenEditor();
+        }
+        // If it's already open, do nothing
+        else if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
+            return;
+        }
+        SetEditorMode(EditorMode::HOUSE_EDITOR);
+
+        // World state
+        World::LoadSingleHouse(Editor::GetEditorHouseName());
+        World::DisableOcean();
+
+        // Init UI
+        //InitFileMenuImGuiElements();
+        //InitLeftPanel();
+        //ReconfigureMapObjectEditorImGuiElements();
+
+        // Move player somewhere reasonable
+        Player* player = Game::GetLocalPlayerByIndex(0);
+        if (player) {
+            player->SetFootPosition(glm::vec3(2.25f, 0.0, 1.68f));
+            player->GetCamera().SetEulerRotation(glm::vec3(-0.2f, 0.0, 0.0f));
+        }
+
+        //if (Editor::GetEditorMode() != EditorMode::HOUSE_EDITOR) {
+        //
+        //    g_currentFilename = "TestHouse";
+        //    HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename(g_currentFilename);
+        //    World::LoadSingleHouse(houseCreateInfo);
+        //
+        //
+        //
+        //    Editor::SetEditorMode(EditorMode::HOUSE_EDITOR);
+        //    if (Editor::IsClosed()) {
+        //        Editor::OpenEditor();
+        //    }
+        //}
+
+        Audio::PlayAudio(AUDIO_SELECT, 1.0f);
+    }
 
     void InitHouseEditor() {
         InitHouseEditorFileMenu();
@@ -128,30 +170,6 @@ namespace Editor {
         }
         if (elements.openFileWindow.IsVisible()) {
             elements.openFileWindow.CreateImGuiElements();
-        }
-    }
-
-    void OpenHouseEditor() {
-        Audio::PlayAudio(AUDIO_SELECT, 1.0f);
-        World::DisableOcean();
-
-        if (Editor::GetEditorMode() != EditorMode::HOUSE_EDITOR) {
-
-            g_currentFilename = "TestHouse";
-            HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename(g_currentFilename);
-            World::LoadSingleHouse(houseCreateInfo);
-
-            // Move player somewhere reasonable
-            Player* player = Game::GetLocalPlayerByIndex(0);
-            if (player) {
-                player->SetFootPosition(glm::vec3(2.25f, 0.0, 1.68f));
-                player->GetCamera().SetEulerRotation(glm::vec3(-0.2f, 0.0, 0.0f));
-            }
-
-            Editor::SetEditorMode(EditorMode::HOUSE_EDITOR);
-            if (Editor::IsClosed()) {
-                Editor::OpenEditor();
-            }
         }
     }
 

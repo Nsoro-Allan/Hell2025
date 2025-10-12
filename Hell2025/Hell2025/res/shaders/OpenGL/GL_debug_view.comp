@@ -49,7 +49,7 @@ void main() {
     }
     else if (rendererData.rendererOverrideState == 3) {
         finalColor = rma;
-        finalColor = vec3(rma.b);
+        finalColor = vec3(rma.r);
     }
     else if (rendererData.rendererOverrideState == 4) {
         return;

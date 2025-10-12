@@ -307,7 +307,7 @@ namespace Bvh::Cpu {
         const std::vector<GpuPrimitiveInstance>& instances = sceneBvh->m_instances;
 
         // Bail if scene is empty
-        if (sceneNodes.empty() || sceneNodes.empty()) return rayResult;
+        if (sceneNodes.empty()) return rayResult;
         
         RayData rayData = ComputeRayData(rayOrigin, rayDir, 0.0001f, maxDistance);
         uint32_t stack[MAX_BVH_STACK_SIZE];

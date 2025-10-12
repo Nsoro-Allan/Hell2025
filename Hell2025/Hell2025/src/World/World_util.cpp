@@ -43,8 +43,10 @@ namespace World {
             return (glm::distance(rayHitPosition, playerCameraPosition) < 2.0f);
         }
 
-
         if (objectType == ObjectType::DRAWER) {
+            return true;
+        }
+        if (objectType == ObjectType::OPENABLE) {
             return true;
         }
 

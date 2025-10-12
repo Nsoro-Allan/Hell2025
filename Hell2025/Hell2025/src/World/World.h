@@ -1,10 +1,10 @@
 #pragma once
 #include "HellTypes.h"
 #include "Core/Debug.h"
-#include "Game/Allies/Mermaid/Mermaid.h"
-#include "Game/Enemies/Dobermann/Dobermann.h"
-#include "Game/Enemies/Kangaroo/Kangaroo.h"
-#include "Game/Enemies/Shark/Shark.h"
+#include "Types/Characters/Allies/Mermaid/Mermaid.h"
+#include "Types/Characters/Enemies/Dobermann/Dobermann.h"
+#include "Types/Characters/Enemies/Kangaroo/Kangaroo.h"
+#include "Types/Characters/Enemies/Shark/Shark.h"
 #include "Types/Christmas/ChristmasLights.h"
 #include "Types/Christmas/ChristmasPresent.h"
 #include "Types/Christmas/ChristmasTree.h"
@@ -26,6 +26,7 @@
 #include "Types/Interior/Drawers.h"
 #include "Types/Interior/Toilet.h"
 #include "Types/House/Door.h"
+#include "Types/House/HouseInstance.h"
 #include "Types/House/Plane.h"
 #include "Types/House/Wall.h"
 #include "Types/House/Window.h"
@@ -69,12 +70,16 @@ namespace World {
     void ResetWorld();
     void ClearAllObjects();
 
-    void LoadMapInstance(const std::string& mapName);
-    void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet);
-    void LoadMapInstanceObjects(const std::string& mapName, SpawnOffset spawnOffset); // Everything except the heightmap
+    void LoadMapInstance(const std::string& mapName); // Calls the function below, but with a single map
+    void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet); // Calls the 3 functions below
+    void LoadMapInstancesHeightMapData(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet);
+    void LoadMapInstanceObjects(const std::string& mapName, SpawnOffset spawnOffset);
+    void LoadMapInstanceHouses(const std::string& mapName, SpawnOffset spawnOffset);
+    
+    void LoadSingleHouse(const std::string& houseName);
+    void LoadHouseInstance(const std::string& houseName, SpawnOffset spawnOffset);
 
-    void LoadSingleSector(SectorCreateInfo* sectorCreateInfo, bool loadHouses);
-    void LoadSingleHouse(HouseCreateInfo* houseCreateInfo);
+    //void LoadSingleHouse(HouseCreateInfo* houseCreateInfo);
     
 
     bool ChunkExists(int x, int z);
@@ -89,7 +94,7 @@ namespace World {
     void AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset());
+    void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
     void AddDecal(const DecalCreateInfo& createInfo);
     void AddDobermann(DobermannCreateInfo& createInfo);
     void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset);
@@ -110,7 +115,9 @@ namespace World {
     void AddVATBlood(glm::vec3 position, glm::vec3 front);
     void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset);
 
-    void AddHouse(HouseCreateInfo houseCreateInfo, SpawnOffset spawnOffset);
+    //void AddHouse(HouseCreateInfo houseCreateInfo, SpawnOffset spawnOffset);
+
+    void PrintObjectCounts();
 
     void EnableOcean();
     void DisableOcean();
@@ -132,6 +139,7 @@ namespace World {
     void RemoveObject(uint64_t objectID);
     
     // BVH
+    //void RemoveAllHouseBvhs();
     void UpdatePlayerBvhs();
     BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance, int viewportIndex);
 
