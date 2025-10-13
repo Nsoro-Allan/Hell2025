@@ -4,7 +4,14 @@
 #include "Types/Renderer/Model.h"
 
 struct Door {
-    void Init(DoorCreateInfo createInfo);
+    Door() = default;
+    Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset);    
+    Door(const Door&) = delete;
+    Door& operator=(const Door&) = delete;
+    Door(Door&&) noexcept = default;
+    Door& operator=(Door&&) noexcept = default;
+    ~Door() = default;
+
     void SetPosition(glm::vec3 position);
     void Update(float deltaTime);
     void CleanUp();
@@ -15,7 +22,7 @@ struct Door {
     const bool MovedThisFrame() const                       { return m_movedThisFrame; }
     const uint64_t GetObjectId() const                      { return m_objectId; }
     const uint64_t GetPhysicsId() const                     { return m_physicsId; }
-    const uint64_t GetFrameObjectId() const                 { return m_frameObjectId; }
+    //const uint64_t GetFrameObjectId() const                 { return m_frameObjectId; }
     const glm::vec3& GetPosition() const                    { return m_position; }
     const glm::vec3& GetRotation() const                    { return m_rotation; }
     const glm::vec3& GetInteractPosition() const            { return m_interactPosition; }
@@ -32,7 +39,7 @@ private:
     bool m_movedThisFrame = true;
     uint64_t m_lifeTime = 0;
     uint64_t m_objectId = 0;
-    uint64_t m_frameObjectId = 0;
+    //uint64_t m_frameObjectId = 0;
     uint64_t m_physicsId = 0;
     Model* m_doorModel = nullptr;
     Model * m_frameModel = nullptr;

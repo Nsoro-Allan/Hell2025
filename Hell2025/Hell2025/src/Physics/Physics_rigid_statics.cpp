@@ -42,7 +42,7 @@ namespace Physics {
         pxScene->addActor(*pxRigidStatic);
 
         // Create DynamicBox
-        uint64_t physicsID = UniqueID::GetNextGlobal();
+        uint64_t physicsID = UniqueID::GetNext(ObjectType::PHYSICS_RIGID_DYNAMIC);
         RigidStatic& rigidDynamic = g_rigidStatics[physicsID];
 
         // Update its pointers
@@ -85,7 +85,7 @@ namespace Physics {
         pxScene->addActor(*pxRigidStatic);
 
         // Create DynamicBox
-        uint64_t physicsID = UniqueID::GetNextGlobal();
+        uint64_t physicsID = UniqueID::GetNext(ObjectType::PHYSICS_RIGID_STATIC);
         RigidStatic& rigidDynamic = g_rigidStatics[physicsID];
 
         // Update its pointers
@@ -143,7 +143,7 @@ namespace Physics {
        pxScene->addActor(*pxRigidStatic);
     
        // Create RigidStatic
-       uint64_t physicsID = UniqueID::GetNextGlobal();
+       uint64_t physicsID = UniqueID::GetNext(ObjectType::PHYSICS_RIGID_STATIC);
        RigidStatic& rigidStatic = g_rigidStatics[physicsID];
   
        // Update its pointers
@@ -175,7 +175,7 @@ namespace Physics {
        PxRigidStatic* pxRigidStatic = pxPhysics->createRigidStatic(pxTransform);
 
        // Create RigidStatic
-       uint64_t physicsID = UniqueID::GetNextGlobal();
+       uint64_t physicsID = UniqueID::GetNext(ObjectType::PHYSICS_RIGID_STATIC);
        RigidStatic& rigidStatic = g_rigidStatics[physicsID];
 
        // Create convex shapes
@@ -317,7 +317,7 @@ namespace Physics {
        pxRigidStatic->attachShape(*pxShape);
 
        // Create Rigid Static
-       uint64_t physicsID = UniqueID::GetNextGlobal();
+       uint64_t physicsID = UniqueID::GetNext(ObjectType::PHYSICS_RIGID_STATIC);
        RigidStatic& rigidStatic = g_rigidStatics[physicsID];
        rigidStatic.AddPxShape(pxShape);
 

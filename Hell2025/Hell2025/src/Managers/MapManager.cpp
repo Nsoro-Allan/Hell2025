@@ -50,7 +50,7 @@ namespace MapManager {
 
         // Construct the JSON string
         CreateInfoCollection createInfoCollection = World::GetCreateInfoCollection();
-        map->SetCreateInfoCollection(createInfoCollection);                             // This can probably go into the close editor function, or something better
+        map->SetCreateInfoCollection(createInfoCollection);
         
         std::string createInfoJson = Util::CreateInfoCollectionToJSON(createInfoCollection);
         std::string additionalJson = Util::AdditionalMapDataToJSON(map->GetAdditionalMapData());
@@ -83,10 +83,12 @@ namespace MapManager {
         // Close file
         file.close();
 
-        Logging::Debug()
-            << "Saved map '" << mapName << "'\n"
-            << createInfoJson << "'\n"
-            << additionalJson;
+        Logging::Debug() << "Saved " << outputPath;
+
+        //Logging::Debug()
+        //    << "Saved map '" << mapName << "'\n"
+        //    << createInfoJson << "'\n"
+        //    << additionalJson;
     }
 
     void LoadMap(const std::string& mapName) {

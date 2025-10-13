@@ -18,6 +18,8 @@
 #include "UI/UIBackEnd.h"
 #include "Viewport/ViewportManager.h"
 
+#include "UniqueId.h"
+
 // Get me out of here
 #include "World/World.h"
 // Get me out of here

@@ -84,6 +84,7 @@ namespace Util {
     void SetNormalsAndTangentsFromVertices(Vertex& vert0, Vertex& vert1, Vertex& vert2);
 
     // Text
+    const char* ShortcutToString(Shortcut shortcut);
     std::string BoolToString(bool b);
     std::string Vec2ToString(glm::vec2 v);
     std::string Vec3ToString(glm::vec3 v);
@@ -159,8 +160,9 @@ namespace Util {
 
     // Type to string Conversions
     std::string BlendingModeToString(BlendingMode mode);
+    std::string DrawersTypeToString(DrawersType houseType);
     std::string HouseTypeToString(HouseType houseType);
-    std::string InventoryStateToString(const InventoryState& state);
+    std::string InventoryStateToString(InventoryState state);
     std::string LightTypeToString(LightType type);
     std::string PickUpTypeToString(PickUpType type);
     std::string ObjectTypeToString(ObjectType type);
@@ -173,6 +175,7 @@ namespace Util {
 
     // String to type conversions
     BlendingMode StringToBlendingMode(const std::string& str);
+    DrawersType StringToDrawersType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);
     LightType StringToLightType(const std::string& str);
     PickUpType StringToPickUpType(const std::string& str);

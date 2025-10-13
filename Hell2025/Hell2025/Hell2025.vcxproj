@@ -401,8 +401,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\Generics\GenericStatic.cpp" />
     <ClCompile Include="src\Types\Interior\Drawers.cpp" />
     <ClCompile Include="src\Types\Interior\Toilet.cpp" />
-    <ClCompile Include="src\Types\Misc\Piano.cpp" />
-    <ClCompile Include="src\Types\Misc\PictureFrame.cpp" />
+    <ClCompile Include="src\Types\Interior\Piano.cpp" />
+    <ClCompile Include="src\Types\Interior\PictureFrame.cpp" />
     <ClCompile Include="src\Types\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Types\Renderer\MeshBuffer.cpp" />
     <ClCompile Include="src\Types\Renderer\MeshNodes.cpp" />
@@ -503,7 +503,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\World\World_house.cpp" />
     <ClCompile Include="src\World\World_process_bullets.cpp" />
     <ClCompile Include="src\World\World_render_submit.cpp" />
-    <ClCompile Include="src\World\World_saving.cpp" />
     <ClCompile Include="src\World\World_update.cpp" />
     <ClCompile Include="src\World\World_util.cpp" />
     <ClCompile Include="vendor\clipper\src\clipper.engine.cpp" />
@@ -759,8 +758,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Interior\Toilet.h" />
     <ClInclude Include="src\Types\Map\Map.h" />
     <ClInclude Include="src\Types\Map\MapInstance.h" />
-    <ClInclude Include="src\Types\Misc\Piano.h" />
-    <ClInclude Include="src\Types\Misc\PictureFrame.h" />
+    <ClInclude Include="src\Types\Interior\Piano.h" />
+    <ClInclude Include="src\Types\Interior\PictureFrame.h" />
     <ClInclude Include="src\Types\Renderer\Mesh.h" />
     <ClInclude Include="src\Types\Renderer\MeshNodes.h" />
     <ClInclude Include="src\Types\Renderer\Model.h" />

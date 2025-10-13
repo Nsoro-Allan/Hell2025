@@ -23,6 +23,8 @@
 
 #include "Physics/Types/Ragdoll.h"
 
+#include "SlotMap.h"
+
 namespace World {
     std::vector<AnimatedGameObject> g_animatedGameObjects;
     std::vector<ScreenSpaceBloodDecal> g_screenSpaceBloodDecals;
@@ -32,10 +34,8 @@ namespace World {
     std::vector<ChristmasPresent> g_christmasPresents;
     std::vector<ChristmasTree> g_christmasTrees;
     std::vector<ClippingCube> g_clippingCubes;
-    std::vector<Door> g_doors;
     std::vector<Dobermann> g_dobermanns;
     std::vector<Decal> g_decals;
-    std::vector<Drawers> g_drawers;
     std::vector<Fence> g_fences;
     std::vector<GameObject> g_gameObjects;
     std::vector<GenericStatic> g_genericStatics;
@@ -61,8 +61,10 @@ namespace World {
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
     std::vector<Window> g_windows;
 
-    //std::unordered_map<uint64_t, Drawers> g_drawers;
-    std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
+    Hell::SlotMap<Door> g_doors;
+    Hell::SlotMap<Drawers> g_drawers;
+
+    // std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
 
     std::vector<GPULight> g_gpuLightsLowRes;
     std::vector<GPULight> g_gpuLightsMidRes;
@@ -140,14 +142,14 @@ namespace World {
         fence.Init();
 
         GameObjectCreateInfo createInfo;
-        createInfo.position = glm::vec3(40.65f, 31.0f, 34.1f);
-        createInfo.modelName = "Drawers2";
+        //createInfo.position = glm::vec3(40.65f, 31.0f, 34.1f);
+        //createInfo.modelName = "Drawers2";
 
-        AddGameObject(createInfo);
-        g_gameObjects[0].SetMeshMaterial("Frame", "T_Main_01a");
-        g_gameObjects[0].SetMeshMaterial("Drawers", "T_Drawers_01a");
-        g_gameObjects[0].SetMeshMaterial("Handles", "T_Handles_01a");
-        g_gameObjects[0].SetMeshMaterial("Key", "T_SmallKey_01a");
+        //AddGameObject(createInfo);
+        //g_gameObjects[0].SetMeshMaterial("Frame", "T_Main_01a");
+        //g_gameObjects[0].SetMeshMaterial("Drawers", "T_Drawers_01a");
+        //g_gameObjects[0].SetMeshMaterial("Handles", "T_Handles_01a");
+        //g_gameObjects[0].SetMeshMaterial("Key", "T_SmallKey_01a");
 
         //
         //createInfo2.position = glm::vec3(37.25f, 31.0f, 35.5f);
@@ -164,8 +166,8 @@ namespace World {
         createInfo.scale = glm::vec3(1.0f);
         createInfo.modelName = "Reflector";
         AddGameObject(createInfo);
-        g_gameObjects[1].SetMeshMaterial("ReflectorPole", "Fence");
-        g_gameObjects[1].SetMeshMaterial("ReflectorRed", "Red");
+        g_gameObjects[0].SetMeshMaterial("ReflectorPole", "Fence");
+        g_gameObjects[0].SetMeshMaterial("ReflectorRed", "Red");
 
         DobermannCreateInfo dobermannCreateInfo;
         //dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
@@ -243,16 +245,7 @@ namespace World {
         //toiletCreateInfo.rotation.y = HELL_PI * 0.5f;
         //World::AddToilet(toiletCreateInfo, spawnOffset);
         //
-        //DrawersCreateInfo drawersCreateInfo;
-        //drawersCreateInfo.position = glm::vec3(8.65f, 0.0f, -0.6f);
-        //drawersCreateInfo.rotation.y = HELL_PI * 1.5f;
-        //drawersCreateInfo.type = DrawersType::LARGE;
-        //World::AddDrawers(drawersCreateInfo, spawnOffset);
-        //
-        //drawersCreateInfo.position = glm::vec3(4.50f, 0.0f, -0.85f);
-        //drawersCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //drawersCreateInfo.type = DrawersType::SMALL;
-        //World::AddDrawers(drawersCreateInfo, spawnOffset);
+
 
     }
 
@@ -330,6 +323,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
+        for (DrawersCreateInfo& createInfo : createInfoCollection.drawers)              AddDrawers(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
@@ -344,15 +338,16 @@ namespace World {
         CreateInfoCollection createInfoCollection;
 
         for (Door& door : World::GetDoors())                        createInfoCollection.doors.push_back(door.GetCreateInfo());
+        for (Drawers& drawers : World::GetDrawers())                createInfoCollection.drawers.push_back(drawers.GetCreateInfo());
         for (Light& light : World::GetLights())                     createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                     createInfoCollection.pianos.push_back(piano.GetCreateInfo());
         for (PickUp& pickUp : World::GetPickUps())                  createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
         for (Plane& plane : World::GetPlanes())                     createInfoCollection.planes.push_back(plane.GetCreateInfo());
-        for (PictureFrame& pictureFrame: World::GetPictureFrames()) createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
+        for (PictureFrame& pictureFrame : World::GetPictureFrames()) createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
         for (Tree& tree : World::GetTrees())                        createInfoCollection.trees.push_back(tree.GetCreateInfo());
         for (Wall& wall : World::GetWalls())                        createInfoCollection.walls.push_back(wall.GetCreateInfo());
         for (Window& window : World::GetWindows())                  createInfoCollection.windows.push_back(window.GetCreateInfo());
-       
+
         return createInfoCollection;
     }
 
@@ -392,9 +387,6 @@ namespace World {
             houseSpawnOffset.yRotation += houseLocation.rotation;
 
             LoadHouseInstance("TestHouse", houseSpawnOffset);
-
-            //HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
-            //World::AddHouse(*houseCreateInfo, houseSpawnOffset);
         }
     }
 
@@ -457,6 +449,35 @@ namespace World {
         return animatedGameObject.GetObjectId();
     }
 
+    Door* GetDoorByObjectId(uint64_t objectId) {
+        return g_doors.get(objectId);
+    }
+
+    Drawers* GetDrawersByObjectId(uint64_t objectId) {
+        return g_drawers.get(objectId);
+    }
+
+
+
+
+
+
+    //Door* GetDoorByDoorFrameObjectId(uint64_t objectID) {
+    //    for (int i = 0; i < g_doors.size(); i++) {
+    //        Door& door = g_doors[i];
+    //        if (door.GetFrameObjectId() == objectID) {
+    //            return &g_doors[i];
+    //        }
+    //    }
+    //    return nullptr;
+    //}
+
+
+
+
+
+
+
     AnimatedGameObject* GetAnimatedGameObjectByIndex(int32_t index) {
         if (index >= 0 && index < g_animatedGameObjects.size()) {
             return &g_animatedGameObjects[index];
@@ -512,78 +533,10 @@ namespace World {
         }
     }
 
-    //void LoadSingleHouse(HouseCreateInfo* houseCreateInfo) {
-    //    if (!houseCreateInfo) {
-    //        std::cout << "World::LoadSingleHouse() failed: houseCreateInfo was nullptr\n";
-    //        return;
-    //    }
-    //
-    //    ResetWorld();
-    //
-    //    g_mapName = "HouseEditorMap";
-    //    //g_mapWidth = 1;
-    //    //g_mapDepth = 1;
-    //
-    //    AddHouse(*houseCreateInfo, SpawnOffset());
-    //
-    //    GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
-    //}
-
-    //void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses) {
-    //    for (LightCreateInfo& createInfo : sectorCreateInfo.lights) {
-    //        AddLight(createInfo, spawnOffset);
-    //    }
-    //    for (GameObjectCreateInfo& createInfo : sectorCreateInfo.gameObjects) {
-    //        AddGameObject(createInfo, spawnOffset);
-    //    }
-    //    for (PickUpCreateInfo& createInfo : sectorCreateInfo.pickUps) {
-    //        AddPickUp(createInfo, spawnOffset);
-    //    }
-    //    for (TreeCreateInfo& createInfo : sectorCreateInfo.trees) {
-    //        AddTree(createInfo, spawnOffset);
-    //    }
-    //
-    //    if (loadHouses) {
-    //        HouseManager::LoadAllHouseFilesFromDisk();
-    //
-    //        glm::vec3 houseLocation = glm::vec3(15.0f, 30.5f, 40.0f);
-    //
-    //        SpawnOffset houseSpawnOffset = spawnOffset;
-    //        houseSpawnOffset.translation += houseLocation;
-    //
-    //        HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename("TestHouse");
-    //        if (houseCreateInfo) {
-    //            AddHouse(*houseCreateInfo, houseSpawnOffset);
-    //        }
-    //
-    //        GlobalIllumination::SetGlobalIlluminationStructuresDirtyState(true);
-    //    }
-    //}
-
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectID) {
         for (AnimatedGameObject& animatedGameObject : g_animatedGameObjects) {
             if (animatedGameObject.GetObjectId() == objectID) {
                 return &animatedGameObject;
-            }
-        }
-        return nullptr;
-    }
-
-    Door* GetDoorByObjectId(uint64_t objectID) {
-        for (int i = 0; i < g_doors.size(); i++) {
-            Door& door = g_doors[i];
-            if (door.GetObjectId() == objectID) {
-                return &g_doors[i];
-            }
-        }
-        return nullptr;
-    }
-
-    Door* GetDoorByDoorFrameObjectId(uint64_t objectID) {
-        for (int i = 0; i < g_doors.size(); i++) {
-            Door& door = g_doors[i];
-            if (door.GetFrameObjectId() == objectID) {
-                return &g_doors[i];
             }
         }
         return nullptr;
@@ -646,7 +599,7 @@ namespace World {
             }
         }
         return nullptr;
-    }    
+    }
 
     Toilet* GetToiletByMeshNodeObjectId(uint64_t objectId) {
         for (Toilet& toilet : g_toilets) {
@@ -670,6 +623,11 @@ namespace World {
     }
 
     void SetObjectPosition(uint64_t objectId, glm::vec3 position) {
+        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        if (drawers) {
+            drawers->SetPosition(position);
+        }
+
         Door* door = World::GetDoorByObjectId(objectId);
         if (door) {
             door->SetPosition(position);
@@ -722,68 +680,90 @@ namespace World {
         }
     }
 
-    void RemoveObject(uint64_t objectID) {
-        for (int i = 0; i < g_doors.size(); i++) {
-            if (g_doors[i].GetObjectId() == objectID) {
-                g_doors[i].CleanUp();
-                g_doors.erase(g_doors.begin() + i);
-                return;
-            }
+    void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
+        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        if (drawers) {
+            drawers->SetRotation(rotation);
         }
+    }
+
+    glm::vec3 GetGizmoOffest(uint64_t objectId) {
+        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        if (drawers) {
+            return drawers->GetGizmoOffset();
+        }
+        return glm::vec3(0.0f);
+    }
+
+    bool RemoveObject(uint64_t objectId) {
+        if (g_doors.contains(objectId)) {
+            g_doors.get(objectId)->CleanUp();
+            g_doors.erase(objectId);
+            return true;
+        }
+        if (g_drawers.contains(objectId)) {
+            g_drawers.get(objectId)->CleanUp();
+            g_drawers.erase(objectId);
+            return true;
+        }
+
+
+
         for (int i = 0; i < g_pianos.size(); i++) {
-            if (g_pianos[i].GetObjectId() == objectID) {
+            if (g_pianos[i].GetObjectId() == objectId) {
                 g_pianos[i].CleanUp();
                 g_pianos.erase(g_pianos.begin() + i);
-                return;
+                return true;
             }
         }
         for (int i = 0; i < g_planes.size(); i++) {
-            if (g_planes[i].GetObjectId() == objectID) {
+            if (g_planes[i].GetObjectId() == objectId) {
                 g_planes[i].CleanUp();
                 g_planes.erase(g_planes.begin() + i);
-                return;
+                return true;
             }
         }
         for (int i = 0; i < g_pickUps.size(); i++) {
-            if (g_pickUps[i].GetObjectId() == objectID) {
+            if (g_pickUps[i].GetObjectId() == objectId) {
                 g_pickUps[i].CleanUp();
                 g_pickUps.erase(g_pickUps.begin() + i);
-                return;
+                return true;
             }
         }
         for (int i = 0; i < g_walls.size(); i++) {
-            if (g_walls[i].GetObjectId() == objectID) {
+            if (g_walls[i].GetObjectId() == objectId) {
                 g_walls[i].CleanUp();
                 g_walls.erase(g_walls.begin() + i);
-                return;
+                return true;
             }
         }
         for (int i = 0; i < g_windows.size(); i++) {
-            if (g_windows[i].GetObjectId() == objectID) {
+            if (g_windows[i].GetObjectId() == objectId) {
                 g_windows[i].CleanUp();
                 g_windows.erase(g_windows.begin() + i);
-                return;
+                return true;
             }
         }
 
         for (int i = 0; i < g_animatedGameObjects.size(); i++) {
-            if (g_animatedGameObjects[i].GetObjectId() == objectID) {
+            if (g_animatedGameObjects[i].GetObjectId() == objectId) {
                 g_animatedGameObjects[i].CleanUp();
                 g_animatedGameObjects.erase(g_animatedGameObjects.begin() + i);
-                return;
+                return true;
             }
         }
 
         for (int i = 0; i < g_trees.size(); i++) {
-            if (g_trees[i].GetObjectId() == objectID) {
+            if (g_trees[i].GetObjectId() == objectId) {
                 Logging::Debug() << "Deleted " << g_trees[i].GetEditorName();
                 g_trees[i].CleanUp();
                 g_trees.erase(g_trees.begin() + i);
-                return;
+                return true;
             }
         }
 
-        Logging::Error() << "World::RemoveObject() Failed to remove object " << objectID << ", check you have implemented this type!\n";
+        Logging::Error() << "World::RemoveObject() Failed to remove object " << objectId << ", check you have implemented this type!\n";
+        return false;
     }
 
     void ResetWorld() {
@@ -912,14 +892,21 @@ namespace World {
         }
     }
 
-    void AddBullet(BulletCreateInfo createInfo) {
-        g_bullets.push_back(Bullet(createInfo));
+    void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNext(ObjectType::DOOR);
+        g_doors.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
-    void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset) {
-        Door& door = g_doors.emplace_back();
-        createInfo.position += spawnOffset.translation;
-        door.Init(createInfo);
+    void AddDrawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNext(ObjectType::DRAWERS);
+        g_drawers.emplace_with_id(id, id, createInfo, spawnOffset);
+    }
+
+
+
+
+    void AddBullet(BulletCreateInfo createInfo) {
+        g_bullets.push_back(Bullet(createInfo));
     }
 
     void AddBulletCasing(BulletCasingCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -988,10 +975,6 @@ namespace World {
 
     void AddToilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
         g_toilets.push_back(Toilet(createInfo, spawnOffset));
-    }
-
-    void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset) {
-        g_drawers.push_back(Drawers(createInfo, spawnOffset));
     }
 
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo) {
@@ -1251,10 +1234,10 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees()                     { return g_christmasTrees; }
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
-    std::vector<Door>& GetDoors()                                       { return g_doors; }
+    Hell::SlotMap<Door>& GetDoors()                                     { return g_doors; }
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
+    Hell::SlotMap<Drawers>& GetDrawers()                                { return g_drawers; }
     std::vector<Fence>& GetFences()                                     { return g_fences; }
-    std::vector<Drawers>& GetDrawers()                                  { return g_drawers; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }
     std::vector<GenericStatic>& GetGenericStatics()                     { return g_genericStatics; }

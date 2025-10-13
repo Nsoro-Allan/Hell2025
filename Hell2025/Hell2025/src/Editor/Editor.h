@@ -91,21 +91,7 @@ namespace Editor {
     void CloseAllMapHeightEditorWindows();
     void CreateMapHeightEditorImGuiElements();
 
-    float GetMapHeightNoiseScale();
-    float GetMapHeightBrushSize();
-    float GetMapHeightBrushStrength();
-    float GetMapHeightNoiseStrength();
-    float GetMapHeightMinPaintHeight();
-    float GetMapHeightMaxPaintHeight();
-    
-    std::string GetNextEditorName(const std::string& desiredName, ObjectType objectType);
-
-    std::string GetNextAvailableTreeName(TreeType type);
-
-    std::vector<std::string> GetTreeNames();
-
-    // Sector Editor
-    void InitMapObjectEditor();
+    // Map Object Editor
     void OpenMapObjectEditor();
     void UpdateMapObjectEditor();
     void CreateMapObjectEditorImGuiElements();
@@ -113,9 +99,28 @@ namespace Editor {
     void ShowOpenSectorWindow();
     void CloseAllMapObjectEditorWindows();
 
+    float GetMapHeightNoiseScale();
+    float GetMapHeightBrushSize();
+    float GetMapHeightBrushStrength();
+    float GetMapHeightNoiseStrength();
+    float GetMapHeightMinPaintHeight();
+    float GetMapHeightMaxPaintHeight();
+
+    std::string GetNextEditorName(const std::string& desiredName, ObjectType objectType);
+
+    std::string GetNextAvailableTreeName(TreeType type);
+
+    std::vector<std::string> GetTreeNames();
+
+
     void CloseAllEditorWindows();
 
+    void Save();
+
     // Object placement
+    void PlaceObject(ObjectType objectType);
+    ObjectType GetPlacementObjectType();
+
     void UpdateDoorPlacement();
     void UpdatePictureFramePlacement();
     void UpdatePlayerCampaignSpawnPlacement();

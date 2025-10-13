@@ -7,69 +7,32 @@ namespace Util {
         CreateInfoCollection createInfoCollection;
         nlohmann::json json = nlohmann::json::parse(jsonString);
 
-        // Load Game Objects
-        //for (auto& jsonObject : json["GameObjects"]) {
-        //    GameObjectCreateInfo& createInfo = createInfoCollection.gameObjects.emplace_back();
-        //    createInfo.position = jsonObject["position"];
-        //    createInfo.rotation = jsonObject["rotation"];
-        //    createInfo.scale = jsonObject["scale"];
-        //    createInfo.modelName = jsonObject["modelName"];
-        //    createInfo.meshRenderingInfoSet = jsonObject["meshRenderingInfo"];
-        //}
-
-        // Load lights
-        //for (auto& jsonObject : json["Lights"]) {
-        //    LightCreateInfo& createInfo = sectorCreateInfo.lights.emplace_back();
-        //    createInfo.position = jsonObject["position"];
-        //    createInfo.color = jsonObject["color"];
-        //    createInfo.radius = jsonObject["radius"];
-        //    createInfo.strength = jsonObject["strength"];
-        //    createInfo.type = Util::StringToLightType(jsonObject["type"]);
-        //}
-
-        // Pickups
-        for (auto& jsonObject : json["PickUps"]) {
-            PickUpCreateInfo& createInfo = createInfoCollection.pickUps.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.rotation = jsonObject["rotation"];
-            createInfo.pickUpType = jsonObject["type"];
-        }
-
-        // Trees
-        for (auto& jsonObject : json["Trees"]) {
-            TreeCreateInfo& createInfo = createInfoCollection.trees.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.rotation = jsonObject["rotation"];
-            createInfo.scale = jsonObject["scale"];
-            createInfo.type = Util::StringToTreeType(jsonObject.value<std::string>("type", std::string("TREE_LARGE_0")));
-        }
+        createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
+        createInfoCollection.drawers = json.value("Drawers", std::vector<DrawersCreateInfo>{});
+        createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
+        createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
+        createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
+        createInfoCollection.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
+        createInfoCollection.planes = json.value("Planes", std::vector<PlaneCreateInfo>{});
+        createInfoCollection.trees = json.value("Trees", std::vector<TreeCreateInfo>{});
+        createInfoCollection.walls = json.value("Walls", std::vector<WallCreateInfo>{});
+        createInfoCollection.windows = json.value("Windows", std::vector<WindowCreateInfo>{});
 
         return createInfoCollection;
     }
 
     std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection) {
         nlohmann::json json;
-        json["PickUps"] = nlohmann::json::array();
-        json["Trees"] = nlohmann::json::array();
-
-        // Pick Ups
-        for (const PickUpCreateInfo& createInfo : createInfoCollection.pickUps) {
-            json["PickUps"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "rotation", createInfo.rotation },
-                { "type", createInfo.pickUpType }
-            });
-        }
-
-        // Trees
-        for (const TreeCreateInfo& createInfo : createInfoCollection.trees) {
-            json["Trees"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "rotation", createInfo.rotation },
-                { "scale", createInfo.scale },
-                { "type", Util::TreeTypeToString(createInfo.type) }
-            });
-        }
+        json["Doors"] = createInfoCollection.doors;
+        json["Drawers"] = createInfoCollection.drawers;
+        json["Lights"] = createInfoCollection.lights;
+        json["Pianos"] = createInfoCollection.pianos;
+        json["PickUps"] = createInfoCollection.pickUps;
+        json["PictureFrames"] = createInfoCollection.pictureFrames;
+        json["Planes"] = createInfoCollection.planes;
+        json["Trees"] = createInfoCollection.trees;
+        json["Walls"] = createInfoCollection.walls;
+        json["Windows"] = createInfoCollection.windows;
 
         return json.dump(2);
     }

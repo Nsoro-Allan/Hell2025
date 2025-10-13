@@ -1,13 +1,22 @@
 #include "Util.h"
 
 namespace Util {
-    std::string InventoryStateToString(const InventoryState& state) {
+    std::string InventoryStateToString(InventoryState state) {
         switch (state) {
             case InventoryState::CLOSED:            return "CLOSED";
             case InventoryState::MAIN_SCREEN:       return "MAIN_SCREEN";
             case InventoryState::EXAMINE_ITEM:      return "EXAMINE_ITEM";
             case InventoryState::MOVING_ITEM:       return "MOVING_ITEM";
             case InventoryState::ROTATING_ITEM:     return "ROTATING_ITEM";
+            default: return "UNKNOWN";
+        }
+    }
+
+    std::string DrawersTypeToString(DrawersType houseType) {
+        switch (houseType) {
+            case DrawersType::SMALL:        return "SMALL";
+            case DrawersType::LARGE:        return "LARGE";
+            case DrawersType::UNDEFINED:    return "UNDEFINED";
             default: return "UNKNOWN";
         }
     }
@@ -131,6 +140,7 @@ namespace Util {
             case ObjectType::DECAL:                         return "DECAL";
             case ObjectType::CHARACTER_CONTROLLER:          return "CHARACTER_CONTROLLER";
             case ObjectType::DOOR:                          return "DOOR";
+            case ObjectType::DRAWERS:                       return "DRAWERS";
             case ObjectType::DOOR_FRAME:                    return "DOOR_FRAME";
             case ObjectType::DRAWER:                        return "DRAWER";
             case ObjectType::DRAWERS_FRAME:                 return "DRAWERS_FRAME";
@@ -200,10 +210,16 @@ namespace Util {
     std::string TrimTypeToString(TrimType type) {
         switch (type) {
             case TrimType::NONE:             return "NONE";
-            case TrimType::PLASTER:         return "PLASTER";
+            case TrimType::PLASTER:          return "PLASTER";
             case TrimType::TIMBER:           return "TIMBER";
             default:                         return "UNKNOWN";
         }
+    }
+
+    DrawersType StringToDrawersType(const std::string& str) {
+        if (str == "SMALL")     return DrawersType::SMALL;
+        if (str == "LARGE")     return DrawersType::LARGE;
+        return                  DrawersType::UNDEFINED;
     }
 
     BlendingMode StringToBlendingMode(const std::string& str) {

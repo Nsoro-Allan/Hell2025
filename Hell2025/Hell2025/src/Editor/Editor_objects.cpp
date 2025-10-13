@@ -7,6 +7,7 @@
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
+#include "UniqueID.h"
 
 namespace Editor {
 
@@ -42,32 +43,47 @@ namespace Editor {
 
         ObjectType hovererdType = Editor::GetHoveredObjectType();
 
-        // Find parents if necessary
-        if (GetHoveredObjectType() == ObjectType::DOOR_FRAME) {
-            Door* door = World::GetDoorByDoorFrameObjectId(GetHoveredObjectId());
-            if (door) {
-                SetHoveredObjectType(ObjectType::DOOR);
-                SetHoveredObjectId(door->GetObjectId());
+        if (GetHoveredObjectType() == ObjectType::OPENABLE) {
+            Openable* openable = OpenableManager::GetOpeneableByOpenableId(GetHoveredObjectId());
+            if (openable) {
+                SetHoveredObjectType(UniqueID::GetType(openable->m_parentObjectId));
+                SetHoveredObjectId(openable->m_parentObjectId);
             }
         }
-        if (GetHoveredObjectType() == ObjectType::PIANO_TOP_COVER ||
-            GetHoveredObjectType() == ObjectType::PIANO_KEY ||
-            GetHoveredObjectType() == ObjectType::PIANO_SHEET_MUSIC_REST ||
-            GetHoveredObjectType() == ObjectType::PIANO_SHEET_SUSTAIN_PEDAL ||
-            GetHoveredObjectType() == ObjectType::PIANO_KEYBOARD_COVER) {
-            Piano* piano = World::GetPianoByMeshNodeObjectId(GetHoveredObjectId());
-            if (piano) {
-                SetHoveredObjectType(ObjectType::PIANO);
-                SetHoveredObjectId(piano->GetObjectId());
-            }
+        else {
+            SetHoveredObjectType(UniqueID::GetType(GetHoveredObjectId()));
+            SetHoveredObjectId(GetHoveredObjectId());
         }
-        if (GetHoveredObjectType() == ObjectType::WALL_SEGMENT) {
-            Wall* wall = World::GetWallByWallSegmentObjectId(GetHoveredObjectId());
-            if (wall) {
-                SetHoveredObjectType(ObjectType::WALL);
-                SetHoveredObjectId(wall->GetObjectId());
-            }
-        }
+
+        //std::cout << GetHoveredObjectId() << " hovered object: " << Util::ObjectTypeToString(GetHoveredObjectType()) << " " << GetHoveredObjectId() << "\n";
+
+        //
+        //// Find parents if necessary
+        //if (GetHoveredObjectType() == ObjectType::DOOR_FRAME) {
+        //    Door* door = World::GetDoorByDoorFrameObjectId(GetHoveredObjectId());
+        //    if (door) {
+        //        SetHoveredObjectType(ObjectType::DOOR);
+        //        SetHoveredObjectId(door->GetObjectId());
+        //    }
+        //}
+        //if (GetHoveredObjectType() == ObjectType::PIANO_TOP_COVER ||
+        //    GetHoveredObjectType() == ObjectType::PIANO_KEY ||
+        //    GetHoveredObjectType() == ObjectType::PIANO_SHEET_MUSIC_REST ||
+        //    GetHoveredObjectType() == ObjectType::PIANO_SHEET_SUSTAIN_PEDAL ||
+        //    GetHoveredObjectType() == ObjectType::PIANO_KEYBOARD_COVER) {
+        //    Piano* piano = World::GetPianoByMeshNodeObjectId(GetHoveredObjectId());
+        //    if (piano) {
+        //        SetHoveredObjectType(ObjectType::PIANO);
+        //        SetHoveredObjectId(piano->GetObjectId());
+        //    }
+        //}
+        //if (GetHoveredObjectType() == ObjectType::WALL_SEGMENT) {
+        //    Wall* wall = World::GetWallByWallSegmentObjectId(GetHoveredObjectId());
+        //    if (wall) {
+        //        SetHoveredObjectType(ObjectType::WALL);
+        //        SetHoveredObjectId(wall->GetObjectId());
+        //    }
+        //}
     }
 
     void UpdateObjectSelection() {
@@ -78,7 +94,14 @@ namespace Editor {
             SetSelectedObjectType(GetHoveredObjectType());
             SetSelectedObjectId(GetHoveredObjectId());
 
-            std::cout << "Selected: " << Util::ObjectTypeToString(GetSelectedObjectType()) << " " << GetSelectedObjectId() << "\n";
+            //std::cout << "Selected: " << Util::ObjectTypeToString(GetSelectedObjectType()) << " " << GetSelectedObjectId() << "\n";
+            Gizmo::SetSourceObjectOffeset(World::GetGizmoOffest(GetSelectedObjectId()));
+
+            Drawers* drawers = World::GetDrawersByObjectId(GetSelectedObjectId());
+            if (drawers) {
+                Gizmo::SetPosition(drawers->GetPosition());
+                Gizmo::SetRotation(drawers->GetRotation());
+            }
 
             if (GetSelectedObjectType() == ObjectType::DOOR) {
                 Door* door = World::GetDoorByObjectId(GetSelectedObjectId());
@@ -138,6 +161,9 @@ namespace Editor {
 
         if (GetEditorState() == EditorState::GIZMO_TRANSLATING) {
             World::SetObjectPosition(GetSelectedObjectId(), Gizmo::GetPosition());
+        }
+        if (GetEditorState() == EditorState::GIZMO_ROTATING) {
+            World::SetObjectRotation(GetSelectedObjectId(), Gizmo::GetRotation());
         }
 
     }

@@ -365,7 +365,7 @@ namespace RagdollManager {
 
     uint64_t SpawnRagdoll(glm::vec3 position, glm::vec3 eulerRotation, const std::string& ragdollName) {
         Logging::Function() << "RagdollManager::SpawnRagdoll()";
-        uint64_t ragdollId = UniqueID::GetNextGlobal();
+        uint64_t ragdollId = UniqueID::GetNext(ObjectType::RAGDOLL_V2);
 
         RagdollV2& ragdoll = g_ragdolls[ragdollId] = RagdollV2();
         ragdoll.Init(position, eulerRotation, ragdollName, ragdollId);

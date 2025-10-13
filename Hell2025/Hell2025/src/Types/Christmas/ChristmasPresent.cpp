@@ -11,7 +11,7 @@ ChristmasPresent::ChristmasPresent(const ChristmasPresentCreateInfo& createInfo,
     m_createInfo = createInfo;
 
     CreatePhysicsObject();
-    m_objectId = UniqueID::GetNextGlobal();
+    m_objectId = UniqueID::GetNext(ObjectType::CHRISMAS_PRESENT);
 
     if (m_createInfo.type == ChristmasPresentType::SMALL) {
         m_model = AssetManager::GetModelByName("ChristmasPresentSmall");

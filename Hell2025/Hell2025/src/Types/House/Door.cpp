@@ -8,16 +8,16 @@
 #include "UniqueID.h"
 #include "Util.h"
 
-void Door::Init(DoorCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNextGlobal();
-    m_frameObjectId = UniqueID::GetNextGlobal();
+Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
+    m_objectId = id;
+    //m_frameObjectId = UniqueID::GetNext(ObjectType::DOOR_FRAME);
 
     m_createInfo = createInfo;
 
-    m_position = createInfo.position;
-    m_rotation = createInfo.rotation;
+    m_position = createInfo.position + spawnOffset.translation;
+    m_rotation = createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-    m_material = AssetManager::GetMaterialByName("Door"); 
+    m_material = AssetManager::GetMaterialByName("Door");
     m_doorModel = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("Door"));
     m_frameModel = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("DoorFrame"));
 
@@ -137,7 +137,8 @@ void Door::UpdateRenderItems() {
         renderItem.normalMapTextureIndex = m_material->m_normal;
         renderItem.objectType = Util::EnumToInt(ObjectType::DOOR_FRAME);
         Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_frameObjectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+        //Util::PackUint64(m_frameObjectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
     }
 }
 

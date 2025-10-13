@@ -37,15 +37,16 @@ struct GizmoRenderItem {
 namespace Gizmo {
     void Init();
     void Update();
-    void SetPosition(glm::vec3 position);
-    void SetEuler(glm::vec3 euler);
+    void SetPosition(const glm::vec3& position);
+    void SetRotation(const glm::vec3& rotation);
+    void SetSourceObjectOffeset(const glm::vec3& offset);
     void UpdateRenderItems();
 
     std::vector<GizmoRenderItem>& GetRenderItemsByViewportIndex(int index);
     MeshBuffer* GetMeshBufferByIndex(int index);
     const std::string GizmoFlagToString(const GizmoFlag& flag);
     const glm::vec3 GetPosition();
-    const glm::vec3 GetEulerRotation();
+    const glm::vec3 GetRotation();
     const bool HasHover();
     float GetGizmoScalingFactorByViewportIndex(int viewportIndex);
     const GizmoAction GetAction();

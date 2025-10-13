@@ -18,6 +18,14 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const DrawersCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"Position", createInfo.position},
+            {"Rotation", createInfo.rotation},
+            {"Type", Util::DrawersTypeToString(createInfo.type)}
+        };
+    }
+
     void to_json(nlohmann::json& j, const HouseLocation& houseLocation) {
         j = nlohmann::json{
             {"Position", houseLocation.position},
@@ -43,6 +51,14 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const PickUpCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"Position", createInfo.position},
+            {"Rotation", createInfo.rotation},
+            {"Type", createInfo.pickUpType}
+        };
+    }
+    
     void to_json(nlohmann::json& j, const PictureFrameCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
@@ -70,6 +86,15 @@ namespace nlohmann {
         j = nlohmann::json{
             {"Position", spawnPoint.GetPosition()},
             {"CamEuler", spawnPoint.GetCamEuler()},
+        };
+    }
+
+    void to_json(nlohmann::json& j, const TreeCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"Position", createInfo.position},
+            {"Rotation", createInfo.rotation},
+            {"Scale", createInfo.scale},
+            {"Type", Util::TreeTypeToString(createInfo.type)}
         };
     }
 
@@ -127,6 +152,12 @@ namespace nlohmann {
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
     }
 
+    void from_json(const nlohmann::json& j, DrawersCreateInfo& info) {
+        info.position = j.value("Position", glm::vec3(0.0f));
+        info.rotation = j.value("Rotation", glm::vec3(0.0f));
+        info.type = Util::StringToDrawersType(j.value("Type", UNDEFINED_STRING));
+    }
+
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation) {
         houseLocation.position = j.value("Position", glm::vec3(0.0f));
         houseLocation.rotation = j.value("Rotation", 0.0f);
@@ -146,6 +177,12 @@ namespace nlohmann {
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
     }
 
+    void from_json(const nlohmann::json& j, PickUpCreateInfo& info) {
+        info.position = j.value("Position", glm::vec3(0.0f));
+        info.rotation = j.value("Rotation", glm::vec3(0.0f));
+        info.pickUpType = j.value("Type", "UNDEFINED_STRING");
+    }
+
     void from_json(const nlohmann::json& j, PictureFrameCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
@@ -163,6 +200,13 @@ namespace nlohmann {
         info.textureOffsetV = j.value("TextureOffsetV", 0.0f);
         info.textureRotation = j.value("TextureRotation", 0.0f);
         info.materialName = j.value("Material", "CheckerBoard");
+    }
+
+    void from_json(const nlohmann::json& j, TreeCreateInfo& info) {
+        info.position = j.value("Position", glm::vec3(0.0f));
+        info.rotation = j.value("Rotation", glm::vec3(0.0f));
+        info.rotation = j.value("Scale", glm::vec3(1.0f));
+        info.type = Util::StringToTreeType(j.value("Type", UNDEFINED_STRING));
     }
 
     void from_json(const nlohmann::json& j, WallCreateInfo& info) {

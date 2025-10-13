@@ -7,7 +7,7 @@
 #include "UniqueID.h"
 
 void Dobermann::Init(DobermannCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNextGlobal();
+    m_objectId = UniqueID::GetNext(ObjectType::DOBERMANN);
     m_ragdollV2Id = RagdollManager::SpawnRagdoll(createInfo.position, createInfo.eulerDirection, "manikin2");
 
     g_animatedGameObjectObjectId = World::CreateAnimatedGameObject();

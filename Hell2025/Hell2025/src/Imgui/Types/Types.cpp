@@ -9,22 +9,6 @@ namespace EditorUI {
 
     void CreateRightJustifiedText(const std::string& text, float right_margin);
 
-    FileMenuNode::FileMenuNode(const std::string& text, std::function<void()> callback, const std::string& shortcut, bool addPadding) {
-        m_callback = callback;
-        m_shortcut = shortcut;
-        if (addPadding) {
-            m_text = "   " + text + "        ";
-        }
-        else {
-            m_text = " " + text + " ";
-        }
-    }
-
-    FileMenuNode& FileMenuNode::AddChild(const std::string& text, std::function<void()> callback, const std::string& shortcut, bool addPadding) {
-        m_children.emplace_back(text, callback, shortcut, addPadding);
-        return m_children.back();
-    }
-
     void FileMenuNode::CreateImguiElement() {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, ImGui::GetStyle().ItemInnerSpacing.y));
 
@@ -39,7 +23,7 @@ namespace EditorUI {
         }
         else {
             // No children? Then it's a leaf item.
-            if (ImGui::MenuItem(m_text.c_str(), m_shortcut.c_str())) {
+            if (ImGui::MenuItem(m_text.c_str(), Util::ShortcutToString(m_shortcut))) {
                 if (m_callback) {
                     m_callback();
                 }
@@ -47,11 +31,6 @@ namespace EditorUI {
         }
 
         ImGui::PopStyleVar();
-    }
-
-    FileMenuNode& FileMenu::AddMenuNode(const std::string& text, std::function<void()> callback, bool addPadding) {
-        m_menuNodes.emplace_back(text, callback, "", addPadding);
-        return m_menuNodes.back();
     }
 
     void FileMenu::CreateImguiElements() {

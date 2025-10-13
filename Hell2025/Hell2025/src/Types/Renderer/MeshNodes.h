@@ -28,7 +28,7 @@ struct MeshNodes {
     void SetBlendingModeByMeshName(const std::string& meshName, BlendingMode blendingMode);
     void SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType);
     void SetObjectIdByMeshName(const std::string& meshName, uint64_t id);
-    void SetOpenableByMeshName(const std::string& meshName, uint64_t openableId);
+    void SetOpenableByMeshName(const std::string& meshName, uint64_t openableId, uint64_t parentObjectId);
     void SetMeshMaterials(const std::string& materialName);
     void SetMaterialByMeshName(const std::string& meshName, const std::string& materialName);
     void SetTransformByMeshName(const std::string& meshName, Transform transform);

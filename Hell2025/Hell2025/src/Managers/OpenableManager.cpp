@@ -6,7 +6,7 @@ namespace OpenableManager {
     std::unordered_map<uint64_t, Openable> g_openables;
 
     uint64_t CreateOpenable() {
-        uint64_t openableId = UniqueID::GetNextGlobal();
+        uint64_t openableId = UniqueID::GetNext(ObjectType::OPENABLE);
         Openable& openable = g_openables[openableId];
 
         return openableId;

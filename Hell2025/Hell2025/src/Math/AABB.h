@@ -3,19 +3,19 @@
 
 struct AABB {
     AABB() = default;
-    AABB(glm::vec3 min, glm::vec3 max);
+    AABB(const glm::vec3& min, const glm::vec3& max);
     void Grow(AABB& b);
-    void Grow(glm::vec3 p);
+    void Grow(const glm::vec3& p);
     float Area();
     bool IntersectsSphere(const glm::vec3& sphereCenter, float radius) const;
     bool IntersectsAABB(const AABB& other) const;
     bool IntersectsAABB(const AABB& other, float threshold) const;
-    bool ContainsPoint(glm::vec3 point) const;
+    bool ContainsPoint(const glm::vec3& point) const;
 
-    const glm::vec3 GetCenter()         const { return center; }
-    const glm::vec3 GetBoundsMin()      const { return boundsMin; }
-    const glm::vec3 GetBoundsMax()      const { return boundsMax; }
-    const glm::vec3 GetExtents()        const { return extents; }
+    const glm::vec3& GetCenter()         const { return center; }
+    const glm::vec3& GetBoundsMin()      const { return boundsMin; }
+    const glm::vec3& GetBoundsMax()      const { return boundsMax; }
+    const glm::vec3& GetExtents()        const { return extents; }
 
 private:
     void CalculateCenterAndExtents();

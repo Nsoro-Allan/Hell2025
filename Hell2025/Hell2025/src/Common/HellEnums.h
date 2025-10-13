@@ -12,6 +12,14 @@ enum class WindowedMode {
     FULLSCREEN 
 };
 
+enum struct Shortcut {
+    F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+    CTRL_A, CTRL_B, CTRL_C, CTRL_D, CTRL_E, CTRL_F, CTRL_G, CTRL_H, CTRL_I, CTRL_J,
+    CTRL_K, CTRL_L, CTRL_M, CTRL_N, CTRL_O, CTRL_P, CTRL_Q, CTRL_R, CTRL_S, CTRL_T,
+    CTRL_U, CTRL_V, CTRL_W, CTRL_X, CTRL_Y, CTRL_Z,
+    ESC, NONE
+};
+
 enum class Alignment {
     CENTERED,
     CENTERED_HORIZONTAL,
@@ -96,6 +104,20 @@ enum class ObjectType : uint16_t {
     WALL_SEGMENT,
     WINDOW,
 
+    ANIMATED_GAME_OBJECT,
+    CHRISMAS_PRESENT,
+    DOBERMANN,
+    DRAWERS,
+    MESH_NODE,
+    PLAYER,
+    RAGDOLL_V1,
+    TRIM,
+
+    BVH,
+    PHYSICS_D6JOINT,
+    PHYSICS_RIGID_CHARACTER_CONTROLLER,
+    PHYSICS_RIGID_DYNAMIC,
+    PHYSICS_RIGID_STATIC,
     UNDEFINED
 };
 
@@ -142,8 +164,12 @@ enum struct EditorState {
     GIZMO_ROTATING,
     DRAGGING_SELECT_RECT,
 
-    // Object placement
+
+    PLACE_OBJECT,
+
+    // Object placement REMOVEEEEEEE MEEEEEEEE
     PLACE_DOOR,
+    PLACE_DRAWERS,
     PLACE_HOUSE,
     PLACE_PICTURE_FRAME,
     PLACE_TREE,
@@ -408,6 +434,12 @@ enum struct HouseType {
     MEDIUM_HOUSE,
     LARGE_HOUSE,
     NAMED,
+    UNDEFINED
+};
+
+enum class DrawersType {
+    SMALL,
+    LARGE,
     UNDEFINED
 };
 

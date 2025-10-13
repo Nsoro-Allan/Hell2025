@@ -44,13 +44,13 @@ namespace OpenGLRenderer {
         ImGui::NewFrame();
 
         if (Editor::IsOpen()) {
+            Editor::CreateFileMenuImGuiElements();
+
             if (Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR) {
-                Editor::CreateFileMenuImGuiElements(); 
                 Editor::CreateMapHeightEditorImGuiElements();
             }
 
             if (Editor::GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
-                Editor::CreateFileMenuImGuiElements();
                 Editor::CreateMapObjectEditorImGuiElements();
             }
 

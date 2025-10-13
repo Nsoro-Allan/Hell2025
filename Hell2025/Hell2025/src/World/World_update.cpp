@@ -137,10 +137,12 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
+        for (Door& door : GetDoors())           door.Update(deltaTime);
+        for (Drawers& drawers : GetDrawers())   drawers.Update(deltaTime); 
+
         std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
         std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
         std::vector<Bullet>& bullets = GetBullets();
-        std::vector<Door>& doors = GetDoors();
         std::vector<GameObject>& gameObjects = GetGameObjects();
         std::vector<Light>& lights = GetLights();
         std::vector<Piano>& pianos = GetPianos();
@@ -169,17 +171,11 @@ namespace World {
             christmasTree.Update(deltaTime);
         }
 
-        for (Door& door : doors) {
-            door.Update(deltaTime);
-        }
 
         for (Dobermann& dobermann : GetDobermanns()) {
             dobermann.Update(deltaTime);
         }
 
-        for (Drawers& drawers : GetDrawers()) {
-            drawers.Update(deltaTime);
-        }
 
         for (Fence& fence : GetFences()) {
             fence.Update();
@@ -284,13 +280,12 @@ namespace World {
 
     void UpdateDoorAndWindowCubeTransforms() {
         std::vector<Transform>& transforms = GetDoorAndWindowCubeTransforms();
-        std::vector<Door>& doors = GetDoors();
         std::vector<Window>& windows = GetWindows();
 
         transforms.clear();
-        transforms.reserve(doors.size() + windows.size());
+        transforms.reserve(World::GetDoors().size() + windows.size());
 
-        for (Door& door : doors) {
+        for (Door& door : World::GetDoors()) {
             Transform& transform = transforms.emplace_back();
             transform.position = door.GetPosition();
             transform.position.y += DOOR_HEIGHT / 2;

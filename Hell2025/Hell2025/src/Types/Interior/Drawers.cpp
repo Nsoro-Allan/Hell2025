@@ -5,16 +5,18 @@
 #include "UniqueID.h"
 #include "Util/Util.h"
 
-Drawers::Drawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
+Drawers::Drawers(uint64_t id, const DrawersCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_createInfo = createInfo;
     m_transform.position = m_createInfo.position + spawnOffset.translation;
     m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
     m_openableIds.clear();
-    m_objectId = UniqueID::GetNextGlobal();
+    m_objectId = id;
 
     if (createInfo.type == DrawersType::LARGE) {
         Model* model = AssetManager::GetModelByName("DrawersLarge2");
         m_meshNodes.InitFromModel(model);
+        m_meshNodes.SetObjectTypes(ObjectType::DRAWERS);
+        m_meshNodes.SetObjectIds(id);
 
         m_meshNodes.SetMaterialByMeshName("Key", "T_SmallKey_01a");
         m_meshNodes.SetMaterialByMeshName("DrawersLargeFrame", "T_Main_01a");
@@ -35,16 +37,16 @@ Drawers::Drawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
         uint64_t drawerThirdId = m_openableIds.emplace_back(OpenableManager::CreateOpenable());
         uint64_t drawerForthId = m_openableIds.emplace_back(OpenableManager::CreateOpenable());
 
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopL", drawerTopLeftId);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopR", drawerTopRightId);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_2nd", drawerSecondId);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_3rd", drawerThirdId);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_4th", drawerForthId);
-        m_meshNodes.SetOpenableByMeshName("Handle_TopL", drawerTopLeftId);
-        m_meshNodes.SetOpenableByMeshName("Handle_TopR", drawerTopRightId);
-        m_meshNodes.SetOpenableByMeshName("Handle_2nd", drawerSecondId);
-        m_meshNodes.SetOpenableByMeshName("Handle_3rd", drawerThirdId);
-        m_meshNodes.SetOpenableByMeshName("Handle_4th", drawerForthId);
+        m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopL", drawerTopLeftId, id);
+        m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopR", drawerTopRightId, id);
+        m_meshNodes.SetOpenableByMeshName("DrawersLarge_2nd", drawerSecondId, id);
+        m_meshNodes.SetOpenableByMeshName("DrawersLarge_3rd", drawerThirdId, id);
+        m_meshNodes.SetOpenableByMeshName("DrawersLarge_4th", drawerForthId, id);
+        m_meshNodes.SetOpenableByMeshName("Handle_TopL", drawerTopLeftId, id);
+        m_meshNodes.SetOpenableByMeshName("Handle_TopR", drawerTopRightId, id);
+        m_meshNodes.SetOpenableByMeshName("Handle_2nd", drawerSecondId, id);
+        m_meshNodes.SetOpenableByMeshName("Handle_3rd", drawerThirdId, id);
+        m_meshNodes.SetOpenableByMeshName("Handle_4th", drawerForthId, id);
 
         Openable* openableTopL = OpenableManager::GetOpeneableByOpenableId(drawerTopLeftId);
         openableTopL->openAxis = TRANSLATE_Z;
@@ -126,8 +128,28 @@ void Drawers::Update(float deltaTime) {
    }
 
    //m_meshNodes.DrawWorldspaceAABB(GREEN);
+
+   glm::vec3 worldSpaceCenter = m_transform.position + GetGizmoOffset();
+   Renderer::DrawPoint(worldSpaceCenter, PINK);
 }
 
 void Drawers::CleanUp() {
 
+}
+
+void Drawers::SetPosition(const glm::vec3& position) {
+    m_createInfo.position = position;
+    m_transform.position = position;
+}
+
+void Drawers::SetRotation(const glm::vec3& rotation) {
+    m_createInfo.rotation = rotation;
+    m_transform.rotation = rotation;
+};
+
+
+glm::vec3 Drawers::GetGizmoOffset() {
+    glm::vec3 aabbMin = m_meshNodes.m_worldspaceAABB.GetBoundsMin();
+    glm::vec3 aabbMax = m_meshNodes.m_worldspaceAABB.GetBoundsMax();
+    return ((aabbMin + aabbMax) * glm::vec3(0.5f)) - m_transform.position;
 }

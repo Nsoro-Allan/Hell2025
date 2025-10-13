@@ -2,6 +2,7 @@
 #include "AssetManagement/AssetManager.h"
 #include "HellLogging.h"
 #include "Input/Input.h"
+#include "Managers/OpenableManager.h"
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
 #include "UniqueID.h"
@@ -198,9 +199,15 @@ void MeshNodes::SetObjectIdByMeshName(const std::string& meshName, uint64_t id) 
     }
 }
 
-void MeshNodes::SetOpenableByMeshName(const std::string& meshName, uint64_t openableId) {
-    SetObjectIdByMeshName(meshName, openableId);
-    SetObjectTypeByMeshName(meshName, ObjectType::OPENABLE);
+void MeshNodes::SetOpenableByMeshName(const std::string& meshName, uint64_t openableId, uint64_t parentObjectId) {
+    Openable* openable = OpenableManager::GetOpeneableByOpenableId(openableId);
+    int nodeIndex = m_localIndexMap[meshName];
+
+    if (nodeIndex >= 0 && nodeIndex < GetNodeCount() && openable) {
+        m_objectIds[nodeIndex] = openableId;
+        m_objectTypes[nodeIndex] = ObjectType::OPENABLE;
+        openable->SetParentObjectId(parentObjectId);
+    }
 }
 
 

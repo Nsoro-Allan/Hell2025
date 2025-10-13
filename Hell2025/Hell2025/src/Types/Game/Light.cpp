@@ -41,7 +41,7 @@ Light::Light(LightCreateInfo createInfo) {
         }
     }
 
-    m_objectId = UniqueID::GetNextGlobal();
+    m_objectId = UniqueID::GetNext(ObjectType::LIGHT);
 }
 
 void Light::Update(float deltaTime) {

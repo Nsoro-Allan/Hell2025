@@ -33,6 +33,11 @@ struct Openable {
     std::string lockedAudio = "Locked.wav";
     Transform m_transform;
     float audioVolume = 2.0f;
+    uint64_t m_parentObjectId = 0;
+
+    void SetParentObjectId(uint64_t parentObjectId) {
+        m_parentObjectId = parentObjectId;
+    }
 
     void Interact() {
         if (locked) {

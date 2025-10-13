@@ -29,16 +29,8 @@ namespace Callbacks {
         Logging::ToDo() << "TODO: OpenHouse() callback: " << filename << "\n";
     }
 
-    void SaveHouse() {
-        World::SaveHouse();
-    }
-
     void OpenMap(const std::string& filename) {
         MapManager::LoadMap(filename);
-    }
-
-    void SaveMap(const std::string& filename) {
-        MapManager::SaveMap(filename);
     }
 
     void OpenHouseEditor() {

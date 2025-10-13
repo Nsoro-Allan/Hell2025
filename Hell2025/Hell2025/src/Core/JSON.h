@@ -7,24 +7,30 @@
 
 namespace nlohmann {
     void to_json(nlohmann::json& j, const DoorCreateInfo& info);
+    void to_json(nlohmann::json& j, const DrawersCreateInfo& info);
     void to_json(nlohmann::json& j, const HouseLocation& houseLocation);
     void to_json(nlohmann::json& j, const LightCreateInfo& info);
     void to_json(nlohmann::json& j, const MeshRenderingInfo& info);
     void to_json(nlohmann::json& j, const PianoCreateInfo& info);
+    void to_json(nlohmann::json& j, const PickUpCreateInfo& info);
     void to_json(nlohmann::json& j, const PictureFrameCreateInfo& info);
     void to_json(nlohmann::json& j, const PlaneCreateInfo& info);
     void to_json(nlohmann::json& j, const SpawnPoint& spawnPoint);
+    void to_json(nlohmann::json& j, const TreeCreateInfo& info);
     void to_json(nlohmann::json& j, const WallCreateInfo& info);
     void to_json(nlohmann::json& j, const WindowCreateInfo& info);
 
     void from_json(const nlohmann::json& j, DoorCreateInfo& info);
+    void from_json(const nlohmann::json& j, DrawersCreateInfo& info);
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation);
     void from_json(const nlohmann::json& j, LightCreateInfo& info);
     void from_json(const nlohmann::json& j, MeshRenderingInfo& info);
     void from_json(const nlohmann::json& j, PianoCreateInfo& info);
+    void from_json(const nlohmann::json& j, PickUpCreateInfo& info);
     void from_json(const nlohmann::json& j, PictureFrameCreateInfo& info);
     void from_json(const nlohmann::json& j, PlaneCreateInfo& info);
     void from_json(const nlohmann::json& j, SpawnPoint& info);
+    void from_json(const nlohmann::json& j, TreeCreateInfo& info);
     void from_json(const nlohmann::json& j, WallCreateInfo& info);
     void from_json(const nlohmann::json& j, WindowCreateInfo& info);
 

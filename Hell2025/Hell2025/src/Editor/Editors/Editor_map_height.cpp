@@ -18,7 +18,6 @@
 namespace Editor {
     namespace {
         struct ImguiElements {
-            //EditorUI::LeftPanel leftPanel;
             EditorUI::CollapsingHeader rendererSettingsHeader;
             EditorUI::CollapsingHeader mapHeightPropertiesHeader;
             EditorUI::StringInput mapHeightNameInput;
@@ -45,7 +44,7 @@ namespace Editor {
     float g_maxPaintHeight = HEIGHTMAP_SCALE_Y;
 
     void InitMapHeightEditorPropertiesElements();
-    void ReconfigureMapHeightEditorImGuiElements();
+    //void ReconfigureMapHeightEditorImGuiElements();
 
     void OpenMapHeightEditor() {
         // If it's closed, open it
@@ -70,7 +69,7 @@ namespace Editor {
         // Init UI
         InitFileMenuImGuiElements();
         InitLeftPanel();
-        ReconfigureMapHeightEditorImGuiElements();
+        //ReconfigureMapHeightEditorImGuiElements();
 
         Audio::PlayAudio(AUDIO_SELECT, 1.0f);
     }
@@ -79,9 +78,9 @@ namespace Editor {
         InitMapHeightEditorPropertiesElements();
     }
 
-    void InitMapHeightEditorFileMenu() {
-
-    }
+    //void InitMapHeightEditorFileMenu() {
+    //
+    //}
 
     void InitMapHeightEditorPropertiesElements() {
         g_imguiElements.rendererSettingsHeader.SetTitle("Renderer Settings");
@@ -124,19 +123,19 @@ namespace Editor {
         g_imguiElements.openFileWindow.SetCallback(nullptr);
     }
 
-    void ReconfigureMapHeightEditorImGuiElements() {
-        //MapHeightEditorEditorImguiElements& elements = g_MapHeightEditorImguiElements;
-        //
-        //// Update name input with height map name
-        //elements.MapHeightNameInput.SetText(SectorManager::GetSectorMapHeightName("MapHeightEditor_Center"));
-        //
-        //// Height map neighbor drop downs
-        //std::vector<std::string> MapHeights = { "None" };
-        //MapHeights.insert(MapHeights.end(), MapHeightManager::GetHeigthMapNames().begin(), MapHeightManager::GetHeigthMapNames().end());
-        //
-        //RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
-        //elements.drawGrass.SetState(renderSettings.drawGrass);
-    }
+    //void ReconfigureMapHeightEditorImGuiElements() {
+    //    //MapHeightEditorEditorImguiElements& elements = g_MapHeightEditorImguiElements;
+    //    //
+    //    //// Update name input with height map name
+    //    //elements.MapHeightNameInput.SetText(SectorManager::GetSectorMapHeightName("MapHeightEditor_Center"));
+    //    //
+    //    //// Height map neighbor drop downs
+    //    //std::vector<std::string> MapHeights = { "None" };
+    //    //MapHeights.insert(MapHeights.end(), MapHeightManager::GetHeigthMapNames().begin(), MapHeightManager::GetHeigthMapNames().end());
+    //    //
+    //    //RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
+    //    //elements.drawGrass.SetState(renderSettings.drawGrass);
+    //}
 
     void CreateMapHeightEditorImGuiElements() {
         BeginLeftPanel();

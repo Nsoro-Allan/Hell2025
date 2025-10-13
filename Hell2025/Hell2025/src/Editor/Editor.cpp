@@ -30,6 +30,7 @@ namespace Editor {
 
     ObjectType g_hoveredObjectType = ObjectType::NONE;
     ObjectType g_selectedObjectType = ObjectType::NONE;
+    ObjectType g_placementObjectType = ObjectType::NONE;
     uint64_t g_hoveredObjectId = 0;
     uint64_t g_selectedObjectId = 0;
 
@@ -48,7 +49,7 @@ namespace Editor {
         ResetViewports();
         ResetCameras();
 
-        InitMapObjectEditor();
+        //InitMapObjectEditor();
         InitMapHeightEditor();
         InitHouseEditor();
     }
@@ -111,6 +112,14 @@ namespace Editor {
         g_isOpen = false;
     }
 
+    void Save() {
+        if (Editor::GetEditorMode() == EditorMode::HOUSE_EDITOR) {
+            HouseManager::SaveHouse(Editor::GetEditorHouseName());
+        }
+        else if (Editor::GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR || Editor::GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+            MapManager::SaveMap(Editor::GetEditorMapName());
+        }
+    }
 
     void ResetViewports() {
 
@@ -246,6 +255,15 @@ namespace Editor {
         else {
             CloseEditor();
         }
+    }
+
+    void PlaceObject(ObjectType objectType) {
+        SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectType = objectType;
+    }
+
+    ObjectType GetPlacementObjectType() {
+        return g_placementObjectType;
     }
 
     void SetEditorMode(EditorMode editorMode) {

@@ -18,7 +18,7 @@ namespace HouseManager {
     }
 
     void LoadHouse(const std::string& filename) {
-        const std::string path = "res/houses/" + filename + ".json";
+        const std::string path = "res/houses/" + filename + ".house";
         std::ifstream file(path, std::ios::binary);
         if (!file) {
             Logging::Error() << "HouseManager::LoadHouse(): failed to open '" << path;
@@ -36,6 +36,7 @@ namespace HouseManager {
 
         CreateInfoCollection& createInfoCollection = house.GetCreateInfoCollection();
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
+        createInfoCollection.drawers = json.value("Drawers", std::vector<DrawersCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.planes = json.value("Planes", std::vector<PlaneCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
@@ -44,7 +45,8 @@ namespace HouseManager {
         createInfoCollection.windows = json.value("Windows", std::vector<WindowCreateInfo>{});
 
         Logging::Debug()
-            << "Loaded house: " << filename << ".json\n"
+            << "Loaded: " << path
+            << "\n" << Util::CreateInfoCollectionToJSON(createInfoCollection)
             //<< "- signature:     " << header.signature << "\n"
             //<< "- version:       " << header.version << "\n"
             //<< "- chunk count x: " << header.chunkCountX << "\n"
@@ -54,8 +56,34 @@ namespace HouseManager {
             << "";
     }
     
-    void SaveHouse(const std::string& houseName) {
+    void SaveHouse(const std::string& filename) {
+        House* house = GetHouseByName(filename);
+        if (!house) {
+            Logging::Error() << "HouseManager::SaveHouse(): failed because '" << filename << "' was not found.";
+            return;
+        }
 
+        // Construct the JSON string
+        CreateInfoCollection createInfoCollection = World::GetCreateInfoCollection();
+        house->SetCreateInfoCollection(createInfoCollection);
+
+        std::string createInfoJson = Util::CreateInfoCollectionToJSON(createInfoCollection);
+
+        // Create the file
+        std::string outputPath = "res/houses/" + filename + ".house";
+        std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
+        if (!file.is_open()) {
+            std::cout << "Failed to open file for writing: " << outputPath << "\n";
+            return;
+        }
+
+        // Quick n dirty dump of the string to file
+        file.write(createInfoJson.data(), static_cast<std::streamsize>(createInfoJson.size()));
+
+        Logging::Debug() 
+            << "Saved: " << outputPath
+            << "\n" << createInfoJson
+            << "";
     }
 
     void UpdateCreateInfoCollectionFromWorld(const std::string& houseName) {

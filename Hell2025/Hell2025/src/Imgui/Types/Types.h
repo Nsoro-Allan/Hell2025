@@ -9,19 +9,107 @@ namespace EditorUI {
 
     struct FileMenuNode {
         FileMenuNode() = default;
-        FileMenuNode(const std::string& text, std::function<void()> callback = nullptr, const std::string& shortcut = "", bool addPadding = true);
-        FileMenuNode& AddChild(const std::string& text, std::function<void()> callback = nullptr, const std::string& shortcut = "", bool addPadding = true);
+
+        // make sure real copy/move are available
+        FileMenuNode(const FileMenuNode&) = default;
+        FileMenuNode(FileMenuNode&&) noexcept = default;
+        FileMenuNode& operator=(const FileMenuNode&) = default;
+        FileMenuNode& operator=(FileMenuNode&&) noexcept = default;
+
+        FileMenuNode(const std::string& text, Shortcut shortcut, std::function<void()> cb = nullptr)
+            : m_text(" " + text + " "), m_shortcut(shortcut), m_callback(std::move(cb)) {
+        }
+
+        FileMenuNode& AddChild(const std::string& text, Shortcut shortcut, std::function<void()> cb = nullptr) {
+            m_children.emplace_back(text, shortcut, std::move(cb));
+            return m_children.back();
+        }
+
+        // Free function pointer
+        template<class R, class... P, class... A,
+            std::enable_if_t<!std::is_same_v<std::decay_t<R>, FileMenuNode>, int> = 0>
+        FileMenuNode& AddChild(const std::string& text, Shortcut shortcut, R(*pf)(P...), A&&... a) {
+            m_children.emplace_back(text, shortcut, [pf, tup = std::make_tuple(std::decay_t<A>(a)...)]() mutable { std::apply(pf, tup); });
+            return m_children.back();
+        }
+
+        // Free function pointer (overload friendly)
+        template<class R, class... P, class... A,
+            std::enable_if_t<!std::is_same_v<std::decay_t<R>, FileMenuNode>, int> = 0>
+        FileMenuNode(const std::string& text, Shortcut shortcut, R(*pf)(P...), A&&... a)
+            : m_text(" " + text + " "), m_shortcut(shortcut),
+            m_callback([pf, tup = std::make_tuple(std::decay_t<A>(a)...)]() mutable { std::apply(pf, tup); }) {
+        }
+
+        // Generic callable (exclude function pointers)
+        template<class F, class... A,
+            std::enable_if_t<
+            !std::is_same_v<std::decay_t<F>, FileMenuNode> &&
+            !(std::is_pointer_v<std::decay_t<F>>&&
+              std::is_function_v<std::remove_pointer_t<std::decay_t<F>>>)
+            , int> = 0>
+        FileMenuNode(const std::string& text, Shortcut shortcut, F&& f, A&&... a)
+            : m_text(" " + text + " "), m_shortcut(shortcut),
+            m_callback([fn = std::decay_t<F>(std::forward<F>(f)), tup = std::make_tuple(std::decay_t<A>(a)...)]() mutable { std::apply(fn, tup); }) {
+        }
+
+        FileMenuNode& AddChild(const std::string& text, Shortcut shortcut, std::nullptr_t) {
+            m_children.emplace_back(text, shortcut, std::function<void()>{});
+            return m_children.back();
+        }
+
+        // Generic callable (exclude function pointers)
+        template<class F, class... A,
+            std::enable_if_t<
+            !std::is_same_v<std::decay_t<F>, FileMenuNode> &&
+            !(std::is_pointer_v<std::decay_t<F>>&&
+              std::is_function_v<std::remove_pointer_t<std::decay_t<F>>>)
+            , int> = 0>
+        FileMenuNode& AddChild(const std::string& text, Shortcut shortcut, F&& f, A&&... a) {
+            m_children.emplace_back(text, shortcut, [fn = std::decay_t<F>(std::forward<F>(f)), tup = std::make_tuple(std::decay_t<A>(a)...)]() mutable { std::apply(fn, tup); });
+            return m_children.back();
+        }
+
         void CreateImguiElement();
 
     private:
         std::string m_text;
-        std::string m_shortcut = "";
+        Shortcut m_shortcut;
         std::function<void()> m_callback = nullptr;
         std::vector<FileMenuNode> m_children;
     };
 
     struct FileMenu {
-        FileMenuNode& AddMenuNode(const std::string& text, std::function<void()> callback = nullptr, bool addPadding = false);
+        FileMenuNode& AddMenuNode(const std::string& text, Shortcut shortcut, std::function<void()> cb = nullptr) {
+            m_menuNodes.emplace_back(text, shortcut, std::move(cb));
+            return m_menuNodes.back();
+        }
+
+        FileMenuNode& AddMenuNode(const std::string& text, Shortcut shortcut, std::nullptr_t) {
+            m_menuNodes.emplace_back(text, shortcut, std::function<void()>{});
+            return m_menuNodes.back();
+        }
+
+        // Free function pointer
+        template<class R, class... P, class... A,
+            std::enable_if_t<!std::is_same_v<std::decay_t<R>, FileMenuNode>, int> = 0>
+        FileMenuNode& AddMenuNode(const std::string& text, Shortcut shortcut, R(*pf)(P...), A&&... a) {
+            m_menuNodes.emplace_back(text, shortcut, pf, std::forward<A>(a)...);
+            return m_menuNodes.back();
+        }
+
+        // Generic callable (exclude function pointers)
+        template<class F, class... A,
+            std::enable_if_t<
+            !std::is_same_v<std::decay_t<F>, FileMenuNode> &&
+            !(std::is_pointer_v<std::decay_t<F>>&&
+              std::is_function_v<std::remove_pointer_t<std::decay_t<F>>>)
+            , int> = 0>
+        FileMenuNode& AddMenuNode(const std::string& text, Shortcut shortcut, F&& f, A&&... a) {
+            m_menuNodes.emplace_back(text, shortcut, std::forward<F>(f), std::forward<A>(a)...);
+            return m_menuNodes.back();
+        }
+
         void CreateImguiElements();
         void Reset();
 

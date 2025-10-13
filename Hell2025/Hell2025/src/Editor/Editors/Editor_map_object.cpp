@@ -19,8 +19,6 @@ namespace Editor {
             EditorUI::CollapsingHeader sectorPropertiesHeader;
             EditorUI::CollapsingHeader rendererSettingsHeader;
             EditorUI::CollapsingHeader objectSettingsHeader;
-            EditorUI::DropDown heightMapDropDown;
-            EditorUI::StringInput sectorNameInput;
             EditorUI::CheckBox drawGrass;
             EditorUI::CheckBox drawWater;
             EditorUI::Vec3Input objectPositon;
@@ -31,9 +29,9 @@ namespace Editor {
         } g_imguiElements;
     }
 
-    void InitMapObjectEditorFileMenu();
-    void InitMapObjectEditorPropertiesElements();
-    void ReconfigureMapObjectEditorImGuiElements();
+    //void InitMapObjectEditorFileMenu();
+    //void InitMapObjectEditorPropertiesElements();
+    //void ReconfigureMapObjectEditorImGuiElements();
 
     void OpenMapObjectEditor() {
         // If it's closed, open it
@@ -59,39 +57,13 @@ namespace Editor {
         // Init UI
         InitFileMenuImGuiElements();
         InitLeftPanel();
-        ReconfigureMapObjectEditorImGuiElements();
+        //ReconfigureMapObjectEditorImGuiElements();
 
         Audio::PlayAudio(AUDIO_SELECT, 1.0f);
     }
 
-    void InitMapObjectEditor() {
-        InitMapObjectEditorFileMenu();
-        InitMapObjectEditorPropertiesElements();
-    }
+    
 
-    void InitMapObjectEditorFileMenu() {
-        ImguiElements& elements = g_imguiElements;
-
-    }
-
-    void InitMapObjectEditorPropertiesElements() {
-        ImguiElements& elements = g_imguiElements;
-        elements.sectorPropertiesHeader.SetTitle("Sector Properties");
-        elements.rendererSettingsHeader.SetTitle("Renderer Settings");
-        elements.objectSettingsHeader.SetTitle("Object Settings");
-        elements.sectorNameInput.SetLabel("Name");
-        elements.heightMapDropDown.SetText("Height Map");
-        elements.drawGrass.SetText("Draw Grass");
-        elements.drawWater.SetText("Draw Water");
-        elements.objectPositon.SetText("Position");
-        elements.objectRotation.SetText("Rotation");
-        elements.objectScale.SetText("Scale");
-        elements.newFileWindow.SetTitle("New Sector");
-        elements.newFileWindow.SetCallback(nullptr);
-        elements.openFileWindow.SetTitle("Open Sector");
-        elements.openFileWindow.SetPath("res/sectors/");
-        elements.openFileWindow.SetCallback(nullptr);
-    }
 
     void CreateMapObjectEditorImGuiElements() {
         BeginLeftPanel();
@@ -157,9 +129,9 @@ namespace Editor {
         //}
     }
 
-    void ReconfigureMapObjectEditorImGuiElements() {
-
-    }
+    //void ReconfigureMapObjectEditorImGuiElements() {
+    //
+    //}
 
     void ShowNewSectorWindow() {
         CloseAllEditorWindows();

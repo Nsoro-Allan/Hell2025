@@ -14,18 +14,36 @@
 #include <imgui/imgui.h>
 
 namespace Editor {
+    namespace {
+        struct ImguiElements {
+            EditorUI::CollapsingHeader sectorPropertiesHeader;
+            EditorUI::CollapsingHeader rendererSettingsHeader;
+            EditorUI::CollapsingHeader objectSettingsHeader;
+            EditorUI::CheckBox drawGrass;
+            EditorUI::CheckBox drawWater;
+            EditorUI::Vec3Input objectPositon;
+            EditorUI::Vec3Input objectRotation;
+            EditorUI::Vec3Input objectScale;
+            EditorUI::NewFileWindow newFileWindow;
+            EditorUI::OpenFileWindow openFileWindow;
+        } g_imguiElements;
+    }
 
-    struct HouseEditorEditorImguiElements {
-        EditorUI::FileMenu fileMenu;
-        EditorUI::LeftPanel leftPanel;
-        EditorUI::CollapsingHeader housePropertiesHeader;
-        EditorUI::StringInput houseNameInput;
-        EditorUI::NewFileWindow newFileWindow;
-        EditorUI::OpenFileWindow openFileWindow;
-    } g_houseEditorImguiElements;
-
-    void InitHouseEditorFileMenu();
+    //void InitHouseEditorFileMenu();
     void InitHouseEditorPropertiesElements();
+    //void ReconfigureHouseEditorImGuiElements();
+
+    //struct HouseEditorEditorImguiElements {
+    //    EditorUI::FileMenu fileMenu;
+    //    EditorUI::LeftPanel leftPanel;
+    //    EditorUI::CollapsingHeader housePropertiesHeader;
+    //    EditorUI::StringInput houseNameInput;
+    //    EditorUI::NewFileWindow newFileWindow;
+    //    EditorUI::OpenFileWindow openFileWindow;
+    //} g_houseEditorImguiElements;
+
+    //void InitHouseEditorFileMenu();
+    //void InitHouseEditorPropertiesElements();
     //void ReconfigureHMapEditorImGuiElements();
 
     // Wall placement
@@ -49,9 +67,9 @@ namespace Editor {
         World::DisableOcean();
 
         // Init UI
-        //InitFileMenuImGuiElements();
-        //InitLeftPanel();
-        //ReconfigureMapObjectEditorImGuiElements();
+        InitFileMenuImGuiElements();
+        InitLeftPanel();
+        //ReconfigureHouseEditorImGuiElements();
 
         // Move player somewhere reasonable
         Player* player = Game::GetLocalPlayerByIndex(0);
@@ -60,117 +78,118 @@ namespace Editor {
             player->GetCamera().SetEulerRotation(glm::vec3(-0.2f, 0.0, 0.0f));
         }
 
-        //if (Editor::GetEditorMode() != EditorMode::HOUSE_EDITOR) {
-        //
-        //    g_currentFilename = "TestHouse";
-        //    HouseCreateInfo* houseCreateInfo = HouseManager::GetHouseCreateInfoByFilename(g_currentFilename);
-        //    World::LoadSingleHouse(houseCreateInfo);
-        //
-        //
-        //
-        //    Editor::SetEditorMode(EditorMode::HOUSE_EDITOR);
-        //    if (Editor::IsClosed()) {
-        //        Editor::OpenEditor();
-        //    }
-        //}
-
         Audio::PlayAudio(AUDIO_SELECT, 1.0f);
     }
 
+    //void InitHouseEditor() {
+    //    InitHouseEditorFileMenu();
+    //    InitHouseEditorPropertiesElements();
+    //}
+    //
+    //void InitHouseEditorFileMenu() {
+    //    HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
+    //
+    //    EditorUI::FileMenuNode& file = elements.fileMenu.AddMenuNode("File", nullptr);
+    //    file.AddChild("New", []() { ShowNewHouseWindow(); }, "F2");
+    //    file.AddChild("Open", []() { ShowOpenHouseWindow(); }, "F3");
+    //    file.AddChild("Save", &Callbacks::SaveHouse, "Ctrl+S");
+    //    file.AddChild("Revert", nullptr);
+    //    file.AddChild("Delete", nullptr);
+    //    file.AddChild("Duplicate", nullptr);
+    //    file.AddChild("Quit", &Callbacks::QuitProgram, "Esc");
+    //
+    //    EditorUI::FileMenuNode& editor = elements.fileMenu.AddMenuNode("Editor");
+    //    editor.AddChild("House", &Callbacks::OpenHouseEditor, "F4");
+    //    editor.AddChild("Map Objects", &Callbacks::OpenMapObjectEditor, "F5");
+    //    editor.AddChild("Map Height", &Callbacks::OpenMapHeightEditor, "F6");
+    //
+    //    EditorUI::FileMenuNode& insert = elements.fileMenu.AddMenuNode("Insert");
+    //    insert.AddChild("Door", &Callbacks::BeginAddingDoor, "");
+    //    insert.AddChild("Picture Frame", &Callbacks::BeginAddingPictureFrame, "");
+    //    insert.AddChild("Wall", &Callbacks::BeginAddingWall, "");
+    //    insert.AddChild("Window", &Callbacks::BeginAddingWindow, "");
+    //}
+    //
+    //void InitHouseEditorPropertiesElements() {
+    //    HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
+    //    //elements.rendererSettingsHeader.SetTitle("Renderer Settings");
+    //    //elements.drawGrass.SetText("Draw Grass");
+    //    //elements.drawWater.SetText("Draw Water");
+    //    elements.housePropertiesHeader.SetTitle("House Properties");
+    //    elements.houseNameInput.SetLabel("House name");
+    //    //elements.test.SetText("Integer Test");
+    //    //elements.test.SetRange(-1, 10);
+    //    //elements.test.SetValue(8);
+    //    //elements.test2.SetText("Slider Test");
+    //    //elements.test2.SetRange(-1.0f, 10.0f);
+    //    //elements.test2.SetValue(8.0f);
+    //
+    //    elements.newFileWindow.SetTitle("New House");
+    //    elements.newFileWindow.SetCallback(Callbacks::NewHouse);
+    //    elements.openFileWindow.SetTitle("Open House");
+    //    elements.openFileWindow.SetPath("res/houses/");
+    //    elements.openFileWindow.SetCallback(Callbacks::OpenHouse);
+    //}
+    //
+    //void ReconfigureHouseEditorImGuiElements() {
+    //    HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
+    //
+    //    // Update name input with height map name
+    //    elements.houseNameInput.SetText(World::GetCurrentMapName());
+    //
+    //    //RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
+    //    //elements.drawGrass.SetState(renderSettings.drawGrass);
+    //}
+    //
+    //void CreateHouseEditorImGuiElements() {
+    //    HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
+    //    elements.fileMenu.CreateImguiElements();
+    //    elements.leftPanel.BeginImGuiElement();
+    //
+    //    // Renderer settings
+    //    //if (elements.rendererSettingsHeader.CreateImGuiElement()) {
+    //    //    if (elements.drawGrass.CreateImGuiElements()) {
+    //    //        RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
+    //    //        renderSettings.drawGrass = elements.drawGrass.GetState();
+    //    //    }
+    //    //    if (elements.drawWater.CreateImGuiElements()) {
+    //    //        std::cout << elements.drawWater.GetState();
+    //    //    }
+    //    //    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    //    //}
+    //
+    //    // Height map properties
+    //    if (elements.housePropertiesHeader.CreateImGuiElement()) {
+    //        elements.houseNameInput.CreateImGuiElement();
+    //        //elements.test.CreateImGuiElements();
+    //        //elements.test2.CreateImGuiElements();
+    //
+    //    }
+    //
+    //    elements.leftPanel.EndImGuiElement();
+    //
+    //    // Windows
+    //    if (elements.newFileWindow.IsVisible()) {
+    //        elements.newFileWindow.CreateImGuiElements();
+    //    }
+    //    if (elements.openFileWindow.IsVisible()) {
+    //        elements.openFileWindow.CreateImGuiElements();
+    //    }
+    //}
+
     void InitHouseEditor() {
-        InitHouseEditorFileMenu();
         InitHouseEditorPropertiesElements();
     }
 
-    void InitHouseEditorFileMenu() {
-        HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
+    void CreateHouseEditorImGuiElements() {
+        BeginLeftPanel();
 
-        EditorUI::FileMenuNode& file = elements.fileMenu.AddMenuNode("File", nullptr);
-        file.AddChild("New", []() { ShowNewHouseWindow(); }, "F2");
-        file.AddChild("Open", []() { ShowOpenHouseWindow(); }, "F3");
-        file.AddChild("Save", &Callbacks::SaveHouse, "Ctrl+S");
-        file.AddChild("Revert", nullptr);
-        file.AddChild("Delete", nullptr);
-        file.AddChild("Duplicate", nullptr);
-        file.AddChild("Quit", &Callbacks::QuitProgram, "Esc");
-
-        EditorUI::FileMenuNode& editor = elements.fileMenu.AddMenuNode("Editor");
-        editor.AddChild("House", &Callbacks::OpenHouseEditor, "F4");
-        editor.AddChild("Map Objects", &Callbacks::OpenMapObjectEditor, "F5");
-        editor.AddChild("Map Height", &Callbacks::OpenMapHeightEditor, "F6");
-
-        EditorUI::FileMenuNode& insert = elements.fileMenu.AddMenuNode("Insert");
-        insert.AddChild("Door", &Callbacks::BeginAddingDoor, "");
-        insert.AddChild("Picture Frame", &Callbacks::BeginAddingPictureFrame, "");
-        insert.AddChild("Wall", &Callbacks::BeginAddingWall, "");
-        insert.AddChild("Window", &Callbacks::BeginAddingWindow, "");
+        EndLeftPanel();
     }
+
 
     void InitHouseEditorPropertiesElements() {
-        HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
-        //elements.rendererSettingsHeader.SetTitle("Renderer Settings");
-        //elements.drawGrass.SetText("Draw Grass");
-        //elements.drawWater.SetText("Draw Water");
-        elements.housePropertiesHeader.SetTitle("House Properties");
-        elements.houseNameInput.SetLabel("House name");
-        //elements.test.SetText("Integer Test");
-        //elements.test.SetRange(-1, 10);
-        //elements.test.SetValue(8);
-        //elements.test2.SetText("Slider Test");
-        //elements.test2.SetRange(-1.0f, 10.0f);
-        //elements.test2.SetValue(8.0f);
 
-        elements.newFileWindow.SetTitle("New House");
-        elements.newFileWindow.SetCallback(Callbacks::NewHouse);
-        elements.openFileWindow.SetTitle("Open House");
-        elements.openFileWindow.SetPath("res/houses/");
-        elements.openFileWindow.SetCallback(Callbacks::OpenHouse);
-    }
-
-    void ReconfigureHouseEditorImGuiElements() {
-        HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
-
-        // Update name input with height map name
-        elements.houseNameInput.SetText(World::GetCurrentMapName());
-
-        //RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
-        //elements.drawGrass.SetState(renderSettings.drawGrass);
-    }
-
-    void CreateHouseEditorImGuiElements() {
-        HouseEditorEditorImguiElements& elements = g_houseEditorImguiElements;
-        elements.fileMenu.CreateImguiElements();
-        elements.leftPanel.BeginImGuiElement();
-
-        // Renderer settings
-        //if (elements.rendererSettingsHeader.CreateImGuiElement()) {
-        //    if (elements.drawGrass.CreateImGuiElements()) {
-        //        RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
-        //        renderSettings.drawGrass = elements.drawGrass.GetState();
-        //    }
-        //    if (elements.drawWater.CreateImGuiElements()) {
-        //        std::cout << elements.drawWater.GetState();
-        //    }
-        //    ImGui::Dummy(ImVec2(0.0f, 10.0f));
-        //}
-
-        // Height map properties
-        if (elements.housePropertiesHeader.CreateImGuiElement()) {
-            elements.houseNameInput.CreateImGuiElement();
-            //elements.test.CreateImGuiElements();
-            //elements.test2.CreateImGuiElements();
-
-        }
-
-        elements.leftPanel.EndImGuiElement();
-
-        // Windows
-        if (elements.newFileWindow.IsVisible()) {
-            elements.newFileWindow.CreateImGuiElements();
-        }
-        if (elements.openFileWindow.IsVisible()) {
-            elements.openFileWindow.CreateImGuiElements();
-        }
     }
 
     void UpdateHouseEditor() {

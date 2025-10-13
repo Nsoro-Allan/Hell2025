@@ -2,7 +2,7 @@
 #include "Util.h"
 #include <algorithm>
 
-AABB::AABB(glm::vec3 min, glm::vec3 max) {
+AABB::AABB(const glm::vec3& min, const glm::vec3& max) {
     boundsMin = min;
     boundsMax = max;
     CalculateCenterAndExtents();
@@ -13,7 +13,7 @@ void AABB::Grow(AABB& b) {
     }
     AABB::CalculateCenterAndExtents();
 }
-void AABB::Grow(glm::vec3 p) {
+void AABB::Grow(const glm::vec3& p) {
     boundsMin = glm::vec3(std::min(boundsMin.x, p.x), std::min(boundsMin.y, p.y), std::min(boundsMin.z, p.z));
     boundsMax = glm::vec3(std::max(boundsMax.x, p.x), std::max(boundsMax.y, p.y), std::max(boundsMax.z, p.z));
     CalculateCenterAndExtents();
@@ -28,7 +28,7 @@ void AABB::CalculateCenterAndExtents() {
     extents = boundsMax - boundsMin;
 }
 
-bool AABB::ContainsPoint(glm::vec3 point) const {
+bool AABB::ContainsPoint(const glm::vec3& point) const {
     return (point.x >= boundsMin.x && point.x <= boundsMax.x) &&
         (point.y >= boundsMin.y && point.y <= boundsMax.y) &&
         (point.z >= boundsMin.z && point.z <= boundsMax.z);

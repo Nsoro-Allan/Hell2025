@@ -2,6 +2,8 @@
 #include "UniqueID.h"
 #include <algorithm>
 
+// TODO: replace UniqueID with self contained ID counter. No need to waste IDs for audio.
+
 namespace Audio {
     std::unordered_map<std::string, FMOD::Sound*> g_loadedAudio;
     std::unordered_map<uint64_t, AudioHandle> g_playingAudio;
@@ -133,7 +135,7 @@ namespace Audio {
             }
         }
 
-        uint64_t uniqueId = UniqueID::GetNextGlobal();
+        uint64_t uniqueId = UniqueID::GetNext(ObjectType::UNDEFINED);
         AudioHandle& handle = g_playingAudio[uniqueId];
         handle.state = AudioHandle::State::PLAYING;
         handle.sound = g_loadedAudio[filename];
@@ -189,7 +191,7 @@ namespace Audio {
         // Load if needed
         if (g_loadedAudio.find(filename) == g_loadedAudio.end()) LoadAudio(filename);
 
-        uint64_t id = UniqueID::GetNextGlobal();
+        uint64_t id = UniqueID::GetNext(ObjectType::UNDEFINED);
         AudioHandle& h = g_playingAudio[id];
         h.state = AudioHandle::State::LOOPING;
         h.sound = g_loadedAudio[filename];

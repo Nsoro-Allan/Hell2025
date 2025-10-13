@@ -257,8 +257,6 @@ namespace GlobalIllumination {
     }
     
     void UpdateSceneBVh() {
-
-        std::vector<Door>& doors = World::GetDoors();
         std::vector<PrimitiveInstance> instances;
 
         // Add the house
@@ -276,7 +274,7 @@ namespace GlobalIllumination {
 
         // Add all the doors
         int objectId = 1;
-        for (Door& door : doors) {
+        for (Door& door : World::GetDoors()) {
             uint64_t rigidStaticId = door.GetPhysicsId();
             RigidStatic* rigidStatic = Physics::GetRigidStaitcById(rigidStaticId);
             PxRigidStatic* pxRigidStatic = rigidStatic->GetPxRigidStatic();

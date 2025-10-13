@@ -5,7 +5,7 @@
 #include "Util.h"
 
 Tree::Tree(TreeCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNextGlobal();
+    m_objectId = UniqueID::GetNext(ObjectType::TREE);
     m_createInfo = createInfo;
 
     float collisionCaspuleRadius = 0.0f;

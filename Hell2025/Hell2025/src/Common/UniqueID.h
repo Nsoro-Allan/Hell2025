@@ -1,7 +1,8 @@
 #pragma once
 #include <cstdint>
+#include "HellEnums.h"
 
-enum class ObjectType : uint16_t;
+//enum class ObjectType : uint16_t;
 
 namespace UniqueID {
 
@@ -22,7 +23,7 @@ namespace UniqueID {
         return id & kLocalMask;
     }
 
-    uint64_t GetNextGlobal();
+    //uint64_t GetNextGlobal();
     uint64_t GetNext(ObjectType type);
 
 }

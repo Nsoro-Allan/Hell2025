@@ -81,9 +81,9 @@ namespace World {
         // Drawers
         for (Drawers& drawers : GetDrawers()) {
             RenderDataManager::SubmitRenderItems(drawers.GetRenderItems());
-            // TODO: if (Editor::GetSelectedObjectId() == toilet.GetObjectId()) {
-            // TODO:     RenderDataManager::SubmitOutlineRenderItems(toilet.GetRenderItems());
-            // TODO: }
+            if (Editor::GetSelectedObjectId() == drawers.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(drawers.GetRenderItems());
+            }
         }
 
         // Window

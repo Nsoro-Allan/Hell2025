@@ -1,5 +1,7 @@
 #pragma once
 #include "HellTypes.h"
+#include "SlotMap.h"
+
 #include "Core/Debug.h"
 #include "Types/Characters/Allies/Mermaid/Mermaid.h"
 #include "Types/Characters/Enemies/Dobermann/Dobermann.h"
@@ -24,6 +26,8 @@
 #include "Types/Generics/GenericBouncable.h"
 #include "Types/Generics/GenericStatic.h"
 #include "Types/Interior/Drawers.h"
+#include "Types/Interior/PictureFrame.h"
+#include "Types/Interior/Piano.h"
 #include "Types/Interior/Toilet.h"
 #include "Types/House/Door.h"
 #include "Types/House/HouseInstance.h"
@@ -32,8 +36,6 @@
 #include "Types/House/Window.h"
 #include "Types/Map/Map.h"
 #include "Types/Map/MapInstance.h"
-#include "Types/Misc/PictureFrame.h"
-#include "Types/Misc/Piano.h"
 #include "Util/Util.h"
 #include "glm/gtx/intersect.hpp"
 #include <vector>
@@ -54,8 +56,6 @@ struct MapInstanceCreateInfo {
 };
 
 namespace World {
-    //AnimatedGameObject* GetRooTest();
-
     void Init();
     void BeginFrame();
     void EndFrame();
@@ -79,9 +79,6 @@ namespace World {
     void LoadSingleHouse(const std::string& houseName);
     void LoadHouseInstance(const std::string& houseName, SpawnOffset spawnOffset);
 
-    //void LoadSingleHouse(HouseCreateInfo* houseCreateInfo);
-    
-
     bool ChunkExists(int x, int z);
     const uint32_t GetChunkCountX();
     const uint32_t GetChunkCountZ();
@@ -97,7 +94,7 @@ namespace World {
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
     void AddDecal(const DecalCreateInfo& createInfo);
     void AddDobermann(DobermannCreateInfo& createInfo);
-    void AddDrawers(const DrawersCreateInfo& createInfo, SpawnOffset spawnOffset);
+    void AddDrawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -126,17 +123,15 @@ namespace World {
     // Logic
     void ProcessBullets();
 
-    // Saving
-    SectorCreateInfo CreateSectorInfoFromWorldObjects();
-    void SaveSector(SectorCreateInfo sectorCreateInfo);
-
     // Creation
     void CreateGameObject();
     uint64_t CreateAnimatedGameObject();
 
-    // Removal
-    void SetObjectPosition(uint64_t objectID, glm::vec3 position);
-    void RemoveObject(uint64_t objectID);
+    // Objects
+    void SetObjectPosition(uint64_t objectId, glm::vec3 position);
+    void SetObjectRotation(uint64_t objectId, glm::vec3 rotation);
+    bool RemoveObject(uint64_t objectId);
+    glm::vec3 GetGizmoOffest(uint64_t objectId);
     
     // BVH
     //void RemoveAllHouseBvhs();
@@ -145,11 +140,6 @@ namespace World {
 
     const float GetWorldSpaceWidth();
     const float GetWorldSpaceDepth();
-    //const uint32_t GetMapWidth();
-    //const uint32_t GetMapDepth();
-    ///// const std::string& GetSectorNameAtLocation(int x, int z);
-    ///// const std::string& GetHeightMapNameAtLocation(int x, int z);
-    ///// bool IsMapCellInRange(int x, int z);
 
     void UpdateDoorAndWindowCubeTransforms();
     void ResetWeatherboardMeshBuffer();
@@ -181,6 +171,9 @@ namespace World {
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectID);
     Door* GetDoorByObjectId(uint64_t objectID);
     Door* GetDoorByDoorFrameObjectId(uint64_t objectID);
+
+    Drawers* GetDrawersByObjectId(uint64_t objectId);
+
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);
     PianoKey* GetPianoKeyByObjectId(uint64_t objectId);
@@ -210,9 +203,9 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees();
     std::vector<ClippingCube>& GetClippingCubes();
     std::vector<Decal>& GetDecals();
-    std::vector<Drawers>& GetDrawers();
-    std::vector<Door>& GetDoors();
+    Hell::SlotMap<Door>& GetDoors();
     std::vector<Dobermann>& GetDobermanns();
+    Hell::SlotMap<Drawers>& GetDrawers();
     std::vector<Fence>& GetFences();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();

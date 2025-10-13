@@ -1,6 +1,55 @@
 #include "Util.h"
 
 namespace Util {
+
+    const char* ShortcutToString(Shortcut shortcut) {
+        switch (shortcut) {
+            case Shortcut::F1:  return "F1";
+            case Shortcut::F2:  return "F2";
+            case Shortcut::F3:  return "F3";
+            case Shortcut::F4:  return "F4";
+            case Shortcut::F5:  return "F5";
+            case Shortcut::F6:  return "F6";
+            case Shortcut::F7:  return "F7";
+            case Shortcut::F8:  return "F8";
+            case Shortcut::F9:  return "F9";
+            case Shortcut::F10: return "F10";
+            case Shortcut::F11: return "F11";
+            case Shortcut::F12: return "F12";
+
+            case Shortcut::CTRL_A: return "Ctrl+A";
+            case Shortcut::CTRL_B: return "Ctrl+B";
+            case Shortcut::CTRL_C: return "Ctrl+C";
+            case Shortcut::CTRL_D: return "Ctrl+D";
+            case Shortcut::CTRL_E: return "Ctrl+E";
+            case Shortcut::CTRL_F: return "Ctrl+F";
+            case Shortcut::CTRL_G: return "Ctrl+G";
+            case Shortcut::CTRL_H: return "Ctrl+H";
+            case Shortcut::CTRL_I: return "Ctrl+I";
+            case Shortcut::CTRL_J: return "Ctrl+J";
+            case Shortcut::CTRL_K: return "Ctrl+K";
+            case Shortcut::CTRL_L: return "Ctrl+L";
+            case Shortcut::CTRL_M: return "Ctrl+M";
+            case Shortcut::CTRL_N: return "Ctrl+N";
+            case Shortcut::CTRL_O: return "Ctrl+O";
+            case Shortcut::CTRL_P: return "Ctrl+P";
+            case Shortcut::CTRL_Q: return "Ctrl+Q";
+            case Shortcut::CTRL_R: return "Ctrl+R";
+            case Shortcut::CTRL_S: return "Ctrl+S";
+            case Shortcut::CTRL_T: return "Ctrl+T";
+            case Shortcut::CTRL_U: return "Ctrl+U";
+            case Shortcut::CTRL_V: return "Ctrl+V";
+            case Shortcut::CTRL_W: return "Ctrl+W";
+            case Shortcut::CTRL_X: return "Ctrl+X";
+            case Shortcut::CTRL_Y: return "Ctrl+Y";
+            case Shortcut::CTRL_Z: return "Ctrl+Z";
+
+            case Shortcut::ESC:  return "Esc";
+            case Shortcut::NONE: return "";
+            default:             return "UNDEFINED";
+        }
+    }
+
     bool StrCmp(const char* queryA, const char* queryB) {
         if (strcmp(queryA, queryB) == 0)
             return true;

@@ -5,11 +5,6 @@
 #include "Types/Game/SpawnPoint.h"
 #include <map>
 
-enum class DrawersType {
-    SMALL,
-    LARGE
-};
-
 struct DrawersCreateInfo {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
@@ -151,7 +146,7 @@ struct BulletCreateInfo {
     glm::vec3 direction = glm::vec3(0);
     int32_t weaponIndex = 0;
     uint32_t damage = 0;
-    uint32_t ownerObjectId = 0;
+    uint64_t ownerObjectId = 0;
     float rayLength = 1000.0f;
     bool createsDecals = true;
     bool createsFollowThroughBulletOnGlassHit = true;
@@ -250,6 +245,7 @@ struct MapCreateInfo {
 
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
+    std::vector<DrawersCreateInfo> drawers;
     std::vector<PlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;
