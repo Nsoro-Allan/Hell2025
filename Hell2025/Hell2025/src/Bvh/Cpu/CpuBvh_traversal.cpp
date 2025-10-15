@@ -95,7 +95,7 @@ namespace Bvh::Cpu {
 
             // Intersect primitives
             if (node.primitiveCount > 0) {
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     int index = node.firstChildOrPrimitive + i * 12;
 
                     glm::vec3 p0, e1, e2, normal;

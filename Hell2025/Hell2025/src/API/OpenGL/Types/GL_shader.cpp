@@ -197,6 +197,13 @@ void OpenGLShader::SetIVec2(const std::string& name, const glm::ivec2& value) {
     glUniform2i(m_uniformLocations[name], value.x, value.y);
 }
 
+void OpenGLShader::SetVec2Array(const std::string& name, const std::vector<glm::vec2>& data) {
+    if (m_uniformLocations.find(name) == m_uniformLocations.end()) {
+        m_uniformLocations[name] = glGetUniformLocation(m_handle, name.c_str());
+    }
+    glUniform2fv(m_uniformLocations[name], static_cast<GLsizei>(data.size()), reinterpret_cast<const float*>(data.data()));
+}
+
 void OpenGLShader::SetIVec2Array(const std::string& name, const std::vector<glm::ivec2>& data) {
     if (m_uniformLocations.find(name) == m_uniformLocations.end()) {
         m_uniformLocations[name] = glGetUniformLocation(m_handle, name.c_str());

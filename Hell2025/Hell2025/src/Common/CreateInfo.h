@@ -5,10 +5,49 @@
 #include "Types/Game/SpawnPoint.h"
 #include <map>
 
-struct DrawersCreateInfo {
+struct OpenableCreateInfo {
+    OpenState initialOpenState = OpenState::CLOSED;
+    OpenAxis openAxis = OpenAxis::TRANSLATE_Z;
+    uint64_t parentObjectId = 0;
+    std::string meshName = UNDEFINED_STRING;
+    std::string openingAudio = UNDEFINED_STRING;
+    std::string closingAudio = UNDEFINED_STRING;
+    std::string openedAudio = UNDEFINED_STRING;
+    std::string closedAudio = UNDEFINED_STRING;
+    std::string lockedAudio = "Locked.wav";
+    float initialOpenValue = 1.0f;
+    float minOpenValue = 0.0f;
+    float maxOpenValue = HELL_PI * 0.5f;
+    float openSpeed = 1.0f;
+    float closeSpeed = 1.0f;
+    float audioVolume = 2.0f;
+    bool createMe = false;
+};
+
+struct RigidDynamicCreateInfo {
+    std::string meshName = UNDEFINED_STRING;
+};
+
+struct RigidStaticCreateInfo {
+    std::string meshName = UNDEFINED_STRING;
+};
+
+struct MeshNodeCreateInfo {
+    std::string meshName;
+    std::string materialName = UNDEFINED_STRING;
+    BlendingMode blendingMode = BlendingMode::BLEND_DISABLED;
+    OpenableCreateInfo openable;
+    RigidDynamicCreateInfo rigidDynamic;
+    RigidStaticCreateInfo rigidStatic;
+    bool isGold = false;
+};
+
+struct GenericObjectCreateInfo {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
-    DrawersType type = DrawersType::LARGE;
+    glm::vec3 scale = glm::vec3(1.0f);
+    std::string editorName = UNDEFINED_STRING;
+    GenericObjectType type = GenericObjectType::UNDEFINED;
 };
 
 struct ToiletCreateInfo {
@@ -245,7 +284,7 @@ struct MapCreateInfo {
 
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
-    std::vector<DrawersCreateInfo> drawers;
+    std::vector<GenericObjectCreateInfo> drawers;
     std::vector<PlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;

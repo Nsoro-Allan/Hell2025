@@ -12,7 +12,7 @@
 #include "Audio/Audio.h"
 #include "Audio/MidiFileManager.h"
 #include "Audio/Synth.h"
-#include "Core/Bible.h"
+#include "Bible/Bible.h"
 #include "Core/Debug.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"

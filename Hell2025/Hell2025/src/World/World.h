@@ -10,6 +10,7 @@
 #include "Types/Christmas/ChristmasLights.h"
 #include "Types/Christmas/ChristmasPresent.h"
 #include "Types/Christmas/ChristmasTree.h"
+#include "Types/Core/GenericObject.h"
 #include "Types/Effects/VolumetricBloodSplatter.h"
 #include "Types/Effects/ScreenSpaceBloodDecal.h"
 #include "Types/Exterior/Fence.h"
@@ -25,7 +26,6 @@
 #include "Types/Game/PickUp.h"
 #include "Types/Generics/GenericBouncable.h"
 #include "Types/Generics/GenericStatic.h"
-#include "Types/Interior/Drawers.h"
 #include "Types/Interior/PictureFrame.h"
 #include "Types/Interior/Piano.h"
 #include "Types/Interior/Toilet.h"
@@ -94,7 +94,7 @@ namespace World {
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
     void AddDecal(const DecalCreateInfo& createInfo);
     void AddDobermann(DobermannCreateInfo& createInfo);
-    void AddDrawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset);
+    void AddDrawers(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -172,7 +172,7 @@ namespace World {
     Door* GetDoorByObjectId(uint64_t objectID);
     Door* GetDoorByDoorFrameObjectId(uint64_t objectID);
 
-    Drawers* GetDrawersByObjectId(uint64_t objectId);
+    GenericObject* GetDrawersByObjectId(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);
@@ -205,7 +205,7 @@ namespace World {
     std::vector<Decal>& GetDecals();
     Hell::SlotMap<Door>& GetDoors();
     std::vector<Dobermann>& GetDobermanns();
-    Hell::SlotMap<Drawers>& GetDrawers();
+    Hell::SlotMap<GenericObject>& GetGenericObjects();
     std::vector<Fence>& GetFences();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();

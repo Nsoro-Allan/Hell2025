@@ -5,57 +5,66 @@
 #include <vector>
 #include <unordered_map>
 
+#include "CreateInfo.h"
+
 struct MeshNodes {
+    std::vector<AABB> m_worldspaceAabbs;
     std::vector<BlendingMode> m_blendingModes;
+    std::vector<int32_t> m_localParentIndices;
     std::vector<uint32_t> m_globalMeshIndices;
     std::vector<uint32_t> m_materialIndices;
-    std::vector<int32_t> m_localParentIndices;
-    std::vector<Transform> m_transforms;
+    std::vector<Transform> m_transforms;              // These are the transforms updated by an Openable
+    std::vector<Transform> m_transformsPreviousFrame; // These are the transforms updated by an Openable
+    //std::vector<ObjectType> m_objectTypes;
+    std::vector<uint64_t> m_objectIds;                // Written to renderItem.objectId
+    //std::vector<uint64_t> m_openableIds;              // Maps node to an Openable
+    //std::vector<uint64_t> m_rigidDynamictIds;         // Maps node to a RigidDynamic
+    //std::vector<uint64_t> m_rigidStaticIds;           // Maps node to a RigidStatic
     std::vector<glm::mat4> m_modelMatrices;
     std::vector<glm::mat4> m_localTransforms;
     std::vector<glm::mat4> m_inverseBindTransforms;
-    std::vector<AABB> m_worldspaceAabbs;
-    std::vector<ObjectType> m_objectTypes;
-    std::vector<uint64_t> m_objectIds;
     std::unordered_map<std::string, uint32_t> m_localIndexMap; // maps mesh name to its local index
     AABB m_worldspaceAABB;
 
-    void InitFromModel(const std::string& modelName);
-    void InitFromModel(Model* model);
+    void InitFromModel(uint64_t parentId, const std::string& modelName, const std::vector<MeshNodeCreateInfo>& meshNodeCreateInfoSet);
+    //void InitFromModel(Model* model);
     void CleanUp();
-    void UpdateHierachy();
+    void UpdateHierarchy();
     void UpdateRenderItems(const glm::mat4& worldMatrix);
     void SetBlendingModeByMeshName(const std::string& meshName, BlendingMode blendingMode);
-    void SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType);
+    //void SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType);
     void SetObjectIdByMeshName(const std::string& meshName, uint64_t id);
     void SetOpenableByMeshName(const std::string& meshName, uint64_t openableId, uint64_t parentObjectId);
+    
+    //void SetOpenable(const std::string& meshName, OpenableCreateInfo& openableCreateInfo);
+
     void SetMeshMaterials(const std::string& materialName);
     void SetMaterialByMeshName(const std::string& meshName, const std::string& materialName);
     void SetTransformByMeshName(const std::string& meshName, Transform transform);
-    void SetObjectTypes(ObjectType objectType);
-    void SetObjectIds(uint64_t objectId);
+    //void SetObjectTypes(ObjectType objectType);
     void PrintMeshNames();
     void SetGoldFlag(bool flag);
     void DrawWorldspaceAABB(glm::vec4 color);
     void DrawWorldspaceAABBs(glm::vec4 color);
 
+    bool NodeExists(const std::string& meshName);
     bool BoneExists(const std::string& boneName);
     bool HasNodeWithObjectId(uint64_t objectId) const;
-        
-    RenderItem* GetRenderItemByNodeIndex(int nodeIndex);
+
     int32_t GetGlobalMeshIndex(int nodeIndex);
     Material* GetMaterial(int nodeIndex);
-    glm::mat4 GetLocalTransform(int nodeIndex);
-    glm::mat4 GetInverseBindTransform(int nodeIndex);
-    glm::mat4 GetMeshModelMatrix(int nodeIndex);
-    glm::mat4 GetBoneLocalMatrix(const std::string& boneName);
+    const AABB* GetWorldSpaceAabbByMeshName(const std::string& meshName);
+    const glm::mat4& GetLocalTransform(int nodeIndex) const;
+    const glm::mat4& GetInverseBindTransform(int nodeIndex) const;
+    const glm::mat4& GetMeshModelMatrix(int nodeIndex) const;
+    const glm::mat4& GetBoneLocalMatrix(const std::string& boneName) const;
 
     size_t GetNodeCount() const                                             { return m_nodeCount; }
-    bool HasHierachyChanged() const                                         { return m_hierarchyChanged; }
+    bool IsDirty() const                                                    { return m_isDirty; }
     const ArmatureData& GetArmature() const                                 { return m_armatureData; }
     const std::string& GetModelName() const                                 { return m_modelName; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_renderItems; }
-    const std::vector<RenderItem>& GetRenderItemsBlended()const             { return m_renderItemsBlended; }
+    const std::vector<RenderItem>& GetRenderItemsBlended() const            { return m_renderItemsBlended; }
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_renderItemsAlphaDiscarded; }
     const std::vector<RenderItem>& GetRenderItemsHairTopLayer() const       { return m_renderItemsHairTopLayer; }
     const std::vector<RenderItem>& GetRenderItemsHairBottomLayer() const    { return m_renderItemsHairBottomLayer; }
@@ -64,13 +73,14 @@ private:
     void UpdateAABBs(const glm::mat4& worldMatrix);
 
     ArmatureData m_armatureData;
-    uint32_t m_nodeCount = 0;
+    size_t m_nodeCount = 0;
     std::string m_modelName = UNDEFINED_STRING;
+    glm::mat4 m_worldMatrixPreviousFrame = glm::mat4(0.0f); // Intentionally (0.0f) to force a dirty update on first use
     std::vector<RenderItem> m_renderItems;
     std::vector<RenderItem> m_renderItemsBlended;
     std::vector<RenderItem> m_renderItemsAlphaDiscarded;
     std::vector<RenderItem> m_renderItemsHairTopLayer;
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
     bool m_isGold = false;
-    bool m_hierarchyChanged = false;
+    bool m_isDirty = true;
 };

@@ -14,7 +14,9 @@ Toilet::Toilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
         std::cout << "Toilet() constructor failed because your hack to load the model into a static Model pointer failed the first time around\n";
     }
 
-    m_meshNodes.InitFromModel(model);
+
+    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+    m_meshNodes.InitFromModel(NO_ID, "Toilet", emptyMeshNodeCreateInfoSet);
 
 
     uint32_t materialIndex = AssetManager::GetMaterialIndexByName("Toilet");
@@ -28,15 +30,15 @@ Toilet::Toilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
 
         if (mesh->GetName() == "Body") {
             m_meshNodes.m_materialIndices[i] = materialIndex;
-            m_meshNodes.m_objectTypes[i] = ObjectType::TOILET;
+            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET;
         }
         if (mesh->GetName() == "Lid") {
             m_meshNodes.m_materialIndices[i] = materialIndex;
-            m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_LID;
+            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_LID;
         }
         if (mesh->GetName() == "Seat") {
             m_meshNodes.m_materialIndices[i] = materialIndex;
-            m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_SEAT;
+            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_SEAT;
         }
         if (mesh->GetName() == "ToiletWater") {
             // TODO
@@ -44,21 +46,21 @@ Toilet::Toilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
     }
 
      // Init handlers
-    m_lidOpenHandler.openState = OpenState::OPEN;
-    m_lidOpenHandler.minOpenValue = 0.0f;
-    m_lidOpenHandler.maxOpenValue = 1.7f;
-    m_lidOpenHandler.openSpeed = 6.825f;
-    m_lidOpenHandler.closeSpeed = 6.825f;
-    m_lidOpenHandler.openedAudio = "Piano_LidClose.wav";
-    m_lidOpenHandler.closedAudio = "Piano_LidClose.wav";
+    m_lidOpenHandler.m_currentOpenState = OpenState::OPEN;
+    m_lidOpenHandler.m_minOpenValue = 0.0f;
+    m_lidOpenHandler.m_maxOpenValue = 1.7f;
+    m_lidOpenHandler.m_openSpeed = 6.825f;
+    m_lidOpenHandler.m_closeSpeed = 6.825f;
+    m_lidOpenHandler.m_openedAudio = "Piano_LidClose.wav";
+    m_lidOpenHandler.m_closedAudio = "Piano_LidClose.wav";
 
-    m_seatOpenHandler.openState = OpenState::CLOSED;
-    m_seatOpenHandler.minOpenValue = 0.0f;
-    m_seatOpenHandler.maxOpenValue = 1.7;
-    m_seatOpenHandler.openSpeed = 7.25f;
-    m_seatOpenHandler.closeSpeed = 7.25f;
-    m_seatOpenHandler.openedAudio = "Piano_LidClose.wav";
-    m_seatOpenHandler.closedAudio = "Piano_LidClose.wav";
+    m_seatOpenHandler.m_currentOpenState = OpenState::CLOSED;
+    m_seatOpenHandler.m_minOpenValue = 0.0f;
+    m_seatOpenHandler.m_maxOpenValue = 1.7;
+    m_seatOpenHandler.m_openSpeed = 7.25f;
+    m_seatOpenHandler.m_closeSpeed = 7.25f;
+    m_seatOpenHandler.m_openedAudio = "Piano_LidClose.wav";
+    m_seatOpenHandler.m_closedAudio = "Piano_LidClose.wav";
 }
 
 void Toilet::Update(float deltaTime) {
@@ -66,16 +68,16 @@ void Toilet::Update(float deltaTime) {
     m_seatOpenHandler.Update(deltaTime);
 
     Transform lidNodeTransform;
-    lidNodeTransform.rotation.x = -m_lidOpenHandler.currentOpenValue;
+    lidNodeTransform.rotation.x = -m_lidOpenHandler.m_currentOpenValue;
     m_meshNodes.SetTransformByMeshName("Lid", lidNodeTransform);
 
     Transform seatNodeTransform;
-    seatNodeTransform.rotation.x = m_seatOpenHandler.currentOpenValue;
+    seatNodeTransform.rotation.x = m_seatOpenHandler.m_currentOpenValue;
     m_meshNodes.SetTransformByMeshName("Seat", seatNodeTransform);
 
     m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
 
-    m_movedThisFrame = m_lidOpenHandler.movedThisFrame || m_seatOpenHandler.movedThisFrame;
+    m_movedThisFrame = m_lidOpenHandler.m_movedThisFrame || m_seatOpenHandler.m_movedThisFrame;
 
 }
 
@@ -84,13 +86,13 @@ void Toilet::CleanUp() {
 }
 
 void Toilet::InteractWithSeat() {
-    if (m_lidOpenHandler.openState == OpenState::CLOSED) {
+    if (m_lidOpenHandler.m_currentOpenState == OpenState::CLOSED) {
         m_seatOpenHandler.Interact();
     }
 }
 
 void Toilet::InteractWithLid() {
-    if (m_seatOpenHandler.openState == OpenState::CLOSED) {
+    if (m_seatOpenHandler.m_currentOpenState == OpenState::CLOSED) {
         m_lidOpenHandler.Interact();
     }
 }

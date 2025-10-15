@@ -171,7 +171,7 @@ void AnimatedGameObject::Update(float deltaTime) {
 
     m_boneSkinningMatrices.clear();
 
-    for (int i = 0; i < m_skinnedModel->GetBoneCount(); i++) {
+    for (uint32_t i = 0; i < m_skinnedModel->GetBoneCount(); i++) {
         m_boneSkinningMatrices.push_back(glm::mat4(1));
     }
 

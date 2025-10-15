@@ -13,7 +13,7 @@ namespace Editor {
 
     void UpdateObjectHover() {
         // Reset values from last frame
-        SetHoveredObjectType(ObjectType::NONE);
+        SetHoveredObjectType(ObjectType::NO_TYPE);
         SetHoveredObjectId(0);
 
         // Bail if there is no hovered viewport
@@ -44,7 +44,7 @@ namespace Editor {
         ObjectType hovererdType = Editor::GetHoveredObjectType();
 
         if (GetHoveredObjectType() == ObjectType::OPENABLE) {
-            Openable* openable = OpenableManager::GetOpeneableByOpenableId(GetHoveredObjectId());
+            Openable* openable = OpenableManager::GetOpenableByOpenableId(GetHoveredObjectId());
             if (openable) {
                 SetHoveredObjectType(UniqueID::GetType(openable->m_parentObjectId));
                 SetHoveredObjectId(openable->m_parentObjectId);
@@ -97,7 +97,7 @@ namespace Editor {
             //std::cout << "Selected: " << Util::ObjectTypeToString(GetSelectedObjectType()) << " " << GetSelectedObjectId() << "\n";
             Gizmo::SetSourceObjectOffeset(World::GetGizmoOffest(GetSelectedObjectId()));
 
-            Drawers* drawers = World::GetDrawersByObjectId(GetSelectedObjectId());
+            GenericObject* drawers = World::GetDrawersByObjectId(GetSelectedObjectId());
             if (drawers) {
                 Gizmo::SetPosition(drawers->GetPosition());
                 Gizmo::SetRotation(drawers->GetRotation());
@@ -169,7 +169,7 @@ namespace Editor {
     }
 
     void UnselectAnyObject() {
-        SetSelectedObjectType(ObjectType::NONE);
+        SetSelectedObjectType(ObjectType::NO_TYPE);
         SetSelectedObjectId(0);
     }
 }

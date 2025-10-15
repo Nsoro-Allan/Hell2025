@@ -33,7 +33,7 @@ void Player::UpdateCursorRays() {
     m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
 
     if (m_bvhRayResult.hitFound) {
-        Renderer::DrawSphere(m_bvhRayResult.hitPosition, 0.05f, YELLOW);
+        //Renderer::DrawSphere(m_bvhRayResult.hitPosition, 0.05f, YELLOW);
     }
 
     // Store the closest of the two hits
@@ -79,7 +79,7 @@ void Player::UpdateCursorRays() {
 
 
 void Player::UpdateInteract() {
-    m_interactObjectType = ObjectType::NONE;
+    m_interactObjectType = ObjectType::NO_TYPE;
     m_interactObjectId = 0;
 
     if (!ViewportIsVisible()) return;
@@ -98,7 +98,7 @@ void Player::UpdateInteract() {
     // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
 
     // Overwrite with PhysX overlap test if an overlap with interact object is found
-    //if (m_rayHitObjectType != ObjectType::NONE) {
+    //if (m_rayHitObjectType != ObjectType::NO_TYPE) {
     
         glm::vec3 spherePosition = m_rayHitPosition;
         float sphereRadius = 0.15f;
@@ -125,7 +125,7 @@ void Player::UpdateInteract() {
     //}
 
     // Convenience bool for setting crosshair
-    m_interactFound = (m_interactObjectType != ObjectType::NONE);
+    m_interactFound = (m_interactObjectType != ObjectType::NO_TYPE);
 
     if (PressedInteract()) {
 

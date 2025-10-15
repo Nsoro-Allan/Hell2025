@@ -511,10 +511,22 @@ namespace Util {
         return points;
     }
 
-    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b, float eps) {
+    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b) {
+        constexpr float eps = 1e-4f;
+
         for (int c = 0; c < 4; ++c)
             for (int r = 0; r < 4; ++r)
                 if (glm::abs(a[c][r] - b[c][r]) > eps) return false;
         return true;
+    }
+
+    bool NearlyEqualTransform(const Transform& a, const Transform& b) {
+        constexpr float kPosEps = 1e-4f;   // meters
+        constexpr float kAngEps = 1e-3f;   // radians (0.057 deg)
+        constexpr float kScaleEps = 1e-4f;
+
+        return glm::all(glm::lessThanEqual(glm::abs(a.position - b.position), glm::vec3(kPosEps))) &&
+            glm::all(glm::lessThanEqual(glm::abs(a.rotation - b.rotation), glm::vec3(kAngEps))) &&
+            glm::all(glm::lessThanEqual(glm::abs(a.scale - b.scale), glm::vec3(kScaleEps)));
     }
 }

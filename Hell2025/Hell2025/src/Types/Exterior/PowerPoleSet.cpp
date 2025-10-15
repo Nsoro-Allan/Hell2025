@@ -5,9 +5,11 @@
 #include "Util.h"
 
 void PowerPoleSet::Init() {
-    m_meshNodes.InitFromModel("PowerPole");
+    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+
+    m_meshNodes.InitFromModel(NO_ID, "PowerPole", emptyMeshNodeCreateInfoSet);
     m_meshNodes.SetMeshMaterials("PowerPole");
-    m_meshNodes.UpdateHierachy();
+    m_meshNodes.UpdateHierarchy();
     m_meshNodes.UpdateRenderItems(glm::mat4(1.0f));
 
     std::vector<glm::vec2> controlPoints2D;

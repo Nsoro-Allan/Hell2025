@@ -79,7 +79,7 @@ namespace World {
         }
 
         // Drawers
-        for (Drawers& drawers : GetDrawers()) {
+        for (GenericObject& drawers : GetGenericObjects()) {
             RenderDataManager::SubmitRenderItems(drawers.GetRenderItems());
             if (Editor::GetSelectedObjectId() == drawers.GetObjectId()) {
                 RenderDataManager::SubmitOutlineRenderItems(drawers.GetRenderItems());

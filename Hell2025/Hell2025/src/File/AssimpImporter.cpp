@@ -169,7 +169,7 @@ namespace AssimpImporter {
         GrabSkeleton(modelData.nodes, scene->mRootNode, -1);
 
         // Get vertex data
-        int localBaseVertex = 0;
+        uint32_t localBaseVertex = 0;
         for (int i = 0; i < scene->mNumMeshes; i++) {
             const aiMesh* assimpMesh = scene->mMeshes[i];
 
@@ -264,9 +264,9 @@ namespace AssimpImporter {
                     }
                 }
             }
-            localBaseVertex += meshData.vertices.size();
-            modelData.vertexCount += meshData.vertices.size();
-            modelData.indexCount += meshData.indices.size();
+            localBaseVertex += (uint32_t)meshData.vertices.size();
+            modelData.vertexCount += (uint32_t)meshData.vertices.size();
+            modelData.indexCount += (uint32_t)meshData.indices.size();
         }
 
         // Cleanup

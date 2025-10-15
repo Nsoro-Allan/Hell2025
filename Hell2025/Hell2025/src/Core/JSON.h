@@ -7,7 +7,7 @@
 
 namespace nlohmann {
     void to_json(nlohmann::json& j, const DoorCreateInfo& info);
-    void to_json(nlohmann::json& j, const DrawersCreateInfo& info);
+    void to_json(nlohmann::json& j, const GenericObjectCreateInfo& info);
     void to_json(nlohmann::json& j, const HouseLocation& houseLocation);
     void to_json(nlohmann::json& j, const LightCreateInfo& info);
     void to_json(nlohmann::json& j, const MeshRenderingInfo& info);
@@ -21,7 +21,7 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const WindowCreateInfo& info);
 
     void from_json(const nlohmann::json& j, DoorCreateInfo& info);
-    void from_json(const nlohmann::json& j, DrawersCreateInfo& info);
+    void from_json(const nlohmann::json& j, GenericObjectCreateInfo& info);
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation);
     void from_json(const nlohmann::json& j, LightCreateInfo& info);
     void from_json(const nlohmann::json& j, MeshRenderingInfo& info);

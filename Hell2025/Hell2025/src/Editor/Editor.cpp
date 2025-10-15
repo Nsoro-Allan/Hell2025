@@ -28,9 +28,9 @@ namespace Editor {
     float g_verticalDividerXPos = 0.2f;
     float g_horizontalDividerYPos = 0.2f;
 
-    ObjectType g_hoveredObjectType = ObjectType::NONE;
-    ObjectType g_selectedObjectType = ObjectType::NONE;
-    ObjectType g_placementObjectType = ObjectType::NONE;
+    ObjectType g_hoveredObjectType = ObjectType::NO_TYPE;
+    ObjectType g_selectedObjectType = ObjectType::NO_TYPE;
+    ObjectType g_placementObjectType = ObjectType::NO_TYPE;
     uint64_t g_hoveredObjectId = 0;
     uint64_t g_selectedObjectId = 0;
 
@@ -79,7 +79,7 @@ namespace Editor {
         Input::DisableCursor();
 
         UnselectAnyObject();
-        SetHoveredObjectType(ObjectType::NONE);
+        SetHoveredObjectType(ObjectType::NO_TYPE);
         SetHoveredObjectId(0);
 
         if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
@@ -213,7 +213,7 @@ namespace Editor {
             }
         }
 
-        // Draw grid and spawn points
+        // Draw world map perimeter and spawn points
         if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR || GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             float h = 30.0f;
             float w = World::GetWorldSpaceWidth();
@@ -243,6 +243,38 @@ namespace Editor {
             // Draw cubes around spawn points
             for (SpawnPoint& spawnPoint : World::GetCampaignSpawnPoints()) {
                 spawnPoint.DrawDebugCube();
+            }
+        }
+
+        // Draw house editor grid
+        const Resolutions& resolutions = Config::GetResolutions();
+        float pixelSizeX = 2.0f / resolutions.gBuffer.x;
+        float pixelSizeY = 2.0f / resolutions.gBuffer.y;
+
+        float gridWorldSpaceSize = 20.0f;
+        float gridSpacing = 0.5f;
+        float yHeight = -0.01f;
+
+        for (float x = -gridWorldSpaceSize; x <= gridWorldSpaceSize; x += gridSpacing) {
+            for (float z = -gridWorldSpaceSize; z <= gridWorldSpaceSize; z += gridSpacing) {
+                glm::vec3 p1 = glm::vec3(x, yHeight, -gridWorldSpaceSize);
+                glm::vec3 p2 = glm::vec3(x, yHeight, gridWorldSpaceSize);
+                glm::vec3 p3 = glm::vec3(-gridWorldSpaceSize, yHeight, z);
+                glm::vec3 p4 = glm::vec3(gridWorldSpaceSize, yHeight, z);
+                Renderer::DrawLine(p1, p2, GRID_COLOR, true);
+                Renderer::DrawLine(p3, p4, GRID_COLOR, true);
+            }
+        }
+
+        for (int x = 0; x <= 1; x++) {
+            for (int y = 0; y <= 1; y++) {
+                glm::vec3 n = glm::vec3(gridWorldSpaceSize, yHeight, 0.0f);
+                glm::vec3 s = glm::vec3(-gridWorldSpaceSize, yHeight, 0.0f);
+                glm::vec3 e = glm::vec3(0.0f, yHeight, gridWorldSpaceSize);
+                glm::vec3 w = glm::vec3(0.0f, yHeight, -gridWorldSpaceSize);
+
+                Renderer::DrawLine(n, s, WHITE, true);
+                Renderer::DrawLine(e, w, WHITE, true);
             }
         }
     }

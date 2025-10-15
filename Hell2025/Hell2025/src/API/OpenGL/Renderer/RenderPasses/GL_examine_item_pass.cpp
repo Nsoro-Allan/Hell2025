@@ -12,6 +12,51 @@
 
 namespace OpenGLRenderer {
 
+    void InventoryGaussianPass() {
+        if (Editor::IsOpen()) return;
+
+        OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+        if (!gBuffer) return;
+
+        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
+            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+            Player* player = Game::GetLocalPlayerByIndex(i);
+
+            if (!viewport->IsVisible()) continue;
+            if (!player->InventoryIsOpen()) continue;
+
+            SpaceCoords gBufferSpaceCooords = viewport->GetGBufferSpaceCoords();
+
+
+            if (Game::GetSplitscreenMode() == SplitscreenMode::FULLSCREEN && i == 0) {
+                BlitRect blitRect;
+                blitRect.x0 = 0;
+                blitRect.x1 = 1920;
+                blitRect.y0 = 0;
+                blitRect.y1 = 1080;
+                GaussianBlur(gBuffer, gBuffer, "FinalLighting", "FinalLighting", blitRect, blitRect, 5, 1);
+            }
+
+            if (Game::GetSplitscreenMode() == SplitscreenMode::TWO_PLAYER && i == 0) {
+                BlitRect blitRect;
+                blitRect.x0 = 0;
+                blitRect.x1 = 1920;
+                blitRect.y0 = 540;
+                blitRect.y1 = 1080;
+                GaussianBlur(gBuffer, gBuffer, "FinalLighting", "FinalLighting", blitRect, blitRect, 5, 1);
+            }
+
+            if (Game::GetSplitscreenMode() == SplitscreenMode::TWO_PLAYER && i == 1) {
+                BlitRect blitRect;
+                blitRect.x0 = 0;
+                blitRect.x1 = 1920;
+                blitRect.y0 = 0;
+                blitRect.y1 = 540;
+                GaussianBlur(gBuffer, gBuffer, "FinalLighting", "FinalLighting", blitRect, blitRect, 5, 1);
+            }
+        }
+    }
+
     void ExamineItemPass() {
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("ExamineItem");
@@ -28,7 +73,6 @@ namespace OpenGLRenderer {
 
         SetRasterizerState("GeometryPass_NonBlended");
 
-        
         glm::vec3 cameraPosition = glm::vec3(0, 0, 1.5f); // Remember the item is rendered at (0,0,0)
 
         Transform cameraTransform;

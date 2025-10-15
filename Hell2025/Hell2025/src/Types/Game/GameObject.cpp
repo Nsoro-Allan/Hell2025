@@ -72,7 +72,8 @@ void GameObject::SetScale(glm::vec3 scale) {
 void GameObject::SetModel(const std::string& name) {
     Model* model = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName(name.c_str()));
     if (model) {
-        m_meshNodes.InitFromModel(model);
+        std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+        m_meshNodes.InitFromModel(NO_ID, name, emptyMeshNodeCreateInfoSet);
     }
     else {
         m_meshNodes.CleanUp();

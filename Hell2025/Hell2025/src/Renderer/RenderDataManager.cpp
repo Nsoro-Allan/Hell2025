@@ -186,10 +186,10 @@ namespace RenderDataManager {
         const Resolutions& resolutions = Config::GetResolutions();
         g_rendererData.nearPlane = NEAR_PLANE;
         g_rendererData.farPlane = FAR_PLANE;
-        g_rendererData.gBufferWidth = resolutions.gBuffer.x;
-        g_rendererData.gBufferHeight = resolutions.gBuffer.y;
-        g_rendererData.hairBufferWidth = resolutions.hair.x;
-        g_rendererData.hairBufferHeight = resolutions.hair.y;
+        g_rendererData.gBufferWidth = (float)resolutions.gBuffer.x;
+        g_rendererData.gBufferHeight = (float)resolutions.gBuffer.y;
+        g_rendererData.hairBufferWidth = (float)resolutions.hair.x;
+        g_rendererData.hairBufferHeight = (float)resolutions.hair.y;
         g_rendererData.splitscreenMode = (int)Game::GetSplitscreenMode();
         g_rendererData.time = Game::GetTotalTime();
         g_rendererData.rendererOverrideState = (int)rendererSettings.rendererOverrideState;

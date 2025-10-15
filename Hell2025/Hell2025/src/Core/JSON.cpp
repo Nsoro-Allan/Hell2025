@@ -18,11 +18,13 @@ namespace nlohmann {
         };
     }
 
-    void to_json(nlohmann::json& j, const DrawersCreateInfo& createInfo) {
+    void to_json(nlohmann::json& j, const GenericObjectCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
             {"Rotation", createInfo.rotation},
-            {"Type", Util::DrawersTypeToString(createInfo.type)}
+            {"Scale", createInfo.scale},
+            {"EditorName", createInfo.editorName},
+            {"Type", Util::GenericObjectTypeToString(createInfo.type)}
         };
     }
 
@@ -152,10 +154,12 @@ namespace nlohmann {
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
     }
 
-    void from_json(const nlohmann::json& j, DrawersCreateInfo& info) {
+    void from_json(const nlohmann::json& j, GenericObjectCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
-        info.type = Util::StringToDrawersType(j.value("Type", UNDEFINED_STRING));
+        info.scale = j.value("Scale", glm::vec3(1.0f));
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
+        info.type = Util::StringToGenericObjectType(j.value("Type", UNDEFINED_STRING));
     }
 
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation) {

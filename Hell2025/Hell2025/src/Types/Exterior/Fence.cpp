@@ -5,24 +5,26 @@
 #include "Util.h"
 
 void Fence::Init() {
-    m_meshNodesThin.InitFromModel("FencePostThin");
+    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+
+    m_meshNodesThin.InitFromModel(NO_ID, "FencePostThin", emptyMeshNodeCreateInfoSet);
     m_meshNodesThin.SetMeshMaterials("Fence");
-    m_meshNodesThin.UpdateHierachy();
+    m_meshNodesThin.UpdateHierarchy();
     m_meshNodesThin.UpdateRenderItems(glm::mat4(1.0f));
 
-    m_meshNodesFat.InitFromModel("FencePost");
+    m_meshNodesFat.InitFromModel(NO_ID, "FencePost", emptyMeshNodeCreateInfoSet);
     m_meshNodesFat.SetMeshMaterials("Fence");
-    m_meshNodesFat.UpdateHierachy();
+    m_meshNodesFat.UpdateHierarchy();
     m_meshNodesFat.UpdateRenderItems(glm::mat4(1.0f));
 
-    m_meshNodesWireBarbed.InitFromModel("FenceWireBarbed");
+    m_meshNodesWireBarbed.InitFromModel(NO_ID, "FenceWireBarbed", emptyMeshNodeCreateInfoSet);
     m_meshNodesWireBarbed.SetMeshMaterials("Fence");
-    m_meshNodesWireBarbed.UpdateHierachy();
+    m_meshNodesWireBarbed.UpdateHierarchy();
     m_meshNodesWireBarbed.UpdateRenderItems(glm::mat4(1.0f));
 
-    m_meshNodesWire.InitFromModel("FenceWire");
+    m_meshNodesWire.InitFromModel(NO_ID, "FenceWire", emptyMeshNodeCreateInfoSet);
     m_meshNodesWire.SetMeshMaterials("Fence");
-    m_meshNodesWire.UpdateHierachy();
+    m_meshNodesWire.UpdateHierarchy();
     m_meshNodesWire.UpdateRenderItems(glm::mat4(1.0f));
 
     std::vector<glm::vec2> controlPoints2D;

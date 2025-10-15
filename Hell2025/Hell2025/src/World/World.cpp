@@ -62,7 +62,7 @@ namespace World {
     std::vector<Window> g_windows;
 
     Hell::SlotMap<Door> g_doors;
-    Hell::SlotMap<Drawers> g_drawers;
+    Hell::SlotMap<GenericObject> g_genericObjects;
 
     // std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
 
@@ -323,7 +323,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
-        for (DrawersCreateInfo& createInfo : createInfoCollection.drawers)              AddDrawers(createInfo, spawnOffset);
+        for (GenericObjectCreateInfo& createInfo : createInfoCollection.drawers)              AddDrawers(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
@@ -338,7 +338,7 @@ namespace World {
         CreateInfoCollection createInfoCollection;
 
         for (Door& door : World::GetDoors())                        createInfoCollection.doors.push_back(door.GetCreateInfo());
-        for (Drawers& drawers : World::GetDrawers())                createInfoCollection.drawers.push_back(drawers.GetCreateInfo());
+        for (GenericObject& drawers : World::GetGenericObjects())                createInfoCollection.drawers.push_back(drawers.GetCreateInfo());
         for (Light& light : World::GetLights())                     createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                     createInfoCollection.pianos.push_back(piano.GetCreateInfo());
         for (PickUp& pickUp : World::GetPickUps())                  createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
@@ -453,8 +453,8 @@ namespace World {
         return g_doors.get(objectId);
     }
 
-    Drawers* GetDrawersByObjectId(uint64_t objectId) {
-        return g_drawers.get(objectId);
+    GenericObject* GetDrawersByObjectId(uint64_t objectId) {
+        return g_genericObjects.get(objectId);
     }
 
 
@@ -623,7 +623,7 @@ namespace World {
     }
 
     void SetObjectPosition(uint64_t objectId, glm::vec3 position) {
-        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
         if (drawers) {
             drawers->SetPosition(position);
         }
@@ -681,14 +681,14 @@ namespace World {
     }
 
     void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
-        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
         if (drawers) {
             drawers->SetRotation(rotation);
         }
     }
 
     glm::vec3 GetGizmoOffest(uint64_t objectId) {
-        Drawers* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
         if (drawers) {
             return drawers->GetGizmoOffset();
         }
@@ -701,9 +701,9 @@ namespace World {
             g_doors.erase(objectId);
             return true;
         }
-        if (g_drawers.contains(objectId)) {
-            g_drawers.get(objectId)->CleanUp();
-            g_drawers.erase(objectId);
+        if (g_genericObjects.contains(objectId)) {
+            g_genericObjects.get(objectId)->CleanUp();
+            g_genericObjects.erase(objectId);
             return true;
         }
 
@@ -812,7 +812,7 @@ namespace World {
         for (ChristmasPresent& christmasPresent : g_christmasPresents)  christmasPresent.CleanUp();
         for (ChristmasTree& christmasTree : g_christmasTrees)           christmasTree.CleanUp();
         for (Door& door : g_doors)                                      door.CleanUp();
-        for (Drawers& drawer : g_drawers)                               drawer.CleanUp();
+        for (GenericObject& drawer : g_genericObjects)                               drawer.CleanUp();
         for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
         //for (GenericBouncable& genericBouncable : g_genericBouncables) genericStatic.CleanUp();
@@ -840,7 +840,7 @@ namespace World {
         g_christmasTrees.clear();
         g_decals.clear();
         g_doors.clear();
-        g_drawers.clear();
+        g_genericObjects.clear();
         g_fences.clear();
         g_gameObjects.clear();
         g_genericStatics.clear();
@@ -897,9 +897,9 @@ namespace World {
         g_doors.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
-    void AddDrawers(DrawersCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNext(ObjectType::DRAWERS);
-        g_drawers.emplace_with_id(id, id, createInfo, spawnOffset);
+    void AddDrawers(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNext(ObjectType::GENERIC_OBJECT);
+        g_genericObjects.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
 
@@ -1236,7 +1236,7 @@ namespace World {
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
     Hell::SlotMap<Door>& GetDoors()                                     { return g_doors; }
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
-    Hell::SlotMap<Drawers>& GetDrawers()                                { return g_drawers; }
+    Hell::SlotMap<GenericObject>& GetGenericObjects()                                { return g_genericObjects; }
     std::vector<Fence>& GetFences()                                     { return g_fences; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }

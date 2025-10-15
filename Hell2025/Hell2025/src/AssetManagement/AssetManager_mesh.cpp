@@ -95,7 +95,7 @@ namespace AssetManager {
         std::vector<Vertex> result;
         result.reserve(mesh->vertexCount);
 
-        for (int i = mesh->baseIndex; i < mesh->baseIndex + mesh->indexCount; i++) {
+        for (uint32_t i = mesh->baseIndex; i < mesh->baseIndex + mesh->indexCount; i++) {
             uint32_t index = indices[i];
             const Vertex& vertex = vertices[index + mesh->baseVertex];
             result.push_back(vertex);

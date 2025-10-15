@@ -1,7 +1,7 @@
 #include "Inventory.h"
 #include "AssetManagement/AssetManager.h"
 #include "Audio/Audio.h"
-#include "Core/Bible.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
@@ -101,7 +101,9 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
         m_examineModelMatrix = rotX.to_mat4() * rotY.to_mat4() * initialTransform.to_mat4() * scale.to_mat4();
 
         // Update the mesh nodes from the model. WARNNG: YOu dont wanna do this every frame like you are currently!
-        m_examineItemMeshNodes.InitFromModel(itemInfo->m_examineModelName);
+
+        std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+        m_examineItemMeshNodes.InitFromModel(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
 
         // Calculate matrix to scale the model to fit on screen nicely
         float maxXZ = 2.0f; // Desired max footprint on XZ in meters

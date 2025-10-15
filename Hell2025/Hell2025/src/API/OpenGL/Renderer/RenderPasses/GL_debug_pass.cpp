@@ -75,8 +75,6 @@ namespace OpenGLRenderer {
                 glBindVertexArray(g_debugMeshPoints.GetVAO());
                 glDrawArrays(GL_POINTS, 0, g_debugMeshPoints.GetVertexCount());
             }
-
-
         }
 
         if (Debug::GetDebugRenderMode() == DebugRenderMode::ASTAR_MAP) {

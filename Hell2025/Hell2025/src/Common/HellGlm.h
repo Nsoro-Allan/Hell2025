@@ -1,7 +1,16 @@
 #pragma once
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_FORCE_SILENT_WARNINGS
-#define GLM_ENABLE_EXPERIMENTAL
+#ifndef GLM_FORCE_DEPTH_ZERO_TO_ONE
+    #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#endif
+
+#ifndef GLM_FORCE_SILENT_WARNINGS
+    #define GLM_FORCE_SILENT_WARNINGS
+#endif
+
+#ifndef GLM_ENABLE_EXPERIMENTAL
+    #define GLM_ENABLE_EXPERIMENTAL
+#endif
+    
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/matrix_decompose.hpp>

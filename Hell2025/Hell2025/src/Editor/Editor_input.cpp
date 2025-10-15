@@ -61,7 +61,7 @@ namespace Editor {
 
             // Object deletion
             if (Input::KeyPressed(HELL_KEY_BACKSPACE)) {
-                if (GetSelectedObjectType() != ObjectType::NONE) {
+                if (GetSelectedObjectType() != ObjectType::NO_TYPE) {
                     World::RemoveObject(GetSelectedObjectId());
                     World::RecreateHouseMesh();
                     Audio::PlayAudio(AUDIO_SELECT, 1.0f);

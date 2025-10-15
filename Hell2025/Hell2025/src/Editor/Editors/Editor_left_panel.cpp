@@ -32,7 +32,7 @@ namespace Editor {
     }
 
     void UpdateOutliner() {
-        if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR ||
+        if (GetEditorMode() == EditorMode::HOUSE_EDITOR ||
             GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             Map* map = MapManager::GetMapByName(GetEditorMapName());
             if (map) {
@@ -91,7 +91,8 @@ namespace Editor {
         }
 
         // Outliner
-        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR ||
+            GetEditorMode() == EditorMode::HOUSE_EDITOR) {
             if (g_outlinerHeader.CreateImGuiElement()) {
                 float outlinerHeight = BackEnd::GetCurrentWindowHeight() * 0.45f;
                 g_outliner.CreateImGuiElements(outlinerHeight);
@@ -102,7 +103,7 @@ namespace Editor {
         // Object properties
         if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
             if (g_objectPropertiesHeader.CreateImGuiElement()) {
-                if (GetSelectedObjectType() != ObjectType::NONE) {
+                if (GetSelectedObjectType() != ObjectType::NO_TYPE) {
                     g_objectNameInput.CreateImGuiElement();
                 }
 

@@ -12,6 +12,13 @@ namespace Editor {
                 }
             }
         }
+        if (objectType == ObjectType::DRAWER) {
+            for (const GenericObject& drawers : World::GetGenericObjects()) {
+                if (drawers.GetEditorName() == desiredName) {
+                    return false;
+                }
+            }
+        }
         else {
             Logging::Warning() << "Editor::NameAvailable() is missing implementation for object type '" << Util::ObjectTypeToString(objectType) << "'";
         }
@@ -60,6 +67,19 @@ namespace Editor {
 
         for (const Tree& tree : World::GetTrees()) {
             names.push_back(tree.GetEditorName());
+        }
+
+        return names;
+    }
+
+    std::vector<std::string> GetDrawersNames() {
+        std::vector<std::string> names;
+
+        names.clear();
+        names.reserve(World::GetGenericObjects().size());
+
+        for (const GenericObject& drawers : World::GetGenericObjects()) {
+            names.push_back(drawers.GetEditorName());
         }
 
         return names;

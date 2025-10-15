@@ -77,11 +77,11 @@ namespace Editor {
     }
 
     void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
-        if (objectType == ObjectType::DRAWERS) {
-            DrawersCreateInfo createInfo;
+        if (objectType == ObjectType::GENERIC_OBJECT) {
+            GenericObjectCreateInfo createInfo;
             createInfo.position = hitPosition;
             createInfo.rotation.y = 0.0f;
-            createInfo.type = DrawersType::LARGE;
+            createInfo.type = GenericObjectType::DRAWERS_LARGE;
             World::AddDrawers(createInfo, SpawnOffset());
             ExitObjectPlacement();
             return;

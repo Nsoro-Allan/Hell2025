@@ -7,6 +7,8 @@
 #define NEAR_PLANE 0.005f
 #define FAR_PLANE 256.0f
 
+#define NO_ID 0
+
 #define PINK                glm::vec4(0.98f, 0.06f, 0.75f, 1.0f)
 #define ORANGE              glm::vec4(1.00f, 0.65f, 0.00f, 1.0f)
 #define BLACK               glm::vec4(0.00f, 0.00f, 0.00f, 1.0f)
@@ -25,7 +27,8 @@
 #define OUTLINE_COLOR       glm::vec4(1.00f, 0.50f, 0.00f, 0.0f)
 #define DEFAULT_LIGHT_COLOR glm::vec4(1.00f, 0.7799999713897705f, 0.5289999842643738f, 1.0f)
 
-#define HELL_PI 3.14159265358979323846
+#define HELL_PRECISE_PI 3.14159265358979323846
+#define HELL_PI 3.14159265f
 #define HELL_EPSILON 1e-12f
 #define HELL_SQRT_OF_TWO static_cast<float>(sqrt(2.0))
 #define HELL_SQRT_OF_HALF 1.0f / HELL_SQRT_OF_TWO

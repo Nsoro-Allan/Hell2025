@@ -38,7 +38,7 @@ namespace OpenGLRenderer {
                 shader->SetMat4("view", viewportData[i].view);
                 shader->SetBool("useUniformColor", true);
 
-                if (Editor::GetSelectedObjectType() != ObjectType::NONE) {
+                if (Editor::GetSelectedObjectType() != ObjectType::NO_TYPE) {
                     for (GizmoRenderItem& renderItem : Gizmo::GetRenderItemsByViewportIndex(i)) {
                         MeshBuffer* mesh = Gizmo::GetMeshBufferByIndex(renderItem.meshIndex);
                         if (mesh) {

@@ -75,6 +75,7 @@
   ],
   "Drawers": [
     {
+      "EditorName": "UNDEFINED_STRING",
       "Position": [
         6.71803092956543,
         0.0,
@@ -85,7 +86,12 @@
         0.0,
         0.0
       ],
-      "Type": "LARGE"
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "DRAWERS_LARGE"
     }
   ],
   "Lights": [

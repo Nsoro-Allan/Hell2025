@@ -84,8 +84,8 @@ void Light::UpdateDirtyState() {
     }
 
     // Drawers
-    for (Drawers& drawers: World::GetDrawers()) {
-        if (drawers.MovedThisFrame()) {
+    for (GenericObject& drawers: World::GetGenericObjects()) {
+        if (drawers.IsDirty()) {
             m_dirty = true;
             return;
         }

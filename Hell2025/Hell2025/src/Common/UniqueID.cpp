@@ -15,10 +15,6 @@ namespace {
 }
 
 namespace UniqueID {
-    uint64_t GetNextGlobal() {
-        return g_global.fetch_add(1, std::memory_order_relaxed);
-    }
-
     uint64_t GetNext(ObjectType type) {
         const auto idx = size_t(static_cast<uint16_t>(type));
         const uint64_t local = Table().ctr[idx].fetch_add(1, std::memory_order_relaxed);

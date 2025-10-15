@@ -46,7 +46,7 @@ void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex)
 void Player::BeginFrame() {
     m_interactFound = false;
     m_interactObjectId = 0;
-    m_interactObjectType = ObjectType::NONE;
+    m_interactObjectType = ObjectType::NO_TYPE;
 }
 
 void Player::Update(float deltaTime) {

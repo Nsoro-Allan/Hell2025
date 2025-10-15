@@ -1,7 +1,7 @@
 #include "Inventory.h"
 #include "AssetManagement/AssetManager.h"
 #include "Config/Config.h"
-#include "Core/Bible.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "HellLogging.h"
 #include "Input/Input.h"

@@ -60,7 +60,7 @@ struct RenderItem {
     int32_t woundBaseColorTextureIndex = 0;
     int32_t woundNormalMapTextureIndex = 0;
     int32_t woundRmaTextureIndex = 0;
-    int32_t padding3;
+    int32_t padding3 = 0;
 };
 
 struct HouseRenderItem {
@@ -550,7 +550,7 @@ struct PhysicsUserData {
     uint64_t physicsId = 0;
     uint64_t objectId = 0;
     PhysicsType physicsType = PhysicsType::NONE;
-    ObjectType objectType = ObjectType::NONE;
+    ObjectType objectType = ObjectType::NO_TYPE;
 };
 
 struct PhysXRayResult {
@@ -634,7 +634,7 @@ struct BvhRayResult {
     bool hitFound = false;
     size_t primtiviveId = 0;
     uint64_t objectId = 0;
-    ObjectType objectType = ObjectType::NONE;
+    ObjectType objectType = ObjectType::NO_TYPE;
     float distanceToHit = std::numeric_limits<float>::max();
     glm::vec3 hitPosition = glm::vec3(0);
     glm::mat4 primitiveTransform = glm::mat4(1.0f);

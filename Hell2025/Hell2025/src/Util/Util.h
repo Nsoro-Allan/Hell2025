@@ -54,7 +54,8 @@ namespace Util {
     float GetSphereVolume(float radius);
     float GetCapsuleVolume(float radius, float halfHeight);
     AABB GetAABBFromPoints(std::vector<glm::vec3>& points);
-    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b, float eps);
+    bool Mat4NearlyEqual(const glm::mat4& a, const glm::mat4& b);
+    bool NearlyEqualTransform(const Transform& a, const Transform& b);
     bool IsPointInTriangle2D(const glm::vec2& pt, const glm::vec2& v0, const glm::vec2& v1, const glm::vec2& v2);
     std::vector<glm::vec3> GetBeizerPointsFromControlPoints(const std::vector<glm::vec3>& controlPoints, float spacing);
     bool HoveredLine(glm::ivec2 mouseCoords, glm::ivec2 p1, glm::ivec2 p2, float threshold);
@@ -160,7 +161,7 @@ namespace Util {
 
     // Type to string Conversions
     std::string BlendingModeToString(BlendingMode mode);
-    std::string DrawersTypeToString(DrawersType houseType);
+    std::string GenericObjectTypeToString(GenericObjectType houseType);
     std::string HouseTypeToString(HouseType houseType);
     std::string InventoryStateToString(InventoryState state);
     std::string LightTypeToString(LightType type);
@@ -175,9 +176,10 @@ namespace Util {
 
     // String to type conversions
     BlendingMode StringToBlendingMode(const std::string& str);
-    DrawersType StringToDrawersType(const std::string& str);
+    GenericObjectType StringToGenericObjectType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);
     LightType StringToLightType(const std::string& str);
+    //ObjectType StringToObjectType(const std::string& str);
     PickUpType StringToPickUpType(const std::string& str);
     PictureFrameType StringToPictureFrameType(const std::string& str);
     TreeType StringToTreeType(const std::string& str);

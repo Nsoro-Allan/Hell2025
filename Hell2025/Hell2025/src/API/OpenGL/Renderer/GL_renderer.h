@@ -64,6 +64,7 @@ namespace OpenGLRenderer {
     void HeightMapPass(); 
     void HouseGeometryPass();
     void ImGuiPass();
+    void InventoryGaussianPass();
     void LightCullingPass();
     void LightingPass();
     void OceanGeometryPass();

@@ -69,7 +69,7 @@ enum class TextureFilter {
 };
 
 enum class ObjectType : uint16_t {
-    NONE = 0,
+    NO_TYPE = 0,
     CHARACTER_CONTROLLER,
     DECAL,
     DOOR,
@@ -107,7 +107,7 @@ enum class ObjectType : uint16_t {
     ANIMATED_GAME_OBJECT,
     CHRISMAS_PRESENT,
     DOBERMANN,
-    DRAWERS,
+    GENERIC_OBJECT,
     MESH_NODE,
     PLAYER,
     RAGDOLL_V1,
@@ -126,6 +126,21 @@ enum class Axis {
     Y,
     Z,
     NONE,
+};
+
+enum struct OpenAxis {
+    TRANSLATE_X,
+    TRANSLATE_Y,
+    TRANSLATE_Z,
+    TRANSLATE_X_NEG,
+    TRANSLATE_Y_NEG,
+    TRANSLATE_Z_NEG,
+    ROTATE_X,
+    ROTATE_Y,
+    ROTATE_Z,
+    ROTATE_X_NEG,
+    ROTATE_Y_NEG,
+    ROTATE_Z_NEG,
 };
 
 enum class SplitscreenMode { 
@@ -437,9 +452,8 @@ enum struct HouseType {
     UNDEFINED
 };
 
-enum class DrawersType {
-    SMALL,
-    LARGE,
+enum class GenericObjectType {
+    DRAWERS_LARGE,
     UNDEFINED
 };
 

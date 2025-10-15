@@ -99,7 +99,7 @@ namespace Physics {
         userData.physicsId = 0;
         userData.objectId = 0;
         userData.physicsType = PhysicsType::GROUND_PLANE;
-        userData.objectType = ObjectType::NONE;
+        userData.objectType = ObjectType::NO_TYPE;
         groundPlane->userData = new PhysicsUserData(userData);
 
         // This might not work!

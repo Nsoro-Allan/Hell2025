@@ -23,7 +23,6 @@ namespace UniqueID {
         return id & kLocalMask;
     }
 
-    //uint64_t GetNextGlobal();
     uint64_t GetNext(ObjectType type);
 
 }

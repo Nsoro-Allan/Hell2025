@@ -100,7 +100,7 @@ namespace World {
                 }
             }
 
-            for (Drawers& drawers: GetDrawers()) {
+            for (GenericObject& drawers: GetGenericObjects()) {
                 const std::vector<RenderItem>& renderItems = drawers.GetRenderItems();
                 for (const RenderItem& renderItem : renderItems) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);

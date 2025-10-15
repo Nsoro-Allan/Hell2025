@@ -8,39 +8,45 @@
 #include "UniqueID.h"
 #include "Util.h"
 
-void MeshNodes::InitFromModel(const std::string & modelName) {
+void MeshNodes::InitFromModel(uint64_t parentId, const std::string & modelName, const std::vector<MeshNodeCreateInfo>& meshNodeCreateInfoSet) {
     Model* model = AssetManager::GetModelByName(modelName);
-    if (model) {
-        InitFromModel(model);
+    if (!model) {
+        Logging::Error() << "MeshNodes::InitFromModel() failed because modelName was not found";
+        return;
     }
-    else {
-        CleanUp();
-        std::cout << "MeshNodes::InitFromModel() failed: '" << modelName << "' does not exist!\n";
-    }
-}
 
-void MeshNodes::InitFromModel(Model* model) {
     CleanUp();
 
-    if (!model) return;
-
-    m_modelName = model->GetName();
+    m_modelName = modelName;
     m_nodeCount = model->GetMeshCount();
     int32_t materialIndex = AssetManager::GetMaterialIndexByName(DEFAULT_MATERIAL_NAME);
 
     m_blendingModes.resize(m_nodeCount, BlendingMode::BLEND_DISABLED);
     m_materialIndices.resize(m_nodeCount, materialIndex);
     m_transforms.resize(m_nodeCount, Transform());
+    m_transformsPreviousFrame.resize(m_nodeCount, Transform());
     m_localParentIndices.resize(m_nodeCount, -1);
     m_localTransforms.resize(m_nodeCount, glm::mat4(1.0f));
     m_inverseBindTransforms.resize(m_nodeCount, glm::mat4(1.0f));
     m_modelMatrices.resize(m_nodeCount, glm::mat4(1.0f));
-    m_objectTypes.resize(m_nodeCount, ObjectType::UNDEFINED);
-    m_objectIds.resize(m_nodeCount, 0);
+    //m_objectTypes.resize(m_nodeCount, ObjectType::UNDEFINED);
     m_worldspaceAabbs.resize(m_nodeCount);
+    //m_openableIds.resize(m_nodeCount, 0);
+    //m_rigidStaticIds.resize(m_nodeCount, 0);
+    //m_rigidDynamictIds.resize(m_nodeCount, 0);
+
+    // By default, match that parent id/type. If you later set a node to
+    // ObjectType::OPENABLE, ObjectType::PHYSICS_RIGID, ObjectType::PHYSICS_STATIC
+    // then the parent id/type will be now contained within that new object.
+    m_objectIds.resize(m_nodeCount, parentId); 
+
+    // Force dirty previous frame transforms
+    for (size_t i = 0; i < m_nodeCount; i++) {
+        m_transformsPreviousFrame[i].position = glm::vec3(666.0f);
+    }
 
     // Map mesh names to their local index and extra parent index and transforms
-    for (int i = 0; i < m_nodeCount; i++) {
+    for (size_t i = 0; i < m_nodeCount; i++) {
         int meshIndex = model->GetMeshIndices()[i];
 
         Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
@@ -50,11 +56,9 @@ void MeshNodes::InitFromModel(Model* model) {
             m_localParentIndices[i] = mesh->parentIndex;
             m_localTransforms[i] = mesh->localTransform;
             m_inverseBindTransforms[i] = mesh->inverseBindTransform;
-
-            // Update parent
-            if (mesh->parentIndex != -1) {
-                Mesh* parentMesh = AssetManager::GetMeshByIndex(meshIndex);
-            }
+        }
+        else {
+            Logging::Error() << "Some weird shit that should never happen happened";
         }
     }
 
@@ -62,20 +66,38 @@ void MeshNodes::InitFromModel(Model* model) {
     if (model->m_modelData.armatures.size() > 0) {
         m_armatureData = model->m_modelData.armatures[0];
     }
-}
 
+    // Apply any mesh node create info
+    for (const MeshNodeCreateInfo& createInfo : meshNodeCreateInfoSet) {
+        if (!NodeExists(createInfo.meshName)) {
+            Logging::Error() << "MeshNodes::InitFromModel() failed to process meshNodeCreateInfoSet, mesh name '" << createInfo.meshName << "' not found";
+            continue;
+        }
+        int nodeIndex = m_localIndexMap[createInfo.meshName];
 
-void MeshNodes::SetObjectTypes(ObjectType type) {
-    for (ObjectType& objectType : m_objectTypes) {
-        objectType = type;
+        SetMaterialByMeshName(createInfo.meshName, createInfo.materialName);
+        SetBlendingModeByMeshName(createInfo.meshName, createInfo.blendingMode);
+        SetGoldFlag(createInfo.isGold); // REMOVE ME WHEN CARLOS GIVES U BALLER GOLDEN GLOCK TEXTURE SET
+
+        if (createInfo.openable.createMe) {
+            uint64_t openableId = OpenableManager::CreateOpenable(createInfo.openable);
+            Openable* openable = OpenableManager::GetOpenableByOpenableId(openableId);
+            if (openable) {
+                openable->SetParentObjectId(m_objectIds[nodeIndex]);
+                openable->m_meshName = createInfo.meshName;
+                m_objectIds[nodeIndex] = openableId;
+                Logging::Fatal() << "SET " << nodeIndex << " to " << m_objectIds[nodeIndex];
+            }
+        }
     }
+
 }
 
-void MeshNodes::SetObjectIds(uint64_t id) {
-    for (uint64_t& objectId : m_objectIds) {
-        objectId = id;
-    }
-}
+//void MeshNodes::SetObjectTypes(ObjectType type) {
+//    for (ObjectType& objectType : m_objectTypes) {
+//        objectType = type;
+//    }
+//}
 
 void MeshNodes::PrintMeshNames() {
     std::cout << m_modelName << "\n";
@@ -89,6 +111,11 @@ void MeshNodes::PrintMeshNames() {
 
 void MeshNodes::SetGoldFlag(bool flag) {
     m_isGold = flag;
+}
+
+bool MeshNodes::NodeExists(const std::string& meshName) {
+    const auto it = m_localIndexMap.find(meshName);
+    return (it != m_localIndexMap.end());
 }
 
 bool MeshNodes::BoneExists(const std::string& boneName) {
@@ -120,7 +147,7 @@ void MeshNodes::CleanUp() {
     m_localTransforms.clear();
     m_inverseBindTransforms.clear();
     m_modelMatrices.clear();
-    m_objectTypes.clear();
+    //m_objectTypes.clear();
     m_objectIds.clear();
     m_renderItems.clear();
 }
@@ -129,7 +156,7 @@ void MeshNodes::SetTransformByMeshName(const std::string& meshName, Transform tr
     if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
         int nodeIndex = m_localIndexMap[meshName];
 
-        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+        if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
             m_transforms[nodeIndex] = transform;
         }
     }
@@ -142,7 +169,7 @@ void MeshNodes::SetMeshMaterials(const std::string& materialName) {
         return;
     }
 
-    for (int i = 0; i < m_materialIndices.size(); i++) {
+    for (size_t i = 0; i < m_nodeCount; i++) {
         m_materialIndices[i] = materialIndex;
     }
 }
@@ -157,7 +184,7 @@ void MeshNodes::SetMaterialByMeshName(const std::string& meshName, const std::st
     if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
         int nodeIndex = m_localIndexMap[meshName];
 
-        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+        if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
             m_materialIndices[nodeIndex] = materialIndex;
             return;
         }
@@ -173,43 +200,67 @@ void MeshNodes::SetBlendingModeByMeshName(const std::string& meshName, BlendingM
     if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
         int nodeIndex = m_localIndexMap[meshName];
 
-        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+        if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
             m_blendingModes[nodeIndex] = blendingMode;
         }
     }
 }
 
-void MeshNodes::SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType) {
-    if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
-        int nodeIndex = m_localIndexMap[meshName];
-
-        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
-            m_objectTypes[nodeIndex] = objectType;
-        }
-    }
-}
+//void MeshNodes::SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType) {
+//    if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
+//        int nodeIndex = m_localIndexMap[meshName];
+//
+//        if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
+//            m_objectTypes[nodeIndex] = objectType;
+//        }
+//    }
+//}
 
 void MeshNodes::SetObjectIdByMeshName(const std::string& meshName, uint64_t id) {
     if (m_localIndexMap.find(meshName) != m_localIndexMap.end()) {
         int nodeIndex = m_localIndexMap[meshName];
 
-        if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+        if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
             m_objectIds[nodeIndex] = id;
         }
     }
 }
 
+//void MeshNodes::SetOpenable(const std::string& meshName, OpenableCreateInfo& openableCreateInfo) {
+//    const auto it = m_localIndexMap.find(meshName);
+//    if (it == m_localIndexMap.end()) {
+//        Logging::Error() << "MeshNodes::SetOpenable failed because meshName '" << meshName << "' not found";
+//        return;
+//    }
+//
+//    const int nodeIndex = static_cast<int>(it->second);
+//
+//    m_openableIds[nodeIndex] = OpenableManager::CreateOpenable(openableCreateInfo);
+//    //m_objectIds[nodeIndex] = 
+//}
+
 void MeshNodes::SetOpenableByMeshName(const std::string& meshName, uint64_t openableId, uint64_t parentObjectId) {
-    Openable* openable = OpenableManager::GetOpeneableByOpenableId(openableId);
-    int nodeIndex = m_localIndexMap[meshName];
-
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount() && openable) {
-        m_objectIds[nodeIndex] = openableId;
-        m_objectTypes[nodeIndex] = ObjectType::OPENABLE;
-        openable->SetParentObjectId(parentObjectId);
+    const auto it = m_localIndexMap.find(meshName);
+    if (it == m_localIndexMap.end()) {
+        Logging::Error() << "MeshNodes::SetOpenableByMeshName failed: meshName '" << meshName << "' not found\n";
+        return;
     }
-}
 
+    Openable* openable = OpenableManager::GetOpenableByOpenableId(openableId);
+    if (!openable) {
+        Logging::Error() << "MeshNodes::SetOpenableByMeshName failed: openableId " << openableId << " not found\n";
+        return;
+    }
+
+    const int nodeIndex = static_cast<int>(it->second);
+    if (nodeIndex < 0 || static_cast<size_t>(nodeIndex) >= m_nodeCount) {
+        Logging::Error() << "MeshNodes::SetOpenableByMeshName failed: nodeIndex out of range\n";
+        return;
+    }
+
+    openable->SetParentObjectId(m_objectIds[nodeIndex]); // Store a reference id to the parent object that owns this MeshNodes (plural intended)
+    m_objectIds[nodeIndex] = openableId;                 // Replace the node id with the openable id
+}
 
 void MeshNodes::DrawWorldspaceAABB(glm::vec4 color) {
     Renderer::DrawAABB(m_worldspaceAABB, color);
@@ -221,17 +272,16 @@ void MeshNodes::DrawWorldspaceAABBs(glm::vec4 color) {
     }
 }
 
-RenderItem* MeshNodes::GetRenderItemByNodeIndex(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < m_renderItems.size()) {
-        return &m_renderItems[nodeIndex];
-    }
-    else {
-        return nullptr;
-    }
+const AABB* MeshNodes::GetWorldSpaceAabbByMeshName(const std::string& meshName) {
+    const auto it = m_localIndexMap.find(meshName);
+    if (it == m_localIndexMap.end()) return nullptr;
+
+    const size_t nodeIndex = it->second;
+    return &m_worldspaceAabbs[nodeIndex];
 }
 
 int32_t MeshNodes::GetGlobalMeshIndex(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+    if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
         return m_globalMeshIndices[nodeIndex];
     }
     else { 
@@ -240,7 +290,7 @@ int32_t MeshNodes::GetGlobalMeshIndex(int nodeIndex) {
 }
 
 Material* MeshNodes::GetMaterial(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+    if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
         return AssetManager::GetMaterialByIndex(m_materialIndices[nodeIndex]);
     }
     else {
@@ -248,51 +298,44 @@ Material* MeshNodes::GetMaterial(int nodeIndex) {
     }
 }
 
-glm::mat4 MeshNodes::GetLocalTransform(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
-        return m_localTransforms[nodeIndex];
-    }
-    else {
-        return glm::mat4(1.0f);
-    }
-}
+void MeshNodes::UpdateHierarchy() {
+    for (size_t i = 0; i < m_nodeCount; ++i) {
+        const int32_t parentIndex = m_localParentIndices[i];
 
-glm::mat4 MeshNodes::GetInverseBindTransform(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
-        return m_inverseBindTransforms[nodeIndex];
-    }
-    else {
-        return glm::mat4(1.0f);
-    }
-}
-
-void MeshNodes::UpdateHierachy() {
-    m_hierarchyChanged = false;
-    const float eps = 1e-5f;
-
-    for (int i = 0; i < GetNodeCount(); ++i) {
-        int32_t parentIndex = m_localParentIndices[i];
-
-        glm::mat4 newM = (parentIndex != -1)
-            ? m_modelMatrices[parentIndex] * m_localTransforms[i] * m_transforms[i].to_mat4()
-            : m_localTransforms[i] * m_transforms[i].to_mat4();
-
-        if (!m_hierarchyChanged) {
-            if (!Util::Mat4NearlyEqual(newM, m_modelMatrices[i], eps)) {
-                m_hierarchyChanged = true;
-            }
+        if (parentIndex != -1) {
+            m_modelMatrices[i] = m_modelMatrices[parentIndex] * m_localTransforms[i] * m_transforms[i].to_mat4();
         }
-
-        m_modelMatrices[i] = newM;
+        else {
+            m_modelMatrices[i] = m_localTransforms[i] * m_transforms[i].to_mat4();
+        }
     }
 }
 
 void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
-    UpdateHierachy();
+    // Check if the world matrix changed this frame
+    const bool worldMatrixDirty = (!Util::Mat4NearlyEqual(worldMatrix, m_worldMatrixPreviousFrame));
 
-    //if (m_hierarchyChanged) {
-        UpdateAABBs(worldMatrix);
-    //}
+    // Check if hierarchy has been modified by an Openable this frame
+    bool hierarchyDirty = false;
+    for (size_t i = 0; i < m_nodeCount; ++i) {
+        if (!Util::NearlyEqualTransform(m_transforms[i], m_transformsPreviousFrame[i])) {
+            hierarchyDirty = true;
+            break;
+        }
+    }    
+    if (hierarchyDirty) {
+        UpdateHierarchy();
+    }
+
+    // If neither are dirty, then no need to recompute RenderItems
+    if (!worldMatrixDirty && !hierarchyDirty) {
+        m_isDirty = false;
+        return;
+    }
+    m_isDirty = worldMatrixDirty || hierarchyDirty;
+
+    // If you made it this far, then AABBs are now also dirty
+    UpdateAABBs(worldMatrix);
 
     m_renderItems.clear();
     m_renderItemsBlended.clear();
@@ -300,7 +343,7 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
     m_renderItemsHairTopLayer.clear();
     m_renderItemsHairBottomLayer.clear();
 
-    for (int i = 0; i < GetNodeCount(); i++) {
+    for (size_t i = 0; i < m_nodeCount; i++) {
         Material* material = GetMaterial(i);
         if (!material) continue;
 
@@ -308,11 +351,9 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
         if (!mesh) continue;
 
-        glm::mat4 meshModelMatrix = GetMeshModelMatrix(i);
-
         RenderItem renderItem;
-        renderItem.objectType = (int)m_objectTypes[i];
-        renderItem.modelMatrix = worldMatrix * meshModelMatrix;
+        renderItem.objectType = (int)UniqueID::GetType(m_objectIds[i]);
+        renderItem.modelMatrix = worldMatrix * m_modelMatrices[i];
         renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
         renderItem.meshIndex = meshIndex;
         renderItem.baseColorTextureIndex = material->m_basecolor;
@@ -329,28 +370,30 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         }
 
         Util::PackUint64(m_objectIds[i], renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-        //Util::UpdateRenderItemAABB(renderItem);
 
-        BlendingMode blendingMode = m_blendingModes[i];
-        switch (blendingMode) {
-            case BlendingMode::BLEND_DISABLED:      m_renderItems.push_back(renderItem); break;
-            case BlendingMode::BLENDED:             m_renderItemsBlended.push_back(renderItem); break;
-            case BlendingMode::ALPHA_DISCARDED:     m_renderItemsAlphaDiscarded.push_back(renderItem); break;
-            case BlendingMode::HAIR_TOP_LAYER:      m_renderItemsHairTopLayer.push_back(renderItem); break;
-            case BlendingMode::HAIR_UNDER_LAYER:    m_renderItemsHairBottomLayer.push_back(renderItem); break;
+        switch (m_blendingModes[i]) {
+            case BlendingMode::BLEND_DISABLED:    m_renderItems.push_back(renderItem);                 break;
+            case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(renderItem);          break;
+            case BlendingMode::ALPHA_DISCARDED:   m_renderItemsAlphaDiscarded.push_back(renderItem);   break;
+            case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(renderItem);     break;
+            case BlendingMode::HAIR_UNDER_LAYER:  m_renderItemsHairBottomLayer.push_back(renderItem);  break;
             default: break;
         }
     }
+
+    // Store previous frame data
+    m_worldMatrixPreviousFrame = worldMatrix;
+    m_transformsPreviousFrame = m_transforms;
 }
 
 void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
-    m_worldspaceAabbs.resize(GetNodeCount());
+    m_worldspaceAabbs.resize(m_nodeCount);
 
     glm::vec3 min(std::numeric_limits<float>::max());
     glm::vec3 max(-std::numeric_limits<float>::max());
     bool found = false;
 
-    for (int i = 0; i < GetNodeCount(); ++i) {
+    for (size_t i = 0; i < m_nodeCount; ++i) {
         int32_t meshIndex = m_globalMeshIndices[i];
         Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
         if (!mesh) continue;
@@ -386,20 +429,40 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
     m_worldspaceAABB = found ? AABB(min, max) : AABB();
 }
 
-glm::mat4 MeshNodes::GetMeshModelMatrix(int nodeIndex) {
-    if (nodeIndex >= 0 && nodeIndex < GetNodeCount()) {
+const glm::mat4& MeshNodes::GetMeshModelMatrix(int nodeIndex) const {
+    static glm::mat4 identity = glm::mat4(1.0f);
+
+    if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
         return m_modelMatrices[nodeIndex];
     }
-    else {
-        return glm::mat4(1.0f);
-    }
+    return identity;
 }
 
-glm::mat4 MeshNodes::GetBoneLocalMatrix(const std::string& boneName) {
-    for (Bone& bone : m_armatureData.bones) {
+const glm::mat4& MeshNodes::GetBoneLocalMatrix(const std::string& boneName) const {
+    static glm::mat4 identity = glm::mat4(1.0f);
+
+    for (const Bone& bone : m_armatureData.bones) {
         if (bone.name == boneName) {
             return bone.localRestPose;
         }
     }
-    return glm::mat4(1.0f);
+    return identity;
+}
+
+const glm::mat4& MeshNodes::GetLocalTransform(int nodeIndex) const {
+    static glm::mat4 identity = glm::mat4(1.0f);
+
+    if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
+        return m_localTransforms[nodeIndex];
+    }
+    return identity;
+}
+
+const glm::mat4& MeshNodes::GetInverseBindTransform(int nodeIndex) const {
+    static glm::mat4 identity = glm::mat4(1.0f);
+
+    if (nodeIndex >= 0 && nodeIndex < m_nodeCount) {
+        return m_inverseBindTransforms[nodeIndex];
+    }
+    return identity;
 }

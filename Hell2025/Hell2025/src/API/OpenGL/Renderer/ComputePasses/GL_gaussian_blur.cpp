@@ -35,10 +35,10 @@ namespace OpenGLRenderer {
         }
 
         // Initilize with src dimensions / 2
-        int width = (srcRect.x1 - srcRect.x0) / 2;
-        int height = (srcRect.y1 - srcRect.y0) / 2;
-        width = std::max(1, width);
-        height = std::max(1, height);
+        unsigned int width = (srcRect.x1 - srcRect.x0) / 2;
+        unsigned int height = (srcRect.y1 - srcRect.y0) / 2;
+        width = std::max(1u, width);
+        height = std::max(1u, height);
 
         // Ensure the gaussian framebuffer is big enough to peform this
         if (gaussianFrameBuffer->GetWidth() < width || gaussianFrameBuffer->GetHeight() < height) {
@@ -98,8 +98,8 @@ namespace OpenGLRenderer {
                BlitFrameBuffer(gaussianFrameBuffer, gaussianFrameBuffer, dstGaussianAtttachmentName.c_str(), srcGaussianAtttachmentName.c_str(), srcDownscaleRect, dstDownscaleRect, GL_COLOR_BUFFER_BIT, GL_LINEAR);
                width /= 2;
                height /= 2;
-               width = std::max(1, width);
-               height = std::max(1, height);
+               width = std::max(1u, width);
+               height = std::max(1u, height);
            }
            else {
                BlitRect composteRect;

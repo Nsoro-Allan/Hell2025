@@ -138,7 +138,7 @@ namespace World {
         LazyDebugSpawns();
 
         for (Door& door : GetDoors())           door.Update(deltaTime);
-        for (Drawers& drawers : GetDrawers())   drawers.Update(deltaTime); 
+        for (GenericObject& drawers : GetGenericObjects())   drawers.Update(deltaTime); 
 
         std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
         std::vector<BulletCasing>& bulletCasings = GetBulletCasings();

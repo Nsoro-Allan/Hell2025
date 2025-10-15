@@ -25,11 +25,11 @@ namespace OpenGLRenderer {
         skinningTransforms->Update(RenderDataManager::skinningTransforms.size() * sizeof(glm::mat4), &RenderDataManager::skinningTransforms[0]);
                
         // Calculate total amount of vertices to skin and allocate space
-        int totalVertexCount = 0;
+        uint32_t totalVertexCount = 0;
         for (AnimatedGameObject* animatedGameObject : animatedGameObjects) {
             SkinnedModel* skinnedModel = animatedGameObject->GetSkinnedModel();
             if (!skinnedModel) continue;
-            for (int i = 0; i < skinnedModel->GetMeshCount(); i++) {
+            for (uint32_t i = 0; i < skinnedModel->GetMeshCount(); i++) {
                 int meshindex = skinnedModel->GetMeshIndices()[i];
                 SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(meshindex);
                 totalVertexCount += mesh->vertexCount;
@@ -66,7 +66,7 @@ namespace OpenGLRenderer {
 
                 baseOutputVertex += mesh->vertexCount;
             }
-            baseTransformIndex += animatedGameObject->GetBoneSkinningMatrices().size();
+            baseTransformIndex += (uint32_t)animatedGameObject->GetBoneSkinningMatrices().size();
             j++;
         }
     }

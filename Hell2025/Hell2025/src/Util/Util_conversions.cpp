@@ -1,3 +1,4 @@
+#include "MagicEnum.hpp"
 #include "Util.h"
 
 namespace Util {
@@ -8,15 +9,6 @@ namespace Util {
             case InventoryState::EXAMINE_ITEM:      return "EXAMINE_ITEM";
             case InventoryState::MOVING_ITEM:       return "MOVING_ITEM";
             case InventoryState::ROTATING_ITEM:     return "ROTATING_ITEM";
-            default: return "UNKNOWN";
-        }
-    }
-
-    std::string DrawersTypeToString(DrawersType houseType) {
-        switch (houseType) {
-            case DrawersType::SMALL:        return "SMALL";
-            case DrawersType::LARGE:        return "LARGE";
-            case DrawersType::UNDEFINED:    return "UNDEFINED";
             default: return "UNKNOWN";
         }
     }
@@ -134,47 +126,6 @@ namespace Util {
         }
     }
 
-    std::string ObjectTypeToString(ObjectType type) {
-        switch (type) {
-            case ObjectType::NONE:                          return "NONE";
-            case ObjectType::DECAL:                         return "DECAL";
-            case ObjectType::CHARACTER_CONTROLLER:          return "CHARACTER_CONTROLLER";
-            case ObjectType::DOOR:                          return "DOOR";
-            case ObjectType::DRAWERS:                       return "DRAWERS";
-            case ObjectType::DOOR_FRAME:                    return "DOOR_FRAME";
-            case ObjectType::DRAWER:                        return "DRAWER";
-            case ObjectType::DRAWERS_FRAME:                 return "DRAWERS_FRAME";
-            case ObjectType::GAME_OBJECT:                   return "GAME_OBJECT";
-            case ObjectType::GENERIC_STATIC:                return "GENERIC_STATIC";
-            case ObjectType::HEIGHT_MAP:                    return "HEIGHT_MAP";
-            case ObjectType::PLANE:                         return "HOUSE_PLANE";
-            case ObjectType::LIGHT:                         return "LIGHT";
-            case ObjectType::OPENABLE:                      return "OPENABLE";
-            case ObjectType::PICK_UP:                       return "PICK_UP";
-            case ObjectType::PIANO:                         return "PIANO";
-            case ObjectType::PIANO_KEY:                     return "PIANO_KEY";
-            case ObjectType::PIANO_KEYBOARD_COVER:          return "PIANO_KEYBOARD_COVER";
-            case ObjectType::PIANO_TOP_COVER:               return "PIANO_TOP_COVER";
-            case ObjectType::PIANO_SHEET_MUSIC_REST:        return "PIANO_SHEET_MUSIC_REST";
-            case ObjectType::PIANO_SHEET_SUSTAIN_PEDAL:     return "PIANO_SHEET_SUSTAIN_PEDAL";
-            case ObjectType::PICTURE_FRAME:                 return "PICTURE_FRAME";
-            case ObjectType::RAGDOLL_ENEMY:                 return "RAGDOLL_ENEMY";
-            case ObjectType::RAGDOLL_V2:                    return "RAGDOLL_V2";
-            case ObjectType::RAGDOLL_PLAYER:                return "RAGDOLL_PLAYER";
-            case ObjectType::SHARK:                         return "SHARK";
-            case ObjectType::SPAWN_POINT:                   return "SPAWN_POINT";
-            case ObjectType::TOILET:                        return "TOILET";
-            case ObjectType::TOILET_LID:                    return "TOILET_LID";
-            case ObjectType::TOILET_SEAT:                   return "TOILET_SEAT";
-            case ObjectType::TREE:                          return "TREE";
-            case ObjectType::UNDEFINED:                     return "UNDEFINED";
-            case ObjectType::WALL:                          return "WALL";
-            case ObjectType::WALL_SEGMENT:                  return "WALL_SEGMENT";
-            case ObjectType::WINDOW:                        return "WINDOW";
-            default:                                        return "UNKNOWN";
-        }
-    }
-
     std::string PictureFrameTypeToString(PictureFrameType type) {
         switch (type) {
             case PictureFrameType::BIG_LANDSCAPE:       return "BIG_LANDSCAPE";
@@ -216,11 +167,11 @@ namespace Util {
         }
     }
 
-    DrawersType StringToDrawersType(const std::string& str) {
-        if (str == "SMALL")     return DrawersType::SMALL;
-        if (str == "LARGE")     return DrawersType::LARGE;
-        return                  DrawersType::UNDEFINED;
-    }
+    //ObjectType StringToObjectType(const std::string& str)               { return magic_enum::enum_cast<ObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+    GenericObjectType StringToGenericObjectType(const std::string& str) { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+
+    std::string GenericObjectTypeToString(GenericObjectType objType)    { return std::string(magic_enum::enum_name(objType)); }
+    std::string ObjectTypeToString(ObjectType objType)                  { return std::string(magic_enum::enum_name(objType)); }
 
     BlendingMode StringToBlendingMode(const std::string& str) {
         if (str == "BLENDED") return BlendingMode::BLENDED;

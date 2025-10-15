@@ -136,7 +136,7 @@ namespace Bvh::Gpu {
             if (node.primitiveCount > 0) {
                 uint32_t newPrimitiveFloatIndex = static_cast<uint32_t>(meshBvh.m_triangleData.size());
 
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     const size_t originalPrimitiveId = node.firstChildOrPrimitive + i;
                     const size_t triIndex = bvh.prim_ids[originalPrimitiveId];
                     const size_t indexOffset = triIndex * 3;
@@ -288,7 +288,7 @@ namespace Bvh::Gpu {
                 int newPrimitiveIndex = static_cast<int>(sceneBvh.m_instances.size());
 
                 // Loop over each primitive instance in the leaf
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     int primitiveId = node.firstChildOrPrimitive + i;
                     int instanceIndex = bvh.prim_ids[primitiveId];
 
@@ -319,8 +319,8 @@ namespace Bvh::Gpu {
         g_triangleData.clear();
 
         // Preallocate memory
-        int totalNodeCount = 0;
-        int totalTriangleDataSize = 0;
+        uint32_t totalNodeCount = 0;
+        uint32_t totalTriangleDataSize = 0;
         for (auto it = g_meshBvhs.begin(); it != g_meshBvhs.end(); ++it) {
             MeshBvh& meshBvh = it->second;
             totalNodeCount += meshBvh.m_nodes.size();
@@ -360,8 +360,8 @@ namespace Bvh::Gpu {
             g_triangleData.insert(g_triangleData.end(), meshBvh.m_triangleData.begin(), meshBvh.m_triangleData.end());
 
             // Increment offsets
-            rootNodeOffset += meshBvh.m_nodes.size();
-            baseTriangleOffset += meshBvh.m_triangleData.size();
+            rootNodeOffset += (uint32_t)meshBvh.m_nodes.size();
+            baseTriangleOffset += (uint32_t)meshBvh.m_triangleData.size();
         }
     }
 
