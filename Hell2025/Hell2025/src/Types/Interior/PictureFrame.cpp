@@ -11,7 +11,7 @@ const std::vector<const char*> bigLandscapeImages = {
 
 void PictureFrame::Init(PictureFrameCreateInfo createInfo) {
     m_createInfo = createInfo;
-    m_objectId = UniqueID::GetNext(ObjectType::PICTURE_FRAME);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::PICTURE_FRAME);
     SelectRandomPicture();
     UpdateRenderItems();   
 }

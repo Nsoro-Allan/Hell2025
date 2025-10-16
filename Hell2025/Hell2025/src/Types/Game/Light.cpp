@@ -41,7 +41,7 @@ Light::Light(LightCreateInfo createInfo) {
         }
     }
 
-    m_objectId = UniqueID::GetNext(ObjectType::LIGHT);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
 }
 
 void Light::Update(float deltaTime) {
@@ -84,8 +84,14 @@ void Light::UpdateDirtyState() {
     }
 
     // Drawers
-    for (GenericObject& drawers: World::GetGenericObjects()) {
+    for (GenericObject& drawers : World::GetGenericObjects()) {
         if (drawers.IsDirty()) {
+            m_dirty = true;
+            return;
+        }
+    }
+    for (Piano& pianos : World::GetPianos()) {
+        if (pianos.GetMeshNodes().IsDirty()) {
             m_dirty = true;
             return;
         }

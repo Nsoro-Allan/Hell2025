@@ -117,7 +117,7 @@ namespace Game {
         while (g_deltaTimeAccumulator >= g_fixedDeltaTime) {
             g_deltaTimeAccumulator -= g_fixedDeltaTime;
             if (Editor::IsClosed()) {
-                Physics::StepPhysics(g_fixedDeltaTime);
+                Physics::StepPhysics((float)g_fixedDeltaTime);
             }
         }
 

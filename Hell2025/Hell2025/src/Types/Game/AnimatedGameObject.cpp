@@ -13,7 +13,7 @@
 #include <Ragdoll/RagdollManager.h>
 
 void AnimatedGameObject::Init() {
-    m_objectId = UniqueID::GetNext(ObjectType::ANIMATED_GAME_OBJECT);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::ANIMATED_GAME_OBJECT);
 }
 
 void AnimatedGameObject::SetMeshWoundMaskTextureIndex(const std::string& meshName, int32_t woundMaskTextureIndex) {

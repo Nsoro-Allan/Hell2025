@@ -2,6 +2,7 @@
 #include "Renderer/Renderer.h"
 #include "HellDefines.h"
 #include "HellTypes.h"
+#include "UniqueID.h"
 #include "Util.h"
 
 namespace Bvh::Cpu {
@@ -130,8 +131,9 @@ namespace Bvh::Cpu {
                         rayResult.primitiveTransform = instance.inverseWorldTransform;
                         rayResult.nodeBoundsMin = node.boundsMin;
                         rayResult.nodeBoundsMax = node.boundsMax;
-                        rayResult.objectType = Util::IntToEnum(instance.objectType);
-                        rayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
+                        rayResult.openableId = instance.openableId;
+                        rayResult.customId = instance.customId;
+                        rayResult.globalMeshIndex = instance.globalMeshIndex;
                         Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, rayResult.objectId);
                         return rayResult;
                     }
@@ -179,7 +181,7 @@ namespace Bvh::Cpu {
             if (node.primitiveCount > 0) {
 
                 // It is, so now iterate the instances and check for a ray hit on those
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     const GpuPrimitiveInstance& instance = instances[node.firstChildOrPrimitive + i];
                     BvhRayResult localRayResult = MeshAnyHit(instance, rayOrigin, rayDir, maxDistance);
                         
@@ -239,8 +241,8 @@ namespace Bvh::Cpu {
             if (node.primitiveCount > 0) {
 
                 // IF so, then check intersections with the triangles within it
-                for (int i = 0; i < node.primitiveCount; i++) {
-                    int index = node.firstChildOrPrimitive + i * 12;
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
+                    uint32_t index = node.firstChildOrPrimitive + i * 12;
 
                     glm::vec3 p0, e1, e2, normal;
                     p0.x = triangleData[index + 0];
@@ -275,8 +277,9 @@ namespace Bvh::Cpu {
                             closestRayResult.primitiveTransform = instance.worldTransform;
                             closestRayResult.nodeBoundsMin = node.boundsMin;
                             closestRayResult.nodeBoundsMax = node.boundsMax;
-                            closestRayResult.objectType = Util::IntToEnum(instance.objectType);
-                            closestRayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
+                            closestRayResult.openableId = instance.openableId;
+                            closestRayResult.customId = instance.customId;
+                            closestRayResult.globalMeshIndex = instance.globalMeshIndex;
                             Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, closestRayResult.objectId);
 
                             // Update the ray's max distance to prune further bvh nodes

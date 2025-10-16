@@ -37,30 +37,30 @@ struct RenderItem {
     int32_t baseSkinnedVertex = 0;
     int32_t ignoredViewportIndex = -1;
 
-    int32_t exclusiveViewportIndex = -1;
-    int32_t skinned = 0;    // True or false
     uint32_t objectIdUpperBit = 0;
     uint32_t objectIdLowerBit = 0;
+    uint32_t openableId = 0;
+    uint32_t customId = 0;
+
+    int32_t padding1 = 0;               // Unused
+    int32_t exclusiveViewportIndex = -1;
+    int32_t skinned = 0;                // True or false
+    int32_t castShadows = 1;            // True or false
 
     float emissiveR = 0.0f;
     float emissiveG = 0.0f;
     float emissiveB = 0.0f;
-    int32_t castShadows = 1; // True or false
+    int32_t emissiveTextureIndex = -1;
 
     float furLength = 0.0f;
     float furShellDistanceAttenuation = 0.0f;
     float furUVScale = 0.0f;
-    int localMeshNodeIndex = 0;
-
     int blockScreenSpaceBloodDecals = 0;  // True or false
-    int emissiveTextureIndex = -1;
-    int padding1;
-    int padding2;
 
     int32_t woundBaseColorTextureIndex = 0;
     int32_t woundNormalMapTextureIndex = 0;
     int32_t woundRmaTextureIndex = 0;
-    int32_t padding3 = 0;
+    int32_t padding2 = 0;               // Unused
 };
 
 struct HouseRenderItem {
@@ -604,23 +604,28 @@ struct RayData {
 struct PrimitiveInstance {
     uint64_t objectId;
     uint64_t meshBvhId;
-    ObjectType objectType;
     glm::vec3 worldAabbBoundsMin;
     glm::vec3 worldAabbBoundsMax;
     glm::vec3 worldAabbCenter;
     glm::mat4 worldTransform;
-    uint16_t localMeshNodeIndex;
+    uint32_t openableId;
+    uint32_t customId;
+    uint32_t globalMeshIndex;
 };
 
 struct GpuPrimitiveInstance {
     glm::mat4 worldTransform;
     glm::mat4 inverseWorldTransform;
+
     int32_t rootNodeIndex;
-    //int32_t objectType;
-    uint16_t objectType;
-    uint16_t localMeshNodeIndex;
     uint32_t objectIdLowerBit;
     uint32_t objectIdUpperBit;
+    uint32_t openableId;
+
+    uint32_t globalMeshIndex;
+    uint32_t customId;
+    uint32_t padding1;
+    uint32_t padding2;
 };
 
 struct SceneBvh {
@@ -637,13 +642,14 @@ struct BvhRayResult {
     bool hitFound = false;
     size_t primtiviveId = 0;
     uint64_t objectId = 0;
-    ObjectType objectType = ObjectType::NO_TYPE;
+    uint32_t openableId = 0;
+    uint32_t customId = 0;
+    uint32_t globalMeshIndex = 0;
     float distanceToHit = std::numeric_limits<float>::max();
     glm::vec3 hitPosition = glm::vec3(0);
     glm::mat4 primitiveTransform = glm::mat4(1.0f);
     glm::vec3 nodeBoundsMin = glm::vec3(0.0f);
     glm::vec3 nodeBoundsMax = glm::vec3(0.0f);
-    uint32_t localMeshNodeIndex = 0;
 };
 
 struct OceanReadbackData {

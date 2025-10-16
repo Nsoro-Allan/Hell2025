@@ -202,7 +202,6 @@ struct Player {
 
     bool InteractFound()                { return m_interactFound; }
     uint64_t GetInteractObjectId()      { return m_interactObjectId; }
-    ObjectType GetInteractObjectType()  { return m_interactObjectType; }
     Frustum& GetFlashlightFrustum()     { return m_flashlightFrustum; }
     const std::string& GetName() const  { return m_name; }
 
@@ -213,11 +212,9 @@ private:
     // Interact
     PhysXRayResult m_physXRayResult;
     BvhRayResult m_bvhRayResult;
-    ObjectType m_rayHitObjectType = ObjectType::UNDEFINED;
-    ObjectType m_interactObjectType = ObjectType::UNDEFINED;
-    uint64_t m_rayhitObjectId = 0;
     uint64_t m_interactObjectId = 0;
-    glm::vec3 m_rayHitPosition = glm::vec3(0.0f);
+    uint32_t m_interactOpenableId = 0;
+    uint32_t m_interactCustomId = 0;
     bool m_rayHitFound = false;
     bool m_interactFound = false;
     int32_t m_deathCount = 0;

@@ -893,12 +893,12 @@ namespace World {
     }
 
     void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNext(ObjectType::DOOR);
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::DOOR);
         g_doors.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
     void AddDrawers(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNext(ObjectType::GENERIC_OBJECT);
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::GENERIC_OBJECT);
         g_genericObjects.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 

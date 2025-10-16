@@ -38,7 +38,7 @@ namespace Bvh::Gpu {
     MadmannVec3 GlmVec3ToBvhVec3(glm::vec3 vec);
 
     uint64_t CreateMeshBvhFromMeshBvh(MeshBvh& sourceMeshBvh) {
-        uint64_t uniqueId = UniqueID::GetNext(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
 
         MeshBvh& targetMeshBvh = g_meshBvhs[uniqueId];
         targetMeshBvh.m_nodes.swap(sourceMeshBvh.m_nodes);
@@ -49,7 +49,7 @@ namespace Bvh::Gpu {
     uint64_t CreateMeshBvhFromVertexData(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) {
         //Timer timer("CreateBvhFromVertices() " + std::to_string(indices.size()) + " indices");
 
-        uint64_t uniqueId = UniqueID::GetNext(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
         MeshBvh& meshBvh = g_meshBvhs[uniqueId];
 
         // Validate index count
@@ -224,7 +224,7 @@ namespace Bvh::Gpu {
     }
 
     uint64_t CreateNewSceneBvh() {
-        uint64_t uniqueId = UniqueID::GetNext(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
         SceneBvh& sceneBvh = g_sceneBvhs[uniqueId];
         return uniqueId;
     }
@@ -299,10 +299,9 @@ namespace Bvh::Gpu {
                     gpuInstance.rootNodeIndex = g_meshBvhRootNodeOffsetMapping[instance.meshBvhId];
                     gpuInstance.worldTransform = instance.worldTransform;
                     gpuInstance.inverseWorldTransform = glm::inverse(gpuInstance.worldTransform);
-                    //gpuInstance.objectType = Util::EnumToInt(instance.objectType);
-                    gpuInstance.objectType = static_cast<uint16_t>(instance.objectType);
-                    gpuInstance.localMeshNodeIndex = instance.localMeshNodeIndex;
-                    std::cout << gpuInstance.localMeshNodeIndex << "\n";
+                    gpuInstance.openableId = instance.openableId;
+                    gpuInstance.customId = instance.customId;
+                    gpuInstance.globalMeshIndex = instance.globalMeshIndex;
                     Util::PackUint64(instance.objectId, gpuInstance.objectIdLowerBit, gpuInstance.objectIdUpperBit);
                 }
                 // Update the leaf node's pointer so it now points into the new, contiguous instance array
@@ -325,8 +324,8 @@ namespace Bvh::Gpu {
         uint32_t totalTriangleDataSize = 0;
         for (auto it = g_meshBvhs.begin(); it != g_meshBvhs.end(); ++it) {
             MeshBvh& meshBvh = it->second;
-            totalNodeCount += meshBvh.m_nodes.size();
-            totalTriangleDataSize += meshBvh.m_triangleData.size();
+            totalNodeCount += (uint32_t)meshBvh.m_nodes.size();
+            totalTriangleDataSize += (uint32_t)meshBvh.m_triangleData.size();
         }
         g_meshBvhsNodes.reserve(totalNodeCount);
         g_triangleData.reserve(totalTriangleDataSize);

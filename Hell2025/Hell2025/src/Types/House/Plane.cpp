@@ -8,7 +8,7 @@
 #include "Util.h"
 
 void Plane::Init(PlaneCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNext(ObjectType::PLANE);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::PLANE);
     m_createInfo = createInfo;
     m_material = AssetManager::GetMaterialByName(m_createInfo.materialName);
 

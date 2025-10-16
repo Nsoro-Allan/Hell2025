@@ -15,13 +15,14 @@ namespace World {
     void CreateObjectInstanceDataFromRenderItem(const RenderItem& renderItem, Frustum& frustum, std::vector<PrimitiveInstance>& container) {
         if (frustum.IntersectsAABBFast(renderItem)) {
             PrimitiveInstance& instance = container.emplace_back();
-            instance.objectType = Util::IntToEnum(renderItem.objectType);
             instance.worldTransform = renderItem.modelMatrix;
             instance.worldAabbBoundsMin = renderItem.aabbMin;
             instance.worldAabbBoundsMax = renderItem.aabbMax;
             instance.worldAabbCenter = (renderItem.aabbMin + renderItem.aabbMax) * 0.5f;
             instance.meshBvhId = AssetManager::GetMeshByIndex(renderItem.meshIndex)->meshBvhId;
-            instance.localMeshNodeIndex = renderItem.localMeshNodeIndex;
+            instance.openableId= renderItem.openableId;
+            instance.globalMeshIndex = renderItem.meshIndex;
+            instance.customId = renderItem.customId;
             Util::UnpackUint64(renderItem.objectIdLowerBit, renderItem.objectIdUpperBit, instance.objectId);
         }
     }

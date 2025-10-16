@@ -81,7 +81,7 @@ namespace OpenGLRenderer {
             glBindTextureUnit(2, GetBlurBuffer(i, 1)->GetColorAttachmentHandleByName("ColorB"));
             glBindTextureUnit(3, GetBlurBuffer(i, 2)->GetColorAttachmentHandleByName("ColorB"));
             glBindTextureUnit(4, GetBlurBuffer(i, 3)->GetColorAttachmentHandleByName("ColorB"));
-            glDispatchCompute(viewportWidth / 16, viewportHeight / 4, 1);
+            glDispatchCompute((int)viewportWidth / 16, (int)viewportHeight / 4, 1);
         }
     }
 }

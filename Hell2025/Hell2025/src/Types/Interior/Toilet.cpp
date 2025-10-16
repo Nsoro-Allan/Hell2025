@@ -58,7 +58,7 @@ void Toilet::Update(float deltaTime) {
 
     m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
 
-    m_movedThisFrame = m_lidOpenHandler.m_movedThisFrame || m_seatOpenHandler.m_movedThisFrame;
+    m_movedThisFrame = m_lidOpenHandler.IsDirty() || m_seatOpenHandler.IsDirty();
 
 }
 

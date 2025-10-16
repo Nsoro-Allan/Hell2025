@@ -5,6 +5,7 @@
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
+#include "UniqueID.h"
 
 namespace OpenGLRenderer {
 
@@ -51,7 +52,7 @@ namespace OpenGLRenderer {
             if (player->InteractFound()) {
 
                 uint64_t interactObjectId = player->GetInteractObjectId();
-                ObjectType interactObjectType = player->GetInteractObjectType();
+                ObjectType interactObjectType = UniqueID::GetType(interactObjectId);
 
                 if (interactObjectType == ObjectType::PICK_UP) {
                     PickUp* pickUp = World::GetPickUpByObjectId(interactObjectId);

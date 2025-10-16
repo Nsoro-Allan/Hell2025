@@ -18,7 +18,7 @@
 // Get me out of here
 
 void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex) {
-    m_playerId = UniqueID::GetNext(ObjectType::PLAYER);
+    m_playerId = UniqueID::GetNextObjectId(ObjectType::PLAYER);
 
     m_camera.SetPosition(position + glm::vec3(0.0f, m_viewHeightStanding, 0.0f));
     m_camera.SetEulerRotation(rotation);
@@ -46,7 +46,7 @@ void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex)
 void Player::BeginFrame() {
     m_interactFound = false;
     m_interactObjectId = 0;
-    m_interactObjectType = ObjectType::NO_TYPE;
+    m_interactOpenableId = 0;
 }
 
 void Player::Update(float deltaTime) {

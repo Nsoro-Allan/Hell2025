@@ -135,7 +135,7 @@ namespace Audio {
             }
         }
 
-        uint64_t uniqueId = UniqueID::GetNext(ObjectType::UNDEFINED);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::UNDEFINED);
         AudioHandle& handle = g_playingAudio[uniqueId];
         handle.state = AudioHandle::State::PLAYING;
         handle.sound = g_loadedAudio[filename];
@@ -191,7 +191,7 @@ namespace Audio {
         // Load if needed
         if (g_loadedAudio.find(filename) == g_loadedAudio.end()) LoadAudio(filename);
 
-        uint64_t id = UniqueID::GetNext(ObjectType::UNDEFINED);
+        uint64_t id = UniqueID::GetNextObjectId(ObjectType::UNDEFINED);
         AudioHandle& h = g_playingAudio[id];
         h.state = AudioHandle::State::LOOPING;
         h.sound = g_loadedAudio[filename];

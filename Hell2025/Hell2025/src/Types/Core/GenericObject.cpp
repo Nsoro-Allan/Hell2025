@@ -12,7 +12,6 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
     m_transform.position = m_createInfo.position + spawnOffset.translation;
     m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
     m_transform.scale = m_createInfo.scale;
-    //m_openableIds.clear();
     m_objectId = id;
 
     //Bible::ConfigureMeshNodes(id, m_createInfo.type, m_meshNodes);
@@ -26,9 +25,10 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         largeFrame.materialName = "T_Main_01a";
 
         MeshNodeCreateInfo& drawerTopL = meshNodeCreateInfoSet.emplace_back();
-        drawerTopL.meshName = "DrawersLarge_TopL";
+        drawerTopL.type = MeshNodeType::OPENABLE;
         drawerTopL.materialName = "T_Drawers_01a";
-        drawerTopL.openable.createMe = true;
+        drawerTopL.meshName = "DrawersLarge_TopL";
+        drawerTopL.openable.additionalTriggerMeshNames = { "Handle_TopL" };
         drawerTopL.openable.openAxis = OpenAxis::TRANSLATE_Z;
         drawerTopL.openable.initialOpenState = OpenState::CLOSED;
         drawerTopL.openable.initialOpenValue = 0.0f;
@@ -36,15 +36,15 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         drawerTopL.openable.maxOpenValue = 0.158f;
         drawerTopL.openable.openSpeed = 1.5f;
         drawerTopL.openable.closeSpeed = 1.5f;
-        drawerTopL.openable.meshName = "DrawersLarge_TopL"; // remove me yet?
         drawerTopL.openable.openingAudio = "DrawerOpen.wav";
         drawerTopL.openable.closingAudio = "DrawerClose.wav";
         drawerTopL.openable.lockedAudio = "Locked.wav";
 
         MeshNodeCreateInfo& drawerTopR = meshNodeCreateInfoSet.emplace_back();
-        drawerTopR.meshName = "DrawersLarge_TopR";
+        drawerTopR.type = MeshNodeType::OPENABLE;
         drawerTopR.materialName = "T_Drawers_01a";
-        drawerTopR.openable.createMe = true;
+        drawerTopR.meshName = "DrawersLarge_TopR";
+        drawerTopR.openable.additionalTriggerMeshNames = { "Handle_TopR" };
         drawerTopR.openable.openAxis = OpenAxis::TRANSLATE_Z;
         drawerTopR.openable.initialOpenState = OpenState::CLOSED;
         drawerTopR.openable.initialOpenValue = 0.0f;
@@ -52,7 +52,6 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         drawerTopR.openable.maxOpenValue = 0.155f;
         drawerTopR.openable.openSpeed = 1.5f;
         drawerTopR.openable.closeSpeed = 1.5f;
-        drawerTopR.openable.meshName = "DrawersLarge_TopL"; // remove me yet?
         drawerTopR.openable.openingAudio = "DrawerOpen.wav";
         drawerTopR.openable.closingAudio = "DrawerClose.wav";
         drawerTopR.openable.lockedAudio = "Locked.wav";
@@ -76,7 +75,6 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         openableCreateInfo.maxOpenValue = 0.158f;
         openableCreateInfo.openSpeed = 1.5f;
         openableCreateInfo.closeSpeed = 1.5f;
-        openableCreateInfo.meshName = "DrawersLarge_TopL";
         openableCreateInfo.openingAudio = "DrawerOpen.wav";
         openableCreateInfo.closingAudio = "DrawerClose.wav";
         openableCreateInfo.lockedAudio = "Locked.wav";
@@ -85,31 +83,31 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         //uint64_t drawerTopLeftOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
 
         openableCreateInfo.maxOpenValue = 0.155f;
-        openableCreateInfo.meshName = "DrawersLarge_TopR";
+        //openableCreateInfo.meshName = "DrawersLarge_TopR";
         //uint64_t drawerTopRightOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
 
         openableCreateInfo.maxOpenValue = 0.175f;
-        openableCreateInfo.meshName = "DrawersLarge_2nd";
-        uint64_t drawerSecondOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));;
+        //openableCreateInfo.meshName = "DrawersLarge_2nd";
+        //uint64_t drawerSecondOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));;
 
         openableCreateInfo.maxOpenValue = 0.170f;
-        openableCreateInfo.meshName = "DrawersLarge_3rd";
-        uint64_t drawerThirdOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
+        //openableCreateInfo.meshName = "DrawersLarge_3rd";
+        //uint64_t drawerThirdOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
 
         openableCreateInfo.maxOpenValue = 0.180f;
-        openableCreateInfo.meshName = "DrawersLarge_4th";
-        uint64_t drawerForthOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
+        //openableCreateInfo.meshName = "DrawersLarge_4th";
+        //uint64_t drawerForthOpenableId = m_openableIds.emplace_back(OpenableManager::CreateOpenable(openableCreateInfo));
 
         //m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopL", drawerTopLeftOpenableId, id);
         //m_meshNodes.SetOpenableByMeshName("DrawersLarge_TopR", drawerTopRightOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_2nd", drawerSecondOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_3rd", drawerThirdOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("DrawersLarge_4th", drawerForthOpenableId, id);
-        //m_meshNodes.SetOpenableByMeshName("Handle_TopL", drawerTopLeftOpenableId, id);
-        //m_meshNodes.SetOpenableByMeshName("Handle_TopR", drawerTopRightOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("Handle_2nd", drawerSecondOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("Handle_3rd", drawerThirdOpenableId, id);
-        m_meshNodes.SetOpenableByMeshName("Handle_4th", drawerForthOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("DrawersLarge_2nd", drawerSecondOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("DrawersLarge_3rd", drawerThirdOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("DrawersLarge_4th", drawerForthOpenableId, id);
+        ////m_meshNodes.SetOpenableByMeshName("Handle_TopL", drawerTopLeftOpenableId, id);
+        ////m_meshNodes.SetOpenableByMeshName("Handle_TopR", drawerTopRightOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("Handle_2nd", drawerSecondOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("Handle_3rd", drawerThirdOpenableId, id);
+        //m_meshNodes.SetOpenableByMeshName("Handle_4th", drawerForthOpenableId, id);
     }
     else {
         Logging::Error() << "GenericObject constructor failed because you haven't implemented this GenericObjectType";

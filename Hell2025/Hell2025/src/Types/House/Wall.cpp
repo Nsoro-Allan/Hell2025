@@ -8,7 +8,7 @@
 #include "UniqueID.h"
 
 void Wall::Init(WallCreateInfo createInfo, const SpawnOffset& spawnOffset) {
-    m_objectId = UniqueID::GetNext(ObjectType::WALL); // Only do this once
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::WALL); // Only do this once
     m_createInfo = createInfo;
     m_spawnOffset = spawnOffset;
 

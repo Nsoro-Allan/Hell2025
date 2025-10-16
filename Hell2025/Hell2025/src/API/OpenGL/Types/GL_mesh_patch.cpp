@@ -155,7 +155,7 @@ void OpenGLMeshPatch::CreateBuffers2() {
         }
     }
 
-    m_indexCount = indices.size();
+    m_indexCount = (GLsizei)indices.size();
 
     glGenVertexArrays(1, &m_VAO);
     glBindVertexArray(m_VAO);

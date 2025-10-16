@@ -18,179 +18,129 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     m_transform.position = createInfo.position;
     m_transform.rotation = createInfo.rotation;
 
-    m_pianoObjectId = UniqueID::GetNext(ObjectType::PIANO);
+    m_pianoObjectId = UniqueID::GetNextObjectId(ObjectType::PIANO);
 
-    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+    std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-    m_model = AssetManager::GetModelByName("Piano");
-    m_meshNodes.Init(m_pianoObjectId, "Piano", emptyMeshNodeCreateInfoSet);
+    MeshNodeCreateInfo& topCover = meshNodeCreateInfoSet.emplace_back();
+    topCover.type = MeshNodeType::OPENABLE;
+    topCover.materialName = "Piano0";
+    topCover.meshName = "Yamaha_Case.Top.Cover";
+    topCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
+    topCover.openable.initialOpenState = OpenState::CLOSED;
+    topCover.openable.initialOpenValue = 0.0f;
+    topCover.openable.minOpenValue = 0.0f;
+    topCover.openable.maxOpenValue = HELL_PI;
+    topCover.openable.openSpeed = 8.5f;
+    topCover.openable.closeSpeed = 8.5f;
 
-    uint32_t materialIndex0 = AssetManager::GetMaterialIndexByName("Piano0");
-    uint32_t materialIndex1 = AssetManager::GetMaterialIndexByName("Piano1");
+    MeshNodeCreateInfo& keyboardCover = meshNodeCreateInfoSet.emplace_back();
+    keyboardCover.type = MeshNodeType::OPENABLE;
+    keyboardCover.materialName = "Piano0";
+    keyboardCover.meshName = "Yamaha_Keyboard.Cover";
+    keyboardCover.openable.additionalTriggerMeshNames = { "Yamaha_Keyboard.Cover.Lock" };
+    keyboardCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
+    keyboardCover.openable.initialOpenState = OpenState::CLOSED;
+    keyboardCover.openable.initialOpenValue = 0.0f;
+    keyboardCover.openable.minOpenValue = 0.0f;
+    keyboardCover.openable.maxOpenValue = 2.1f;
+    keyboardCover.openable.openSpeed = 8.5f;
+    keyboardCover.openable.closeSpeed = 8.5f;
+
+    MeshNodeCreateInfo& sheetMusicRest = meshNodeCreateInfoSet.emplace_back();
+    sheetMusicRest.type = MeshNodeType::OPENABLE;
+    sheetMusicRest.materialName = "Piano0";
+    sheetMusicRest.meshName = "Yamaha_Lyrics.Stand";
+    sheetMusicRest.openable.additionalTriggerMeshNames = { "Yamaha_Lyrics.Hinges.Plate.A",  "Yamaha_Lyrics.Hinges.Plate.B" };
+    sheetMusicRest.openable.openAxis = OpenAxis::ROTATE_X_NEG;
+    sheetMusicRest.openable.initialOpenState = OpenState::CLOSED;
+    sheetMusicRest.openable.initialOpenValue = 0.0f;
+    sheetMusicRest.openable.minOpenValue = 0.0f;
+    sheetMusicRest.openable.maxOpenValue = HELL_PI * 0.7f;
+    sheetMusicRest.openable.openSpeed = 8.5f;
+    sheetMusicRest.openable.closeSpeed = 8.5f;
+
+    MeshNodeCreateInfo& sheetMusicRestHingesA = meshNodeCreateInfoSet.emplace_back();
+    sheetMusicRestHingesA.meshName = "Yamaha_Lyrics.Stand.Hinges.Plate.A";
+    sheetMusicRestHingesA.materialName = "Piano1";
+
+    MeshNodeCreateInfo& sheetMusicRestHingesB = meshNodeCreateInfoSet.emplace_back();
+    sheetMusicRestHingesB.meshName = "Yamaha_Lyrics.Stand.Hinges.Plate.B";
+    sheetMusicRestHingesB.materialName = "Piano1";
+
+    MeshNodeCreateInfo& topCoverLock = meshNodeCreateInfoSet.emplace_back();
+    topCoverLock.meshName = "Yamaha_Keyboard.Cover.Lock";
+    topCoverLock.materialName = "Piano0";
+
+    MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
+    body.meshName = "Yamaha_Main";
+    body.materialName = "Piano0";
+
+    MeshNodeCreateInfo& topHingePlate = meshNodeCreateInfoSet.emplace_back();
+    topHingePlate.meshName = "Yamaha_MusicBox.Hinge.Plate";
+    topHingePlate.materialName = "Piano1";
+
+    MeshNodeCreateInfo& topHinge = meshNodeCreateInfoSet.emplace_back();
+    topHinge.meshName = "Yamaha_MusicBox.Cover.Hinge";
+    topHinge.materialName = "Piano1";
+
+    MeshNodeCreateInfo& hingeStick = meshNodeCreateInfoSet.emplace_back();
+    hingeStick.meshName = "Yamaha_Keyboard.Cover.Hinge.Stick";
+    hingeStick.materialName = "Piano1";
+
+    MeshNodeCreateInfo& coverHingePlate = meshNodeCreateInfoSet.emplace_back();
+    coverHingePlate.meshName = "Yamaha_Keyboard.Cover.Hinge.Plate";
+    coverHingePlate.materialName = "Piano1";
+
+    MeshNodeCreateInfo& coverLock = meshNodeCreateInfoSet.emplace_back();
+    coverLock.meshName = "Yamaha_Keyboard.Cover.Lock";
+    coverLock.materialName = "Piano1";
+
+    MeshNodeCreateInfo& keyBedLock = meshNodeCreateInfoSet.emplace_back();
+    coverLock.meshName = "Yamaha_KeyBed.Lock";
+    coverLock.materialName = "Piano1";
+
+    MeshNodeCreateInfo& pedalL = meshNodeCreateInfoSet.emplace_back();
+    pedalL.meshName = "Yamaha_Soft.&.Damper.Pedal.L";
+    pedalL.materialName = "Piano1";
+
+    MeshNodeCreateInfo& pedalR = meshNodeCreateInfoSet.emplace_back();
+    pedalR.meshName = "Yamaha_Soft.&.Damper.Pedal.R";
+    pedalR.materialName = "Piano1";
+
+    MeshNodeCreateInfo& pedalM = meshNodeCreateInfoSet.emplace_back();
+    pedalM.meshName = "Yamaha_Muffler.Pedal";
+    pedalM.materialName = "Piano1";
+
+    MeshNodeCreateInfo& hingePin = meshNodeCreateInfoSet.emplace_back();
+    hingePin.meshName = "Yamaha_HingePin.001";
+    hingePin.materialName = "Piano1";
+
+    if (Model* model = AssetManager::GetModelByName("Piano")) {
+        for (uint32_t meshIndex : model->GetMeshIndices()) {
+            if (Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex)) {
+                if (mesh->name.find("Yamaha_Key_") != std::string::npos) {
+                    uint64_t keyId = UniqueID::GetNextCustomId();
+                    PianoKey& pianoKey = m_keys[keyId];
+                    pianoKey.m_meshName = mesh->GetName();
+                    pianoKey.m_note = MeshNameToNote(mesh->GetName());
+                    pianoKey.m_isSharp = (mesh->GetName().find("#") != std::string::npos);
+
+                    MeshNodeCreateInfo& key = meshNodeCreateInfoSet.emplace_back();
+                    key.meshName = mesh->name;
+                    key.materialName = "Piano1";
+                    key.customId = keyId;
+                }
+            }
+        }
+    }
+
+    m_meshNodes.Init(m_pianoObjectId, "Piano", meshNodeCreateInfoSet);
+
+    //uint32_t materialIndex0 = AssetManager::GetMaterialIndexByName("Piano0");
+    //uint32_t materialIndex1 = AssetManager::GetMaterialIndexByName("Piano1");
 
     m_seatPosition = m_transform.to_mat4() * glm::vec4(0.75f, 0.0f, 0.75f, 1.0f);
-
-    for (int i = 0; i < m_meshNodes.GetNodeCount(); i++) {
-        uint32_t meshIndex = m_meshNodes.GetGlobalMeshIndex(i);
-
-        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-        if (!mesh) continue;
-
-
-        if (mesh->GetName() == "Yamaha_Key_A0" ||
-            mesh->GetName() == "Yamaha_Key_A0#" ||
-            mesh->GetName() == "Yamaha_Key_B0" ||
-            mesh->GetName() == "Yamaha_Key_C1" ||
-            mesh->GetName() == "Yamaha_Key_C1#" ||
-            mesh->GetName() == "Yamaha_Key_D1" ||
-            mesh->GetName() == "Yamaha_Key_D1#" ||
-            mesh->GetName() == "Yamaha_Key_E1" ||
-            mesh->GetName() == "Yamaha_Key_F1" ||
-            mesh->GetName() == "Yamaha_Key_F1#" ||
-            mesh->GetName() == "Yamaha_Key_G1" ||
-            mesh->GetName() == "Yamaha_Key_G1#" ||
-
-            mesh->GetName() == "Yamaha_Key_A1" ||
-            mesh->GetName() == "Yamaha_Key_A1#" ||
-            mesh->GetName() == "Yamaha_Key_B1" ||
-            mesh->GetName() == "Yamaha_Key_C2" ||
-            mesh->GetName() == "Yamaha_Key_C2#" ||
-            mesh->GetName() == "Yamaha_Key_D2" ||
-            mesh->GetName() == "Yamaha_Key_D2#" ||
-            mesh->GetName() == "Yamaha_Key_E2" ||
-            mesh->GetName() == "Yamaha_Key_F2" ||
-            mesh->GetName() == "Yamaha_Key_F2#" ||
-            mesh->GetName() == "Yamaha_Key_G2" ||
-            mesh->GetName() == "Yamaha_Key_G2#" ||
-
-            mesh->GetName() == "Yamaha_Key_A2" ||
-            mesh->GetName() == "Yamaha_Key_A2#" ||
-            mesh->GetName() == "Yamaha_Key_B2" ||
-            mesh->GetName() == "Yamaha_Key_C3" ||
-            mesh->GetName() == "Yamaha_Key_C3#" ||
-            mesh->GetName() == "Yamaha_Key_D3" ||
-            mesh->GetName() == "Yamaha_Key_D3#" ||
-            mesh->GetName() == "Yamaha_Key_E3" ||
-            mesh->GetName() == "Yamaha_Key_F3" ||
-            mesh->GetName() == "Yamaha_Key_F3#" ||
-            mesh->GetName() == "Yamaha_Key_G3" ||
-            mesh->GetName() == "Yamaha_Key_G3#" ||
-
-            mesh->GetName() == "Yamaha_Key_A3" ||
-            mesh->GetName() == "Yamaha_Key_A3#" ||
-            mesh->GetName() == "Yamaha_Key_B3" ||
-            mesh->GetName() == "Yamaha_Key_C4" ||
-            mesh->GetName() == "Yamaha_Key_C4#" ||
-            mesh->GetName() == "Yamaha_Key_D4" ||
-            mesh->GetName() == "Yamaha_Key_D4#" ||
-            mesh->GetName() == "Yamaha_Key_E4" ||
-            mesh->GetName() == "Yamaha_Key_F4" ||
-            mesh->GetName() == "Yamaha_Key_F4#" ||
-            mesh->GetName() == "Yamaha_Key_G4" ||
-            mesh->GetName() == "Yamaha_Key_G4#" ||
-
-            mesh->GetName() == "Yamaha_Key_A4" ||
-            mesh->GetName() == "Yamaha_Key_A4#" ||
-            mesh->GetName() == "Yamaha_Key_B4" ||
-            mesh->GetName() == "Yamaha_Key_C5" ||
-            mesh->GetName() == "Yamaha_Key_C5#" ||
-            mesh->GetName() == "Yamaha_Key_D5" ||
-            mesh->GetName() == "Yamaha_Key_D5#" ||
-            mesh->GetName() == "Yamaha_Key_E5" ||
-            mesh->GetName() == "Yamaha_Key_F5" ||
-            mesh->GetName() == "Yamaha_Key_F5#" ||
-            mesh->GetName() == "Yamaha_Key_G5" ||
-            mesh->GetName() == "Yamaha_Key_G5#" ||
-
-            mesh->GetName() == "Yamaha_Key_A5" ||
-            mesh->GetName() == "Yamaha_Key_A5#" ||
-            mesh->GetName() == "Yamaha_Key_B5" ||
-            mesh->GetName() == "Yamaha_Key_C6" ||
-            mesh->GetName() == "Yamaha_Key_C6#" ||
-            mesh->GetName() == "Yamaha_Key_D6" ||
-            mesh->GetName() == "Yamaha_Key_D6#" ||
-            mesh->GetName() == "Yamaha_Key_E6" ||
-            mesh->GetName() == "Yamaha_Key_F6" ||
-            mesh->GetName() == "Yamaha_Key_F6#" ||
-            mesh->GetName() == "Yamaha_Key_G6" ||
-            mesh->GetName() == "Yamaha_Key_G6#" ||
-
-            mesh->GetName() == "Yamaha_Key_A6" ||
-            mesh->GetName() == "Yamaha_Key_A6#" ||
-            mesh->GetName() == "Yamaha_Key_B6" ||
-            mesh->GetName() == "Yamaha_Key_C7" ||
-            mesh->GetName() == "Yamaha_Key_C7#" ||
-            mesh->GetName() == "Yamaha_Key_D7" ||
-            mesh->GetName() == "Yamaha_Key_D7#" ||
-            mesh->GetName() == "Yamaha_Key_E7" ||
-            mesh->GetName() == "Yamaha_Key_F7" ||
-            mesh->GetName() == "Yamaha_Key_F7#" ||
-            mesh->GetName() == "Yamaha_Key_G7" ||
-            mesh->GetName() == "Yamaha_Key_G7#" ||
-
-            mesh->GetName() == "Yamaha_Key_A7" ||
-            mesh->GetName() == "Yamaha_Key_A7#" ||
-            mesh->GetName() == "Yamaha_Key_B7" ||
-            mesh->GetName() == "Yamaha_Key_C8") {
-
-            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_KEY);
-
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByLocalIndex(i);
-            meshNode->materialIndex = materialIndex1;
-            meshNode->objectId = objectId;
-
-            m_keys[objectId] = PianoKey();
-            PianoKey& pianoKey = m_keys[objectId];
-            pianoKey.m_meshName = mesh->GetName();
-            pianoKey.m_note = MeshNameToNote(mesh->GetName());
-            pianoKey.m_isSharp = (mesh->GetName().find("#") != std::string::npos);
-        }
-
-        // Top cover 
-        else if (mesh->GetName() == "Yamaha_Case.Top.Cover") {
-            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_TOP_COVER);
-
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
-            meshNode->materialIndex = materialIndex0;
-            meshNode->objectId = objectId;
-        }
-
-        // Keyboard cover
-        else if (mesh->GetName() == "Yamaha_Keyboard.Cover.Lock" || mesh->GetName() == "Yamaha_Keyboard.Cover") {
-            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_KEYBOARD_COVER);
-
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
-            meshNode->materialIndex = materialIndex0;
-            meshNode->objectId = objectId;
-        }
-
-        // Music rest
-        else if (mesh->GetName() == "Yamaha_Lyrics.Stand") {
-            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_SHEET_MUSIC_REST);
-
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
-            meshNode->materialIndex = materialIndex0;
-            meshNode->objectId = objectId;
-        }
-
-        // Black body parts
-        else if (mesh->GetName() == "Yamaha_Main") {
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
-            meshNode->materialIndex = materialIndex0;
-            meshNode->objectId = m_pianoObjectId;
-        }
-
-        // White body parts
-        else {
-            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
-            if (!meshNode) {
-                Logging::Error() << "some piano shit fucked up\n";
-                continue;
-            }
-            meshNode->materialIndex = materialIndex1;
-            meshNode->objectId = m_pianoObjectId;
-        }        
-    }
 
     // Create physics objects
     PhysicsFilterData filterData;
@@ -207,32 +157,14 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
 
     CalculatePianoKeyWorldspaceCenters();
+}
 
-    // Init handlers
-    m_keyboardCoverOpenHandler.m_currentOpenState = OpenState::OPEN;
-    m_keyboardCoverOpenHandler.m_minOpenValue = 0.0f;
-    m_keyboardCoverOpenHandler.m_maxOpenValue = 2.1f;
-    m_keyboardCoverOpenHandler.m_openSpeed = 6.825f;
-    m_keyboardCoverOpenHandler.m_closeSpeed = 6.825f;
-    m_keyboardCoverOpenHandler.m_openedAudio = "Piano_LidClose.wav";
-    m_keyboardCoverOpenHandler.m_closedAudio = "Piano_LidClose.wav";
-    m_keyboardCoverOpenHandler.Update(0.0f); // check u really want this???
-
-    m_topCoverOpenHandler.m_currentOpenState = OpenState::CLOSED;
-    m_topCoverOpenHandler.m_minOpenValue = 0.0f;
-    m_topCoverOpenHandler.m_maxOpenValue = HELL_PI;
-    m_topCoverOpenHandler.m_openSpeed = 7.25f;
-    m_topCoverOpenHandler.m_closeSpeed = 7.25f;
-    m_topCoverOpenHandler.m_openedAudio = "Piano_LidClose.wav";
-    m_topCoverOpenHandler.m_closedAudio = "Piano_LidClose.wav";
-
-    m_sheetMusicRestOpenHandler.m_currentOpenState = OpenState::CLOSED;
-    m_sheetMusicRestOpenHandler.m_minOpenValue = 0.0f;
-    m_sheetMusicRestOpenHandler.m_maxOpenValue = HELL_PI * 0.7f;
-    m_sheetMusicRestOpenHandler.m_openSpeed = 8.5f;
-    m_sheetMusicRestOpenHandler.m_closeSpeed = 8.5f;
-    m_sheetMusicRestOpenHandler.m_openedAudio = "Piano_LidClose.wav";
-    m_sheetMusicRestOpenHandler.m_closedAudio = "Piano_LidClose.wav";
+void Piano::PressKey(uint32_t customId) {
+    auto it = m_keys.find(customId);
+    if (it != m_keys.end()) {
+        PianoKey& key = it->second;
+        key.PressKey();
+    }
 }
 
 void Piano::CalculatePianoKeyWorldspaceCenters() {
@@ -257,72 +189,34 @@ void Piano::SetPosition(glm::vec3 position) {
     CalculatePianoKeyWorldspaceCenters();
 }
 
-void Piano::InteractWithKeyboardCover() {
-    m_keyboardCoverOpenHandler.Interact();
-}
-
-void Piano::InteractWithTopCover() {
-    m_topCoverOpenHandler.Interact();
-}
-
-void Piano::InteractWithSheetMusicRestCover() {
-    m_sheetMusicRestOpenHandler.Interact();
-}
-
 void Piano::CleanUp() {
     Physics::MarkRigidStaticForRemoval(m_rigidStaticId);
 }
 
 void Piano::Update(float deltaTime) {
-    m_modelMatrix = m_transform.to_mat4();
+    m_worldMatrix = m_transform.to_mat4();
 
     // Update keys
     for (auto& pair : m_keys) {
-        const uint64_t& objectId = pair.first;
+        const uint32_t& objectId = pair.first;
+
         PianoKey& key = pair.second;
         key.Update(deltaTime);
 
-        int meshNodeIndex = m_meshNodes.m_localIndexMap[key.m_meshName];
+        if (key.IsDirty()) {
+            Transform transform;
+            transform.position.y = key.m_yTranslation;
+            transform.rotation.x = key.m_xRotation;
 
-        Transform transform;
-        transform.position.y = key.m_yTranslation;
-        transform.rotation.x = key.m_xRotation;
-
-        m_meshNodes.SetTransformByMeshName(key.m_meshName, transform);
+            m_meshNodes.SetTransformByMeshName(key.m_meshName, transform);
+            m_meshNodes.ForceDirty();
+        }
     }
-
-    m_topCoverOpenHandler.Update(deltaTime);
-    m_sheetMusicRestOpenHandler.Update(deltaTime);
-    m_keyboardCoverOpenHandler.Update(deltaTime);
- 
-    
-    //if (m_keyboardCoverOpenState == OpenState::OPEN) {
-    //    m_keyboardCoverCurrentOpenValue = m_keyboardCoverMaxOpenValue;
-    //}
-    //if (m_keyboardCoverOpenState == OpenState::CLOSED) {
-    //    m_keyboardCoverCurrentOpenValue = 0;
-    //}
-
-    Transform keyboardCoverTransform;
-    keyboardCoverTransform.rotation.x = -m_keyboardCoverOpenHandler.m_currentOpenValue;
-    m_meshNodes.SetTransformByMeshName("Yamaha_Keyboard.Cover", keyboardCoverTransform);
-
-    Transform topCoverTransform;
-    topCoverTransform.rotation.x = -m_topCoverOpenHandler.m_currentOpenValue;
-    m_meshNodes.SetTransformByMeshName("Yamaha_Case.Top.Cover", topCoverTransform);
-
-    Transform sheetMusicRestTransform;
-    sheetMusicRestTransform.rotation.x = -m_sheetMusicRestOpenHandler.m_currentOpenValue;
-    m_meshNodes.SetTransformByMeshName("Yamaha_Lyrics.Stand", sheetMusicRestTransform);
-
-
 
     m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
 }
 
-void Piano::TriggerInternalNoteFromExternalBulletHit(glm::vec3 bulletHitPositon) {    
-    std::cout << "TriggerInternalNoteFromExternalBulletHit()\n";
-
+void Piano::TriggerInternalNoteFromExternalBulletHit(glm::vec3 bulletHitPositon) {
     float closetDistance = std::numeric_limits<float>::max();
     PianoKey* closetKey = nullptr;
 
@@ -388,12 +282,10 @@ void Piano::PlayMajor7th(int rootNote) {
 }
 
 void Piano::PlayMinor(int rootNote) {
-
     int minorThird = rootNote + 3;
     int fifth = rootNote + 7;
 
     for (auto& pair : m_keys) {
-        const uint64_t& objectId = pair.first;
         PianoKey& key = pair.second;
 
         if (key.m_note == rootNote) {
@@ -410,12 +302,10 @@ void Piano::PlayMinor(int rootNote) {
 
 
 void Piano::PlayMajor(int rootNote) {
-
     int third = rootNote + 4;
     int fifth = rootNote + 7;
 
     for (auto& pair : m_keys) {
-        const uint64_t& objectId = pair.first;
         PianoKey& key = pair.second;
 
         if (key.m_note == rootNote) {
@@ -432,7 +322,6 @@ void Piano::PlayMajor(int rootNote) {
 
 void Piano::PlayKey(int note, int velocity, float duration) {
     for (auto& pair : m_keys) {
-        const uint64_t& objectId = pair.first;
         PianoKey& key = pair.second;
         if (key.m_note == note) {
             key.PressKey(velocity, duration);
@@ -553,20 +442,11 @@ uint32_t Piano::MeshNameToNote(const std::string& meshName) {
 }
 
 void PianoKey::Update(float deltaTime) {
+    m_dirty = false;
 
-    if (m_state == State::IDLE) {
-        m_xRotation = 0.0f;
-        m_yTranslation = 0.0f;
-    }
-
-    if (m_state == State::KEY_PRESSED) {
+    if (m_state == State::KEY_DOWN) {
         m_timeRemaining -= deltaTime;
-
-        if (m_timeRemaining <= 0) {
-            m_timeRemaining = 0;
-            m_state = State::IDLE;
-            Synth::ReleaseNote(m_note);
-        }
+        m_dirty = true;
 
         if (!m_isSharp) {
             m_yTranslation = 0.0f;
@@ -576,34 +456,17 @@ void PianoKey::Update(float deltaTime) {
             m_yTranslation = -0.01f;
             m_xRotation = 0.0f;
         }
+
+        // Done? Then reset transform and state
+        if (m_timeRemaining <= 0) {
+            m_timeRemaining = 0;
+            m_xRotation = 0.0f;
+            m_yTranslation = 0.0f;
+            m_state = State::IDLE;
+            Synth::ReleaseNote(m_note);
+        }
     }
-
-    //Mesh* mesh = AssetManager::GetMeshByIndex(m_meshIndex);
-    //AABB aabb = AABB(mesh->aabbMin, mesh->aabbMax);
-
-    //Transform orignOffsetTransform;
-    //orignOffsetTransform.position = aabb.GetCenter();
-    //orignOffsetTransform.position.y += aabb.GetExtents().y * 0.5f;
-    //orignOffsetTransform.position.z -= aabb.GetExtents().z * 0.5f;
-    //
-    //Transform rotationTransform;
-    //rotationTransform.position.y = m_yTranslation;
-    //rotationTransform.rotation.x = m_xRotation;
-    //
-    //glm::mat4 originOffset = orignOffsetTransform.to_mat4();
-    //glm::mat4 inverseOriginOffset = glm::inverse(originOffset);
-    //glm::mat4 localRotation = rotationTransform.to_mat4();
-    //
-    //m_localOffsetMatrix = originOffset * localRotation * inverseOriginOffset;
 }
-
-//void PianoKey::UpdateWorldSpaceCenter(glm::mat4 parentPianoModelMatrix) {
-//    Mesh* mesh = AssetManager::GetMeshByIndex(m_meshIndex);
-//    if (!mesh) return;
-//
-//    AABB aabb = AABB(mesh->aabbMin, mesh->aabbMax);
-//    m_worldSpaceCenter = parentPianoModelMatrix * glm::vec4(aabb.GetCenter(), 1.0f);
-//}
 
 void PianoKey::PressKey(int velocity, float duration) {
     // Play sound if you were not pressed already
@@ -611,6 +474,6 @@ void PianoKey::PressKey(int velocity, float duration) {
         Synth::PlayNote(m_note, velocity);
     }
 
-    m_state = State::KEY_PRESSED;
+    m_state = State::KEY_DOWN;
     m_timeRemaining = duration;
 }

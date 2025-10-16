@@ -1,4 +1,5 @@
 #pragma once
+#include "HellEnums.h"
 #include "HellTypes.h"
 #include "Math/AABB.h"
 #include "Model.h"
@@ -7,33 +8,24 @@
 
 #include "CreateInfo.h"
 
-enum MeshNodeType {
-    DEFAULT,
-    OPENABLE,
-    RIGID_STATIC,
-    RIGID_DYNAMIC
-};
-
 struct MeshNode {
-    AABB worldspaceAabb;
+    uint64_t parentObjectId;
+    uint32_t openableId;
+    uint32_t customId;
+    MeshNodeType type;
     BlendingMode blendingMode;
     int32_t localParentIndex;
     uint32_t globalMeshIndex;
     uint32_t materialIndex;
     Transform transform;              // These are the transforms updated by an Openable // rename to offsetTransform
     Transform transformPreviousFrame; // These are the transforms updated by an Openable // rename to offsetTransform
-    //std::vector<ObjectType> m_objectTypes;
-    uint64_t objectId;                // Written to renderItem.objectId  - rename to renderItemObjectId or something that implies its written to the render item id
-    //std::vector<uint64_t> m_openableIds;              // Maps node to an Openable     - do not use me. think of a better way.
-    //std::vector<uint64_t> m_rigidDynamictIds;         // Maps node to a RigidDynamic  - do not use me. think of a better way.
-    //std::vector<uint64_t> m_rigidStaticIds;           // Maps node to a RigidStatic   - do not use me. think of a better way.
-    glm::mat4 modelMatrix;   // world or local? find out and name accordingly
-    glm::mat4 localTransform; // think of better namw
-    glm::mat4 inverseBindTransform; // think of better name
-    MeshNodeType type = MeshNodeType::DEFAULT;
-    bool isGold = false;
+    glm::mat4 localModelMatrix;
+    glm::mat4 localTransform;         // Think of better name. Same for transform/transformPreviousFrame. Cause you are always confused.
+    glm::mat4 inverseBindTransform;
+    AABB worldspaceAabb;
+    RenderItem renderItem;
 
-    // probably store parentId, but also somehow openableId if type is openable
+    bool isGold = false;              // Remove me when Carlos finishes Golden Glock texture set
 };
 
 struct MeshNodes {
@@ -68,13 +60,13 @@ struct MeshNodes {
     void SetGoldFlag(bool flag);
     void DrawWorldspaceAABB(glm::vec4 color);
     void DrawWorldspaceAABBs(glm::vec4 color);
+    void ForceDirty();
 
     bool NodeExists(const std::string& meshName);
     bool BoneExists(const std::string& boneName);
     bool HasNodeWithObjectId(uint64_t objectId) const;
 
     int32_t GetGlobalMeshIndex(int nodeIndex);
-    uint64_t GetObjectIdOfFirstOpenableParentNode(int nodeIndex);
     Material* GetMaterial(int nodeIndex);
     const AABB* GetWorldSpaceAabbByMeshName(const std::string& meshName);
     const glm::mat4& GetLocalTransform(int nodeIndex) const;
@@ -111,4 +103,5 @@ private:
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
     bool m_isGold = false;
     bool m_isDirty = true;
+    bool m_forceDirty = true;
 };

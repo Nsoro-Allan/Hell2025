@@ -4,10 +4,10 @@
 
 struct OpenGLDebugMesh {
 private:
-    unsigned int m_vao = 0;
-    unsigned int m_vbo = 0;
-    unsigned int m_allocatedBufferSize = 0;
-    unsigned int m_vertexCount = 0;
+    GLuint m_vao = 0;
+    GLuint m_vbo = 0;
+    GLsizeiptr m_allocatedBufferSize = 0;
+    GLsizeiptr m_vertexCount = 0;
 
 public:
     size_t GetVertexCount() const { return m_vertexCount; }
@@ -23,7 +23,7 @@ public:
         glBindVertexArray(m_vao);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-        size_t bufferSize = vertices.size() * sizeof(DebugVertex);
+        GLsizeiptr bufferSize = (GLsizeiptr)(vertices.size() * sizeof(DebugVertex));
 
         // Allocate or resize buffer if necessary
         if (bufferSize > m_allocatedBufferSize) {
@@ -53,6 +53,6 @@ public:
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        m_vertexCount = vertices.size();
+        m_vertexCount = (GLsizeiptr)vertices.size();
     }
 };

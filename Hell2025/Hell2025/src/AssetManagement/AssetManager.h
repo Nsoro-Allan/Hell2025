@@ -52,6 +52,7 @@ namespace AssetManager {
     std::span<Vertex> GetMeshVerticesSpan(Mesh* mesh);
     std::span<uint32_t> GetMeshIndicesSpan(Mesh* mesh);
     void CreateMeshBvhs();
+    const std::string& GetMeshNameByMeshIndex(int index);
 
     // Models
     std::vector<Model>& GetModels();

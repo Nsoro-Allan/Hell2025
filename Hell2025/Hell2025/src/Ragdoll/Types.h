@@ -185,7 +185,7 @@ inline glm::mat4 RdMatrixToGlmMat4(const RdMatrix& matrix) {
     glm::mat4 result(1.0f);
     for (int r = 0; r < 4; ++r) {
         for (int c = 0; c < 4; ++c) {
-            result[c][r] = matrix[c][r];
+            result[c][r] = (float)matrix[c][r];
         }
     }
     return result;

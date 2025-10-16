@@ -112,7 +112,7 @@ struct MeshData {
     glm::vec3 aabbMax = glm::vec3(-std::numeric_limits<float>::max());
     uint32_t vertexCount = 0;
     uint32_t indexCount = 0;
-    uint32_t parentIndex = -1;
+    int32_t parentIndex = -1;
     glm::mat4 localTransform = glm::mat4(1.0f);
     glm::mat4 inverseBindTransform = glm::mat4(1.0f);
 };

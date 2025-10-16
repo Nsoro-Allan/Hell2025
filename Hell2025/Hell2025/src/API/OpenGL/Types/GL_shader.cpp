@@ -300,7 +300,7 @@ void ParseFile(const std::string& filepath, std::string& outputString, std::vect
     }
 }
 
-std::string GetShaderCompileErrors(unsigned int shader, const std::string& filename, const std::vector<std::string>& lineToFile) {
+std::string GetShaderCompileErrors(unsigned int shader, const std::string& /*filename*/, const std::vector<std::string>& lineToFile) {
     int success;
     char infoLog[1024];
     std::string result = "";

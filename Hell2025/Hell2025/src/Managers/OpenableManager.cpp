@@ -1,14 +1,20 @@
 #include "OpenableManager.h"
-#include "UniqueID.h"
 #include "World/World.h"
+#include <atomic>
+#include <cstdint>
 
 namespace OpenableManager {
-    std::unordered_map<uint64_t, Openable> g_openables;
+    std::unordered_map<uint32_t, Openable> g_openables;
+    std::atomic<uint32_t> g_global = 1;
+    
+    uint32_t GetNextID() {
+        return g_global++;
+    }
 
-    uint64_t CreateOpenable(const OpenableCreateInfo& createInfo) {
-        uint64_t openableId = UniqueID::GetNext(ObjectType::OPENABLE);
+    uint32_t CreateOpenable(const OpenableCreateInfo& createInfo, uint64_t parentObjectId) {
+        uint64_t openableId = GetNextID();
         Openable& openable = g_openables[openableId];
-        openable.Init(createInfo);
+        openable.Init(createInfo, parentObjectId);
 
         return openableId;
     }
@@ -16,45 +22,26 @@ namespace OpenableManager {
     void Update(float deltaTime) {
         for (auto& pair : g_openables) {
             Openable& openable = pair.second;
-            uint64_t openableId = pair.first;
-            uint64_t parentId = openable.m_parentObjectId;
-
             openable.Update(deltaTime);
 
-            if (openable.m_currentOpenState == OpenState::OPENING ||
-                openable.m_currentOpenState == OpenState::CLOSING) {
-                ObjectType parentType = UniqueID::GetType(parentId);
-
-                std::cout << "TRANSLATE_Z ";
-                std::cout << "val: " << openable.m_currentOpenValue << " ";
-                std::cout << "parentId: " << parentId << " ";
-                std::cout << "parentType: " << Util::ObjectTypeToString(parentType) << " ";
-                std::cout << "\n";
-            }
-
-            if (GenericObject* parent = World::GetGenericObjects().get(parentId)) {
-                parent->GetMeshNodes().SetTransformByMeshName(openable.m_meshName, openable.m_transform);
-                continue;
-            }
-
-            // More parent types here...
-            // More parent types here...
-            // More parent types here...
+            // if (openable.IsDirty()) {
+            //     std::cout << pair.first << ": " << openable.m_currentOpenValue << " " << openable.m_transform.position << " " << openable.m_transform.rotation << "\n";
+            // }
         }
     }
 
-    void TriggerInteract(uint64_t openableId) {
+    void TriggerInteract(uint32_t openableId) {
         if (!OpenableExists(openableId)) return;
 
         Openable* openStateHandler = GetOpenableByOpenableId(openableId);
         openStateHandler->Interact();
     }
 
-    bool OpenableExists(uint64_t openableId) {
+    bool OpenableExists(uint32_t openableId) {
         return (g_openables.find(openableId) != g_openables.end());
     }
 
-    Openable* GetOpenableByOpenableId(uint64_t openableId) {
+    Openable* GetOpenableByOpenableId(uint32_t openableId) {
         if (OpenableExists(openableId)) {
             return &g_openables[openableId];
         }
@@ -62,11 +49,4 @@ namespace OpenableManager {
             return nullptr;
         }
     }
-
-    //Transform GetOpenStateHandleTransformById(uint64_t openableId) {
-    //    if (!OpenableExists(openableId)) return Transform();
-    //
-    //    Openable* openStateHandler = GetOpeneableByOpenableId(openableId);
-    //    return openStateHandler->m_transform;
-    //}
 }

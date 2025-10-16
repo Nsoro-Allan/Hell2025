@@ -5,6 +5,7 @@
 #include "Renderer/RenderDataManager.h"
 
 #include "Ragdoll/RagdollManager.h"
+#include "UniqueID.h"
 
 namespace World {
     void EvaluatePianoKeyBulletHit(Bullet& bullet);
@@ -204,7 +205,7 @@ namespace World {
 
             BvhRayResult result = ClosestHit(rayOrigin, rayDir, maxRayDistance, i);
             if (result.hitFound) {
-                if (result.objectType == ObjectType::PIANO_KEY) {
+                if (UniqueID::GetType(result.objectId) == ObjectType::PIANO_KEY) {
                     for (Piano& piano : World::GetPianos()) {
                         if (piano.PianoKeyExists(result.objectId)) {
                             PianoKey* pianoKey = piano.GetPianoKey(result.objectId);

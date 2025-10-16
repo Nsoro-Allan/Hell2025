@@ -22,10 +22,11 @@ struct BvhNode {
 struct EntityInstance {
     mat4 worldTransform;
     mat4 inverseWorldTransform;
+
     int rootNodeIndex;
-    int objectId;
-    int padding1;
-    int padding2;
+    int objectIdLowerBit; // Unused on the GPU currently. CPU bvh stuff uses it.
+    int objectIdUpperBit; // Unused on the GPU currently. CPU bvh stuff uses it.
+    int openableId;       // Unused on the GPU currently. CPU bvh stuff uses it.
 };
 
 layout(std430, binding = 0) buffer PointCloudBuffer          { CloudPoint points[]; };
@@ -143,7 +144,7 @@ int AnyHit(in vec3 rayOrigin, in vec3 rayDir, float minDistance, float maxDistan
 
 
                 if (MeshAnyHit(uint(instance.rootNodeIndex), rayOrigin, rayDir, minDistance, maxDistance, instance.inverseWorldTransform))
-                    return instance.objectId;
+                    return 1;// instance.objectId; // NOTE. this did return bool but you were testing shit so you made it the object ID.
             }
         }
         // Otherwise, recursively process the child nodes

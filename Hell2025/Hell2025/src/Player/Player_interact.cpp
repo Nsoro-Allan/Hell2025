@@ -20,6 +20,7 @@ void Player::UpdateCursorRays() {
     m_physXRayResult.hitFound = false;
     m_bvhRayResult.hitFound = false;
     m_rayHitFound = false;
+
     if (!ViewportIsVisible()) return;
 
     float maxRayDistance = 1000.0f;
@@ -37,20 +38,21 @@ void Player::UpdateCursorRays() {
 
     // Find openable mesh if one exists
     if (m_bvhRayResult.hitFound) {
-
+        // BUGS SURELY
         if (GenericObject* hitObject = World::GetGenericObjects().get(m_bvhRayResult.objectId)) {
-            uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.localMeshNodeIndex);
-
-            if (openableParentId != 0) {
-                m_bvhRayResult.objectId = openableParentId;
-                m_bvhRayResult.objectType = UniqueID::GetType(openableParentId);
-            }
+            //uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.openableId);
+            //
+            //if (openableParentId != 0) {
+            //    m_bvhRayResult.objectId = openableParentId;
+            //    m_bvhRayResult.objectType = UniqueID::GetType(openableParentId);
+            //}
         }
     }
 
-    m_rayHitObjectType = m_bvhRayResult.objectType;
-    m_rayhitObjectId = m_bvhRayResult.objectId;
-    m_rayHitPosition = m_bvhRayResult.hitPosition;
+
+    //m_rayHitObjectType = UniqueID::GetType(m_bvhRayResult.objectId);
+    //m_rayhitObjectId = m_bvhRayResult.objectId;
+    //m_rayHitPosition = m_bvhRayResult.hitPosition;
 
     // Store the closest of the two hits
     //m_rayHitObjectType = ObjectType::UNDEFINED;
@@ -95,70 +97,89 @@ void Player::UpdateCursorRays() {
 
 
 void Player::UpdateInteract() {
-    m_interactObjectType = ObjectType::NO_TYPE;
-    m_interactObjectId = 0;
+    m_interactObjectId = NO_ID;
+    m_interactOpenableId = NO_ID;
+    m_interactCustomId = NO_ID;
 
     if (!ViewportIsVisible()) return;
 
     // Probably make this cleaner, but for now this handles the fact you can interact while inventory is open. 
     if (InventoryIsOpen()) return;
 
-    // If ray hit object is intractable, store it
-    if (World::ObjectTypeIsInteractable(m_rayHitObjectType, m_rayhitObjectId, GetCameraPosition(), m_rayHitPosition)) {
-        m_interactObjectType = m_rayHitObjectType;
-        m_interactObjectId = m_rayhitObjectId;
-    }
-
+    // Rewrite me in such a way to consider pickups and openable ids only, you'll need to think how doors and piano keys will work with that...
+    //{
+    //    // If ray hit object is intractable, store it       
+    //    if (World::ObjectTypeIsInteractable(m_rayHitObjectType, m_rayhitObjectId, GetCameraPosition(), m_rayHitPosition)) {
+    //        m_interactObjectType = m_rayHitObjectType;
+    //        m_interactObjectId = m_rayhitObjectId;
+    //    }
+    //}
 
     // If it's not an openable, maybe it's parent is? Search and stop at the first parent
-    ObjectType hitObjectType = UniqueID::GetType(m_rayhitObjectId);
-    if (hitObjectType == ObjectType::GENERIC_OBJECT) {
-       // std::cout << "generic hit " << m_rayhitObjectId << "\n";
-
-        //if(GenericObject * parent = World::GetGenericObjects().get(m_interactObjectId)) {
-        //    parent->GetMeshNodes().SetTransformByMeshName(openable.m_meshName, openable.m_transform);
-        //    continue;
-        //}
-    }
+    //ObjectType hitObjectType = UniqueID::GetType(m_rayhitObjectId);
+    //if (hitObjectType == ObjectType::GENERIC_OBJECT) {
+    //   // std::cout << "generic hit " << m_rayhitObjectId << "\n";
+    //
+    //    //if(GenericObject * parent = World::GetGenericObjects().get(m_interactObjectId)) {
+    //    //    parent->GetMeshNodes().SetTransformByMeshName(openable.m_meshName, openable.m_transform);
+    //    //    continue;
+    //    //}
+    //}
 
     // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
     // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
     // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
 
     // Overwrite with PhysX overlap test if an overlap with interact object is found
-    //if (m_rayHitObjectType != ObjectType::NO_TYPE) {
-    
-        glm::vec3 spherePosition = m_rayHitPosition;
-        float sphereRadius = 0.15f;
-        PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
-        const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));
-        PhysXOverlapReport overlapReport = Physics::OverlapTest(overlapSphereShape, overlapSphereTranform, CollisionGroup(GENERIC_BOUNCEABLE | GENERTIC_INTERACTBLE | ITEM_PICK_UP | ENVIROMENT_OBSTACLE));
-    
-        // Sort by distance to player
-        sort(overlapReport.hits.begin(), overlapReport.hits.end(), [this, spherePosition](PhysXOverlapResult& lhs, PhysXOverlapResult& rhs) {
-            float distanceA = glm::distance(spherePosition, lhs.objectPosition);
-            float distanceB = glm::distance(spherePosition, rhs.objectPosition);
-            return distanceA < distanceB;
-        });
-    
-        if (overlapReport.hits.size()) {
-            PhysicsUserData userData = overlapReport.hits[0].userData;
-            if (World::ObjectTypeIsInteractable(userData.objectType, userData.objectId, GetCameraPosition(), m_rayHitPosition)) {
-                if (userData.objectType != ObjectType::DOOR) {
-                    m_interactObjectType = userData.objectType;
-                    m_interactObjectId = userData.objectId;
-                }
-            }
-        }
-    //}
+    // //if (m_rayHitObjectType != ObjectType::NO_TYPE) {
+    // 
+    //     glm::vec3 spherePosition = m_rayHitPosition;
+    //     float sphereRadius = 0.15f;
+    //     PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
+    //     const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));
+    //     PhysXOverlapReport overlapReport = Physics::OverlapTest(overlapSphereShape, overlapSphereTranform, CollisionGroup(GENERIC_BOUNCEABLE | GENERTIC_INTERACTBLE | ITEM_PICK_UP | ENVIROMENT_OBSTACLE));
+    // 
+    //     // Sort by distance to player
+    //     sort(overlapReport.hits.begin(), overlapReport.hits.end(), [this, spherePosition](PhysXOverlapResult& lhs, PhysXOverlapResult& rhs) {
+    //         float distanceA = glm::distance(spherePosition, lhs.objectPosition);
+    //         float distanceB = glm::distance(spherePosition, rhs.objectPosition);
+    //         return distanceA < distanceB;
+    //     });
+    // 
+    //     if (overlapReport.hits.size()) {
+    //         PhysicsUserData userData = overlapReport.hits[0].userData;
+    //         if (World::ObjectTypeIsInteractable(userData.objectType, userData.objectId, GetCameraPosition(), m_rayHitPosition)) {
+    //             if (userData.objectType != ObjectType::DOOR) {
+    //                 m_interactObjectType = userData.objectType;
+    //                 m_interactObjectId = userData.objectId;
+    //             }
+    //         }
+    //     }
+    // //}
+
+    // Replace me with some distance check with closest point from hit object AABB
+    if (m_bvhRayResult.hitFound) {
+        m_interactObjectId = m_bvhRayResult.objectId;
+        m_interactOpenableId = m_bvhRayResult.openableId;
+        m_interactCustomId = m_bvhRayResult.customId;
+    }
+
+    ObjectType interactObjectType = UniqueID::GetType(m_interactObjectId);
 
     // Convenience bool for setting crosshair
-    m_interactFound = (m_interactObjectType != ObjectType::NO_TYPE);
+    m_interactFound = false;
+    if (m_interactObjectId != 0)                                            m_interactFound = true;
+    if (m_interactOpenableId != 0)                                          m_interactFound = true;
+    if (interactObjectType == ObjectType::PIANO && m_interactCustomId != 0) m_interactFound = true;
 
+    // PRESSED interact key
     if (PressedInteract()) {
+        if (OpenableManager::GetOpenableByOpenableId(m_interactOpenableId)) {
+            OpenableManager::TriggerInteract(m_interactOpenableId);
+        }
 
         // Pickups
-        if (m_interactObjectType == ObjectType::PICK_UP) {
+        if (interactObjectType == ObjectType::PICK_UP) {
             PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId);
             if (pickUp) {
                 World::RemoveObject(m_interactObjectId);
@@ -166,79 +187,39 @@ void Player::UpdateInteract() {
             }
         }
         // Doors
-        if (m_interactObjectType == ObjectType::DOOR) {
+        if (interactObjectType == ObjectType::DOOR) {
             Door* door = World::GetDoorByObjectId(m_interactObjectId);
             if (door) {
                 door->Interact();
             }
         }
-        // Piano stuff
-        if (m_interactObjectType == ObjectType::PIANO_KEYBOARD_COVER) {
-            Piano* piano = World::GetPianoByMeshNodeObjectId(m_interactObjectId);
-            if (piano) {
-                piano->InteractWithKeyboardCover();
-            }
-        }
-        if (m_interactObjectType == ObjectType::PIANO_SHEET_MUSIC_REST) {
-            Piano* piano = World::GetPianoByMeshNodeObjectId(m_interactObjectId);
-            if (piano) {
-                piano->InteractWithSheetMusicRestCover();
-            }
-        }
-        if (m_interactObjectType == ObjectType::PIANO_TOP_COVER) {
-            Piano* piano = World::GetPianoByMeshNodeObjectId(m_interactObjectId);
-            if (piano) {
-                piano->InteractWithTopCover();
-            }
-        }
-
 
         // Toilet stuff
-        if (m_interactObjectType == ObjectType::TOILET_LID) {
+        if (interactObjectType == ObjectType::TOILET_LID) {
             Toilet* toilet = World::GetToiletByMeshNodeObjectId(m_interactObjectId);
             if (toilet) {
                 toilet->InteractWithLid();
             }
         }
-        if (m_interactObjectType == ObjectType::TOILET_SEAT) {
+        if (interactObjectType == ObjectType::TOILET_SEAT) {
             Toilet* toilet = World::GetToiletByMeshNodeObjectId(m_interactObjectId);
             if (toilet) {
                 toilet->InteractWithSeat();
             }
         }
-
-        //if (m_interactObjectType == ObjectType::DRAWER) {
-        //    for (Drawers& drawers: World::GetDrawers()) {
-        //        const MeshNodes& meshNodes = drawers.GetMeshNodes();
-        //        if (meshNodes.HasNodeWithObjectId(m_interactObjectId)) {
-        //            for (int i = 0; i < meshNodes.GetNodeCount(); i++) {
-        //                // If this mesh nodes id matches the raycasted object id, and it has a valid open handler id
-        //                if (meshNodes.m_objectIds[i] == m_interactObjectId) {
-        //                    if (meshNodes.m_openHandlerStateIds[i] != 0) {
-        //                        OpenStateHandlerManager::TriggerInteract(meshNodes.m_openHandlerStateIds[i]);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-        if (m_interactObjectType == ObjectType::OPENABLE) {
-            OpenableManager::TriggerInteract(m_interactObjectId);
-        }
-
     }
 
+    // PRESSING interact key
     if (PressingInteract()) {
+
         // Piano keys
-        if (m_interactObjectType == ObjectType::PIANO_KEY) {
-            PianoKey* pianoKey = World::GetPianoKeyByObjectId(m_interactObjectId);
-            if (pianoKey) {
-                pianoKey->PressKey();
+        if (interactObjectType == ObjectType::PIANO && m_interactCustomId != 0) {
+            if (Piano* piano = World::GetPianoByObjectId(m_interactObjectId)) {
+                piano->PressKey(m_interactCustomId);
             }
         }
-    } 
-
+    }
+    
     if (Input::KeyPressed(HELL_KEY_P)) {
 
         glm::vec3 rayOrigin = GetCameraPosition();
@@ -247,19 +228,18 @@ void Player::UpdateInteract() {
 
         BvhRayResult result = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
         if (result.hitFound) {
-
             // Sit at 
-            if (result.objectType == ObjectType::PIANO) {
-                for (Piano& potentialPiano : World::GetPianos()) {
-                    //if (potentialPiano.PianoBodyPartKeyExists(result.objectId)) {
-                    //    SitAtPiano(potentialPiano.GetObjectId());
-                    //}
-
-                    // FIX MEEEEEEE
-                    // FIX MEEEEEEE
-                    // FIX MEEEEEEE
-                }
-            }
+            //if (result.objectType == ObjectType::PIANO) {
+            //    for (Piano& potentialPiano : World::GetPianos()) {
+            //        //if (potentialPiano.PianoBodyPartKeyExists(result.objectId)) {
+            //        //    SitAtPiano(potentialPiano.GetObjectId());
+            //        //}
+            //
+            //        // FIX MEEEEEEE
+            //        // FIX MEEEEEEE
+            //        // FIX MEEEEEEE
+            //    }
+            //}
         }
     }
 }

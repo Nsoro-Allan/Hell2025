@@ -83,6 +83,17 @@ namespace AssetManager {
         }
     }
 
+    const std::string& GetMeshNameByMeshIndex(int index) {
+        std::vector<Mesh>& meshes = GetMeshes();
+        if (index >= 0 && index < meshes.size()) {
+            return meshes[index].GetName();
+        }
+        else {
+            const static std::string notFound = "NOT_FOUND";
+            return notFound;
+        }
+    }
+
     std::vector<Vertex> GetMeshVertices(Mesh* mesh) {
         if (!mesh) {
             std::cout << "AssetManager::GetMeshVertices() failed: mesh was nullptr\n";

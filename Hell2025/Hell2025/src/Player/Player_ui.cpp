@@ -168,17 +168,17 @@ void Player::UpdateUI() {
             }
 
             // Interact
-            if (false) {
-                text += "Interact object: " + Util::ObjectTypeToString(m_interactObjectType) + " " + std::to_string(m_interactObjectId) + "\n";
-            }
+            //if (false) {
+            //    text += "Interact object: " + Util::ObjectTypeToString(m_interactObjectId) + " " + std::to_string(m_interactObjectId) + "\n";
+            //}
 
             // Rays
-            if (true) {
-                text += "BVH ray: " + Util::ObjectTypeToString(m_bvhRayResult.objectType) + " " + std::to_string(m_bvhRayResult.objectId) + "\n";
-                text += "PhysX ray: " + Util::ObjectTypeToString(m_physXRayResult.userData.objectType) + " " + std::to_string(m_physXRayResult.userData.objectId) + " " + Util::PhysicsTypeToString(m_physXRayResult.userData.physicsType) + " " + std::to_string(m_physXRayResult.userData.physicsId) + "\n";
-                text += "Ray hit found: " + Util::BoolToString(m_rayHitFound) + " " + Util::ObjectTypeToString(m_rayHitObjectType) + " " + std::to_string(m_rayhitObjectId) + "\n";
-                text += "Feet above height field: " + Util::BoolToString(m_feetAboveHeightField) + "\n";
-            }
+            //if (true) {
+            //    text += "BVH ray: " + Util::ObjectTypeToString(UniqueID::GetType(m_bvhRayResult.objectId)) + " " + std::to_string(m_bvhRayResult.objectId) + "\n";
+            //    text += "PhysX ray: " + Util::ObjectTypeToString(m_physXRayResult.userData.objectType) + " " + std::to_string(m_physXRayResult.userData.objectId) + " " + Util::PhysicsTypeToString(m_physXRayResult.userData.physicsType) + " " + std::to_string(m_physXRayResult.userData.physicsId) + "\n";
+            //    text += "Ray hit found: " + Util::BoolToString(m_rayHitFound) + " " + Util::ObjectTypeToString(m_rayHitObjectType) + " " + std::to_string(m_rayhitObjectId) + "\n";
+            //    text += "Feet above height field: " + Util::BoolToString(m_feetAboveHeightField) + "\n";
+            //}
 
             // Movement
             if (false) {
@@ -212,23 +212,8 @@ void Player::UpdateUI() {
             glm::vec3 rayDir = GetCameraForward();
             float maxRayDistance = 100.0f;
 
-            BvhRayResult result = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
-            if (result.hitFound) {
-                if (result.objectType == ObjectType::PIANO_KEY) {
-                    for (Piano& piano : World::GetPianos()) {
-                        if (piano.PianoKeyExists(result.objectId)) {
-                            PianoKey* pianoKey = piano.GetPianoKey(result.objectId);
-                            if (pianoKey) {
-                                text += "Key code: " + std::to_string(pianoKey->m_note) + "\n";
-                            }
-                        }
-                    }
-                }
-            }
-
             text += "\n";
             text += "Flip normal map Y: " + Util::BoolToString(OpenGLRenderer::ShouldFlipNormalMapY()) + "\n";
-
 
             // Override with BVH CPU RAYS if that render mode is set
             if (Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS) {
@@ -237,37 +222,12 @@ void Player::UpdateUI() {
                 if (m_bvhRayResult.hitFound) {
                     uint64_t hitId = m_bvhRayResult.objectId;
                     ObjectType hitType = UniqueID::GetType(hitId);
-                    text += "Pos: " + Util::Vec3ToString(m_bvhRayResult.hitPosition) + "\n";
-                    text += "Type: " + Util::ObjectTypeToString(hitType) + "\n";
-
-                    // Mesh
-                    if (GenericObject* hitObject = World::GetGenericObjects().get(m_bvhRayResult.objectId)) {
-                        text += "\n";
-                        //text += "- ID: " + std::to_string(m_bvhRayResult.objectId) + "\n";
-                        text += "- Type: " + Util::ObjectTypeToString(hitType) + "\n";
-                        text += "- Mesh Name: " + hitObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                        text += "- Mesh Index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                    }
-
-                    // Parent mesh
-                    if (hitType == ObjectType::OPENABLE) {
-                        if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.objectId)) {
-                            if (GenericObject* hitObject = World::GetGenericObjects().get(openable->m_parentObjectId)) {
-                                text += "\n";
-                                text += "- Type: " + Util::ObjectTypeToString(hitType) + "\n";
-                                text += "- Mesh Name: " + hitObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                                text += "- Node Index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
-
-                                uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.localMeshNodeIndex);
-                                if (GenericObject* parentObject = World::GetGenericObjects().get(openableParentId)) {
-                                    text += "\n";
-                                    text += "- Parent mesh Name: " + parentObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                                    text += "- Parent mesh index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                                    text += "- Parent ID: " + std::to_string(openableParentId) + "\n";
-                                }
-                            }
-                        }
-                    }
+                    text += "- Hit pos: " + Util::Vec3ToString(m_bvhRayResult.hitPosition) + "\n";
+                    text += "- Parent type: " + Util::ObjectTypeToString(hitType) + "\n";
+                    text += "- Mesh name: " + AssetManager::GetMeshNameByMeshIndex(m_bvhRayResult.globalMeshIndex) + "\n";
+                    text += "- Parent Id: " + std::to_string(UniqueID::GetLocal(m_bvhRayResult.objectId)) + "\n";
+                    text += "- Openable Id: " + std::to_string(m_bvhRayResult.openableId) + "\n";
+                    text += "- Custom Id: " + std::to_string(m_bvhRayResult.customId) + "\n";
                 }
             }
 

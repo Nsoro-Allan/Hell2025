@@ -69,30 +69,30 @@ struct RenderItem {
     int baseSkinnedVertex;
     int ignoredViewportIndex;
 
-    int exclusiveViewportIndex;
-    int skinned; // True or false
     uint objectIdLowerBit;
     uint objectIdUpperBit;
+    uint openableId;
+    uint customId;
+    
+    int padding1;                       // Unused
+    int exclusiveViewportIndex;
+    int skinned;                        // True or false
+    int castShadows;                    // True or false
 
     float emissiveR;
     float emissiveG;
     float emissiveB;
-    int castShadows; // True or false
+    int emissiveTextureIndex;           // -1 means nothing, anything else is a texture index
 
     float furLength;
     float furShellDistanceAttenuation;
     float furUVScale;
-    int localMeshNodeIndex;
-
-    int blockScreenSpaceBloodDecals;  // True or false
-    int emissiveTextureIndex;         // -1 means nothing, anything else is a texture index
-    int padding1;
-    int padding2;
+    int blockScreenSpaceBloodDecals;    // True or false
 
     int woundBaseColorTextureIndex;
     int woundNormalMapTextureIndex;
     int woundRmaTextureIndex;
-    int padding3;
+    int padding2;                       // Unused
 };
 
 struct Light {

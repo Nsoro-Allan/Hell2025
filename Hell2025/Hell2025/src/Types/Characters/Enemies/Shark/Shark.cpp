@@ -23,7 +23,7 @@ std::vector<glm::vec3> GetCirclePoints(const glm::vec3& center, int segments, fl
 }
 
 void Shark::Init(glm::vec3 initialPosition) {
-    m_objectId = UniqueID::GetNext(ObjectType::SHARK);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::SHARK);
 
 
     g_animatedGameObjectObjectId = World::CreateAnimatedGameObject();

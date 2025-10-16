@@ -130,7 +130,9 @@ namespace Bvh::Gpu {
                         rayResult.primitiveTransform = instance.inverseWorldTransform;
                         rayResult.nodeBoundsMin = node.boundsMin;
                         rayResult.nodeBoundsMax = node.boundsMax;
-                        rayResult.objectType = Util::IntToEnum(instance.objectType);
+                        rayResult.openableId = instance.openableId;
+                        rayResult.customId = instance.customId;
+                        rayResult.globalMeshIndex = instance.globalMeshIndex;
                         Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, rayResult.objectId);
                         return rayResult;
                     }
@@ -274,7 +276,9 @@ namespace Bvh::Gpu {
                             closestRayResult.primitiveTransform = instance.worldTransform;
                             closestRayResult.nodeBoundsMin = node.boundsMin;
                             closestRayResult.nodeBoundsMax = node.boundsMax;
-                            closestRayResult.objectType = Util::IntToEnum(instance.objectType);
+                            closestRayResult.openableId = instance.openableId;
+                            closestRayResult.customId = instance.customId;
+                            closestRayResult.globalMeshIndex = instance.globalMeshIndex;
                             Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, closestRayResult.objectId);
 
                             // Update the ray's max distance to prune further bvh nodes

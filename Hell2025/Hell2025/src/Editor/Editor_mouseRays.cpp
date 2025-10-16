@@ -46,6 +46,7 @@ namespace Editor {
         }
         else {
             std::cout << "Editor::GetMouseRayOriginByViewportIndex(int32_t viewportIndex) Failed because " << viewportIndex << " is out of range of size 4\n";
+            return glm::vec3(0.0f, 0.0f, -1.0f);
         }
     }
 
@@ -55,6 +56,7 @@ namespace Editor {
         }
         else {
             std::cout << "Editor::GetMouseRayDirectionByViewportIndex(int32_t viewportIndex) Failed because " << viewportIndex << " is out of range of size 4\n";
+            return glm::vec3(0.0f, 0.0f, -1.0f);
         }
     }
 }

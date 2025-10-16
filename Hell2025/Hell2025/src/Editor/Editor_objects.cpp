@@ -36,24 +36,25 @@ namespace Editor {
             float physXDistance = glm::distance(physxRayResult.hitPosition, rayOrigin);
             float bvhDistance = glm::distance(bvhRayResult.hitPosition, rayOrigin);
             if (bvhDistance < physXDistance) {
-                SetHoveredObjectType(bvhRayResult.objectType);
+                SetHoveredObjectType(UniqueID::GetType(bvhRayResult.objectId));
                 SetHoveredObjectId(bvhRayResult.objectId);
             }
         }
 
         ObjectType hovererdType = Editor::GetHoveredObjectType();
 
-        if (GetHoveredObjectType() == ObjectType::OPENABLE) {
-            Openable* openable = OpenableManager::GetOpenableByOpenableId(GetHoveredObjectId());
-            if (openable) {
-                SetHoveredObjectType(UniqueID::GetType(openable->m_parentObjectId));
-                SetHoveredObjectId(openable->m_parentObjectId);
-            }
-        }
-        else {
-            SetHoveredObjectType(UniqueID::GetType(GetHoveredObjectId()));
-            SetHoveredObjectId(GetHoveredObjectId());
-        }
+
+        //if (GetHoveredObjectType() == ObjectType::OPENABLE) {
+        //    Openable* openable = OpenableManager::GetOpenableByOpenableId(GetHoveredObjectId());
+        //    if (openable) {
+        //        SetHoveredObjectType(UniqueID::GetType(openable->m_parentObjectId));
+        //        SetHoveredObjectId(openable->m_parentObjectId);
+        //    }
+        //}
+        //else {
+        //    SetHoveredObjectType(UniqueID::GetType(GetHoveredObjectId()));
+        //    SetHoveredObjectId(GetHoveredObjectId());
+        //}
 
         //std::cout << GetHoveredObjectId() << " hovered object: " << Util::ObjectTypeToString(GetHoveredObjectType()) << " " << GetHoveredObjectId() << "\n";
 

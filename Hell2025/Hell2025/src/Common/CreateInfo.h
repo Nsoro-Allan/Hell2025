@@ -8,20 +8,18 @@
 struct OpenableCreateInfo {
     OpenState initialOpenState = OpenState::CLOSED;
     OpenAxis openAxis = OpenAxis::TRANSLATE_Z;
-    uint64_t parentObjectId = 0;
-    std::string meshName = UNDEFINED_STRING;
+    std::string lockedAudio = "Locked.wav";
     std::string openingAudio = UNDEFINED_STRING;
     std::string closingAudio = UNDEFINED_STRING;
     std::string openedAudio = UNDEFINED_STRING;
     std::string closedAudio = UNDEFINED_STRING;
-    std::string lockedAudio = "Locked.wav";
+    std::vector<std::string> additionalTriggerMeshNames;
     float initialOpenValue = 1.0f;
     float minOpenValue = 0.0f;
     float maxOpenValue = HELL_PI * 0.5f;
     float openSpeed = 1.0f;
     float closeSpeed = 1.0f;
     float audioVolume = 2.0f;
-    bool createMe = false;
 };
 
 struct RigidDynamicCreateInfo {
@@ -35,11 +33,13 @@ struct RigidStaticCreateInfo {
 struct MeshNodeCreateInfo {
     std::string meshName;
     std::string materialName = UNDEFINED_STRING;
+    MeshNodeType type = MeshNodeType::DEFAULT;
     BlendingMode blendingMode = BlendingMode::BLEND_DISABLED;
     OpenableCreateInfo openable;
     RigidDynamicCreateInfo rigidDynamic;
     RigidStaticCreateInfo rigidStatic;
     bool isGold = false;
+    int32_t customId;
 };
 
 struct GenericObjectCreateInfo {

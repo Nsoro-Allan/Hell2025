@@ -51,7 +51,7 @@ namespace OpenGLRenderer {
             SkinnedModel* skinnedModel = animatedGameObject->GetSkinnedModel();
             if (!skinnedModel) continue;
 
-            for (int i = 0; i < skinnedModel->GetMeshCount(); i++) {
+            for (uint32_t i = 0; i < skinnedModel->GetMeshCount(); i++) {
                 uint32_t meshindex = skinnedModel->GetMeshIndices()[i];
                 SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(meshindex);
                 shader->SetInt("vertexCount", mesh->vertexCount);

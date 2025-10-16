@@ -90,7 +90,7 @@ void WallSegment::CreatePhysicsObject() {
     filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY | CHARACTER_CONTROLLER | ITEM_PICK_UP);
 
     m_physicsId = Physics::CreateRigidStaticTriangleMeshFromVertexData(Transform(), m_vertices, m_indices, filterData);
-    m_objectId = UniqueID::GetNext(ObjectType::WALL_SEGMENT);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::WALL_SEGMENT);
 
     // Set PhysX user data
     PhysicsUserData userData;

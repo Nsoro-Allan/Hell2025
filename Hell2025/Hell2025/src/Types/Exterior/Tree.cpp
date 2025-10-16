@@ -5,7 +5,7 @@
 #include "Util.h"
 
 Tree::Tree(TreeCreateInfo createInfo) {
-    m_objectId = UniqueID::GetNext(ObjectType::TREE);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::TREE);
     m_createInfo = createInfo;
 
 

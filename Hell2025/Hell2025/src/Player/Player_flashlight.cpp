@@ -28,7 +28,9 @@ void Player::UpdateFlashlight(float deltaTime) {
         m_flashlightDirection = GetCameraForward();
     }
 
-    float distanceToRayHit = glm::distance(m_rayHitPosition, GetCameraPosition());
+    glm::vec3 rayHitPosition = m_bvhRayResult.hitPosition;
+
+    float distanceToRayHit = glm::distance(rayHitPosition, GetCameraPosition());
 
     // Centered pos/dir
     glm::vec3 centeredFlashlightPosition = GetCameraPosition();
@@ -44,7 +46,7 @@ void Player::UpdateFlashlight(float deltaTime) {
     glm::vec3 offsetFlashlightPosition = centeredFlashlightPosition;
     offsetFlashlightPosition += GetCameraRight() * glm::vec3(0.1f);
     offsetFlashlightPosition -= GetCameraUp() * glm::vec3(m_bobOffsetY * 2);
-    glm::vec3 offsetFlashlightDirection = glm::normalize(m_rayHitPosition - offsetFlashlightPosition);
+    glm::vec3 offsetFlashlightDirection = glm::normalize(rayHitPosition - offsetFlashlightPosition);
 
     // Compute lerp factor
     float maxDistance = 1.0f;

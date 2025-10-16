@@ -31,7 +31,7 @@ namespace ImGuiBackEnd {
         ImGuiIO& io = ImGui::GetIO();
         io.FontGlobalScale = 1.0f;
         io.IniFilename = nullptr;
-        io.DisplaySize = ImVec2(resolutions.ui.x, resolutions.ui.y);
+        io.DisplaySize = ImVec2((float)resolutions.ui.x, (float)resolutions.ui.y);
         io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 

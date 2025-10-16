@@ -32,7 +32,7 @@ void Window::Init(WindowCreateInfo createInfo) {
     filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
     m_physicsId = Physics::CreateRigidStaticTriangleMeshFromModel(transform, "WindowGlassPhysX", filterData);
-    m_objectId = UniqueID::GetNext(ObjectType::WINDOW);
+    m_objectId = UniqueID::GetNextObjectId(ObjectType::WINDOW);
 
     // Set PhysX user data
     PhysicsUserData userData;

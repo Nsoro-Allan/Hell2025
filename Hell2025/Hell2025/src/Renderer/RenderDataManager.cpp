@@ -133,14 +133,14 @@ namespace RenderDataManager {
             g_viewportData[i].projectionView = g_viewportData[i].projection * g_viewportData[i].view;
             g_viewportData[i].inverseProjectionView = glm::inverse(g_viewportData[i].projectionView);
             g_viewportData[i].skyboxProjectionView = viewport->GetPerpsectiveMatrix() * g_viewportData[i].view;
-            g_viewportData[i].width = resolutions.gBuffer.x * viewport->GetSize().x;
-            g_viewportData[i].height = resolutions.gBuffer.y * viewport->GetSize().y;
-            g_viewportData[i].xOffset = resolutions.gBuffer.x * viewport->GetPosition().x;
-            g_viewportData[i].yOffset = resolutions.gBuffer.y * viewport->GetPosition().y;
-            g_viewportData[i].posX = viewport->GetPosition().x;
-            g_viewportData[i].posY = viewport->GetPosition().y;
-            g_viewportData[i].sizeX = viewport->GetSize().x;
-            g_viewportData[i].sizeY = viewport->GetSize().y;
+            g_viewportData[i].width = resolutions.gBuffer.x * (int)viewport->GetSize().x;
+            g_viewportData[i].height = resolutions.gBuffer.y * (int)viewport->GetSize().y;
+            g_viewportData[i].xOffset = resolutions.gBuffer.x * (int)viewport->GetPosition().x;
+            g_viewportData[i].yOffset = resolutions.gBuffer.y * (int)viewport->GetPosition().y;
+            g_viewportData[i].posX = (int)viewport->GetPosition().x;
+            g_viewportData[i].posY = (int)viewport->GetPosition().y;
+            g_viewportData[i].sizeX = (int)viewport->GetSize().x;
+            g_viewportData[i].sizeY = (int)viewport->GetSize().y;
             g_viewportData[i].viewPos = g_viewportData[i].inverseView[3];
             g_viewportData[i].cameraForward = g_viewportData[i].inverseView[2];
 

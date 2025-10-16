@@ -84,13 +84,8 @@ enum class ObjectType : uint16_t {
     LIGHT,
     PICK_UP,
     TREE,
-    OPENABLE,
     PIANO,
     PIANO_KEY,
-    PIANO_KEYBOARD_COVER,
-    PIANO_TOP_COVER,
-    PIANO_SHEET_MUSIC_REST,
-    PIANO_SHEET_SUSTAIN_PEDAL,
     PICTURE_FRAME,
     RAGDOLL_ENEMY,
     RAGDOLL_V2,
@@ -453,9 +448,16 @@ enum struct HouseType {
     UNDEFINED
 };
 
-enum class GenericObjectType {
+enum struct GenericObjectType {
     DRAWERS_LARGE,
     UNDEFINED
+};
+
+enum struct MeshNodeType {
+    DEFAULT,
+    OPENABLE,
+    RIGID_STATIC,
+    RIGID_DYNAMIC
 };
 
 inline RaycastIgnoreFlags operator|(RaycastIgnoreFlags a, RaycastIgnoreFlags b) {

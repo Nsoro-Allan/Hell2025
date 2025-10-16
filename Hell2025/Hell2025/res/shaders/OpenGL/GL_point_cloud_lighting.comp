@@ -18,10 +18,11 @@ struct BvhNode {
 struct EntityInstance {
     mat4 worldTransform;
     mat4 inverseWorldTransform;
+
     int rootNodeIndex;
-    int padding0;
-    int padding1;
-    int padding2;
+    int objectIdLowerBit; // Unused on the GPU currently. CPU bvh stuff uses it.
+    int objectIdUpperBit; // Unused on the GPU currently. CPU bvh stuff uses it.
+    int openableId;       // Unused on the GPU currently. CPU bvh stuff uses it.
 };
 
 struct Light {

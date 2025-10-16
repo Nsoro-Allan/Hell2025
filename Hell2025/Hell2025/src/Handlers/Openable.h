@@ -9,13 +9,12 @@ struct Openable {
     OpenAxis m_openAxis = OpenAxis::TRANSLATE_Z;
     Transform m_transform;
     uint64_t m_parentObjectId = 0;
-    std::string m_meshName = UNDEFINED_STRING;
     std::string m_openingAudio = UNDEFINED_STRING;
     std::string m_closingAudio = UNDEFINED_STRING;
     std::string m_openedAudio = UNDEFINED_STRING;
     std::string m_closedAudio = UNDEFINED_STRING;
     std::string m_lockedAudio = UNDEFINED_STRING;
-    bool m_movedThisFrame = false;
+    bool m_dirty = false;
     bool m_locked = false;
     float m_currentOpenValue = 1;
     float m_minOpenValue = 0;
@@ -24,10 +23,9 @@ struct Openable {
     float m_closeSpeed = 1.0f;
     float m_audioVolume = 2.0f;
 
-    void Init(const OpenableCreateInfo& createInfo) {
+    void Init(const OpenableCreateInfo& createInfo, uint64_t parentObjectId) {
         m_currentOpenState = createInfo.initialOpenState;
         m_openAxis = createInfo.openAxis;
-        m_meshName = createInfo.meshName;
         m_minOpenValue = createInfo.minOpenValue;
         m_maxOpenValue = createInfo.maxOpenValue;
         m_currentOpenValue = glm::clamp(createInfo.initialOpenValue, m_minOpenValue, m_maxOpenValue);
@@ -39,7 +37,7 @@ struct Openable {
         m_closedAudio = createInfo.closedAudio;
         m_lockedAudio = createInfo.lockedAudio;
         m_audioVolume = createInfo.audioVolume;
-        m_parentObjectId = createInfo.parentObjectId;
+        m_parentObjectId = parentObjectId;
     }
 
     void SetParentObjectId(uint64_t parentObjectId) {
@@ -68,10 +66,10 @@ struct Openable {
     }
 
     void Update(float deltaTime) {
-        m_movedThisFrame = false;
+        m_dirty = false;
 
         if (m_currentOpenState == OpenState::CLOSING) {
-            m_movedThisFrame = true;
+            m_dirty = true;
             m_currentOpenValue -= m_closeSpeed * deltaTime;
 
             if (m_currentOpenValue < m_minOpenValue) {
@@ -84,7 +82,7 @@ struct Openable {
             }
         }
         if (m_currentOpenState == OpenState::OPENING) {
-            m_movedThisFrame = true;
+            m_dirty = true;
             m_currentOpenValue += m_openSpeed * deltaTime;
 
             if (m_currentOpenValue > m_maxOpenValue) {
@@ -126,5 +124,9 @@ struct Openable {
             case OpenAxis::ROTATE_Z_NEG:    m_transform.rotation.z = -m_currentOpenValue; break;
             default: break;
         }
+    }
+
+    bool IsDirty() {
+        return m_dirty;
     }
 };
