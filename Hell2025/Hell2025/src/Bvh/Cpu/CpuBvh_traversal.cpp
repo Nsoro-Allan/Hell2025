@@ -131,6 +131,7 @@ namespace Bvh::Cpu {
                         rayResult.nodeBoundsMin = node.boundsMin;
                         rayResult.nodeBoundsMax = node.boundsMax;
                         rayResult.objectType = Util::IntToEnum(instance.objectType);
+                        rayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
                         Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, rayResult.objectId);
                         return rayResult;
                     }
@@ -275,6 +276,7 @@ namespace Bvh::Cpu {
                             closestRayResult.nodeBoundsMin = node.boundsMin;
                             closestRayResult.nodeBoundsMax = node.boundsMax;
                             closestRayResult.objectType = Util::IntToEnum(instance.objectType);
+                            closestRayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
                             Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, closestRayResult.objectId);
 
                             // Update the ray's max distance to prune further bvh nodes

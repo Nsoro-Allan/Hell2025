@@ -8,6 +8,7 @@ namespace Debug {
     void EndFrame();
     void NextDebugRenderMode();
     void NextDebugTextMode();
+    void SetDebugRenderMode(DebugRenderMode mode);
 
     const std::string& GetText();
     const DebugRenderMode& GetDebugRenderMode();

@@ -16,34 +16,15 @@ Toilet::Toilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
 
 
     std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-    m_meshNodes.InitFromModel(NO_ID, "Toilet", emptyMeshNodeCreateInfoSet);
+    m_meshNodes.Init(NO_ID, "Toilet", emptyMeshNodeCreateInfoSet);
 
 
     uint32_t materialIndex = AssetManager::GetMaterialIndexByName("Toilet");
 
     // Init material setup
-    for (int i = 0; i < m_meshNodes.GetNodeCount(); i++) {
-        Mesh* mesh = AssetManager::GetMeshByIndex(m_meshNodes.m_globalMeshIndices[i]);
-        if (!mesh) continue;
-
-        m_meshNodes.m_objectIds[i] = UniqueID::GetNext(ObjectType::MESH_NODE);
-
-        if (mesh->GetName() == "Body") {
-            m_meshNodes.m_materialIndices[i] = materialIndex;
-            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET;
-        }
-        if (mesh->GetName() == "Lid") {
-            m_meshNodes.m_materialIndices[i] = materialIndex;
-            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_LID;
-        }
-        if (mesh->GetName() == "Seat") {
-            m_meshNodes.m_materialIndices[i] = materialIndex;
-            //m_meshNodes.m_objectTypes[i] = ObjectType::TOILET_SEAT;
-        }
-        if (mesh->GetName() == "ToiletWater") {
-            // TODO
-        }
-    }
+    m_meshNodes.SetMaterialByMeshName("Body", "Toilet");
+    m_meshNodes.SetMaterialByMeshName("Lid", "Toilet");
+    m_meshNodes.SetMaterialByMeshName("Seat", "Toilet");
 
      // Init handlers
     m_lidOpenHandler.m_currentOpenState = OpenState::OPEN;

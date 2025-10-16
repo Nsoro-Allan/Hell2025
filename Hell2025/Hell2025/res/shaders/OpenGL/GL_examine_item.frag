@@ -17,6 +17,7 @@ in vec4 WorldPos;
 in vec3 EmissiveColor;
 
 uniform vec3 u_viewPos;
+uniform bool u_flipNormalMapY;
 
 void main() {
     // Basecolor
@@ -28,6 +29,9 @@ void main() {
     mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
     normalMap = normalize(normalMap);
+    if (u_flipNormalMapY) {
+        normalMap.y *= -1;
+    }
     vec3 normal = normalize(tbn * (normalMap));
     
     // Materials
@@ -64,6 +68,8 @@ void main() {
 
     // Write it
     ColorOut = vec4(finalColor, 1.0);
+
+    //ColorOut.rgb = texture2D(normalTexture, TexCoord).rgb;
 
     /*
     vec3 n = normalize(Normal);

@@ -26,7 +26,9 @@ in vec3 BiTangent;
 in vec4 WorldPos;
 in vec3 ViewPos;
 uniform int u_viewportIndex;
+uniform bool u_flipNormalMapY;
     
+
 void main() {
 
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
@@ -36,6 +38,11 @@ void main() {
     mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
     normalMap = normalize(normalMap);
+
+    if (u_flipNormalMapY) {
+        normalMap.y *= -1;
+    }
+
     vec3 normal = normalize(tbn * (normalMap));
 
     vec3 gammaBaseColor = pow(baseColor.rgb, vec3(2.2));

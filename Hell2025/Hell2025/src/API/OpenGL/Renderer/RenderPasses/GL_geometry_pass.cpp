@@ -27,6 +27,7 @@ namespace OpenGLRenderer {
 
         shader->Bind();
         shader->SetMat4("u_model", glm::mat4(1));
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
 
         MeshBuffer& houseMeshBuffer = World::GetHouseMeshBuffer();
         OpenGLMeshBuffer& glHouseMeshBuffer = houseMeshBuffer.GetGLMeshBuffer();
@@ -99,6 +100,8 @@ namespace OpenGLRenderer {
         shader->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
         SetRasterizerState("GeometryPass_NonBlended");
+
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
 
         OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
         glActiveTexture(GL_TEXTURE6);

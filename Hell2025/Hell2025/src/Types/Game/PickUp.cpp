@@ -26,7 +26,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
 
     // Shotty buckshot
     if (m_pickUpType == PickUpType::SHOTGUN_AMMO_BUCKSHOT) {
-        m_meshNodes.InitFromModel(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun_AmmoBox");
         glm::vec3 modelExtents = AssetManager::GetModelByName("Shotgun_AmmoBox")->GetExtents();
         mass = 0.45f;
@@ -34,7 +34,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     }
     // Shotty slug
     else if (m_pickUpType == PickUpType::SHOTGUN_AMMO_SLUG) {
-        m_meshNodes.InitFromModel(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun_AmmoBoxSlug");
         glm::vec3 modelExtents = AssetManager::GetModelByName("Shotgun_AmmoBox")->GetExtents();
         mass = 0.45f;
@@ -42,7 +42,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     }
     // AKS74U
     else if (m_pickUpType == PickUpType::AKS74U) {
-        m_meshNodes.InitFromModel(NO_ID, "AKS74U_PickUp", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "AKS74U_PickUp", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Mesh0", "AKS74U_0");
         m_meshNodes.SetMaterialByMeshName("Mesh1", "AKS74U_1");
         m_meshNodes.SetMaterialByMeshName("Mesh2", "AKS74U_2");
@@ -54,7 +54,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
 
     // Remington 870
     else if (m_pickUpType == PickUpType::REMINGTON_870) {
-        m_meshNodes.InitFromModel(NO_ID, "World_Remington870", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "World_Remington870", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun");
         mass = 3.2f;
         physicsModel = AssetManager::GetModelByName("World_Remington870_Collision_Mesh");
@@ -62,7 +62,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
 
     // SPAS
     else if (m_pickUpType == PickUpType::SPAS) {
-        m_meshNodes.InitFromModel(NO_ID, "World_SPAS", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "World_SPAS", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("SPAS12_Main", "SPAS_Main");
         m_meshNodes.SetMaterialByMeshName("SPAS12_Moving", "SPAS_Moving");
         m_meshNodes.SetMaterialByMeshName("SPAS12_Stamped", "SPAS_Stamped");
@@ -71,7 +71,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     }
 
     else if (m_pickUpType == PickUpType::GLOCK || m_pickUpType == PickUpType::GOLDEN_GLOCK) {
-        m_meshNodes.InitFromModel(NO_ID, "World_Glock", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "World_Glock", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Glock");
         mass = 0.7f;
         physicsModel = AssetManager::GetModelByName("World_Glock_Collision_Mesh");
@@ -79,7 +79,7 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
 
 
     else if (m_pickUpType == PickUpType::TOKAREV) {
-        m_meshNodes.InitFromModel(NO_ID, "World_Tokarev", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, "World_Tokarev", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("TokarevBody", "Tokarev");
         m_meshNodes.SetMaterialByMeshName("TokarevGripPolymer", "TokarevGrip");
         mass = 0.7f;

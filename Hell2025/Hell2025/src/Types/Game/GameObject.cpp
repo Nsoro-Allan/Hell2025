@@ -73,7 +73,7 @@ void GameObject::SetModel(const std::string& name) {
     Model* model = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName(name.c_str()));
     if (model) {
         std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-        m_meshNodes.InitFromModel(NO_ID, name, emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(NO_ID, name, emptyMeshNodeCreateInfoSet);
     }
     else {
         m_meshNodes.CleanUp();

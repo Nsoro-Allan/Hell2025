@@ -404,6 +404,11 @@ namespace OpenGLRenderer {
 
         glDisable(GL_DITHER);
 
+        if (Input::KeyPressed(HELL_KEY_N)) {
+            Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+            FlipNormalMapY();
+        }
+
         BlitRoads();
 
         UpdateGlobalIllumintation();

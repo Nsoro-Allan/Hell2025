@@ -49,6 +49,7 @@ in flat int BlockScreenSpaceBloodDecalsFlag;
 in flat int EmissiveTextureIndex; 
 
 uniform bool u_alphaDiscard;
+uniform bool u_flipNormalMapY;
 
 void main() {
     vec3 emissiveColor = EmissiveColor;
@@ -114,6 +115,11 @@ void main() {
     mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
     normalMap = normalize(normalMap);
+    
+    if (u_flipNormalMapY) {
+        normalMap.y *= -1;
+    }
+
     vec3 normal = normalize(tbn * (normalMap));
 
     BaseColorOut = vec4(baseColor);

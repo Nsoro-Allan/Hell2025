@@ -9,9 +9,12 @@
 #include "Input/Input.h"
 #include "Viewport/ViewportManager.h"
 
+
+
 #pragma warning(disable : 26498)
 
 #include "Renderer/Renderer.h"
+#include "UniqueID.h"
 
 void Player::UpdateCursorRays() {
     m_physXRayResult.hitFound = false;
@@ -32,49 +35,62 @@ void Player::UpdateCursorRays() {
     glm::vec3 rayDir = GetCameraForward();
     m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
 
+    // Find openable mesh if one exists
     if (m_bvhRayResult.hitFound) {
-        //Renderer::DrawSphere(m_bvhRayResult.hitPosition, 0.05f, YELLOW);
+
+        if (GenericObject* hitObject = World::GetGenericObjects().get(m_bvhRayResult.objectId)) {
+            uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.localMeshNodeIndex);
+
+            if (openableParentId != 0) {
+                m_bvhRayResult.objectId = openableParentId;
+                m_bvhRayResult.objectType = UniqueID::GetType(openableParentId);
+            }
+        }
     }
+
+    m_rayHitObjectType = m_bvhRayResult.objectType;
+    m_rayhitObjectId = m_bvhRayResult.objectId;
+    m_rayHitPosition = m_bvhRayResult.hitPosition;
 
     // Store the closest of the two hits
-    m_rayHitObjectType = ObjectType::UNDEFINED;
-    m_rayhitObjectId = 0;
-    m_rayHitPosition = glm::vec3(0.0f);
-
-    if (m_physXRayResult.hitFound && m_bvhRayResult.hitFound) {
-        float physXDistance = glm::distance(m_physXRayResult.hitPosition, GetCameraPosition());
-        float bvhDistance = glm::distance(m_bvhRayResult.hitPosition, GetCameraPosition());
-
-        if (physXDistance < bvhDistance) {
-            m_rayHitObjectType = m_physXRayResult.userData.objectType;
-            m_rayhitObjectId = m_physXRayResult.userData.objectId;
-            m_rayHitPosition = m_physXRayResult.hitPosition;
-            m_rayHitFound = true;
-        }
-        else {
-            m_rayHitObjectType = m_bvhRayResult.objectType;
-            m_rayhitObjectId = m_bvhRayResult.objectId;
-            m_rayHitPosition = m_bvhRayResult.hitPosition;
-            m_rayHitFound = true;
-        }
-    }    
-    // Or if there was only a physx ray hit...
-    else if (m_physXRayResult.hitFound) {
-        m_rayHitObjectType = m_physXRayResult.userData.objectType;
-        m_rayhitObjectId = m_physXRayResult.userData.objectId;
-        m_rayHitPosition = m_physXRayResult.hitPosition;
-        m_rayHitFound = true;
-    }
-    // Or if there was only a bvh ray hit...
-    else if (m_bvhRayResult.hitFound) {
-        m_rayHitObjectType = m_bvhRayResult.objectType;
-        m_rayhitObjectId = m_bvhRayResult.objectId;
-        m_rayHitPosition = m_bvhRayResult.hitPosition;
-        m_rayHitFound = true;
-    }
-    else {
-        // No ray hit
-    }
+    //m_rayHitObjectType = ObjectType::UNDEFINED;
+    //m_rayhitObjectId = 0;
+    //m_rayHitPosition = glm::vec3(0.0f);
+    //
+    //if (m_physXRayResult.hitFound && m_bvhRayResult.hitFound) {
+    //    float physXDistance = glm::distance(m_physXRayResult.hitPosition, GetCameraPosition());
+    //    float bvhDistance = glm::distance(m_bvhRayResult.hitPosition, GetCameraPosition());
+    //
+    //    if (physXDistance < bvhDistance) {
+    //        m_rayHitObjectType = m_physXRayResult.userData.objectType;
+    //        m_rayhitObjectId = m_physXRayResult.userData.objectId;
+    //        m_rayHitPosition = m_physXRayResult.hitPosition;
+    //        m_rayHitFound = true;
+    //    }
+    //    else {
+    //        m_rayHitObjectType = m_bvhRayResult.objectType;
+    //        m_rayhitObjectId = m_bvhRayResult.objectId;
+    //        m_rayHitPosition = m_bvhRayResult.hitPosition;
+    //        m_rayHitFound = true;
+    //    }
+    //}    
+    //// Or if there was only a physx ray hit...
+    //else if (m_physXRayResult.hitFound) {
+    //    m_rayHitObjectType = m_physXRayResult.userData.objectType;
+    //    m_rayhitObjectId = m_physXRayResult.userData.objectId;
+    //    m_rayHitPosition = m_physXRayResult.hitPosition;
+    //    m_rayHitFound = true;
+    //}
+    //// Or if there was only a bvh ray hit...
+    //else if (m_bvhRayResult.hitFound) {
+    //    m_rayHitObjectType = m_bvhRayResult.objectType;
+    //    m_rayhitObjectId = m_bvhRayResult.objectId;
+    //    m_rayHitPosition = m_bvhRayResult.hitPosition;
+    //    m_rayHitFound = true;
+    //}
+    //else {
+    //    // No ray hit
+    //}
 }
 
 
@@ -91,6 +107,18 @@ void Player::UpdateInteract() {
     if (World::ObjectTypeIsInteractable(m_rayHitObjectType, m_rayhitObjectId, GetCameraPosition(), m_rayHitPosition)) {
         m_interactObjectType = m_rayHitObjectType;
         m_interactObjectId = m_rayhitObjectId;
+    }
+
+
+    // If it's not an openable, maybe it's parent is? Search and stop at the first parent
+    ObjectType hitObjectType = UniqueID::GetType(m_rayhitObjectId);
+    if (hitObjectType == ObjectType::GENERIC_OBJECT) {
+       // std::cout << "generic hit " << m_rayhitObjectId << "\n";
+
+        //if(GenericObject * parent = World::GetGenericObjects().get(m_interactObjectId)) {
+        //    parent->GetMeshNodes().SetTransformByMeshName(openable.m_meshName, openable.m_transform);
+        //    continue;
+        //}
     }
 
     // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
@@ -198,6 +226,7 @@ void Player::UpdateInteract() {
         if (m_interactObjectType == ObjectType::OPENABLE) {
             OpenableManager::TriggerInteract(m_interactObjectId);
         }
+
     }
 
     if (PressingInteract()) {

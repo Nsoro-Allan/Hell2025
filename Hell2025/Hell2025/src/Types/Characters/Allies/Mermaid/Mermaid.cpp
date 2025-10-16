@@ -10,7 +10,7 @@ void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
     m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, m_spawnOffset.yRotation, 0.0f);
 
     std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-    m_meshNodes.InitFromModel(NO_ID, "Mermaid", emptyMeshNodeCreateInfoSet);
+    m_meshNodes.Init(NO_ID, "Mermaid", emptyMeshNodeCreateInfoSet);
     m_meshNodes.SetMaterialByMeshName("Arms", "MermaidArms");
     m_meshNodes.SetMaterialByMeshName("Body", "MermaidBody");
     m_meshNodes.SetMaterialByMeshName("BoobTube", "BoobTube");

@@ -24,6 +24,7 @@ namespace OpenGLRenderer {
         if (!flashLightShadowMapsFBO) return;
 
         shader->Bind();
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
 
         gBuffer->Bind();
         gBuffer->DrawBuffer("Glass");

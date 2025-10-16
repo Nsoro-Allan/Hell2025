@@ -10,6 +10,9 @@
 #include "World/World.h"
 #include "Input/Input.h"
 
+#include "API/OpenGL/Renderer/GL_renderer.h"
+#include "UniqueID.h"
+
 void Player::UpdateUI() {
     if (Editor::IsOpen()) return;
 
@@ -129,16 +132,12 @@ void Player::UpdateUI() {
             }
         }
 
-        if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER) {
-
-
+        if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER || Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS) {
 
             std::string text = "";
             text += "Feet Pos: " + Util::Vec3ToString(GetFootPosition()) + "\n";
             text += "Cam Pos: " + Util::Vec3ToString(GetCameraPosition()) + "\n";
             text += "Cam Euler: " + Util::Vec3ToString(GetCameraRotation()) + "\n";
-
-            //text += "Debug Render mode: " + Util::DebugRenderModeToString(Debug::GetDebugRenderMode())+ "\n";
 
             // Kangaroos
             if (false) {
@@ -226,6 +225,52 @@ void Player::UpdateUI() {
                     }
                 }
             }
+
+            text += "\n";
+            text += "Flip normal map Y: " + Util::BoolToString(OpenGLRenderer::ShouldFlipNormalMapY()) + "\n";
+
+
+            // Override with BVH CPU RAYS if that render mode is set
+            if (Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS) {
+                text = "BVH ray hit: " + Util::BoolToString(m_bvhRayResult.hitFound) + "\n";
+
+                if (m_bvhRayResult.hitFound) {
+                    uint64_t hitId = m_bvhRayResult.objectId;
+                    ObjectType hitType = UniqueID::GetType(hitId);
+                    text += "Pos: " + Util::Vec3ToString(m_bvhRayResult.hitPosition) + "\n";
+                    text += "Type: " + Util::ObjectTypeToString(hitType) + "\n";
+
+                    // Mesh
+                    if (GenericObject* hitObject = World::GetGenericObjects().get(m_bvhRayResult.objectId)) {
+                        text += "\n";
+                        //text += "- ID: " + std::to_string(m_bvhRayResult.objectId) + "\n";
+                        text += "- Type: " + Util::ObjectTypeToString(hitType) + "\n";
+                        text += "- Mesh Name: " + hitObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                        text += "- Mesh Index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                    }
+
+                    // Parent mesh
+                    if (hitType == ObjectType::OPENABLE) {
+                        if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.objectId)) {
+                            if (GenericObject* hitObject = World::GetGenericObjects().get(openable->m_parentObjectId)) {
+                                text += "\n";
+                                text += "- Type: " + Util::ObjectTypeToString(hitType) + "\n";
+                                text += "- Mesh Name: " + hitObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                                text += "- Node Index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
+
+                                uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.localMeshNodeIndex);
+                                if (GenericObject* parentObject = World::GetGenericObjects().get(openableParentId)) {
+                                    text += "\n";
+                                    text += "- Parent mesh Name: " + parentObject->GetMeshNodes().GetMeshNameByNodeIndex(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                                    text += "- Parent mesh index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                                    text += "- Parent ID: " + std::to_string(openableParentId) + "\n";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
             UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);
         }

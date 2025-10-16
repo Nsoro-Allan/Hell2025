@@ -21,6 +21,7 @@ namespace World {
             instance.worldAabbBoundsMax = renderItem.aabbMax;
             instance.worldAabbCenter = (renderItem.aabbMin + renderItem.aabbMax) * 0.5f;
             instance.meshBvhId = AssetManager::GetMeshByIndex(renderItem.meshIndex)->meshBvhId;
+            instance.localMeshNodeIndex = renderItem.localMeshNodeIndex;
             Util::UnpackUint64(renderItem.objectIdLowerBit, renderItem.objectIdUpperBit, instance.objectId);
         }
     }

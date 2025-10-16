@@ -82,7 +82,8 @@ namespace OpenGLRenderer {
         shader->Bind();
         shader->SetMat4("u_model", glm::mat4(1));
         shader->SetMat4("u_viewMatrix", viewMatrix);
-        shader->SetVec3("u_viewPos", cameraPosition);
+        shader->SetVec3("u_viewPos", cameraPosition); 
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
 
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
 

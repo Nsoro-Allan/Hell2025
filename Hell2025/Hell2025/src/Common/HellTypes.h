@@ -50,7 +50,7 @@ struct RenderItem {
     float furLength = 0.0f;
     float furShellDistanceAttenuation = 0.0f;
     float furUVScale = 0.0f;
-    int customFlag = 0; // THIS WAS USED AS A HACK TO TEST KANGAROO WOUND MASKS. YOU CAN USE THIS FREELY FOR SOMETHNG ELSE NOW.
+    int localMeshNodeIndex = 0;
 
     int blockScreenSpaceBloodDecals = 0;  // True or false
     int emissiveTextureIndex = -1;
@@ -609,13 +609,16 @@ struct PrimitiveInstance {
     glm::vec3 worldAabbBoundsMax;
     glm::vec3 worldAabbCenter;
     glm::mat4 worldTransform;
+    uint16_t localMeshNodeIndex;
 };
 
 struct GpuPrimitiveInstance {
     glm::mat4 worldTransform;
     glm::mat4 inverseWorldTransform;
     int32_t rootNodeIndex;
-    int32_t objectType;
+    //int32_t objectType;
+    uint16_t objectType;
+    uint16_t localMeshNodeIndex;
     uint32_t objectIdLowerBit;
     uint32_t objectIdUpperBit;
 };
@@ -640,6 +643,7 @@ struct BvhRayResult {
     glm::mat4 primitiveTransform = glm::mat4(1.0f);
     glm::vec3 nodeBoundsMin = glm::vec3(0.0f);
     glm::vec3 nodeBoundsMax = glm::vec3(0.0f);
+    uint32_t localMeshNodeIndex = 0;
 };
 
 struct OceanReadbackData {

@@ -179,10 +179,10 @@ void Player::Update(float deltaTime) {
     //    std::cout << GetCamera().GetEulerRotation() << "\n\n";
     //}
 
-    if (Input::KeyPressed(HELL_KEY_N) && m_viewportIndex == 0) {
-        auto* viewWeapon = GetViewWeaponAnimatedGameObject();
-        viewWeapon->PrintNodeNames();
-    }
+   //if (Input::KeyPressed(HELL_KEY_N) && m_viewportIndex == 0) {
+   //    auto* viewWeapon = GetViewWeaponAnimatedGameObject();
+   //    viewWeapon->PrintNodeNames();
+   //}
 
     Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
     if (viewport->IsVisible()) {

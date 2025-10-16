@@ -57,7 +57,7 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
         drawerTopR.openable.closingAudio = "DrawerClose.wav";
         drawerTopR.openable.lockedAudio = "Locked.wav";
 
-        m_meshNodes.InitFromModel(id, "DrawersLarge", meshNodeCreateInfoSet);
+        m_meshNodes.Init(id, "DrawersLarge", meshNodeCreateInfoSet);
 
         m_meshNodes.SetMaterialByMeshName("DrawersLarge_2nd", "T_Drawers_01a");
         m_meshNodes.SetMaterialByMeshName("DrawersLarge_3rd", "T_Drawers_01a");

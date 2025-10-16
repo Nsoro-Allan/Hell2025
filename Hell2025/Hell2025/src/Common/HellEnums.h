@@ -277,6 +277,7 @@ enum DebugRenderMode {
     HOUSE_GEOMETRY,
     BONES,
     BONE_TANGENTS,
+    BVH_CPU_PLAYER_RAYS,
     DEBUG_LINE_MODE_COUNT,
 };
 

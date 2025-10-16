@@ -36,7 +36,7 @@ void main() {
     Tangent = normalize(normalMatrix * vec4(vTangent, 0)).xyz;
     BiTangent = normalize(cross(Normal, Tangent));
     EmissiveColor = vec3(0,0,0);
-    
+
 	TexCoord = vUV;
     WorldPos = modelMatrix * vec4(vPosition, 1.0);
 	gl_Position = projection * u_viewMatrix * WorldPos;

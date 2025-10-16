@@ -4,6 +4,7 @@
 #include "Audio/Synth.h"
 #include "Editor/Editor.h"
 #include "Input/Input.h"
+#include "HellLogging.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Physics/Physics.h"
@@ -22,7 +23,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
 
     m_model = AssetManager::GetModelByName("Piano");
-    m_meshNodes.InitFromModel(m_pianoObjectId, "Piano", emptyMeshNodeCreateInfoSet);
+    m_meshNodes.Init(m_pianoObjectId, "Piano", emptyMeshNodeCreateInfoSet);
 
     uint32_t materialIndex0 = AssetManager::GetMaterialIndexByName("Piano0");
     uint32_t materialIndex1 = AssetManager::GetMaterialIndexByName("Piano1");
@@ -35,7 +36,6 @@ void Piano::Init(PianoCreateInfo& createInfo) {
         Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
         if (!mesh) continue;
 
-        uint64_t localObjectId = UniqueID::GetNext(ObjectType::UNDEFINED);
 
         if (mesh->GetName() == "Yamaha_Key_A0" ||
             mesh->GetName() == "Yamaha_Key_A0#" ||
@@ -133,12 +133,14 @@ void Piano::Init(PianoCreateInfo& createInfo) {
             mesh->GetName() == "Yamaha_Key_B7" ||
             mesh->GetName() == "Yamaha_Key_C8") {
 
-            m_meshNodes.m_materialIndices[i] = materialIndex1;
-            m_meshNodes.m_objectIds[i] = localObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO_KEY;
+            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_KEY);
 
-            m_keys[localObjectId] = PianoKey();
-            PianoKey& pianoKey = m_keys[localObjectId];
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByLocalIndex(i);
+            meshNode->materialIndex = materialIndex1;
+            meshNode->objectId = objectId;
+
+            m_keys[objectId] = PianoKey();
+            PianoKey& pianoKey = m_keys[objectId];
             pianoKey.m_meshName = mesh->GetName();
             pianoKey.m_note = MeshNameToNote(mesh->GetName());
             pianoKey.m_isSharp = (mesh->GetName().find("#") != std::string::npos);
@@ -146,37 +148,47 @@ void Piano::Init(PianoCreateInfo& createInfo) {
 
         // Top cover 
         else if (mesh->GetName() == "Yamaha_Case.Top.Cover") {
-            m_meshNodes.m_materialIndices[i] = materialIndex0;
-            m_meshNodes.m_objectIds[i] = localObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO_TOP_COVER;
+            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_TOP_COVER);
+
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
+            meshNode->materialIndex = materialIndex0;
+            meshNode->objectId = objectId;
         }
 
         // Keyboard cover
         else if (mesh->GetName() == "Yamaha_Keyboard.Cover.Lock" || mesh->GetName() == "Yamaha_Keyboard.Cover") {
-            m_meshNodes.m_materialIndices[i] = materialIndex0;
-            m_meshNodes.m_objectIds[i] = localObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO_KEYBOARD_COVER;
+            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_KEYBOARD_COVER);
+
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
+            meshNode->materialIndex = materialIndex0;
+            meshNode->objectId = objectId;
         }
 
         // Music rest
         else if (mesh->GetName() == "Yamaha_Lyrics.Stand") {
-            m_meshNodes.m_materialIndices[i] = materialIndex0;
-            m_meshNodes.m_objectIds[i] = localObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO_SHEET_MUSIC_REST;
+            uint64_t objectId = UniqueID::GetNext(ObjectType::PIANO_SHEET_MUSIC_REST);
+
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
+            meshNode->materialIndex = materialIndex0;
+            meshNode->objectId = objectId;
         }
 
         // Black body parts
         else if (mesh->GetName() == "Yamaha_Main") {
-            m_meshNodes.m_materialIndices[i] = materialIndex0;
-            m_meshNodes.m_objectIds[i] = m_pianoObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO;
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
+            meshNode->materialIndex = materialIndex0;
+            meshNode->objectId = m_pianoObjectId;
         }
 
         // White body parts
         else {
-            m_meshNodes.m_materialIndices[i] = materialIndex1;
-            m_meshNodes.m_objectIds[i] = m_pianoObjectId;
-            // UH OH m_meshNodes.m_objectTypes[i] = ObjectType::PIANO;
+            MeshNode* meshNode = m_meshNodes.GetMeshNodeByMeshName(mesh->GetName());
+            if (!meshNode) {
+                Logging::Error() << "some piano shit fucked up\n";
+                continue;
+            }
+            meshNode->materialIndex = materialIndex1;
+            meshNode->objectId = m_pianoObjectId;
         }        
     }
 
@@ -272,8 +284,11 @@ void Piano::Update(float deltaTime) {
 
         int meshNodeIndex = m_meshNodes.m_localIndexMap[key.m_meshName];
 
-        m_meshNodes.m_transforms[meshNodeIndex].position.y = key.m_yTranslation;
-        m_meshNodes.m_transforms[meshNodeIndex].rotation.x = key.m_xRotation;
+        Transform transform;
+        transform.position.y = key.m_yTranslation;
+        transform.rotation.x = key.m_xRotation;
+
+        m_meshNodes.SetTransformByMeshName(key.m_meshName, transform);
     }
 
     m_topCoverOpenHandler.Update(deltaTime);

@@ -103,7 +103,7 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
         // Update the mesh nodes from the model. WARNNG: YOu dont wanna do this every frame like you are currently!
 
         std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-        m_examineItemMeshNodes.InitFromModel(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
+        m_examineItemMeshNodes.Init(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
 
         // Calculate matrix to scale the model to fit on screen nicely
         float maxXZ = 2.0f; // Desired max footprint on XZ in meters

@@ -82,7 +82,7 @@ struct RenderItem {
     float furLength;
     float furShellDistanceAttenuation;
     float furUVScale;
-    int customFlag; // THIS WAS USED AS A HACK TO TEST KANGAROO WOUND MASKS. YOU CAN USE THIS FREELY FOR SOMETHNG ELSE NOW.
+    int localMeshNodeIndex;
 
     int blockScreenSpaceBloodDecals;  // True or false
     int emissiveTextureIndex;         // -1 means nothing, anything else is a texture index

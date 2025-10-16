@@ -172,6 +172,10 @@ namespace Debug {
         }
     }
 
+    void SetDebugRenderMode(DebugRenderMode mode) {
+        g_debugRenderMode = mode;
+    }
+
     void NextDebugRenderMode() {
         std::vector<DebugRenderMode> allowedDebugRenderModes = {
             NONE,
@@ -183,6 +187,7 @@ namespace Debug {
             BONES,
             BONE_TANGENTS,
             ASTAR_MAP,
+            BVH_CPU_PLAYER_RAYS
             //PATHFINDING,
             //PHYSX_COLLISION,
             //PATHFINDING_RECAST,

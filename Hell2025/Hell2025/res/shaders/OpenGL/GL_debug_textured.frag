@@ -18,19 +18,25 @@ in vec4 WorldPos;
 in vec3 ViewPos;
 in vec3 EmissiveColor;
 
+uniform bool u_flipNormalMapY;
+
 void main() {
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
     vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
-   // vec3 normalMap = textureLod(normalTexture, TexCoord, 2).rgb;
-
    
     vec3 rma = texture2D(rmaTexture, TexCoord).rgb;
 
     mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
     normalMap = normalize(normalMap);
+    
+    if (u_flipNormalMapY) {
+        normalMap.y *= -1;
+    }
+
     vec3 normal = normalize(tbn * (normalMap));
     
+
   //   normal = texture2D(normalTexture, TexCoord).rgb;
    //  normal.y = 1 - normal.y;
 

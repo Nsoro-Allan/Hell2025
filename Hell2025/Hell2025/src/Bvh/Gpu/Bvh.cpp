@@ -300,7 +300,9 @@ namespace Bvh::Gpu {
                     gpuInstance.worldTransform = instance.worldTransform;
                     gpuInstance.inverseWorldTransform = glm::inverse(gpuInstance.worldTransform);
                     //gpuInstance.objectType = Util::EnumToInt(instance.objectType);
-                    gpuInstance.objectType = instance.objectId;
+                    gpuInstance.objectType = static_cast<uint16_t>(instance.objectType);
+                    gpuInstance.localMeshNodeIndex = instance.localMeshNodeIndex;
+                    std::cout << gpuInstance.localMeshNodeIndex << "\n";
                     Util::PackUint64(instance.objectId, gpuInstance.objectIdLowerBit, gpuInstance.objectIdUpperBit);
                 }
                 // Update the leaf node's pointer so it now points into the new, contiguous instance array

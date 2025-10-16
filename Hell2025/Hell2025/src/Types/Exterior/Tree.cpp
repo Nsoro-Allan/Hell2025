@@ -16,7 +16,7 @@ Tree::Tree(TreeCreateInfo createInfo) {
 
     if (m_createInfo.type == TreeType::TREE_LARGE_0) {
         m_model = AssetManager::GetModelByName("TreeLarge_0");
-        m_meshNodes.InitFromModel(m_objectId, "TreeLarge_0", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(m_objectId, "TreeLarge_0", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_0");
         collisionCaspuleRadius = 0.4f;
         collisionCaspuleHalfHeight = 2.0f;
@@ -24,21 +24,21 @@ Tree::Tree(TreeCreateInfo createInfo) {
     }
     else if (m_createInfo.type == TreeType::TREE_LARGE_1) {
         m_model = AssetManager::GetModelByName("TreeLarge_1");
-        m_meshNodes.InitFromModel(m_objectId, "TreeLarge_1", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(m_objectId, "TreeLarge_1", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_1");
         collisionCaspuleRadius = 0.4f;
         collisionCaspuleHalfHeight = 2.0f;
     }
     else if (m_createInfo.type == TreeType::TREE_LARGE_2) {
         m_model = AssetManager::GetModelByName("TreeLarge_2");
-        m_meshNodes.InitFromModel(m_objectId, "TreeLarge_2", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(m_objectId, "TreeLarge_2", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_2");
         collisionCaspuleRadius = 0.4f;
         collisionCaspuleHalfHeight = 2.0f;
     }
     else if (m_createInfo.type == TreeType::BLACK_BERRIES) {
         m_model = AssetManager::GetModelByName("BlackBerries");
-        m_meshNodes.InitFromModel(m_objectId, "BlackBerries", emptyMeshNodeCreateInfoSet);
+        m_meshNodes.Init(m_objectId, "BlackBerries", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Leaves", "Leaves_BlackBerry");
         m_meshNodes.SetBlendingModeByMeshName("Leaves", BlendingMode::ALPHA_DISCARDED);
         m_meshNodes.SetMaterialByMeshName("Trunk", "TreeLarge_0");

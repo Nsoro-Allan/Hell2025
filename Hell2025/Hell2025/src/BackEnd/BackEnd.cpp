@@ -415,6 +415,10 @@ namespace BackEnd {
                 Audio::PlayAudio(AUDIO_SELECT, 1.00f);
                 Debug::NextDebugRenderMode();
             }
+            if (Input::KeyPressed(HELL_KEY_APOSTROPHE)) {
+                Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+                Debug::SetDebugRenderMode(DebugRenderMode::BVH_CPU_PLAYER_RAYS);
+            }
         }
 
         //if (Input::KeyPressed(HELL_KEY_F11)) {

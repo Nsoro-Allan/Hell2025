@@ -176,7 +176,15 @@ namespace OpenGLRenderer {
     GLint CreateQuadVAO();
     void CopyDepthBuffer(OpenGLFrameBuffer* srcFrameBuffer, OpenGLFrameBuffer* dstFrameBuffer);
     void GaussianBlur(OpenGLFrameBuffer* srcFrameBuffer, OpenGLFrameBuffer* dstFrameBuffer, const std::string& srcAttachmentName, const std::string& dstAttachmentName, BlitRect srcRect, BlitRect dstRect, int blurRadius, int passCount);
-
-
     int GetFftDisplayMode();
+
+    // TIDY ME
+    inline bool g_flipNormalMapY = false;
+    inline void FlipNormalMapY() {
+        g_flipNormalMapY = !g_flipNormalMapY;
+    }
+    inline bool ShouldFlipNormalMapY() {
+        return g_flipNormalMapY;
+    }
+    // TIDY ME
 }

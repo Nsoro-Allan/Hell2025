@@ -7,7 +7,7 @@
 void PowerPoleSet::Init() {
     std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
 
-    m_meshNodes.InitFromModel(NO_ID, "PowerPole", emptyMeshNodeCreateInfoSet);
+    m_meshNodes.Init(NO_ID, "PowerPole", emptyMeshNodeCreateInfoSet);
     m_meshNodes.SetMeshMaterials("PowerPole");
     m_meshNodes.UpdateHierarchy();
     m_meshNodes.UpdateRenderItems(glm::mat4(1.0f));

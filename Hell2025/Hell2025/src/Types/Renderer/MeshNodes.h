@@ -7,41 +7,63 @@
 
 #include "CreateInfo.h"
 
-struct MeshNodes {
-    std::vector<AABB> m_worldspaceAabbs;
-    std::vector<BlendingMode> m_blendingModes;
-    std::vector<int32_t> m_localParentIndices;
-    std::vector<uint32_t> m_globalMeshIndices;
-    std::vector<uint32_t> m_materialIndices;
-    std::vector<Transform> m_transforms;              // These are the transforms updated by an Openable
-    std::vector<Transform> m_transformsPreviousFrame; // These are the transforms updated by an Openable
+enum MeshNodeType {
+    DEFAULT,
+    OPENABLE,
+    RIGID_STATIC,
+    RIGID_DYNAMIC
+};
+
+struct MeshNode {
+    AABB worldspaceAabb;
+    BlendingMode blendingMode;
+    int32_t localParentIndex;
+    uint32_t globalMeshIndex;
+    uint32_t materialIndex;
+    Transform transform;              // These are the transforms updated by an Openable // rename to offsetTransform
+    Transform transformPreviousFrame; // These are the transforms updated by an Openable // rename to offsetTransform
     //std::vector<ObjectType> m_objectTypes;
-    std::vector<uint64_t> m_objectIds;                // Written to renderItem.objectId
-    //std::vector<uint64_t> m_openableIds;              // Maps node to an Openable
-    //std::vector<uint64_t> m_rigidDynamictIds;         // Maps node to a RigidDynamic
-    //std::vector<uint64_t> m_rigidStaticIds;           // Maps node to a RigidStatic
-    std::vector<glm::mat4> m_modelMatrices;
-    std::vector<glm::mat4> m_localTransforms;
-    std::vector<glm::mat4> m_inverseBindTransforms;
+    uint64_t objectId;                // Written to renderItem.objectId  - rename to renderItemObjectId or something that implies its written to the render item id
+    //std::vector<uint64_t> m_openableIds;              // Maps node to an Openable     - do not use me. think of a better way.
+    //std::vector<uint64_t> m_rigidDynamictIds;         // Maps node to a RigidDynamic  - do not use me. think of a better way.
+    //std::vector<uint64_t> m_rigidStaticIds;           // Maps node to a RigidStatic   - do not use me. think of a better way.
+    glm::mat4 modelMatrix;   // world or local? find out and name accordingly
+    glm::mat4 localTransform; // think of better namw
+    glm::mat4 inverseBindTransform; // think of better name
+    MeshNodeType type = MeshNodeType::DEFAULT;
+    bool isGold = false;
+
+    // probably store parentId, but also somehow openableId if type is openable
+};
+
+struct MeshNodes {
+    std::vector<MeshNode> m_meshNodes;
+    //std::vector<AABB> m_worldspaceAabbs;
+    //std::vector<BlendingMode> m_blendingModes;
+    //std::vector<int32_t> m_localParentIndices;
+    //std::vector<uint32_t> m_globalMeshIndices;
+    //std::vector<uint32_t> m_materialIndices;
+    //std::vector<Transform> m_transforms;              // These are the transforms updated by an Openable
+    //std::vector<Transform> m_transformsPreviousFrame; // These are the transforms updated by an Openable
+    ////std::vector<ObjectType> m_objectTypes;
+    //std::vector<uint64_t> m_objectIds;                // Written to renderItem.objectId
+    //std::vector<glm::mat4> m_modelMatrices;
+    //std::vector<glm::mat4> m_localTransforms;
+    //std::vector<glm::mat4> m_inverseBindTransforms;
     std::unordered_map<std::string, uint32_t> m_localIndexMap; // maps mesh name to its local index
     AABB m_worldspaceAABB;
 
-    void InitFromModel(uint64_t parentId, const std::string& modelName, const std::vector<MeshNodeCreateInfo>& meshNodeCreateInfoSet);
-    //void InitFromModel(Model* model);
+    void Init(uint64_t parentId, const std::string& modelName, const std::vector<MeshNodeCreateInfo>& meshNodeCreateInfoSet);
     void CleanUp();
     void UpdateHierarchy();
     void UpdateRenderItems(const glm::mat4& worldMatrix);
     void SetBlendingModeByMeshName(const std::string& meshName, BlendingMode blendingMode);
-    //void SetObjectTypeByMeshName(const std::string& meshName, ObjectType objectType);
     void SetObjectIdByMeshName(const std::string& meshName, uint64_t id);
     void SetOpenableByMeshName(const std::string& meshName, uint64_t openableId, uint64_t parentObjectId);
     
-    //void SetOpenable(const std::string& meshName, OpenableCreateInfo& openableCreateInfo);
-
     void SetMeshMaterials(const std::string& materialName);
     void SetMaterialByMeshName(const std::string& meshName, const std::string& materialName);
     void SetTransformByMeshName(const std::string& meshName, Transform transform);
-    //void SetObjectTypes(ObjectType objectType);
     void PrintMeshNames();
     void SetGoldFlag(bool flag);
     void DrawWorldspaceAABB(glm::vec4 color);
@@ -52,12 +74,18 @@ struct MeshNodes {
     bool HasNodeWithObjectId(uint64_t objectId) const;
 
     int32_t GetGlobalMeshIndex(int nodeIndex);
+    uint64_t GetObjectIdOfFirstOpenableParentNode(int nodeIndex);
     Material* GetMaterial(int nodeIndex);
     const AABB* GetWorldSpaceAabbByMeshName(const std::string& meshName);
     const glm::mat4& GetLocalTransform(int nodeIndex) const;
     const glm::mat4& GetInverseBindTransform(int nodeIndex) const;
     const glm::mat4& GetMeshModelMatrix(int nodeIndex) const;
     const glm::mat4& GetBoneLocalMatrix(const std::string& boneName) const;
+    const std::string& GetMeshNameByNodeIndex(int nodeIndex) const;
+
+    MeshNode* GetMeshNodeByLocalIndex(int32_t index) ;
+    MeshNode* GetMeshNodeByMeshName(const std::string& meshName);
+    int32_t GetMeshNodeIndexByMeshName(const std::string& meshName);
 
     size_t GetNodeCount() const                                             { return m_nodeCount; }
     bool IsDirty() const                                                    { return m_isDirty; }
