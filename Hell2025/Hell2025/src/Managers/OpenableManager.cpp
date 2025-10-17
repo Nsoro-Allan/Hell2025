@@ -23,10 +23,6 @@ namespace OpenableManager {
         for (auto& pair : g_openables) {
             Openable& openable = pair.second;
             openable.Update(deltaTime);
-
-            // if (openable.IsDirty()) {
-            //     std::cout << pair.first << ": " << openable.m_currentOpenValue << " " << openable.m_transform.position << " " << openable.m_transform.rotation << "\n";
-            // }
         }
     }
 

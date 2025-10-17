@@ -14,7 +14,6 @@ struct OpenableCreateInfo {
     std::string openedAudio = UNDEFINED_STRING;
     std::string closedAudio = UNDEFINED_STRING;
     std::vector<std::string> additionalTriggerMeshNames;
-    float initialOpenValue = 1.0f;
     float minOpenValue = 0.0f;
     float maxOpenValue = HELL_PI * 0.5f;
     float openSpeed = 1.0f;

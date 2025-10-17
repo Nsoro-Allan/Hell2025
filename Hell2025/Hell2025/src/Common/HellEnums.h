@@ -43,7 +43,8 @@ enum class BlendingMode {
     ALPHA_DISCARDED,
     HAIR_UNDER_LAYER,
     HAIR_TOP_LAYER,
-    DO_NOT_RENDER 
+    TOILET_WATER,
+    DO_NOT_RENDER
 };
 
 enum class ImageDataType {
@@ -447,7 +448,13 @@ enum struct HouseType {
 };
 
 enum struct GenericObjectType {
+    DRAWERS_SMALL,
     DRAWERS_LARGE,
+    TOILET,
+    COUCH,
+    BATHROOM_CUPBOARD,
+    BATHROOM_BASIN,
+    BATHROOM_TOWEL_RACK,    
     UNDEFINED
 };
 

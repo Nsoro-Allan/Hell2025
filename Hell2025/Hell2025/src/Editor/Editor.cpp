@@ -30,7 +30,9 @@ namespace Editor {
 
     ObjectType g_hoveredObjectType = ObjectType::NO_TYPE;
     ObjectType g_selectedObjectType = ObjectType::NO_TYPE;
-    ObjectType g_placementObjectType = ObjectType::NO_TYPE;
+    ObjectType g_placementObjectType = ObjectType::NO_TYPE;    
+    GenericObjectType g_placementGenericObjectType = GenericObjectType::UNDEFINED;
+
     uint64_t g_hoveredObjectId = 0;
     uint64_t g_selectedObjectId = 0;
 
@@ -296,8 +298,18 @@ namespace Editor {
         g_placementObjectType = objectType;
     }
 
+    void PlaceGenericObject(GenericObjectType genericObjectType) {
+        SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectType = ObjectType::GENERIC_OBJECT;
+        g_placementGenericObjectType = genericObjectType;
+    }
+
     ObjectType GetPlacementObjectType() {
         return g_placementObjectType;
+    }
+
+    GenericObjectType GetGenericPlacementObjectType() {
+        return g_placementGenericObjectType;
     }
 
     void SetEditorMode(EditorMode editorMode) {

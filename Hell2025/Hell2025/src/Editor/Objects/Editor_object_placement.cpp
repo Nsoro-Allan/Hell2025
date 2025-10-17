@@ -1,6 +1,7 @@
 
 #include "Audio/Audio.h"
 #include "Editor/Editor.h"
+#include "HellLogging.h"
 #include "Input/Input.h"
 #include "World/World.h"
 #include "Viewport/ViewportManager.h"
@@ -10,6 +11,7 @@ namespace Editor {
     EditorState g_lastPlacementState = EditorState::IDLE;
 
     void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
+    void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
 
     void UpdateObjectPlacement() {
         if (GetEditorState() == EditorState::PLACE_OBJECT) {
@@ -24,8 +26,12 @@ namespace Editor {
                 glm::vec3 rayDir = GetMouseRayDirectionByViewportIndex(GetHoveredViewportIndex());
                 PhysXRayResult rayResult = Physics::CastPhysXRay(rayOrigin, rayDir, maxRayDistance, true);
 
+                // u gotta fix this later, its a mess
                 if (rayResult.hitFound) {
-                    PlaceObject(GetPlacementObjectType(), rayResult.hitPosition, rayResult.hitNormal);
+
+                    if (GetPlacementObjectType() == ObjectType::GENERIC_OBJECT) {
+                        PlaceGenericObject(GetGenericPlacementObjectType(), rayResult.hitPosition, rayResult.hitNormal);
+                    }
                 }
             }
         }
@@ -77,15 +83,26 @@ namespace Editor {
     }
 
     void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+        Logging::ToDo() << "You called Editor::PlaceObject(...) but its old and broken probably, like only makes DRAWERS LARGE";
         if (objectType == ObjectType::GENERIC_OBJECT) {
             GenericObjectCreateInfo createInfo;
             createInfo.position = hitPosition;
             createInfo.rotation.y = 0.0f;
             createInfo.type = GenericObjectType::DRAWERS_LARGE;
-            World::AddDrawers(createInfo, SpawnOffset());
+            World::AddGenericObject(createInfo, SpawnOffset());
             ExitObjectPlacement();
             return;
         }
+    }
+
+    void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+        GenericObjectCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        createInfo.rotation.y = 0.0f;
+        createInfo.type = genericObjectType;
+        World::AddGenericObject(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+        return;
     }
 
     void ExitObjectPlacement() {

@@ -3,6 +3,10 @@
 #include "CreateInfo.h"
 #include "HellDefines.h"
 #include "HellEnums.h"
+#include "Util.h"
+#include "UniqueID.h"
+
+#include "Input/Input.h"
 
 struct Openable {
     OpenState m_currentOpenState = OpenState::CLOSED;
@@ -15,6 +19,7 @@ struct Openable {
     std::string m_closedAudio = UNDEFINED_STRING;
     std::string m_lockedAudio = UNDEFINED_STRING;
     bool m_dirty = true;
+    bool m_firstFrame = true;
     bool m_locked = false;
     float m_currentOpenValue = 1;
     float m_minOpenValue = 0;
@@ -28,7 +33,6 @@ struct Openable {
         m_openAxis = createInfo.openAxis;
         m_minOpenValue = createInfo.minOpenValue;
         m_maxOpenValue = createInfo.maxOpenValue;
-        m_currentOpenValue = glm::clamp(createInfo.initialOpenValue, m_minOpenValue, m_maxOpenValue);
         m_openSpeed = createInfo.openSpeed;
         m_closeSpeed = createInfo.closeSpeed;
         m_openingAudio = createInfo.openingAudio;
@@ -38,6 +42,31 @@ struct Openable {
         m_lockedAudio = createInfo.lockedAudio;
         m_audioVolume = createInfo.audioVolume;
         m_parentObjectId = parentObjectId;
+
+        if (m_currentOpenState == OpenState::OPEN ||
+            m_currentOpenState == OpenState::OPENING) {
+            m_currentOpenValue = m_maxOpenValue;
+
+            switch (m_openAxis) {
+                case OpenAxis::TRANSLATE_X:     m_transform.position.x = m_currentOpenValue;  break;
+                case OpenAxis::TRANSLATE_Y:     m_transform.position.y = m_currentOpenValue;  break;
+                case OpenAxis::TRANSLATE_Z:     m_transform.position.z = m_currentOpenValue;  break;
+                case OpenAxis::TRANSLATE_Y_NEG: m_transform.position.y = -m_currentOpenValue; break;
+                case OpenAxis::TRANSLATE_X_NEG: m_transform.position.x = -m_currentOpenValue; break;
+                case OpenAxis::TRANSLATE_Z_NEG: m_transform.position.z = -m_currentOpenValue; break;
+                case OpenAxis::ROTATE_X:        m_transform.rotation.x = m_currentOpenValue;  break;
+                case OpenAxis::ROTATE_Y:        m_transform.rotation.y = m_currentOpenValue;  break;
+                case OpenAxis::ROTATE_Z:        m_transform.rotation.z = m_currentOpenValue;  break;
+                case OpenAxis::ROTATE_X_NEG:    m_transform.rotation.x = -m_currentOpenValue; break;
+                case OpenAxis::ROTATE_Y_NEG:    m_transform.rotation.y = -m_currentOpenValue; break;
+                case OpenAxis::ROTATE_Z_NEG:    m_transform.rotation.z = -m_currentOpenValue; break;
+                default: break;
+            }
+        }
+        else if (m_currentOpenState == OpenState::CLOSED ||
+                 m_currentOpenState == OpenState::CLOSING) {
+            m_currentOpenValue = m_minOpenValue;
+        }
     }
 
     void SetParentObjectId(uint64_t parentObjectId) {
@@ -108,7 +137,6 @@ struct Openable {
         m_transform.rotation.y = 0.0f;
         m_transform.rotation.z = 0.0f;
 
-        // TODO: Add rotate
         switch (m_openAxis) {
             case OpenAxis::TRANSLATE_X:     m_transform.position.x = m_currentOpenValue;  break;
             case OpenAxis::TRANSLATE_Y:     m_transform.position.y = m_currentOpenValue;  break;
@@ -123,6 +151,15 @@ struct Openable {
             case OpenAxis::ROTATE_Y_NEG:    m_transform.rotation.y = -m_currentOpenValue; break;
             case OpenAxis::ROTATE_Z_NEG:    m_transform.rotation.z = -m_currentOpenValue; break;
             default: break;
+        }
+
+        if (Input::KeyPressed(HELL_KEY_J)) {
+            m_dirty = true;
+        }
+
+        if (m_firstFrame) {
+            m_dirty = true;
+            m_firstFrame = false;
         }
     }
 

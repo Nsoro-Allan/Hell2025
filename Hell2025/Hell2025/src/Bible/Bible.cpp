@@ -172,9 +172,15 @@ mystery.)";
 
     void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes) {
         switch (type) {
+            case GenericObjectType::DRAWERS_SMALL: return ConfigureMeshNodesDrawersSmall(id, meshNodes);
             case GenericObjectType::DRAWERS_LARGE: return ConfigureMeshNodesDrawersLarge(id, meshNodes);
+            case GenericObjectType::TOILET: return ConfigureMeshNodesToilet(id, meshNodes);
 
             default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed from non-implemented GenericObjectType"; return;
+
+                // write an error message for when you fail to init the meshnodes, that will hapnen a lot when you are rapidly implementing shit
+                // so you need a warning!
+
         }
     }
 }

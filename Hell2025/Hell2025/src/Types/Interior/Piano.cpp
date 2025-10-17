@@ -28,7 +28,6 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     topCover.meshName = "Yamaha_Case.Top.Cover";
     topCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
     topCover.openable.initialOpenState = OpenState::CLOSED;
-    topCover.openable.initialOpenValue = 0.0f;
     topCover.openable.minOpenValue = 0.0f;
     topCover.openable.maxOpenValue = HELL_PI;
     topCover.openable.openSpeed = 8.5f;
@@ -41,7 +40,6 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     keyboardCover.openable.additionalTriggerMeshNames = { "Yamaha_Keyboard.Cover.Lock" };
     keyboardCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
     keyboardCover.openable.initialOpenState = OpenState::OPEN;
-    keyboardCover.openable.initialOpenValue = 2.1f;
     keyboardCover.openable.minOpenValue = 0.0f;
     keyboardCover.openable.maxOpenValue = 2.1f;
     keyboardCover.openable.openSpeed = 8.5f;
@@ -54,7 +52,6 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     sheetMusicRest.openable.additionalTriggerMeshNames = { "Yamaha_Lyrics.Hinges.Plate.A",  "Yamaha_Lyrics.Hinges.Plate.B" };
     sheetMusicRest.openable.openAxis = OpenAxis::ROTATE_X_NEG;
     sheetMusicRest.openable.initialOpenState = OpenState::CLOSED;
-    sheetMusicRest.openable.initialOpenValue = 0.0f;
     sheetMusicRest.openable.minOpenValue = 0.0f;
     sheetMusicRest.openable.maxOpenValue = HELL_PI * 0.7f;
     sheetMusicRest.openable.openSpeed = 8.5f;

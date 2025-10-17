@@ -372,13 +372,13 @@ namespace Editor {
 
         UpdateGizmoInteract();
 
-        if (Input::KeyPressed(HELL_KEY_SPACE)) {
-            int wallCount = World::GetWalls().size() - 1;
-            Wall& wall = World::GetWalls()[wallCount];
-            wall.SetMaterial("BathroomWall");
-            wall.SetFloorTrimType(TrimType::NONE);
-            World::UpdateHouseMeshBuffer();
-        }
+        // if (Input::KeyPressed(HELL_KEY_SPACE)) {
+        //     int wallCount = World::GetWalls().size() - 1;
+        //     Wall& wall = World::GetWalls()[wallCount];
+        //     wall.SetMaterial("BathroomWall");
+        //     wall.SetFloorTrimType(TrimType::NONE);
+        //     World::UpdateHouseMeshBuffer();
+        // }
 
         //if (Input::KeyPressed(HELL_KEY_SPACE)) {
         //    //DoorCreateInfo createInfo;

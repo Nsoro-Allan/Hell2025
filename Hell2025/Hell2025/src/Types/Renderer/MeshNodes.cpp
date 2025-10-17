@@ -255,21 +255,20 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
     // Check if the world matrix changed this frame
     const bool worldMatrixDirty = (!Util::Mat4NearlyEqual(worldMatrix, m_worldMatrixPreviousFrame));
 
-    // Is the hierachy dirty?
+    // Is the hierarchy dirty?
     bool hierarchyDirty = false;
 
     if (m_forceDirty) {
         hierarchyDirty = true;
     }
-    else {
-        // Openables
-        for (MeshNode& meshNode : m_meshNodes) {
-            if (meshNode.type == MeshNodeType::OPENABLE) {
-                if (Openable* openable = OpenableManager::GetOpenableByOpenableId(meshNode.openableId)) {
-                    if (openable->IsDirty()) {
-                        meshNode.transform = openable->m_transform;
-                        hierarchyDirty = true;
-                    }
+
+    // Openables
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.type == MeshNodeType::OPENABLE) {
+            if (Openable* openable = OpenableManager::GetOpenableByOpenableId(meshNode.openableId)) {
+                if (openable->IsDirty()) {
+                    meshNode.transform = openable->m_transform;
+                    hierarchyDirty = true;   
                 }
             }
         }
@@ -327,6 +326,7 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
             case BlendingMode::ALPHA_DISCARDED:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
             case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(meshNode.renderItem);     break;
             case BlendingMode::HAIR_UNDER_LAYER:  m_renderItemsHairBottomLayer.push_back(meshNode.renderItem);  break;
+            case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);  break;
             default: break;
         }
     }

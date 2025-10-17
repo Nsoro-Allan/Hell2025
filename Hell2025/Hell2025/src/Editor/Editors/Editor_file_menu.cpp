@@ -24,11 +24,19 @@ namespace Editor {
             EditorUI::FileMenuNode& insert = g_fileMenu.AddMenuNode("Insert", Shortcut::NONE);
             insert.AddChild("Reinsert last",   Shortcut::CTRL_T,   nullptr);
 
+            EditorUI::FileMenuNode& bathroom = insert.AddChild("Bathroom", Shortcut::NONE);
+            bathroom.AddChild("Basin", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_BASIN);
+            bathroom.AddChild("Cupboard", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CUPBOARD);
+            bathroom.AddChild("Toilet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
+            bathroom.AddChild("Towel", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
+
             EditorUI::FileMenuNode& interior = insert.AddChild("Interior", Shortcut::NONE);
-            interior.AddChild("Door",       Shortcut::NONE,     Callbacks::BeginAddingDoor);
-            interior.AddChild("Drawers",    Shortcut::NONE,     Editor::PlaceObject, ObjectType::GENERIC_OBJECT);
-            interior.AddChild("Window",     Shortcut::NONE,     Callbacks::BeginAddingWindow);
-            
+            interior.AddChild("Door",          Shortcut::NONE, Callbacks::BeginAddingDoor);
+            interior.AddChild("Couch",         Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::COUCH);
+            interior.AddChild("Drawers Small", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_SMALL);
+            interior.AddChild("Drawers Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
+            interior.AddChild("Window", Shortcut::NONE, Callbacks::BeginAddingWindow);
+
             EditorUI::FileMenuNode& nature = insert.AddChild("Nature", Shortcut::NONE);
             nature.AddChild("BlackBerries", Shortcut::NONE,     Callbacks::BeginAddingBlackBerries);
             nature.AddChild("Tree",         Shortcut::NONE,     Callbacks::BeginAddingTree);

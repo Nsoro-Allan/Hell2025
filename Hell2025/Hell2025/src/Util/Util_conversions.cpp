@@ -116,16 +116,6 @@ namespace Util {
         }
     }
 
-    std::string OpenStateToString(OpenState mode) {
-        switch (mode) {
-            case OpenState::OPEN:               return "OPEN";
-            case OpenState::OPENING:            return "OPENING";
-            case OpenState::CLOSED:             return "CLOSED";
-            case OpenState::CLOSING:            return "CLOSING";
-            default: return "UNKNOWN";
-        }
-    }
-
     std::string PictureFrameTypeToString(PictureFrameType type) {
         switch (type) {
             case PictureFrameType::BIG_LANDSCAPE:       return "BIG_LANDSCAPE";
@@ -174,6 +164,7 @@ namespace Util {
     std::string EditorSelectionModeToString(const EditorSelectionMode& mode)    { return std::string(magic_enum::enum_name(mode)); }
     std::string GenericObjectTypeToString(GenericObjectType type)               { return std::string(magic_enum::enum_name(type)); }
     std::string ObjectTypeToString(ObjectType type)                             { return std::string(magic_enum::enum_name(type)); }
+    std::string OpenStateToString(OpenState type)                               { return std::string(magic_enum::enum_name(type)); }
   
     BlendingMode StringToBlendingMode(const std::string& str) {
         if (str == "BLENDED") return BlendingMode::BLENDED;

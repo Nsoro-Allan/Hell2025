@@ -11,5 +11,7 @@ namespace Bible {
     int GetInventoryItemSizeByName(const std::string& name);
     InventoryItemInfo* GetInventoryItemInfoByName(const std::string& name);
 
+    void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes);
     void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes);
 }

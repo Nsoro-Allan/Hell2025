@@ -323,7 +323,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
-        for (GenericObjectCreateInfo& createInfo : createInfoCollection.drawers)              AddDrawers(createInfo, spawnOffset);
+        for (GenericObjectCreateInfo& createInfo : createInfoCollection.drawers)              AddGenericObject(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
@@ -897,13 +897,10 @@ namespace World {
         g_doors.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
-    void AddDrawers(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
+    void AddGenericObject(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::GENERIC_OBJECT);
         g_genericObjects.emplace_with_id(id, id, createInfo, spawnOffset);
     }
-
-
-
 
     void AddBullet(BulletCreateInfo createInfo) {
         g_bullets.push_back(Bullet(createInfo));
@@ -1003,11 +1000,12 @@ namespace World {
     }
 
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset) {
-        createInfo.position += spawnOffset.translation;
-        if (createInfo.editorName == UNDEFINED_STRING) {
-            createInfo.editorName = Editor::GetNextAvailableTreeName(createInfo.type);
-        }
-        g_trees.push_back(Tree(createInfo));
+        Logging::Warning() << "World::AddTree(...) failed cause you removed the that did it, to stop some whack crash";
+        //createInfo.position += spawnOffset.translation;
+        //if (createInfo.editorName == UNDEFINED_STRING) {
+        //    createInfo.editorName = Editor::GetNextAvailableTreeName(createInfo.type);
+        //}
+        //g_trees.push_back(Tree(createInfo));
     }
 
     void AddVATBlood(glm::vec3 position, glm::vec3 front) {

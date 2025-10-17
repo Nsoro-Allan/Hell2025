@@ -27,12 +27,10 @@ struct GenericObject {
     const glm::vec3& GetRotation() const                    { return m_transform.rotation; }
     const GenericObjectCreateInfo& GetCreateInfo() const    { return m_createInfo; }
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
-    const std::vector<uint64_t>& GetOpenableIds() const     { return m_openableIds; }
 
 private:
     GenericObjectCreateInfo m_createInfo;
     Transform m_transform;
     MeshNodes m_meshNodes;
     uint64_t m_objectId;
-    std::vector<uint64_t> m_openableIds;
 };

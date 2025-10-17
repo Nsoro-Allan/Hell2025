@@ -228,6 +228,18 @@ void Player::UpdateUI() {
                     text += "- Parent Id: " + std::to_string(UniqueID::GetLocal(m_bvhRayResult.objectId)) + "\n";
                     text += "- Openable Id: " + std::to_string(m_bvhRayResult.openableId) + "\n";
                     text += "- Custom Id: " + std::to_string(m_bvhRayResult.customId) + "\n";
+
+                    if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.openableId)) {
+                        text += "\n";
+                        text += "Open state: " + Util::OpenStateToString(openable->m_currentOpenState) + "\n";
+                        text += "Value: " + std::to_string(openable->m_currentOpenValue) + "\n";
+                        text += "Min: " + std::to_string(openable->m_minOpenValue) + "\n";
+                        text += "Max: " + std::to_string(openable->m_maxOpenValue) + "\n";
+                        text += "Dirty: " + Util::BoolToString(openable->m_dirty) + "\n";
+                        text += "Transform pos: " + Util::Vec3ToString(openable->m_transform.position) + "\n";
+                        text += "Transform rot: " + Util::Vec3ToString(openable->m_transform.rotation) + "\n";
+
+                    }
                 }
             }
 

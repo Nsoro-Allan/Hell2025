@@ -30,18 +30,6 @@ struct MeshNode {
 
 struct MeshNodes {
     std::vector<MeshNode> m_meshNodes;
-    //std::vector<AABB> m_worldspaceAabbs;
-    //std::vector<BlendingMode> m_blendingModes;
-    //std::vector<int32_t> m_localParentIndices;
-    //std::vector<uint32_t> m_globalMeshIndices;
-    //std::vector<uint32_t> m_materialIndices;
-    //std::vector<Transform> m_transforms;              // These are the transforms updated by an Openable
-    //std::vector<Transform> m_transformsPreviousFrame; // These are the transforms updated by an Openable
-    ////std::vector<ObjectType> m_objectTypes;
-    //std::vector<uint64_t> m_objectIds;                // Written to renderItem.objectId
-    //std::vector<glm::mat4> m_modelMatrices;
-    //std::vector<glm::mat4> m_localTransforms;
-    //std::vector<glm::mat4> m_inverseBindTransforms;
     std::unordered_map<std::string, uint32_t> m_localIndexMap; // maps mesh name to its local index
     AABB m_worldspaceAABB;
 
@@ -89,6 +77,7 @@ struct MeshNodes {
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_renderItemsAlphaDiscarded; }
     const std::vector<RenderItem>& GetRenderItemsHairTopLayer() const       { return m_renderItemsHairTopLayer; }
     const std::vector<RenderItem>& GetRenderItemsHairBottomLayer() const    { return m_renderItemsHairBottomLayer; }
+    const std::vector<RenderItem>& GetRenderItemsToiletWater() const        { return m_renderItemsHairBottomLayer; }
 
 private:
     void UpdateAABBs(const glm::mat4& worldMatrix);
@@ -102,6 +91,7 @@ private:
     std::vector<RenderItem> m_renderItemsAlphaDiscarded;
     std::vector<RenderItem> m_renderItemsHairTopLayer;
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
+    std::vector<RenderItem> m_renderItemsToiletWater;
     bool m_isGold = false;
     bool m_isDirty = true;
     bool m_forceDirty = true;

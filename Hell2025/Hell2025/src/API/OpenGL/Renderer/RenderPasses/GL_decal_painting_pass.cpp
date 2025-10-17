@@ -90,7 +90,7 @@ namespace OpenGLRenderer {
                     uvShader->SetMat4("u_model", modelMatrix);
                     glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, renderItem.baseSkinnedVertex);
 
-                    std::cout << "Decal Texture Painting into index " << renderItem.woundMaskTexutreIndex << " and the mesh name is " << mesh->name << "\n";
+                    //std::cout << "Decal Texture Painting into index " << renderItem.woundMaskTexutreIndex << " and the mesh name is " << mesh->name << "\n";
 
                     // Compute pass to paint the actual decal into the appropriate wound mask texture array index
                     maskShader->Bind();

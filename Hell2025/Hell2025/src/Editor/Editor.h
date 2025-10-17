@@ -121,8 +121,10 @@ namespace Editor {
     void Save();
 
     // Object placement
-    void PlaceObject(ObjectType objectType);
+    void PlaceObject(ObjectType objectType); // suss!!!!!!!!!!!
+    void PlaceGenericObject(GenericObjectType objectType);
     ObjectType GetPlacementObjectType();
+    GenericObjectType GetGenericPlacementObjectType();
 
     void UpdateDoorPlacement();
     void UpdatePictureFramePlacement();
