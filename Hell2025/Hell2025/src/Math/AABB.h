@@ -11,6 +11,7 @@ struct AABB {
     bool IntersectsAABB(const AABB& other) const;
     bool IntersectsAABB(const AABB& other, float threshold) const;
     bool ContainsPoint(const glm::vec3& point) const;
+    glm::vec3 NearestPointTo(const glm::vec3& worldPosition) const;
 
     const glm::vec3& GetCenter()         const { return center; }
     const glm::vec3& GetBoundsMin()      const { return boundsMin; }

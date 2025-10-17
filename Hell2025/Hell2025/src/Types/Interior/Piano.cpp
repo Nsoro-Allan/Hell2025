@@ -40,8 +40,8 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     keyboardCover.meshName = "Yamaha_Keyboard.Cover";
     keyboardCover.openable.additionalTriggerMeshNames = { "Yamaha_Keyboard.Cover.Lock" };
     keyboardCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
-    keyboardCover.openable.initialOpenState = OpenState::CLOSED;
-    keyboardCover.openable.initialOpenValue = 0.0f;
+    keyboardCover.openable.initialOpenState = OpenState::OPEN;
+    keyboardCover.openable.initialOpenValue = 2.1f;
     keyboardCover.openable.minOpenValue = 0.0f;
     keyboardCover.openable.maxOpenValue = 2.1f;
     keyboardCover.openable.openSpeed = 8.5f;

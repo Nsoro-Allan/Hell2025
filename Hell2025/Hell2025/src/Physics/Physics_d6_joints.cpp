@@ -30,7 +30,7 @@ namespace Physics {
         pxD6joint->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, false);
 
         // Create D6Joint
-        uint64_t physicsID = UniqueID::GetNextObjectId(ObjectType::PHYSICS_D6JOINT);
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
         D6Joint& d6Joint = g_d6Joints[physicsID];
 
         // Update its pointers

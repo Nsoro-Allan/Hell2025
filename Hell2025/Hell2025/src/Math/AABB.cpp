@@ -56,3 +56,7 @@ bool AABB::IntersectsAABB(const AABB& other, float threshold) const {
         (inflatedMinA.y <= inflatedMaxB.y && inflatedMaxA.y >= inflatedMinB.y) &&
         (inflatedMinA.z <= inflatedMaxB.z && inflatedMaxA.z >= inflatedMinB.z);
 }
+
+glm::vec3 AABB::NearestPointTo(const glm::vec3& worldPosition) const {
+    return glm::clamp(worldPosition, boundsMin, boundsMax);
+}

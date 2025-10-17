@@ -38,7 +38,7 @@ namespace Bvh::Gpu {
     MadmannVec3 GlmVec3ToBvhVec3(glm::vec3 vec);
 
     uint64_t CreateMeshBvhFromMeshBvh(MeshBvh& sourceMeshBvh) {
-        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::UNDEFINED); // make me use another ID system !!!
 
         MeshBvh& targetMeshBvh = g_meshBvhs[uniqueId];
         targetMeshBvh.m_nodes.swap(sourceMeshBvh.m_nodes);
@@ -49,7 +49,7 @@ namespace Bvh::Gpu {
     uint64_t CreateMeshBvhFromVertexData(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices) {
         //Timer timer("CreateBvhFromVertices() " + std::to_string(indices.size()) + " indices");
 
-        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::UNDEFINED); // make me use another ID system !!!
         MeshBvh& meshBvh = g_meshBvhs[uniqueId];
 
         // Validate index count
@@ -224,7 +224,7 @@ namespace Bvh::Gpu {
     }
 
     uint64_t CreateNewSceneBvh() {
-        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::BVH);
+        uint64_t uniqueId = UniqueID::GetNextObjectId(ObjectType::UNDEFINED); // make me use another ID system !!!
         SceneBvh& sceneBvh = g_sceneBvhs[uniqueId];
         return uniqueId;
     }

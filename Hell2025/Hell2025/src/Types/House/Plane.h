@@ -19,7 +19,7 @@ struct Plane {
     Material* GetMaterial()                         { return m_material; };
     std::vector<Vertex>& GetVertices()              { return m_vertices; }
     std::vector<uint32_t>& GetIndices()             { return m_indices; }
-    const PlaneCreateInfo& GetCreateInfo() const    { return m_createInfo; }
+    PlaneCreateInfo& GetCreateInfo()     { return m_createInfo; }
 
 private:
     uint64_t m_objectId = 0;

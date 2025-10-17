@@ -32,7 +32,8 @@ namespace Editor {
                  GetEditorState() == EditorState::PLACE_WALL ||
                  GetEditorState() == EditorState::PLACE_WINDOW ||
                  GetEditorState() == EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN ||
-                 GetEditorState() == EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN) {
+                 GetEditorState() == EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN ||
+                 GetEditorState() == EditorState::PLACE_OBJECT) {
             BackEnd::SetCursor(HELL_CURSOR_CROSSHAIR);
         }
         // Nothing? Then the arrow

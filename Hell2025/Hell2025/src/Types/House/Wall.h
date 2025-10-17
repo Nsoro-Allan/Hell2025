@@ -24,6 +24,9 @@ struct Wall {
     void FlipFaces();
     bool AddPointToEnd(glm::vec3 point, bool supressWarning = true);
     bool UpdatePointPosition(int pointIndex, glm::vec3 position, bool supressWarning = true);
+    void SetMaterial(const std::string& materialName);
+    void SetFloorTrimType(TrimType trimType);
+    void SetCeilingTrimType(TrimType trimType);
 
     glm::vec3 GetPointByIndex(int pointIndex); 
 

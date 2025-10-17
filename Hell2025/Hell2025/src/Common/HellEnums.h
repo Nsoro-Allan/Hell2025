@@ -75,7 +75,6 @@ enum class ObjectType : uint16_t {
     DOOR,
     DOOR_FRAME,
     DRAWER,
-    DRAWERS_FRAME,
     GAME_OBJECT,
     GENERIC_BOUNCABLE,
     GENERIC_STATIC,
@@ -85,7 +84,6 @@ enum class ObjectType : uint16_t {
     PICK_UP,
     TREE,
     PIANO,
-    PIANO_KEY,
     PICTURE_FRAME,
     RAGDOLL_ENEMY,
     RAGDOLL_V2,
@@ -108,11 +106,6 @@ enum class ObjectType : uint16_t {
     RAGDOLL_V1,
     TRIM,
 
-    BVH,
-    PHYSICS_D6JOINT,
-    PHYSICS_RIGID_CHARACTER_CONTROLLER,
-    PHYSICS_RIGID_DYNAMIC,
-    PHYSICS_RIGID_STATIC,
     UNDEFINED
 };
 
@@ -162,6 +155,11 @@ enum class CameraView {
     TOP,
     BOTTOM,
     UNDEFINED
+};
+
+enum struct EditorSelectionMode {
+    OBJECT,
+    VERTEX
 };
 
 enum struct EditorState {

@@ -102,6 +102,12 @@ namespace Editor {
 
     void UpdateCamera() {
 
+        //std::cout << "Cam pos:    " << g_orthographicCameras[0].m_positionCurrent << "\n";
+        //std::cout << "Cam target: " << g_orthographicCameras[0].m_positionCurrent << "\n";
+        //std::cout << "Ray origin: " << GetMouseRayOriginByViewportIndex(0) << "\n";
+        //std::cout << "Ray dir:    " << GetMouseRayDirectionByViewportIndex(0) << "\n\n";
+        
+
        //for (int i = 0; i < 4; i++) {
        //    Viewport* viewport = ViewportManager::GetViewportByIndex(i);
        //    glm::vec3 cameraPosition = g_orthographicCameras[3].m_positionCurrent;

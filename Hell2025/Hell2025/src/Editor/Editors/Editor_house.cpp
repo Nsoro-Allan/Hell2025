@@ -224,20 +224,20 @@ namespace Editor {
 
 
         // Render selected wall/plane lines and vertices
-        if (GetSelectedObjectType() == ObjectType::WALL) {
-            Wall* wall = World::GetWallByObjectId(GetSelectedObjectId());
-            if (wall) {
-                wall->DrawSegmentVertices(OUTLINE_COLOR);
-                wall->DrawSegmentLines(OUTLINE_COLOR);
-            }
-        }
-        if (GetSelectedObjectType() == ObjectType::PLANE) {
-            Plane* plane = World::GetPlaneByObjectId(GetSelectedObjectId());
-            if (plane) {
-                plane->DrawEdges(OUTLINE_COLOR);
-                plane->DrawVertices(OUTLINE_COLOR);
-            }
-        }
+       //if (GetSelectedObjectType() == ObjectType::WALL) {
+       //   // MOVED TO EDITOR_OBJECTS.cpp
+       //   // MOVED TO EDITOR_OBJECTS.cpp
+       //   // MOVED TO EDITOR_OBJECTS.cpp
+       //   // MOVED TO EDITOR_OBJECTS.cpp
+       //   // MOVED TO EDITOR_OBJECTS.cpp
+       //}
+       //if (GetSelectedObjectType() == ObjectType::PLANE) {
+       //    Plane* plane = World::GetPlaneByObjectId(GetSelectedObjectId());
+       //    if (plane) {
+       //        plane->DrawEdges(OUTLINE_COLOR);
+       //        plane->DrawVertices(OUTLINE_COLOR);
+       //    }
+       //}
     }
 
     void ShowNewHouseWindow() {

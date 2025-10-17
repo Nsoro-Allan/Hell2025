@@ -29,6 +29,7 @@ namespace Editor {
     void SetSplitX(float value);
     void SetSplitY(float value);
     void SetViewportView(uint32_t viewportIndex, glm::vec3 viewportOrigin, CameraView targetView);
+    void SetEditorSelectionMode(EditorSelectionMode editorSelectionMode);
     void SetEditorState(EditorState editorState);
     void SetViewportOrthographicState(uint32_t viewportIndex, bool state);
     void SetViewportOrthoSize(uint32_t viewportIndex, float size);
@@ -37,6 +38,8 @@ namespace Editor {
     void SetPlantType(TreeType treeType);
 
     void UpdateGizmoInteract();
+
+    float GetScalingFactor(int targetSizeInPixels);
 
     // Object hover
     void UpdateObjectHover();
@@ -158,6 +161,7 @@ namespace Editor {
     ShadingMode GetViewportModeByIndex(uint32_t index);
     CameraView GetCameraViewByIndex(uint32_t index);
     EditorState GetEditorState();
+    EditorSelectionMode GetEditorSelectionMode();
     EditorViewportSplitMode GetEditorViewportSplitMode();
     SelectionRectangleState& GetSelectionRectangleState();
     EditorMode& GetEditorMode();

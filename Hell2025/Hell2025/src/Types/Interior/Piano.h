@@ -1,7 +1,6 @@
 #pragma once
 #include "HellEnums.h"
 #include "HellTypes.h"
-#include "Handlers/Openable.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 #include <unordered_map>

@@ -1,6 +1,6 @@
 #pragma once
 #include "CreateInfo.h"
-#include "Handlers/Openable.h"
+#include "Types/Core/Openable.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 

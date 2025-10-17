@@ -43,6 +43,7 @@ namespace Editor {
 
     float g_orthoCameraDistances[4];
     EditorState g_editorState;
+    EditorSelectionMode g_editorSelectionMode = EditorSelectionMode::OBJECT;
     SelectionRectangleState g_viewportSelectionRectangleState;
 
     void Init() {
@@ -57,6 +58,7 @@ namespace Editor {
     void OpenEditor() {
         Audio::PlayAudio("UI_Select.wav", 1.0f);
         Editor::SetEditorState(EditorState::IDLE);
+        Editor::SetEditorSelectionMode(EditorSelectionMode::OBJECT);
         Editor::ResetAxisConstraint();
         Input::ShowCursor();
         Input::CenterMouseCursor();
@@ -457,6 +459,10 @@ namespace Editor {
         return g_editorState;
     }
 
+    EditorSelectionMode GetEditorSelectionMode() {
+        return g_editorSelectionMode;
+    }
+
     SelectionRectangleState& GetSelectionRectangleState() {
         return g_viewportSelectionRectangleState;
     }
@@ -479,6 +485,10 @@ namespace Editor {
 
     void SetEditorState(EditorState editorState) {
         g_editorState = editorState;
+    }
+    
+    void SetEditorSelectionMode(EditorSelectionMode editorSelectionMode) {
+        g_editorSelectionMode = editorSelectionMode;
     }
 
     void SetViewportOrthographicState(uint32_t index, bool state) {

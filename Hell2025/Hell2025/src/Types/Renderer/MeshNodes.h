@@ -83,6 +83,7 @@ struct MeshNodes {
     bool IsDirty() const                                                    { return m_isDirty; }
     const ArmatureData& GetArmature() const                                 { return m_armatureData; }
     const std::string& GetModelName() const                                 { return m_modelName; }
+    const std::vector<MeshNode>& GetNodes() const                       { return m_meshNodes; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_renderItems; }
     const std::vector<RenderItem>& GetRenderItemsBlended() const            { return m_renderItemsBlended; }
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_renderItemsAlphaDiscarded; }

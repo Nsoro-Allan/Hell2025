@@ -167,12 +167,14 @@ namespace Util {
         }
     }
 
-    //ObjectType StringToObjectType(const std::string& str)               { return magic_enum::enum_cast<ObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
-    GenericObjectType StringToGenericObjectType(const std::string& str) { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
-
-    std::string GenericObjectTypeToString(GenericObjectType objType)    { return std::string(magic_enum::enum_name(objType)); }
-    std::string ObjectTypeToString(ObjectType objType)                  { return std::string(magic_enum::enum_name(objType)); }
-
+    //ObjectType StringToObjectType(const std::string& str)                     { return magic_enum::enum_cast<ObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+    GenericObjectType StringToGenericObjectType(const std::string& str)         { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+    
+    std::string EditorStateToString(const EditorState& editorState)             { return std::string(magic_enum::enum_name(editorState)); }
+    std::string EditorSelectionModeToString(const EditorSelectionMode& mode)    { return std::string(magic_enum::enum_name(mode)); }
+    std::string GenericObjectTypeToString(GenericObjectType type)               { return std::string(magic_enum::enum_name(type)); }
+    std::string ObjectTypeToString(ObjectType type)                             { return std::string(magic_enum::enum_name(type)); }
+  
     BlendingMode StringToBlendingMode(const std::string& str) {
         if (str == "BLENDED") return BlendingMode::BLENDED;
         if (str == "ALPHA_DISCARDED") return BlendingMode::ALPHA_DISCARDED;
@@ -282,27 +284,6 @@ namespace Util {
             case CameraView::LEFT:          return "LEFT";
             case CameraView::RIGHT:         return "RIGHT";
             default:                        return "UNDEFINED";
-        }
-    }
-
-    std::string EditorStateToString(const EditorState& editorState) {
-        switch (editorState) {
-            case EditorState::IDLE:                             return "IDLE";
-            case EditorState::RESIZING_HORIZONTAL:              return "RESIZING_HORIZONTAL";
-            case EditorState::RESIZING_VERTICAL:                return "RESIZING_VERTICAL";
-            case EditorState::RESIZING_HORIZONTAL_VERTICAL:     return "RESIZING_HORIZONTAL_VERTICAL";
-            case EditorState::GIZMO_TRANSLATING:                return "GIZMO_TRANSLATING";
-            case EditorState::GIZMO_SCALING:                    return "GIZMO_SCALING";
-            case EditorState::GIZMO_ROTATING:                   return "GIZMO_ROTATING";
-            case EditorState::DRAGGING_SELECT_RECT:             return "DRAGGING_SELECT_RECT";
-            case EditorState::PLACE_DOOR:                       return "PLACE_DOOR";
-            case EditorState::PLACE_PICTURE_FRAME:              return "PLACE_PICTURE_FRAME";
-            case EditorState::PLACE_TREE:                       return "PLACE_TREE";
-            case EditorState::PLACE_WALL:                       return "PLACE_WALL";
-            case EditorState::PLACE_WINDOW:                     return "PLACE_WINDOW";
-            case EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN:      return "PLACE_PLAYER_CAMPAIGN_SPAWN";
-            case EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN:    return "PLACE_PLAYER_DEATHMATCH_SPAWN";
-            default:                                            return "UNDEFINED";
         }
     }
 

@@ -3,7 +3,7 @@
 #include "HellDefines.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
-#include "Handlers/Openable.h"
+#include "Types/Core/Openable.h"
 
 namespace OpenableManager {
     uint32_t CreateOpenable(const OpenableCreateInfo& createInfo, uint64_t parentObjectId);

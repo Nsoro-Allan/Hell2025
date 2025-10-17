@@ -8,6 +8,10 @@ void Player::UpdateViewWeapon(float deltaTime) {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     if (!viewWeapon) return;
 
+    if (Input::KeyPressed(HELL_KEY_SPACE)) {
+        viewWeapon->PrintNodeNames();
+    }
+
     SkinnedModel* model = viewWeapon->GetSkinnedModel();
 
     glm::mat4 dmMaster = glm::mat4(1);

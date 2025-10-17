@@ -97,7 +97,7 @@ namespace Physics {
         pxRigidDynamic->addTorque(torque);
 
         // Create RigidDynamic
-        uint64_t physicsID = UniqueID::GetNextObjectId(ObjectType::PHYSICS_RIGID_DYNAMIC);
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
         RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
 
         // Update its pointers
@@ -145,7 +145,7 @@ namespace Physics {
         pxRigidDynamic->addTorque(torque);
 
         // Create DynamicBox
-        uint64_t physicsID = UniqueID::GetNextObjectId(ObjectType::PHYSICS_RIGID_DYNAMIC);
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
         RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
 
         // Update its pointers
@@ -167,7 +167,7 @@ namespace Physics {
         pxScene->addActor(*pxRigidDynamic);
 
         // Create RigidDynamic
-        uint64_t physicsID = UniqueID::GetNextObjectId(ObjectType::PHYSICS_RIGID_DYNAMIC);
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
         RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
 
         PxMat44 localShapeMatrix = GlmMat4ToPxMat44(shapeOffsetMatrix);

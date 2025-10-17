@@ -74,4 +74,14 @@ namespace Util {
         ray_wor = normalize(ray_wor);
         return ray_wor;
     }
+
+    bool RayIntersectsSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& spherePosition, float sphereRadius) {
+        glm::dvec3 oc = glm::dvec3(rayOrigin) - glm::dvec3(spherePosition);
+        double b = glm::dot(oc, glm::dvec3(rayDir));
+        double c = glm::dot(oc, oc) - (double)sphereRadius * (double)sphereRadius;
+        double discriminant = b * b - c;
+
+        if (discriminant < 0.0) return false;
+        return (-b + glm::sqrt(discriminant)) >= 0.0;
+    }
 }

@@ -21,9 +21,8 @@ namespace World {
         return GetAnimatedGameObjectByObjectId(g_testAnimatedGameObject);
     }
     
-
-
     void Update(float deltaTime) {
+
 
         if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
 
@@ -36,6 +35,32 @@ namespace World {
         if (Input::KeyPressed(HELL_KEY_J)) {
             PrintObjectCounts();
         }
+
+        //glm::vec3 rayOrigin = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
+        //glm::vec3 rayDir = Game::GetLocalPlayerByIndex(0)->GetCameraForward();
+        //glm::vec3 position = glm::vec3(1.0f);
+        //float radius = 0.5f;
+        //
+        //bool rayHit = Util::RayIntersectsSphere(rayOrigin, rayDir, position, radius);
+        //glm::vec4 color = rayHit ? GREEN : YELLOW;
+        //Renderer::DrawSphere(position, radius, color);
+        //
+        //if (rayHit) {
+        //    std::cout << "ray origin:      " << rayOrigin << "\n";
+        //    std::cout << "ray dir:         " << rayDir << "\n";
+        //    std::cout << "sphere position: " << position << "\n";
+        //    std::cout << "sphere radius:   " << radius << "\n\n";
+        //}
+
+        // Display closest AABB to mesh nodes to player 0
+        //for (GenericObject& genericObject : GetGenericObjects()) {
+        //    for (const MeshNode& meshNode : genericObject.GetMeshNodes().GetNodes()) {
+        //        const AABB& aabb = meshNode.worldspaceAabb;
+        //        glm::vec3 closestPoint = aabb.NearestPointTo(Game::GetLocalPlayerByIndex(0)->GetCameraPosition());
+        //        Renderer::DrawAABB(aabb, PINK);
+        //        Renderer::DrawPoint(closestPoint, YELLOW);
+        //    }
+        //}
 
       //if (g_testAnimatedGameObject == 0) {
       //    g_testAnimatedGameObject = CreateAnimatedGameObject();

@@ -172,8 +172,8 @@ namespace WeaponManager {
 
         WeaponInfo& goldeneGlock = g_weapons.emplace_back();
         goldeneGlock.name = "GoldenGlock";
-        goldeneGlock.modelName = "Glock";
-        goldeneGlock.meshMaterials["Glock"] = "Glock";
+        goldeneGlock.modelName = "GlockGolden";
+        goldeneGlock.meshMaterials["Glock"] = "T_Glock22.V2_01a";
         goldeneGlock.meshMaterials["ArmsMale"] = "Hands";
         goldeneGlock.meshMaterials["ArmsFemale"] = "FemaleArms";
         goldeneGlock.meshMaterials["Glock_silencer"] = "Silencer";
@@ -228,7 +228,7 @@ namespace WeaponManager {
         goldeneGlock.pickUpMeshMaterials["Glock"] = "Glock";
         goldeneGlock.emptyReloadRequiresSlideOffset = true;
         goldeneGlock.hasADS = true;
-        goldeneGlock.isGold = true;
+        goldeneGlock.isGold = false;
         goldeneGlock.animationSpeeds.adsIn = 3.0f;
         goldeneGlock.animationSpeeds.adsOut = 3.0f;
         goldeneGlock.casingEjectionImpulse = 0.0175f;

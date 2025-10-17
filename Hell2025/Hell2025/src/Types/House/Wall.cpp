@@ -118,6 +118,23 @@ bool Wall::UpdatePointPosition(int pointIndex, glm::vec3 position, bool supressW
     return true;
 }
 
+void Wall::SetMaterial(const std::string& materialName) {
+    if (Material* material = AssetManager::GetMaterialByName(materialName)) {
+        m_createInfo.materialName = materialName;
+        m_material = AssetManager::GetMaterialByName(materialName);
+        UpdateSegmentsAndVertexData();
+    }
+}
+
+void Wall::SetFloorTrimType(TrimType trimType) {
+    m_createInfo.floorTrimType = trimType;
+    UpdateSegmentsAndVertexData(); // neccesary?
+}
+void Wall::SetCeilingTrimType(TrimType trimType) {
+    m_createInfo.ceilingTrimType = trimType;
+    UpdateSegmentsAndVertexData(); // neccesary?
+}
+
 glm::vec3 Wall::GetPointByIndex(int pointIndex) {
     if (pointIndex < 0 || pointIndex >= m_createInfo.points.size()) {
         std::cout << "Wall::GetPointByIndex() failed: point index " << pointIndex << " out of range of size " << m_createInfo.points.size() << "\n";

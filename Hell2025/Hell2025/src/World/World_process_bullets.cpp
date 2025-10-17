@@ -8,7 +8,6 @@
 #include "UniqueID.h"
 
 namespace World {
-    void EvaluatePianoKeyBulletHit(Bullet& bullet);
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction);
 
     void ProcessBullets() {
@@ -18,12 +17,6 @@ namespace World {
         bool rooDeath = false;
 
         for (Bullet& bullet : bullets) {
-
-            // Did the bullet hit a piano key directly?
-            if (bullet.PlaysPiano()) {
-                EvaluatePianoKeyBulletHit(bullet);
-            }
-
             // Cast PhysX ray
             glm::vec3 rayOrigin = bullet.GetOrigin();
             glm::vec3 rayDirection = bullet.GetDirection();
@@ -192,32 +185,6 @@ namespace World {
 
         // Wipe old bullets, and replace with any new ones that got spawned from glass hits
         bullets = newBullets;;
-    }
-
-    void EvaluatePianoKeyBulletHit(Bullet& bullet) {
-        for (int i = 0; i < 4; i++) {
-            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
-            if (!viewport->IsVisible()) continue;
-
-            glm::vec3 rayOrigin = bullet.GetOrigin();
-            glm::vec3 rayDir = bullet.GetDirection();
-            float maxRayDistance = 100.0f;
-
-            BvhRayResult result = ClosestHit(rayOrigin, rayDir, maxRayDistance, i);
-            if (result.hitFound) {
-                if (UniqueID::GetType(result.objectId) == ObjectType::PIANO_KEY) {
-                    for (Piano& piano : World::GetPianos()) {
-                        if (piano.PianoKeyExists(result.objectId)) {
-                            PianoKey* pianoKey = piano.GetPianoKey(result.objectId);
-                            if (pianoKey) {
-                                pianoKey->PressKey();
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
     }
 
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction) {

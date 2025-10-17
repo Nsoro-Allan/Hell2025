@@ -67,6 +67,7 @@ namespace Util {
     CubeRayResult CastCubeRay(const glm::vec3& rayOrigin, const glm::vec3 rayDir, std::vector<Transform>& cubeTransforms, float maxDistance = 99999);
     glm::vec3 GetMouseRayDir(glm::mat4 projection, glm::mat4 view, int windowWidth, int windowHeight, int mouseX, int mouseY);
     bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
+    bool RayIntersectsSphere(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& spherePosition, float sphereRadius);
 
     // Mesh
     std::vector<Vertex> GenerateSphereVertices(float radius, int segments);
@@ -98,7 +99,8 @@ namespace Util {
     std::string CameraViewToString(const CameraView& cameraView);
     std::string DebugRenderModeToString(const DebugRenderMode& mode);
     std::string EditorModeToString(const EditorMode& editorMode);
-    std::string EditorStateToString(const EditorState& g_editorState);
+    std::string EditorStateToString(const EditorState& state);
+    std::string EditorSelectionModeToString(const EditorSelectionMode& mode);
     std::string ImageDataTypeToString(const ImageDataType& imageDataType);
     std::string SharkMovementStateToString(const SharkMovementState& state);
     std::string SharkHuntingStateToString(const SharkHuntingState& state);

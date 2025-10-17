@@ -43,7 +43,7 @@ namespace Physics {
         pxController->getActor()->userData = new PhysicsUserData(physicsUserData);
 
         // Create CharacterController
-        uint64_t physicsID = UniqueID::GetNextObjectId(ObjectType::PHYSICS_RIGID_CHARACTER_CONTROLLER);
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
         CharacterController& characterController = g_characterControllers[physicsID];
 
         // Update its pointers
