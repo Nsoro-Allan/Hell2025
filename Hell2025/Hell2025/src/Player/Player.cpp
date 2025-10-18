@@ -210,6 +210,7 @@ void Player::Respawn() {
     if (m_viewportIndex == 0) {
 
         SetFootPosition(glm::vec3(36.18, 31, 37.26));
+        //SetFootPosition(glm::vec3(500.18, 31, 500.26));
         m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
     }
 

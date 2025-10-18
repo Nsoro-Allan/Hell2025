@@ -8,14 +8,17 @@ struct ViewportData {
     mat4 inverseProjectionView;
     mat4 skyboxProjectionView;
     mat4 flashlightProjectionView;
+
     int xOffset;
     int yOffset;
     int width;
     int height;
+    
     float posX;  // 0 t0 1 range
     float posY;  // 0 t0 1 range
     float sizeX; // 0 t0 1 range
     float sizeY; // 0 t0 1 range
+    
     vec4 frustumPlane0;
     vec4 frustumPlane1;
     vec4 frustumPlane2;
@@ -24,13 +27,19 @@ struct ViewportData {
     vec4 frustumPlane5;
     vec4 flashlightDir;
     vec4 flashlightPosition;
+    
     float flashlightModifer;
     bool isOrtho;
     float orthoSize;
     float fov;
+    
     vec4 viewPos;
     vec4 cameraForward;
+    vec4 cameraUp;
+    vec4 cameraRight;
+    
     vec4 colorTint;
+    
     float colorContrast;
     float padding0;
     float padding1;

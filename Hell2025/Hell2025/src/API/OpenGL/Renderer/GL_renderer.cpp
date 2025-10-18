@@ -106,6 +106,9 @@ namespace OpenGLRenderer {
         //g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F); // before you added stencil buffer
         g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
 
+        g_frameBuffers["GBufferBackup"] = OpenGLFrameBuffer("GBufferBackup", resolutions.gBuffer);
+        g_frameBuffers["GBufferBackup"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
+
         g_frameBuffers["Fog"] = OpenGLFrameBuffer("Fog", resolutions.gBuffer / 2);
         g_frameBuffers["Fog"].CreateAttachment("Color", GL_RGBA16F, GL_LINEAR, GL_LINEAR);
 

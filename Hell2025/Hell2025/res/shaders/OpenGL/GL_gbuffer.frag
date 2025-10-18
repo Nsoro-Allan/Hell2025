@@ -80,18 +80,14 @@ void main() {
         }    
     }
 
-
-
     if (u_useMirrorMatrix) {
-       ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
-       float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
-       
-       if (mirrorMask < 1) {
+        ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
+        float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
+        
+        if (mirrorMask < 1) {
            discard;
-       }
+        }
     }
-
-
 
     // Sensible defaults for wound texture
     vec4 woundBaseColor = vec4(0,0,0,0);

@@ -295,8 +295,11 @@ struct ViewportData {
 
     glm::vec4 viewPos;
     glm::vec4 cameraForward;
+    glm::vec4 cameraUp;
+    glm::vec4 cameraRight;
 
     glm::vec4 colorTint;
+
     float colorContrast;
     float padding0;
     float padding1;

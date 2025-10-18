@@ -28,17 +28,17 @@ uniform bool u_flipNormalMapY;
 // temporarily here
 uniform bool u_useMirrorMatrix;
 uniform mat4 u_mirrorViewMatrix;
-
+uniform mat4 u_mirrorClipPlane;
 
 void main() {
 
     if (u_useMirrorMatrix) {
-       ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
-       float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
-       
-       if (mirrorMask < 1) {
-           discard;
-       }
+           ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
+           float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
+           
+           if (mirrorMask < 1) {
+               discard;
+           }
     }
 
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
@@ -56,26 +56,10 @@ void main() {
 
     vec3 normal = normalize(tbn * (normalMap));
     
-
-  //   normal = texture2D(normalTexture, TexCoord).rgb;
-   //  normal.y = 1 - normal.y;
-
     BaseColorOut = vec4(baseColor);
     NormalOut = vec4(normal, 1.0);   
     RMAOut = vec4(rma, 1.0);
     WorldPositionOut = vec4(WorldPos.rgb, 1.0);
 
     EmissiveOut = vec4(EmissiveColor, 0);
-
-
-    
-   //if (u_useMirrorMatrix) {
-   //   ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
-   //   float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
-   //   
-   //   if (mirrorMask > 0) {
-   //       BaseColorOut.rgb = vec3(0, 1, 0);
-   //   }
-   //}
-
 }

@@ -49,8 +49,7 @@ out flat int BlockScreenSpaceBloodDecalsFlag;
 // temporarily here
 uniform bool u_useMirrorMatrix;
 uniform mat4 u_mirrorViewMatrix;
-uniform vec3 u_mirrorNormal;
-uniform vec3 u_mirrorPosition;
+uniform vec4 u_mirrorClipPlane;
 
 void main() {
 
@@ -76,6 +75,7 @@ void main() {
     RenderItem renderItem = renderItems[globalInstanceIndex]; 
     mat4 modelMatrix = renderItem.modelMatrix;
     mat4 inverseModelMatrix = renderItem.inverseModelMatrix;
+	//mat4 projectionView = viewportData[viewportIndex].projectionView;   
 	mat4 projection = viewportData[viewportIndex].projection;    
 	mat4 view = viewportData[viewportIndex].view;
     mat4 normalMatrix = transpose(inverseModelMatrix);
@@ -93,26 +93,19 @@ void main() {
     // Absolute world position
     WorldPos = modelMatrix * vec4(vPosition, 1.0);
     
-
-    
-
-    // Mirror shit
-    if (u_useMirrorMatrix) {
-        // Clipping plane
-        float d = -dot(u_mirrorNormal, u_mirrorPosition);
-	    vec4 plane = vec4(u_mirrorNormal, d + 0.05);
-        gl_ClipDistance[0] = dot(WorldPos, plane);
-
-        // Replace view matrix
+    // Planar reflections
+    if (u_useMirrorMatrix) {  
+        projection[0][0] *= -1.0;      
         view = u_mirrorViewMatrix;
-    }    
-
-    // Camera relative position for depth precision
-    vec4 camRelativeWorldPos = vec4(WorldPos.xyz - ViewPos, 1.0);
-
-    gl_Position = projection * mat4(mat3(view)) * camRelativeWorldPos;
-
+        gl_ClipDistance[0] = dot(WorldPos, u_mirrorClipPlane);
+    }
+    
     // Old
     gl_Position = projection * view * WorldPos;
+    
+    // Camera relative position for depth precision
+    //vec4 camRelativeWorldPos = vec4(WorldPos.xyz - ViewPos, 1.0);
+    //gl_Position = projection * mat4(mat3(view)) * camRelativeWorldPos;
+
 
 }

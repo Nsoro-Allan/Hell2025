@@ -127,11 +127,28 @@ namespace RenderDataManager {
                     }
                 }
             }
+            glm::mat4 inverseView = glm::inverse(viewMatrix);
+            glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+            //glm::vec3 cameraForward = glm::vec3(g_viewportData[i].inverseView[2]);
+            //glm::vec3 cameraRight = glm::normalize(glm::cross(worldUp, cameraForward));;
+            //glm::vec3 cameraUp = glm::normalize(glm::cross(cameraForward, cameraRight));
 
+            glm::vec3 cameraRight = glm::vec3(inverseView[0]);
+            glm::vec3 cameraUp = glm::vec3(inverseView[1]);
+            glm::vec3 cameraForward = -glm::vec3(inverseView[2]);
+
+            // Store them (no need to normalize, they should already be unit vectors)
+            g_viewportData[i].cameraRight = glm::vec4(cameraRight, 0.0f);
+            g_viewportData[i].cameraUp = glm::vec4(cameraUp, 0.0f);
+            g_viewportData[i].cameraForward = glm::vec4(cameraForward, 0.0f);
+
+            g_viewportData[i].cameraForward = glm::vec4(cameraForward, 0.0f);
+            g_viewportData[i].cameraRight = glm::vec4(cameraRight, 0.0f);
+            g_viewportData[i].cameraUp = glm::vec4(cameraUp, 0.0f);
             g_viewportData[i].projection = viewport->GetProjectionMatrix();
             g_viewportData[i].inverseProjection = glm::inverse(g_viewportData[i].projection);
             g_viewportData[i].view = viewMatrix;
-            g_viewportData[i].inverseView = glm::inverse(g_viewportData[i].view);
+            g_viewportData[i].inverseView = inverseView;
             g_viewportData[i].projectionView = g_viewportData[i].projection * g_viewportData[i].view;
             g_viewportData[i].inverseProjectionView = glm::inverse(g_viewportData[i].projectionView);
             g_viewportData[i].skyboxProjectionView = viewport->GetPerpsectiveMatrix() * g_viewportData[i].view;
@@ -144,7 +161,8 @@ namespace RenderDataManager {
             g_viewportData[i].sizeX = (int)viewport->GetSize().x;
             g_viewportData[i].sizeY = (int)viewport->GetSize().y;
             g_viewportData[i].viewPos = g_viewportData[i].inverseView[3];
-            g_viewportData[i].cameraForward = g_viewportData[i].inverseView[2];
+
+            //Renderer::DrawLine(g_viewportData[i].viewPos, glm::vec3(g_viewportData[i].viewPos) + cameraForward, WHITE);
 
             viewport->GetFrustum().Update(g_viewportData[i].projectionView);
 

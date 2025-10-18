@@ -122,17 +122,26 @@ namespace World {
     void LoadMapInstances(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
         LoadMapInstancesHeightMapData(mapInstanceCreateInfoSet);
 
+
+        int i = 0;
         for (MapInstanceCreateInfo& mapInstanceCreateInfo : mapInstanceCreateInfoSet) {
             SpawnOffset spawnOffset;
             spawnOffset.translation.x = mapInstanceCreateInfo.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
             spawnOffset.translation.z = mapInstanceCreateInfo.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
 
+           //if (i == 1) {
+           //    spawnOffset.translation.x = 32 * mapInstanceCreateInfo.spawnOffsetChunkX * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+           //    spawnOffset.translation.z = 32 * mapInstanceCreateInfo.spawnOffsetChunkZ * HEIGHT_MAP_CHUNK_WORLD_SPACE_SIZE;
+           //}
+
             // Load the objects
             LoadMapInstanceObjects(mapInstanceCreateInfo.mapName, spawnOffset);
             LoadMapInstanceHouses(mapInstanceCreateInfo.mapName, spawnOffset);
 
+
             Logging::Warning() << "MAKE SURE YOU REMOVE THIS LINE break IT IS DISABLING THE LOAD OF THE SECOND MAP INSTANCE";
             break;
+            i++;
         }
 
         RecreateHouseMesh();
@@ -784,6 +793,7 @@ namespace World {
 
         MermaidCreateInfo mermaidCreateInfo;
         mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
+        //mermaidCreateInfo.position = glm::vec3(500.0f, 29.5f, 500.0f);
         mermaidCreateInfo.rotation.y = 0.25f;
         AddMermaid(mermaidCreateInfo);
 
@@ -880,9 +890,9 @@ namespace World {
         for (Window& window : g_windows) {
             Transform transform;
             transform.position = window.GetPosition();
-            transform.position.y += 1.5f;
+            transform.position.y += 1.48f;
             transform.rotation = window.GetRotation();
-            transform.scale = glm::vec3(0.2f, 1.185074f, 0.76f);
+            transform.scale = glm::vec3(0.2f, 1.185074f, 0.90f);
 
             ClippingCube& cube = g_clippingCubes.emplace_back();
             cube.Update(transform);

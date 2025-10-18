@@ -27,26 +27,23 @@ uniform mat4 u_model;
 uniform bool u_useMirrorMatrix;
 uniform mat4 u_mirrorViewMatrix;
 uniform vec3 u_mirrorNormal;
-uniform vec3 u_mirrorPosition;
+uniform vec4 u_mirrorClipPlane;
 
 void main() {
-
     mat4 modelMatrix = u_model;
     mat4 inverseModelMatrix = inverse(modelMatrix);  
 	mat4 projectionView = viewportData[u_viewportIndex].projectionView;            
     mat4 normalMatrix = transpose(inverseModelMatrix);
-
-
     
-    if (u_useMirrorMatrix) {
-        // Clipping plane
-        float d = -dot(u_mirrorNormal, u_mirrorPosition);
-	    vec4 plane = vec4(u_mirrorNormal, d + 0.05);
-        gl_ClipDistance[0] = dot(WorldPos, plane);
+    WorldPos = modelMatrix * vec4(vPosition, 1.0);
 
-        // Replace view matrix
-        mat4 projection = viewportData[u_viewportIndex].projection;         
-        projectionView = projection *  u_mirrorViewMatrix;
+    // Planar reflections
+    if (u_useMirrorMatrix) {
+        mat4 projection = viewportData[u_viewportIndex].projection;   
+        projection[0][0] *= -1.0;      
+        projectionView = projection * u_mirrorViewMatrix;
+
+        gl_ClipDistance[0] = dot(WorldPos, u_mirrorClipPlane);
     }
 
     Normal = normalize(normalMatrix * vec4(vNormal, 0)).xyz;
@@ -55,11 +52,5 @@ void main() {
     EmissiveColor = vec3(0,0,0);
     
 	TexCoord = vUV;
-    WorldPos = modelMatrix * vec4(vPosition, 1.0);
 	gl_Position = projectionView * WorldPos;
-
-    
-	//mat4 view = viewportData[u_viewportIndex].view;     
-    //WorldPos = modelMatrix * vec4(vPosition, 1.0);
-	//gl_Position = u_perspectiveMatrix * view * WorldPos;
 }
