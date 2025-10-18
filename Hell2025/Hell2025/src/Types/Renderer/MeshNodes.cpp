@@ -5,6 +5,8 @@
 #include "Managers/OpenableManager.h"
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
+#include "World/World.h"
+#include "Physics/Physics.h"
 #include "UniqueID.h"
 #include "Util.h"
 
@@ -60,7 +62,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 
         MeshNode* meshNode = GetMeshNodeByMeshName(createInfo.meshName);
         if (!meshNode) {
-            Logging::Error() << "MeshNodes::Init(...) failed to process meshNodeCreateInfoSet, mesh name '" << createInfo.meshName << "' not found";
+            Logging::Error() << "MeshNodes::Init(...) failed to process meshNodeCreateInfoSet, mesh name '" << createInfo.meshName << "' not found in model '" << modelName << "'";
             continue;
         }
         meshNode->materialIndex = AssetManager::GetMaterialIndexByName(createInfo.materialName);
@@ -85,6 +87,30 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                     }
                 }
             }
+        }
+
+
+        if (meshNode->type == MeshNodeType::RIGID_DYNAMIC) {
+            // Break connection with parent
+            meshNode->localParentIndex = -1;
+
+            // If you wanna add physics to MeshNodes that don't belong to a GenericObject then you are gonna need a bit of a different plan here or a giant lists of ifs, ugly...
+            Transform initalTransform; 
+            if (GenericObject* parent = World::GetGenericObjectById(parentId)) {
+                initalTransform.position = parent->GetPosition();
+                initalTransform.rotation = parent->GetRotation();
+                Logging::ToDo() << "FOUND PARENT !!!!!!!!!!!!!!!!!!!!!!!!!!!" << initalTransform.position << " " << initalTransform.rotation;
+            }
+            else {
+                Logging::Error() << "Did not find parent!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+            }
+
+            PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
+            float mass = createInfo.rigidDynamic.mass;
+
+            // Test box
+            glm::vec3 boxExtents = glm::vec3(0.5f);
+            meshNode->physicsId = Physics::CreateRigidDynamicFromBoxExtents(initalTransform, boxExtents, mass, filterData);
         }
     }
 }
@@ -274,6 +300,16 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         }
     }
 
+
+
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.type == MeshNodeType::RIGID_DYNAMIC) {
+            if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.physicsId)) {
+                Renderer::DrawPoint(rigidDynamic->GetCurrentPosition(), YELLOW);
+            }
+        }
+    }
+
     if (hierarchyDirty) {
         UpdateHierarchy();
     }
@@ -293,6 +329,8 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
     m_renderItemsAlphaDiscarded.clear();
     m_renderItemsHairTopLayer.clear();
     m_renderItemsHairBottomLayer.clear();
+    m_renderItemsToiletWater.clear();
+    m_renderItemsMirror.clear();
 
     for (size_t i = 0; i < m_meshNodes.size(); i++) {
         MeshNode& meshNode = m_meshNodes[i];
@@ -320,13 +358,19 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
 
+        // VERY TEMPOARARY!!!!!!!!!!
+        //if (meshNode.blendingMode == BlendingMode::MIRROR) {
+        //
+        //}
+
         switch (meshNode.blendingMode) {
             case BlendingMode::BLEND_DISABLED:    m_renderItems.push_back(meshNode.renderItem);                 break;
             case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(meshNode.renderItem);          break;
             case BlendingMode::ALPHA_DISCARDED:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
             case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(meshNode.renderItem);     break;
             case BlendingMode::HAIR_UNDER_LAYER:  m_renderItemsHairBottomLayer.push_back(meshNode.renderItem);  break;
-            case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);  break;
+            case BlendingMode::MIRROR:            m_renderItemsMirror.push_back(meshNode.renderItem);           break;
+            case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);      break;
             default: break;
         }
     }

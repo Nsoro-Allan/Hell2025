@@ -164,6 +164,7 @@ namespace World {
         UpdateAllWallCSG();
         UpdateHouseMeshBuffer();
         UpdateWeatherBoardMeshBuffer();
+        UpdateAllHangingLightCords();
     }
 
     void UpdateHouseMeshBuffer() {
@@ -207,6 +208,12 @@ namespace World {
 
     void ResetWeatherboardMeshBuffer() {
         g_weatherBoardMeshBuffer.Reset();
+    }
+
+    void UpdateAllHangingLightCords() {
+        for (Light& light : GetLights()) {
+            light.BuildCord();
+        }
     }
 
     MeshBuffer& GetHouseMeshBuffer() {

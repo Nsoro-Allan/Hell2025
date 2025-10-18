@@ -176,7 +176,7 @@ namespace Editor {
             //std::cout << "Selected: " << Util::ObjectTypeToString(GetSelectedObjectType()) << " " << GetSelectedObjectId() << "\n";
             Gizmo::SetSourceObjectOffeset(World::GetGizmoOffest(GetSelectedObjectId()));
 
-            GenericObject* drawers = World::GetDrawersByObjectId(GetSelectedObjectId());
+            GenericObject* drawers = World::GetGenericObjectById(GetSelectedObjectId());
             if (drawers) {
                 Gizmo::SetPosition(drawers->GetPosition());
                 Gizmo::SetRotation(drawers->GetRotation());
@@ -242,134 +242,6 @@ namespace Editor {
 
     void UpdateObjectGizmoInteraction() {
 
-        float roomZmin = -1.8f;
-        float roomZmax = 1.8f;
-        float roomXmin = -2.75f;
-        float roomXmax = 1.6f;
-
-        float bathroomXmin = -2.715f;
-        float bathroomXmax = -0.76f;
-        float bathroomZmin = 1.9f;
-        float bathroomZmax = 3.8f;
-
-        float bathroomDoorX = -1.6f;
-        float doorWidth = 0.9;
-        float hallDoorX = 0.5f;
-
-
-        glm::vec3 door0 = glm::vec3(hallDoorX + 0.39550f, 0, -1.85 - 0.058520);
-        glm::vec3 door1 = glm::vec3(bathroomDoorX - 0.39550f, 0, bathroomZmin - 0.05f + 0.058520);
-        glm::vec3 vase = glm::vec3(1.6f - 0.4f, 1.49f, 0.395f);
-        glm::vec3 toilet = glm::vec3(-1.4, 0.0f, 3.8f);
-
-        glm::vec3 wallAbegin = glm::vec3(roomXmax, 0, roomZmax);        glm::vec3 wallAend = glm::vec3(bathroomDoorX + doorWidth / 2, 0, roomZmax);
-        glm::vec3 wallBbegin = glm::vec3(roomXmin, 0, roomZmin);        glm::vec3 wallBend = glm::vec3(hallDoorX - doorWidth / 2, 0, -roomZmax);
-        glm::vec3 wallCbegin = glm::vec3(roomXmax, 0, roomZmin);        glm::vec3 wallCend = glm::vec3(roomXmax, 0, roomZmax);
-        glm::vec3 wallDbegin = glm::vec3(roomXmin, 0, roomZmax);        glm::vec3 wallDend = glm::vec3(roomXmin, 0, roomZmin);
-
-        glm::vec3 wallB2begin = glm::vec3(hallDoorX + doorWidth / 2, 0, roomZmin);      glm::vec3 wallB2end = glm::vec3(roomXmax, 0, roomZmin);
-        glm::vec3 wallHbegin = glm::vec3(bathroomDoorX - doorWidth / 2, 0, roomZmax);   glm::vec3 wallHend = glm::vec3(roomXmin, 0, roomZmax);
-
-        glm::vec3 wallE = glm::vec3(bathroomXmax, 0, bathroomZmin);        glm::vec3 wallEend = glm::vec3(bathroomXmax, 0, bathroomZmax);
-        glm::vec3 wallG = glm::vec3(bathroomXmax, 0, bathroomZmax);        glm::vec3 wallGend = glm::vec3(bathroomXmin, 0, bathroomZmax);
-        glm::vec3 wallI = glm::vec3(bathroomXmin, 0, bathroomZmax);        glm::vec3 wallIend = glm::vec3(bathroomXmin, 0, bathroomZmin);
-        glm::vec3 wallHI2DOOR = glm::vec3(bathroomXmin, 0, bathroomZmin);  glm::vec3 wallHI2DOORend = glm::vec3(bathroomDoorX - doorWidth / 2, 0, bathroomZmin);
-
-        float angleDegrees = 9.0f;
-        float angleRadians = HELL_PI * 0.5f;
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angleRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        door0 = glm::vec3(rotationMatrix * glm::vec4(door0, 1.0f));
-        door1 = glm::vec3(rotationMatrix * glm::vec4(door1, 1.0f));
-        vase = glm::vec3(rotationMatrix * glm::vec4(vase, 1.0f));
-        toilet = glm::vec3(rotationMatrix * glm::vec4(toilet, 1.0f));
-
-        wallAbegin = glm::vec3(rotationMatrix * glm::vec4(wallAbegin, 1.0f));
-        wallAend = glm::vec3(rotationMatrix * glm::vec4(wallAend, 1.0f));
-        wallBbegin = glm::vec3(rotationMatrix * glm::vec4(wallBbegin, 1.0f));
-        wallBend = glm::vec3(rotationMatrix * glm::vec4(wallBend, 1.0f));
-        wallCbegin = glm::vec3(rotationMatrix * glm::vec4(wallCbegin, 1.0f));
-        wallCend = glm::vec3(rotationMatrix * glm::vec4(wallCend, 1.0f));
-        wallDbegin = glm::vec3(rotationMatrix * glm::vec4(wallDbegin, 1.0f));
-        wallDend = glm::vec3(rotationMatrix * glm::vec4(wallDend, 1.0f));
-
-        wallB2begin = glm::vec3(rotationMatrix * glm::vec4(wallB2begin, 1.0f));
-        wallB2end = glm::vec3(rotationMatrix * glm::vec4(wallB2end, 1.0f));
-        wallHbegin = glm::vec3(rotationMatrix * glm::vec4(wallHbegin, 1.0f));
-        wallHend = glm::vec3(rotationMatrix * glm::vec4(wallHend, 1.0f));
-
-        wallE = glm::vec3(rotationMatrix * glm::vec4(wallE, 1.0f));
-        wallEend = glm::vec3(rotationMatrix * glm::vec4(wallEend, 1.0f));
-        wallG = glm::vec3(rotationMatrix * glm::vec4(wallG, 1.0f));
-        wallGend = glm::vec3(rotationMatrix * glm::vec4(wallGend, 1.0f));
-        wallI = glm::vec3(rotationMatrix * glm::vec4(wallI, 1.0f));
-        wallIend = glm::vec3(rotationMatrix * glm::vec4(wallIend, 1.0f));
-        wallHI2DOOR = glm::vec3(rotationMatrix * glm::vec4(wallHI2DOOR, 1.0f));
-        wallHI2DOORend = glm::vec3(rotationMatrix * glm::vec4(wallHI2DOORend, 1.0f));
-
-        glm::vec3 translationVector = glm::vec3(6.3f, 0.0f, 0.7f); // Example translation values
-        translationVector = glm::vec3(6.3f, 0.0f, -1.3f); // Example translation values
-
-        door0 += translationVector;
-        door1 += translationVector;
-        vase += translationVector;
-        toilet += translationVector;
-
-        wallAbegin += translationVector;
-        wallAend += translationVector;
-        wallBbegin += translationVector;
-        wallBend += translationVector;
-        wallCbegin += translationVector;
-        wallCend += translationVector;
-        wallDbegin += translationVector;
-        wallDend += translationVector;
-
-        wallB2begin += translationVector;
-        wallB2end += translationVector;
-        wallHbegin += translationVector;
-        wallHend += translationVector;
-
-        wallE += translationVector;
-        wallEend += translationVector;
-        wallG += translationVector;
-        wallGend += translationVector;
-        wallI += translationVector;
-        wallIend += translationVector;
-        wallHI2DOOR += translationVector;
-        wallHI2DOORend += translationVector;
-
-    /*	X		   C
-        |	  ___________
-        |	 |	     Wife|
-        |	 |			 |A
-        |	 |			 |   E
-        |  B |			 |______
-        |	 |			 |      |
-        |	 |			 |______| G
-        |	 |___________|H  I
-        |
-        |		   D        F
-        (0,0)----------------- Z
-    */
-
-        Renderer::DrawPoint(door0, RED);
-        Renderer::DrawPoint(door1, BLUE);
-        Renderer::DrawPoint(vase, GREEN);
-        Renderer::DrawPoint(toilet, PINK);
-
-        Renderer::DrawLine(wallAbegin, wallAend, YELLOW);
-        Renderer::DrawLine(wallBbegin, wallBend, YELLOW);
-        Renderer::DrawLine(wallCbegin, wallCend, YELLOW);
-        Renderer::DrawLine(wallDbegin, wallDend, YELLOW);
-
-        Renderer::DrawLine(wallHbegin, wallHend, YELLOW);
-        Renderer::DrawLine(wallB2begin, wallB2end, YELLOW);
-
-        Renderer::DrawLine(wallE, wallEend, YELLOW);
-        Renderer::DrawLine(wallG, wallGend, YELLOW);
-        Renderer::DrawLine(wallI, wallIend, YELLOW);
-        Renderer::DrawLine(wallHI2DOOR, wallHI2DOORend, YELLOW);
-
         UpdateGizmoInteract();
 
         // if (Input::KeyPressed(HELL_KEY_SPACE)) {
@@ -411,14 +283,14 @@ namespace Editor {
         //
         //}
 
-        for (Plane& plane : World::GetPlanes()) {
-
-            PlaneCreateInfo createInfo = plane.GetCreateInfo();
-            Renderer::DrawPoint(createInfo.p0, PURPLE);
-            Renderer::DrawPoint(createInfo.p1, PURPLE);
-            Renderer::DrawPoint(createInfo.p2, PURPLE);
-            Renderer::DrawPoint(createInfo.p3, PURPLE);
-        }
+        //for (Plane& plane : World::GetPlanes()) {
+        //
+        //    PlaneCreateInfo createInfo = plane.GetCreateInfo();
+        //    Renderer::DrawPoint(createInfo.p0, PURPLE);
+        //    Renderer::DrawPoint(createInfo.p1, PURPLE);
+        //    Renderer::DrawPoint(createInfo.p2, PURPLE);
+        //    Renderer::DrawPoint(createInfo.p3, PURPLE);
+        //}
 
         if (GetEditorState() == EditorState::GIZMO_TRANSLATING) {
 

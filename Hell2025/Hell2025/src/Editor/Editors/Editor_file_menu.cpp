@@ -26,7 +26,7 @@ namespace Editor {
 
             EditorUI::FileMenuNode& bathroom = insert.AddChild("Bathroom", Shortcut::NONE);
             bathroom.AddChild("Basin", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_BASIN);
-            bathroom.AddChild("Cupboard", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CUPBOARD);
+            bathroom.AddChild("Cabinet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CABINET);
             bathroom.AddChild("Toilet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
             bathroom.AddChild("Towel", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
 

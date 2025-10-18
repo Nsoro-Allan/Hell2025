@@ -13,11 +13,18 @@
 #include "API/OpenGL/Renderer/GL_renderer.h"
 #include "UniqueID.h"
 
+
+#include "Renderer/RenderDataManager.h"
+
 void Player::UpdateUI() {
     if (Editor::IsOpen()) return;
 
     const Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
     if (!viewport->IsVisible()) return;
+
+   //if (Debug::IsDebugTextVisible()) {
+   //    return;
+   //}
 
     const Resolutions& resolutions = Config::GetResolutions();
     int width = resolutions.ui.x * viewport->GetSize().x;
@@ -242,6 +249,11 @@ void Player::UpdateUI() {
                     }
                 }
             }
+
+
+            //text = Debug::GetText();
+
+
 
 
             UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);

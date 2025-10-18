@@ -18,27 +18,13 @@ Light::Light(LightCreateInfo createInfo) {
 
     if (m_type == LightType::LAMP_POST) {
         m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("LampPost"));
-        m_model0 = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LampPost"));
-        m_transform0.position = m_position;
+        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LampPost"));
+        m_transformMain.position = m_position;
     }
     if (m_type == LightType::HANGING_LIGHT) {
         m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("Light"));
-        m_model0 = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHanging"));
-        m_transform0.position = m_position;
-        PhysXRayResult rayResult = Physics::CastPhysXRay(m_position, glm::vec3(0.0f, 1.0f, 0.0f), 100.0f, RaycastGroup::RAYCAST_ENABLED);
-        if (rayResult.hitFound) {
-            m_model1 = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingCord"));
-            m_model2 = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingMount"));
-            m_transform1.position = m_position;
-            m_transform1.scale.y = glm::distance(rayResult.hitPosition, m_position);
-            m_transform2.position = rayResult.hitPosition;
-            //std::cout << "hit found: " << Util::Vec3ToString(rayResult.hitPosition) << "\n";
-        }
-        else {
-            m_model1 = nullptr;
-            m_model2 = nullptr;
-            //std::cout << "no hit\n";
-        }
+        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHanging"));
+        m_transformMain.position = m_position;
     }
 
     m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
@@ -50,6 +36,26 @@ void Light::Update(float deltaTime) {
     UpdateDirtyState();
 }
 
+void Light::BuildCord() {
+    if (m_type == LightType::HANGING_LIGHT) {
+        m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("Light"));
+        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHanging"));
+        m_transformMain.position = m_position;
+        PhysXRayResult rayResult = Physics::CastPhysXRay(m_position, glm::vec3(0.0f, 1.0f, 0.0f), 100.0f, RaycastGroup::RAYCAST_ENABLED);
+        if (rayResult.hitFound) {
+            m_modelCord = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingCord"));
+            m_modelCordMount = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingMount"));
+            m_transformCord.position = m_position;
+            m_transformCord.scale.y = glm::distance(rayResult.hitPosition, m_position);
+            m_transformCordMount.position = rayResult.hitPosition;
+            //std::cout << "hit found: " << Util::Vec3ToString(rayResult.hitPosition) << "\n";
+        }
+        else {
+            m_modelCord = nullptr;
+            m_modelCordMount = nullptr;
+        }
+    }
+}
 
 void Light::UpdateDirtyState() {
     if (m_forcedDirty) {
@@ -117,11 +123,11 @@ void Light::UpdateDirtyState() {
 void Light::UpdateRenderItems() {
     m_renderItems.clear();
 
-    if (m_model0) {
-        for (uint32_t meshIndex : m_model0->GetMeshIndices()) {
+    if (m_modelMain) {
+        for (uint32_t meshIndex : m_modelMain->GetMeshIndices()) {
             RenderItem& renderItem = m_renderItems.emplace_back();
             renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transform0.to_mat4();
+            renderItem.modelMatrix = m_transformMain.to_mat4();
             renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
             renderItem.meshIndex = meshIndex;
             renderItem.castShadows = false;
@@ -139,11 +145,11 @@ void Light::UpdateRenderItems() {
         }
     }
    
-    if (m_model1) {
-        for (uint32_t meshIndex : m_model1->GetMeshIndices()) {
+    if (m_modelCord) {
+        for (uint32_t meshIndex : m_modelCord->GetMeshIndices()) {
             RenderItem& renderItem = m_renderItems.emplace_back();
             renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transform1.to_mat4();
+            renderItem.modelMatrix = m_transformCord.to_mat4();
             renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
             renderItem.meshIndex = meshIndex;
             renderItem.castShadows = false;
@@ -160,11 +166,11 @@ void Light::UpdateRenderItems() {
             }
         }
     }
-    if (m_model2) {
-        for (uint32_t meshIndex : m_model2->GetMeshIndices()) {
+    if (m_modelCordMount) {
+        for (uint32_t meshIndex : m_modelCordMount->GetMeshIndices()) {
             RenderItem& renderItem = m_renderItems.emplace_back();
             renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transform2.to_mat4();
+            renderItem.modelMatrix = m_transformCordMount.to_mat4();
             renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
             renderItem.meshIndex = meshIndex;
             if (m_material) {

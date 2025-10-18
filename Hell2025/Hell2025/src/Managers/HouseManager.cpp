@@ -36,13 +36,23 @@ namespace HouseManager {
 
         CreateInfoCollection& createInfoCollection = house.GetCreateInfoCollection();
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
-        createInfoCollection.drawers = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
+        createInfoCollection.genericGameObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.planes = json.value("Planes", std::vector<PlaneCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
         createInfoCollection.walls = json.value("Walls", std::vector<WallCreateInfo>{});
         createInfoCollection.windows = json.value("Windows", std::vector<WindowCreateInfo>{});
+
+        for (size_t i = 0; i < createInfoCollection.genericGameObjects.size();) {
+            if (createInfoCollection.genericGameObjects[i].type == GenericObjectType::UNDEFINED) {
+                createInfoCollection.genericGameObjects.erase(createInfoCollection.genericGameObjects.begin() + i);
+                Logging::Error() << "Found UNDEFINED GenericGameObject in " << filename << " and removed it";
+            }
+            else {
+                ++i;
+            }
+        }
 
         Logging::Debug()
             << "Loaded: " << path

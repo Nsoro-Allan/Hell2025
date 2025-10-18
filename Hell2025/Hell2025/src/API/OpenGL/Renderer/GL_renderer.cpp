@@ -102,7 +102,9 @@ namespace OpenGLRenderer {
         g_frameBuffers["GBuffer"].CreateAttachment("WorldPosition", GL_RGBA32F);
         g_frameBuffers["GBuffer"].CreateAttachment("Emissive", GL_RGBA8);
         g_frameBuffers["GBuffer"].CreateAttachment("Glass", GL_RGBA8);
-        g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F);
+        g_frameBuffers["GBuffer"].CreateAttachment("MirrorMask", GL_R8);
+        //g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F); // before you added stencil buffer
+        g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
 
         g_frameBuffers["Fog"] = OpenGLFrameBuffer("Fog", resolutions.gBuffer / 2);
         g_frameBuffers["Fog"].CreateAttachment("Color", GL_RGBA16F, GL_LINEAR, GL_LINEAR);
@@ -427,6 +429,7 @@ namespace OpenGLRenderer {
         HouseGeometryPass();
         GrassPass();
         GeometryPass();
+        MirrorGeometryPass();
         WeatherBoardsPass();
         VatBloodPass();
         ScreenSpaceDecalsPass();
@@ -503,6 +506,7 @@ namespace OpenGLRenderer {
         gBuffer->ClearAttachment("WorldPosition", 0, 0);
         gBuffer->ClearAttachment("Emissive", 0, 0, 0, 0);
         gBuffer->ClearAttachment("Glass", 0, 1, 0, 0);
+        gBuffer->ClearAttachment("MirrorMask", 0, 0, 0, 0);
         gBuffer->ClearDepthAttachment();
 
         // Decal mask

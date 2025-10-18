@@ -564,14 +564,33 @@ void main() {
 
    //finalColor = ambientTerm;
 
+
+
+
+
+
+
+
     // Ambient occlusion
     finalColor *= rma.b;
+
+    // ATTNETION! your hanging light is mostly black, becuase it has no AO channel, coz you arfe using for the emissive mask
+    // and ever since you realized you were't applying AO, now its fucked
+
+
+
+
+
+
+
 
 
     //finalColor = indirect;
 
     // Emissive
     //finalColor += emssiveColor;
+
+
 
     finalColor.rgb = finalColor.rgb * finalAlpha;    
     vec4 outputColor = vec4(finalColor, finalAlpha);

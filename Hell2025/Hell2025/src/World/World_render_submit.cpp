@@ -78,11 +78,18 @@ namespace World {
             // TODO: }
         }
 
-        // Drawers
-        for (GenericObject& drawers : GetGenericObjects()) {
-            RenderDataManager::SubmitRenderItems(drawers.GetRenderItems());
-            if (Editor::GetSelectedObjectId() == drawers.GetObjectId()) {
-                RenderDataManager::SubmitOutlineRenderItems(drawers.GetRenderItems());
+        // Generic Object 
+        for (GenericObject& genericGameObject : GetGenericObjects()) {
+            RenderDataManager::SubmitRenderItems(genericGameObject.GetRenderItems());
+            RenderDataManager::SubmitRenderItemsBlended(genericGameObject.GetRenderItemsBlended());
+            RenderDataManager::SubmitRenderItemsAlphaDiscard(genericGameObject.GetRenderItemsAlphaDiscarded());
+            RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(genericGameObject.GetRenderItemsHairTopLayer());
+            RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(genericGameObject.GetRenderItemsHairBottomLayer());
+            RenderDataManager::SubmitRenderItemsMirror(genericGameObject.GetRenderItemsMirror());
+
+            // Is this object selected?
+            if (Editor::GetSelectedObjectId() == genericGameObject.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(genericGameObject.GetRenderItems());
             }
         }
 

@@ -36,6 +36,7 @@ namespace RenderDataManager {
     std::vector<RenderItem> g_renderItemsAlphaDiscarded;
     std::vector<RenderItem> g_renderItemsHairTopLayer;
     std::vector<RenderItem> g_renderItemsHairBottomLayer;
+    std::vector<RenderItem> g_renderItemsMirror;
 
     std::vector<RenderItem> g_outlineRenderItems;
     std::vector<RenderItem> g_shadowMapRenderItems;
@@ -57,7 +58,7 @@ namespace RenderDataManager {
     void UpdateRendererData();
     void UpdateDrawCommandsSet();
     //void CreateDrawCommands(DrawCommands& drawCommands, std::vector<RenderItem>& renderItems);
-    void CreateDrawCommands(std::vector<DrawIndexedIndirectCommand>& drawCommands, std::vector<RenderItem>& renderItems, Frustum& frustum, int viewportIndex, bool ignoreNonShadowCasters = false);
+    void CreateDrawCommands(std::vector<DrawIndexedIndirectCommand>& drawCommands, std::vector<RenderItem>& renderItems, Frustum* frustum, int viewportIndex, bool ignoreNonShadowCasters = false);
     void CreateDrawCommandsSkinned(DrawCommands& drawCommands, std::vector<RenderItem>& renderItems);
     void CreateMultiDrawIndirectCommands(std::vector<DrawIndexedIndirectCommand>& commands, std::span<RenderItem> renderItems, int viewportIndex, int instanceOffset);
     void CreateMultiDrawIndirectCommandsSkinned(std::vector<DrawIndexedIndirectCommand>& commands, std::span<RenderItem> renderItems, int viewportIndex, int instanceOffset);
@@ -73,6 +74,7 @@ namespace RenderDataManager {
         g_houseRenderItems.clear();
 
         g_renderItems.clear();
+        g_renderItemsMirror.clear();
         g_glassRenderItems.clear();
         g_renderItemsBlended.clear();
         g_renderItemsAlphaDiscarded.clear();
@@ -216,6 +218,7 @@ namespace RenderDataManager {
             set.geometryAlphaDiscarded[i].clear();
             set.hairTopLayer[i].clear();
             set.hairBottomLayer[i].clear();
+            set.mirrorRenderItems[i].clear();
             g_flashLightShadowMapDrawInfo.flashlightShadowMapGeometry[i].clear();
             g_flashLightShadowMapDrawInfo.heightMapChunkIndices[i].clear();
             g_flashLightShadowMapDrawInfo.houseMeshRenderItems[i].clear();
@@ -231,12 +234,22 @@ namespace RenderDataManager {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (!viewport->IsVisible()) continue;
 
+            // If mirrors exist
+           //viewport->ClearMirrorInfo();
+           //
+           //if (RenderDataManager::GetMirrorRenderItems().size()) {
+           //    const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
+           //    glm::mat 
+           //    viewport->UpdateMirrorInfo(mirrorRenderItem.modelMatrix, localMirrorForward);
+           //}
+
             Frustum& frustum = viewport->GetFrustum();
-            CreateDrawCommands(set.geometry[i], g_renderItems, frustum, i);
-            CreateDrawCommands(set.geometryBlended[i], g_renderItemsBlended, frustum, i);
-            CreateDrawCommands(set.geometryAlphaDiscarded[i], g_renderItemsAlphaDiscarded, frustum, i);
-            CreateDrawCommands(set.hairTopLayer[i], g_renderItemsHairTopLayer, frustum, i);
-            CreateDrawCommands(set.hairBottomLayer[i], g_renderItemsHairBottomLayer, frustum, i);
+            CreateDrawCommands(set.geometry[i], g_renderItems, &frustum, i);
+            CreateDrawCommands(set.geometryBlended[i], g_renderItemsBlended, &frustum, i);
+            CreateDrawCommands(set.geometryAlphaDiscarded[i], g_renderItemsAlphaDiscarded, &frustum, i);
+            CreateDrawCommands(set.hairTopLayer[i], g_renderItemsHairTopLayer, &frustum, i);
+            CreateDrawCommands(set.hairBottomLayer[i], g_renderItemsHairBottomLayer, &frustum, i);
+            CreateDrawCommands(set.mirrorRenderItems[i], g_renderItems, nullptr, i);
         }
 
         CreateDrawCommandsSkinned(set.skinnedGeometry, World::GetSkinnedRenderItems());
@@ -256,7 +269,7 @@ namespace RenderDataManager {
             Frustum flashLightFrustum = player->GetFlashlightFrustum();
 
             // Build multi draw commands for regular geometry
-            CreateDrawCommands(g_flashLightShadowMapDrawInfo.flashlightShadowMapGeometry[i], g_renderItems, flashLightFrustum, i, true);
+            CreateDrawCommands(g_flashLightShadowMapDrawInfo.flashlightShadowMapGeometry[i], g_renderItems, &flashLightFrustum, i, true);
 
             // Frustum cull the heightmap chunks
             std::vector<HeightMapChunk>& chunks = World::GetHeightMapChunks();
@@ -302,7 +315,7 @@ namespace RenderDataManager {
         UpdateOceanPatchTransforms();
     }
 
-    void CreateDrawCommands(std::vector<DrawIndexedIndirectCommand>& drawCommands, std::vector<RenderItem>& renderItems, Frustum& frustum, int viewportIndex, bool ignoreNonShadowCasters) {
+    void CreateDrawCommands(std::vector<DrawIndexedIndirectCommand>& drawCommands, std::vector<RenderItem>& renderItems, Frustum* frustum, int viewportIndex, bool ignoreNonShadowCasters) {
         // Store the instance offset for this list of commands
         int instanceStart = g_instanceData.size();
 
@@ -315,8 +328,12 @@ namespace RenderDataManager {
             if (renderItem.ignoredViewportIndex != -1 && renderItem.ignoredViewportIndex == viewportIndex) continue;
             if (renderItem.exclusiveViewportIndex != -1 && renderItem.exclusiveViewportIndex != viewportIndex) continue;
 
+            // If you supplied no frustum, then it passes no matter what
+            if (!frustum) {
+                g_instanceData.push_back(renderItem);
+            }
             // Frustum cull it
-            if (frustum.IntersectsAABBFast(renderItem)) {
+            else if (frustum->IntersectsAABBFast(renderItem)) {
                 g_instanceData.push_back(renderItem);
             }
         }
@@ -551,6 +568,10 @@ namespace RenderDataManager {
         return g_decalRenderItems;
     }
 
+    const std::vector<RenderItem>& GetMirrorRenderItems() {
+        return g_renderItemsMirror;
+    }
+
     const std::vector<RenderItem>& GetInstanceData() {
         return g_instanceData;
     }
@@ -621,6 +642,10 @@ namespace RenderDataManager {
 
     void SubmitRenderItems(const std::vector<RenderItem>& renderItems) {
         g_renderItems.insert(g_renderItems.begin(), renderItems.begin(), renderItems.end());
+    }
+
+    void SubmitRenderItemsMirror(const std::vector<RenderItem>& renderItems) {
+        g_renderItemsMirror.insert(g_renderItemsMirror.begin(), renderItems.begin(), renderItems.end());
     }
 
     void SubmitRenderItemsBlended(const std::vector<RenderItem>& renderItems) {

@@ -22,7 +22,10 @@ struct OpenableCreateInfo {
 };
 
 struct RigidDynamicCreateInfo {
-    std::string meshName = UNDEFINED_STRING;
+    Transform offsetTransform;
+    PhysicsFilterData filterData;
+    float mass = 1.0f;
+
 };
 
 struct RigidStaticCreateInfo {
@@ -283,7 +286,7 @@ struct MapCreateInfo {
 
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
-    std::vector<GenericObjectCreateInfo> drawers;
+    std::vector<GenericObjectCreateInfo> genericGameObjects;
     std::vector<PlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;

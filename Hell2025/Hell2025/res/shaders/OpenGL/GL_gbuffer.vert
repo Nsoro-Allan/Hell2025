@@ -46,6 +46,12 @@ out flat int WoundMaskTextureIndex;
 out flat int BlockScreenSpaceBloodDecalsFlag;
 
 
+// temporarily here
+uniform bool u_useMirrorMatrix;
+uniform mat4 u_mirrorViewMatrix;
+uniform vec3 u_mirrorNormal;
+uniform vec3 u_mirrorPosition;
+
 void main() {
 
 #if ENABLE_BINDLESS
@@ -74,7 +80,6 @@ void main() {
 	mat4 view = viewportData[viewportIndex].view;
     mat4 normalMatrix = transpose(inverseModelMatrix);
 
-    
     WoundMaskTextureIndex = renderItem.woundMaskTextureIndex;
 
     Normal = normalize(normalMatrix * vec4(vNormal, 0)).xyz;
@@ -87,6 +92,20 @@ void main() {
 
     // Absolute world position
     WorldPos = modelMatrix * vec4(vPosition, 1.0);
+    
+
+    
+
+    // Mirror shit
+    if (u_useMirrorMatrix) {
+        // Clipping plane
+        float d = -dot(u_mirrorNormal, u_mirrorPosition);
+	    vec4 plane = vec4(u_mirrorNormal, d + 0.05);
+        gl_ClipDistance[0] = dot(WorldPos, plane);
+
+        // Replace view matrix
+        view = u_mirrorViewMatrix;
+    }    
 
     // Camera relative position for depth precision
     vec4 camRelativeWorldPos = vec4(WorldPos.xyz - ViewPos, 1.0);

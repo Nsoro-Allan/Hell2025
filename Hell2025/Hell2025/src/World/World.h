@@ -143,6 +143,7 @@ namespace World {
 
     void UpdateDoorAndWindowCubeTransforms();
     void ResetWeatherboardMeshBuffer();
+    void UpdateAllHangingLightCords();
 
     // Util
     bool ObjectTypeIsInteractable(ObjectType objectType, uint64_t objectId, glm::vec3 playerCameraPosition, glm::vec3 rayHitPosition);
@@ -172,7 +173,7 @@ namespace World {
     Door* GetDoorByObjectId(uint64_t objectID);
     Door* GetDoorByDoorFrameObjectId(uint64_t objectID);
 
-    GenericObject* GetDrawersByObjectId(uint64_t objectId);
+    GenericObject* GetGenericObjectById(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);

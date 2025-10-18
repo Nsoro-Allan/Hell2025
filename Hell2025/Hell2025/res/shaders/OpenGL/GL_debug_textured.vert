@@ -23,7 +23,11 @@ out vec3 EmissiveColor;
 uniform int u_viewportIndex;
 uniform mat4 u_model;
 
-//uniform mat4 u_perspectiveMatrix;
+// temporarily here
+uniform bool u_useMirrorMatrix;
+uniform mat4 u_mirrorViewMatrix;
+uniform vec3 u_mirrorNormal;
+uniform vec3 u_mirrorPosition;
 
 void main() {
 
@@ -31,6 +35,19 @@ void main() {
     mat4 inverseModelMatrix = inverse(modelMatrix);  
 	mat4 projectionView = viewportData[u_viewportIndex].projectionView;            
     mat4 normalMatrix = transpose(inverseModelMatrix);
+
+
+    
+    if (u_useMirrorMatrix) {
+        // Clipping plane
+        float d = -dot(u_mirrorNormal, u_mirrorPosition);
+	    vec4 plane = vec4(u_mirrorNormal, d + 0.05);
+        gl_ClipDistance[0] = dot(WorldPos, plane);
+
+        // Replace view matrix
+        mat4 projection = viewportData[u_viewportIndex].projection;         
+        projectionView = projection *  u_mirrorViewMatrix;
+    }
 
     Normal = normalize(normalMatrix * vec4(vNormal, 0)).xyz;
     Tangent = normalize(normalMatrix * vec4(vTangent, 0)).xyz;

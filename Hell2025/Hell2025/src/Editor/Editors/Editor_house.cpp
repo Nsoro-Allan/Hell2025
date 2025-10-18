@@ -72,10 +72,11 @@ namespace Editor {
         //ReconfigureHouseEditorImGuiElements();
 
         // Move player somewhere reasonable
-        Player* player = Game::GetLocalPlayerByIndex(0);
-        if (player) {
-            player->SetFootPosition(glm::vec3(2.25f, 0.0, 1.68f));
-            player->GetCamera().SetEulerRotation(glm::vec3(-0.2f, 0.0, 0.0f));
+        if (Player* player = Game::GetLocalPlayerByIndex(0)) {
+            if (player->GetFootPosition().y > 10) {
+                player->SetFootPosition(glm::vec3(2.25f, 0.0, 1.68f));
+                player->GetCamera().SetEulerRotation(glm::vec3(-0.2f, 0.0, 0.0f));
+            }
         }
 
         Audio::PlayAudio(AUDIO_SELECT, 1.0f);

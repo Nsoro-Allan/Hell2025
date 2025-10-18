@@ -11,6 +11,9 @@
 
 #include "Ragdoll/RagdollManager.h"
 #include "Input/Input.h"
+#include "HellLogging.h"
+#include "Physics/Physics.h"
+
 
 namespace OpenGLRenderer {
 
@@ -33,6 +36,12 @@ namespace OpenGLRenderer {
         OpenGLMeshBuffer& glHouseMeshBuffer = houseMeshBuffer.GetGLMeshBuffer();
 
         glBindVertexArray(glHouseMeshBuffer.GetVAO());
+
+
+                // ATTENTION! You are not frustum culling your house mesh bro
+                // ATTENTION! You are not frustum culling your house mesh bro
+                // ATTENTION! You are not frustum culling your house mesh bro
+
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
@@ -247,6 +256,245 @@ namespace OpenGLRenderer {
        }
 
        glBindVertexArray(0);  
+    }
+
+    void MirrorGeometryPass() {
+
+        const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
+
+
+
+        const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
+        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
+
+
+
+        if (RenderDataManager::GetMirrorRenderItems().empty()) {
+            return;
+        }
+
+
+
+
+
+
+
+
+
+
+        // Render the mirror "stencil" mask
+        glEnable(GL_DEPTH_TEST);
+        glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
+        Mesh* mesh = AssetManager::GetMeshByIndex(mirrorRenderItem.meshIndex);
+        if (!mesh) {
+            Logging::Error() << "couldn't find your mirror mesh";
+        }
+
+        for (int i = 0; i < 4; i++) {
+            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+            if (viewport->IsVisible()) {
+
+                OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+                OpenGLShader* solidColorShader = GetShader("DebugSolidColor");
+
+                if (!gBuffer) return;
+                if (!solidColorShader) return;
+
+                gBuffer->Bind();
+                gBuffer->DrawBuffers({ "MirrorMask" });
+
+                solidColorShader->Bind();
+                solidColorShader->SetMat4("u_projectionView", viewportData[i].projectionView);
+                solidColorShader->SetMat4("u_model", mirrorRenderItem.modelMatrix);
+
+
+                glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), mesh->baseVertex);
+            }
+        }
+
+
+
+
+    //    return;
+
+
+
+   //     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+  //      glStencilMask(0x00);
+
+
+
+
+        glm::mat4 mirrorViewMatrices[4];
+        glm::vec3 mirrorReflectVectors[4];
+        glm::vec3 mirrorNormals[4];
+        glm::vec3 mirrorPositions[4];
+
+        for (int i = 0; i < 4; i++) {
+            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+            if (viewport->IsVisible()) {
+                //glm::mat4 mirrorMatrix = glm::mat4(1.0f);
+                glm::vec3 mirrorPos = mirrorRenderItem.modelMatrix[3];
+                //glm::vec3 mirrorNormal = glm::vec3(0.0f, 0.0f, 1.0f);       // TEMPROARTY! YOU NEED TGO GET THE ACTUAL FORWARD VECTOR OF THE MIRROR.
+
+
+
+                glm::vec3 mirrorLocalForward = glm::vec3(-1.0f, 0.0f, 0.0f);
+                glm::vec3 mirrorWorldForward = glm::normalize(mirrorRenderItem.modelMatrix * glm::vec4(mirrorLocalForward, 0.0f));
+
+                glm::vec3 mirrorNormal = mirrorWorldForward;
+
+
+
+                glm::mat3 mirrorRotationMat3 = glm::mat3(mirrorRenderItem.modelMatrix);
+
+                glm::vec3 viewportCamPos = viewportData[i].viewPos;
+
+                mirrorPos.y = viewportCamPos.y;
+                mirrorPos += mirrorNormal * glm::vec3(0.05);
+
+                float d = glm::dot(mirrorNormal, viewportCamPos - mirrorPos);
+                glm::vec3 mirrorCamPos = viewportCamPos - 2 * d * mirrorNormal;
+                glm::vec3 camFront = viewportData[i].cameraForward;
+                glm::vec3 N = glm::normalize(mirrorNormal);
+                glm::vec3 R = -glm::reflect(camFront, N); // why r u negating this? is your params backwards?
+                glm::mat4 mirrorViewMatrix = glm::lookAt(mirrorCamPos, mirrorCamPos + R, glm::vec3(0, 1, 0));
+
+                mirrorViewMatrices[i] = mirrorViewMatrix;
+                mirrorReflectVectors[i] = R;
+                mirrorNormals[i] = mirrorNormal;
+                mirrorPositions[i] = mirrorPos;
+
+                DrawPoint(mirrorPos, PINK);
+                DrawLine(mirrorPos, mirrorPos + mirrorReflectVectors[i], PINK);
+
+
+
+                DrawLine(mirrorPos, mirrorPos + mirrorWorldForward, WHITE);
+
+
+            }
+        }
+     //   return;
+
+
+
+        if (!Input::KeyDown(HELL_KEY_M)) {
+            return;
+        }
+
+        glEnable(GL_CLIP_DISTANCE0);
+
+
+        OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+        OpenGLShader* shader = GetShader("GBuffer");
+        OpenGLShader* editorMeshShader = GetShader("EditorMesh");
+        OpenGLTextureArray* woundMaskArray = GetTextureArray("WoundMasks");
+
+
+        if (!gBuffer) return; if (!shader) return;
+        if (!editorMeshShader) return;
+        if (!woundMaskArray) return;
+
+        gBuffer->Bind();
+        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition" });
+        gBuffer->Bind();
+        gBuffer->ClearDepthAttachment();
+
+        SetRasterizerState("GeometryPass_NonBlended");
+
+
+        shader->Bind();
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
+        shader->SetBool("u_useMirrorMatrix", true);
+              
+
+
+
+        // RENDER THE MAIN SCENE RENDER ITEMS
+        glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
+
+        for (int i = 0; i < 4; i++) {
+            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+            if (viewport->IsVisible()) {
+                shader->SetMat4("u_mirrorViewMatrix", mirrorViewMatrices[i]);
+                shader->SetVec3("u_mirrorNormal", mirrorNormals[i]);
+                shader->SetVec3("u_mirrorPosition", mirrorPositions[i]);
+
+                glBindTextureUnit(7, gBuffer->GetColorAttachmentHandleByName("MirrorMask")); // put me somewhere better
+
+                OpenGLRenderer::SetViewport(gBuffer, viewport);
+                if (BackEnd::RenderDocFound()) {
+                  SplitMultiDrawIndirect(shader, drawInfoSet.mirrorRenderItems[i], true, false);
+                }
+                else {
+                    MultiDrawIndirect(drawInfoSet.mirrorRenderItems[i]);
+                }
+            }
+        }
+        shader->SetBool("u_useMirrorMatrix", false);
+
+
+        // RENDER THE HOUSE GEOMETRY AKA THE WALLS/CEILING/FLOOGS
+        {           
+            OpenGLShader* houseShader = GetShader("DebugTextured");
+
+            if (!gBuffer) return;
+            if (!houseShader) return;
+
+            gBuffer->Bind();
+            gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
+            SetRasterizerState("GeometryPass_NonBlended");
+
+            houseShader->Bind();
+            houseShader->SetMat4("u_model", glm::mat4(1));
+            houseShader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
+            houseShader->SetBool("u_useMirrorMatrix", true);
+
+            MeshBuffer& houseMeshBuffer = World::GetHouseMeshBuffer();
+            OpenGLMeshBuffer& glHouseMeshBuffer = houseMeshBuffer.GetGLMeshBuffer();
+
+            glBindVertexArray(glHouseMeshBuffer.GetVAO());
+
+            for (int i = 0; i < 4; i++) {
+                Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+                if (!viewport->IsVisible()) continue;
+                if (glHouseMeshBuffer.GetIndexCount() <= 0) continue;
+
+                OpenGLRenderer::SetViewport(gBuffer, viewport);
+                houseShader->SetInt("u_viewportIndex", i);
+                           
+                houseShader->SetMat4("u_mirrorViewMatrix", mirrorViewMatrices[i]);
+                houseShader->SetVec3("u_mirrorNormal", mirrorNormals[i]);
+                houseShader->SetVec3("u_mirrorPosition", mirrorPositions[i]);
+
+
+                glFinish();
+
+                glBindTextureUnit(7, gBuffer->GetColorAttachmentHandleByName("MirrorMask")); // put me somewhere better
+
+                const std::vector<HouseRenderItem>& renderItems = RenderDataManager::GetHouseRenderItems();
+
+                for (const HouseRenderItem& renderItem : renderItems) {
+                    int indexCount = renderItem.indexCount;
+                    int baseVertex = renderItem.baseVertex;
+                    int baseIndex = renderItem.baseIndex;
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.baseColorTextureIndex)->GetGLTexture().GetHandle());
+                    glActiveTexture(GL_TEXTURE1);
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.normalMapTextureIndex)->GetGLTexture().GetHandle());
+                    glActiveTexture(GL_TEXTURE2);
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.rmaTextureIndex)->GetGLTexture().GetHandle());
+                    glDrawElementsBaseVertex(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, (void*)(sizeof(unsigned int) * baseIndex), baseVertex);
+                }
+            }
+            houseShader->SetBool("u_useMirrorMatrix", false);
+
+        }
+
+        // Clean up
+        glDisable(GL_CLIP_DISTANCE0);
     }
 }
 

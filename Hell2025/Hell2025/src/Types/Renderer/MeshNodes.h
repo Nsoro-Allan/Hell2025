@@ -12,6 +12,7 @@ struct MeshNode {
     uint64_t parentObjectId;
     uint32_t openableId;
     uint32_t customId;
+    uint64_t physicsId;
     MeshNodeType type;
     BlendingMode blendingMode;
     int32_t localParentIndex;
@@ -71,13 +72,14 @@ struct MeshNodes {
     bool IsDirty() const                                                    { return m_isDirty; }
     const ArmatureData& GetArmature() const                                 { return m_armatureData; }
     const std::string& GetModelName() const                                 { return m_modelName; }
-    const std::vector<MeshNode>& GetNodes() const                       { return m_meshNodes; }
+    const std::vector<MeshNode>& GetNodes() const                           { return m_meshNodes; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_renderItems; }
     const std::vector<RenderItem>& GetRenderItemsBlended() const            { return m_renderItemsBlended; }
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_renderItemsAlphaDiscarded; }
     const std::vector<RenderItem>& GetRenderItemsHairTopLayer() const       { return m_renderItemsHairTopLayer; }
     const std::vector<RenderItem>& GetRenderItemsHairBottomLayer() const    { return m_renderItemsHairBottomLayer; }
     const std::vector<RenderItem>& GetRenderItemsToiletWater() const        { return m_renderItemsHairBottomLayer; }
+    const std::vector<RenderItem>& GetRenderItemsMirror() const             { return m_renderItemsMirror; }
 
 private:
     void UpdateAABBs(const glm::mat4& worldMatrix);
@@ -92,6 +94,7 @@ private:
     std::vector<RenderItem> m_renderItemsHairTopLayer;
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
     std::vector<RenderItem> m_renderItemsToiletWater;
+    std::vector<RenderItem> m_renderItemsMirror;
     bool m_isGold = false;
     bool m_isDirty = true;
     bool m_forceDirty = true;

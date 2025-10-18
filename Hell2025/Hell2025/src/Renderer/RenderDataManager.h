@@ -37,6 +37,7 @@ namespace RenderDataManager {
     void SubmitRenderItemsAlphaDiscard(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItemsAlphaHairTopLayer(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItemsAlphaHairBottomLayer(const std::vector<RenderItem>& renderItems);
+    void SubmitRenderItemsMirror(const std::vector<RenderItem>& renderItems);
 
     void SubmitOutlineRenderItem(const RenderItem& renderItem);
     void SubmitOutlineRenderItems(const std::vector<RenderItem>& renderItems);
@@ -60,6 +61,7 @@ namespace RenderDataManager {
     const std::vector<RenderItem>& GetDecalRenderItems();
     const std::vector<RenderItem>& GetInstanceData();
     const std::vector<RenderItem>& GetOutlineRenderItems();
+    const std::vector<RenderItem>& GetMirrorRenderItems();
     const std::vector<ScreenSpaceBloodDecalInstanceData>& GetScreenSpaceBloodDecalInstanceData();
     const std::vector<ViewportData>& GetViewportData();
     const DrawCommandsSet& GetDrawInfoSet();

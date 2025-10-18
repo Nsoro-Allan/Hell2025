@@ -74,18 +74,6 @@ namespace Util {
         return WallType::NONE;
     }
 
-    std::string BlendingModeToString(BlendingMode mode) {
-        switch (mode) {
-            case BlendingMode::BLEND_DISABLED:      return "BLEND_DISABLED";
-            case BlendingMode::BLENDED:             return "BLENDED";
-            case BlendingMode::ALPHA_DISCARDED:     return "ALPHA_DISCARDED";
-            case BlendingMode::HAIR_UNDER_LAYER:    return "HAIR_UNDER_LAYER";
-            case BlendingMode::HAIR_TOP_LAYER:      return "HAIR_TOP_LAYER";
-            case BlendingMode::DO_NOT_RENDER:       return "DO_NOT_RENDER";
-            default: return "UNKNOWN";
-        }
-    }
-
     std::string HouseTypeToString(HouseType houseType) {
         switch (houseType) {
             case HouseType::SMALL_HOUSE:    return "SMALL_HOUSE";
@@ -158,23 +146,16 @@ namespace Util {
     }
 
     //ObjectType StringToObjectType(const std::string& str)                     { return magic_enum::enum_cast<ObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
-    GenericObjectType StringToGenericObjectType(const std::string& str)         { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+    GenericObjectType StringToGenericObjectType(const std::string& str) { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+    BlendingMode StringToBlendingMode(const std::string& str)           { return magic_enum::enum_cast<BlendingMode>(str).value_or(BlendingMode::BLENDED); }
     
     std::string EditorStateToString(const EditorState& editorState)             { return std::string(magic_enum::enum_name(editorState)); }
     std::string EditorSelectionModeToString(const EditorSelectionMode& mode)    { return std::string(magic_enum::enum_name(mode)); }
     std::string GenericObjectTypeToString(GenericObjectType type)               { return std::string(magic_enum::enum_name(type)); }
     std::string ObjectTypeToString(ObjectType type)                             { return std::string(magic_enum::enum_name(type)); }
     std::string OpenStateToString(OpenState type)                               { return std::string(magic_enum::enum_name(type)); }
+    std::string BlendingModeToString(BlendingMode mode)                         { return std::string(magic_enum::enum_name(mode)); }
   
-    BlendingMode StringToBlendingMode(const std::string& str) {
-        if (str == "BLENDED") return BlendingMode::BLENDED;
-        if (str == "ALPHA_DISCARDED") return BlendingMode::ALPHA_DISCARDED;
-        if (str == "HAIR_UNDER_LAYER") return BlendingMode::HAIR_UNDER_LAYER;
-        if (str == "HAIR_TOP_LAYER") return BlendingMode::HAIR_TOP_LAYER;
-        if (str == "DO_NOT_RENDER") return BlendingMode::DO_NOT_RENDER;
-        return BlendingMode::BLEND_DISABLED;
-    }
-
     HouseType StringToHouseType(const std::string& str) {
         if (str == "SMALL_HOUSE")   return HouseType::SMALL_HOUSE;
         if (str == "MEDIUM_HOUSE")  return HouseType::MEDIUM_HOUSE;

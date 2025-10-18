@@ -58,6 +58,7 @@ namespace OpenGLRenderer {
     void EmissivePass();
     void FurPass();
     void GeometryPass();
+    void MirrorGeometryPass();
     void GlassPass();
     void GrassPass();
     void HairPass();

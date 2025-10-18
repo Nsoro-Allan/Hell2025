@@ -4,6 +4,10 @@ layout (binding = 0) uniform sampler2D baseColorTexture;
 layout (binding = 1) uniform sampler2D normalTexture;
 layout (binding = 2) uniform sampler2D rmaTexture;
 
+layout (binding = 7) uniform sampler2D WorldMirrorMaskTexture; // slot 7 because the main gbuffer shader has already maxed out the 6 before this
+
+
+
 layout (location = 0) out vec4 BaseColorOut;
 layout (location = 1) out vec4 NormalOut;
 layout (location = 2) out vec4 RMAOut;
@@ -20,7 +24,23 @@ in vec3 EmissiveColor;
 
 uniform bool u_flipNormalMapY;
 
+
+// temporarily here
+uniform bool u_useMirrorMatrix;
+uniform mat4 u_mirrorViewMatrix;
+
+
 void main() {
+
+    if (u_useMirrorMatrix) {
+       ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
+       float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
+       
+       if (mirrorMask < 1) {
+           discard;
+       }
+    }
+
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
     vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
    
@@ -46,4 +66,16 @@ void main() {
     WorldPositionOut = vec4(WorldPos.rgb, 1.0);
 
     EmissiveOut = vec4(EmissiveColor, 0);
+
+
+    
+   //if (u_useMirrorMatrix) {
+   //   ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
+   //   float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
+   //   
+   //   if (mirrorMask > 0) {
+   //       BaseColorOut.rgb = vec3(0, 1, 0);
+   //   }
+   //}
+
 }

@@ -44,6 +44,7 @@ enum class BlendingMode {
     HAIR_UNDER_LAYER,
     HAIR_TOP_LAYER,
     TOILET_WATER,
+    MIRROR,
     DO_NOT_RENDER
 };
 
@@ -452,8 +453,8 @@ enum struct GenericObjectType {
     DRAWERS_LARGE,
     TOILET,
     COUCH,
-    BATHROOM_CUPBOARD,
     BATHROOM_BASIN,
+    BATHROOM_CABINET,
     BATHROOM_TOWEL_RACK,    
     UNDEFINED
 };

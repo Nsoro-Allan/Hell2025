@@ -130,6 +130,9 @@ namespace World {
             // Load the objects
             LoadMapInstanceObjects(mapInstanceCreateInfo.mapName, spawnOffset);
             LoadMapInstanceHouses(mapInstanceCreateInfo.mapName, spawnOffset);
+
+            Logging::Warning() << "MAKE SURE YOU REMOVE THIS LINE break IT IS DISABLING THE LOAD OF THE SECOND MAP INSTANCE";
+            break;
         }
 
         RecreateHouseMesh();
@@ -323,7 +326,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
-        for (GenericObjectCreateInfo& createInfo : createInfoCollection.drawers)              AddGenericObject(createInfo, spawnOffset);
+        for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericGameObjects)              AddGenericObject(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
@@ -338,7 +341,7 @@ namespace World {
         CreateInfoCollection createInfoCollection;
 
         for (Door& door : World::GetDoors())                        createInfoCollection.doors.push_back(door.GetCreateInfo());
-        for (GenericObject& drawers : World::GetGenericObjects())                createInfoCollection.drawers.push_back(drawers.GetCreateInfo());
+        for (GenericObject& drawers : World::GetGenericObjects())                createInfoCollection.genericGameObjects.push_back(drawers.GetCreateInfo());
         for (Light& light : World::GetLights())                     createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                     createInfoCollection.pianos.push_back(piano.GetCreateInfo());
         for (PickUp& pickUp : World::GetPickUps())                  createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
@@ -453,7 +456,7 @@ namespace World {
         return g_doors.get(objectId);
     }
 
-    GenericObject* GetDrawersByObjectId(uint64_t objectId) {
+    GenericObject* GetGenericObjectById(uint64_t objectId) {
         return g_genericObjects.get(objectId);
     }
 
@@ -623,7 +626,7 @@ namespace World {
     }
 
     void SetObjectPosition(uint64_t objectId, glm::vec3 position) {
-        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetGenericObjectById(objectId);
         if (drawers) {
             drawers->SetPosition(position);
         }
@@ -681,14 +684,14 @@ namespace World {
     }
 
     void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
-        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetGenericObjectById(objectId);
         if (drawers) {
             drawers->SetRotation(rotation);
         }
     }
 
     glm::vec3 GetGizmoOffest(uint64_t objectId) {
-        GenericObject* drawers = World::GetDrawersByObjectId(objectId);
+        GenericObject* drawers = World::GetGenericObjectById(objectId);
         if (drawers) {
             return drawers->GetGizmoOffset();
         }

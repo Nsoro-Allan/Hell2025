@@ -11,6 +11,7 @@ layout (binding = 2) uniform sampler2D GBufferNormalTexture;
 layout (binding = 3) uniform sampler2D GBufferRMATexture;
 layout (binding = 4) uniform sampler2D GBufferWorldPositionexture;
 layout (binding = 5) uniform usampler2D ViewportIndexTexture;
+layout (binding = 6) uniform sampler2D GBufferWorldMirrorMaskTexture;
 
 shared vec3 sharedDebugOutputColor;
 
@@ -34,6 +35,8 @@ void main() {
     vec3 baseColor = texture(GBufferBaseColorTexture, uv_screenspace).rgb;
     vec3 normal = texture(GBufferNormalTexture, uv_screenspace).rgb;
     vec3 rma = texture(GBufferRMATexture, uv_screenspace).rgb;
+    float mirrorMask = texture(GBufferWorldMirrorMaskTexture, uv_screenspace).r;   
+
     uint viewportIndex = texture(ViewportIndexTexture, uv_screenspace).r;
     mat4 viewMatrix = viewportData[viewportIndex].view;
     mat4 inverseView = viewportData[viewportIndex].inverseView;
@@ -50,6 +53,7 @@ void main() {
     else if (rendererData.rendererOverrideState == 3) {
         finalColor = rma;
         finalColor = vec3(rma.r);
+        finalColor = vec3(mirrorMask, 0, 0);
     }
     else if (rendererData.rendererOverrideState == 4) {
         return;

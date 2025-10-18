@@ -2,6 +2,7 @@
 #include "HellLogging.h"
 #include <iostream>
 #include <unordered_map>
+#include "Util.h">
 
 namespace Bible {
     std::unordered_map<std::string, InventoryItemInfo> m_inventoryItems;
@@ -171,14 +172,18 @@ mystery.)";
     }
 
     void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes) {
-        switch (type) {
-            case GenericObjectType::DRAWERS_SMALL: return ConfigureMeshNodesDrawersSmall(id, meshNodes);
-            case GenericObjectType::DRAWERS_LARGE: return ConfigureMeshNodesDrawersLarge(id, meshNodes);
-            case GenericObjectType::TOILET: return ConfigureMeshNodesToilet(id, meshNodes);
+        switch (type) {            
+            case GenericObjectType::BATHROOM_BASIN:     return ConfigureMeshNodesBathroomBasin(id, meshNodes);
+            case GenericObjectType::BATHROOM_CABINET:   return ConfigureMeshNodesBathroomCabinet(id, meshNodes);
+            case GenericObjectType::DRAWERS_SMALL:      return ConfigureMeshNodesDrawersSmall(id, meshNodes);
+            case GenericObjectType::DRAWERS_LARGE:      return ConfigureMeshNodesDrawersLarge(id, meshNodes);
+            case GenericObjectType::TOILET:             return ConfigureMeshNodesToilet(id, meshNodes);
+            case GenericObjectType::COUCH:              return ConfigureMeshNodesCouch(id, meshNodes);
+                
 
-            default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed from non-implemented GenericObjectType"; return;
+            default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed from non-implemented GenericObjectType, type was: " << Util::GenericObjectTypeToString(type); return;
 
-                // write an error message for when you fail to init the meshnodes, that will hapnen a lot when you are rapidly implementing shit
+                // write an error message for when you fail to init the MeshNodes, that will hapnen a lot when you are rapidly implementing shit
                 // so you need a warning!
 
         }

@@ -1,4 +1,5 @@
 #include "Bible/Bible.h"
+#include "AssetManagement/AssetManager.h"
 
 namespace Bible {
     void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes) {
@@ -37,4 +38,56 @@ namespace Bible {
         meshNodes.Init(id, "Toilet", meshNodeCreateInfoSet);
     }
 
+    void ConfigureMeshNodesBathroomBasin(uint64_t id, MeshNodes& meshNodes) {
+        std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+        MeshNodeCreateInfo& basin = meshNodeCreateInfoSet.emplace_back();
+        basin.meshName = "BathroomBasin";
+        basin.materialName = "BathroomBasin";
+
+        MeshNodeCreateInfo& tapHot = meshNodeCreateInfoSet.emplace_back();
+        tapHot.meshName = "BathroomBasinTapHot";
+        tapHot.materialName = "BathroomBasin";
+
+        MeshNodeCreateInfo& tapCold = meshNodeCreateInfoSet.emplace_back();
+        tapCold.meshName = "BathroomBasinTapCold";
+        tapCold.materialName = "BathroomBasin";
+
+        meshNodes.Init(id, "BathroomBasin", meshNodeCreateInfoSet);
+
+        Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
+        AssetManager::PrintModelMeshNames(model);
+    }
+
+    void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes& meshNodes) {
+        std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+        MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
+        body.meshName = "CabinetBody";
+        body.materialName = "BathroomCabinet";
+
+        MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
+        door.meshName = "CabinetDoor";
+        door.materialName = "BathroomCabinet";
+        door.type = MeshNodeType::OPENABLE;
+        door.openable.openAxis = OpenAxis::ROTATE_Y;
+        door.openable.initialOpenState = OpenState::CLOSED;
+        door.openable.minOpenValue = 0.0f;
+        door.openable.maxOpenValue = 1.7;
+        door.openable.openSpeed = 7.25f;
+        door.openable.closeSpeed = 7.25f;
+        door.openable.openingAudio = "BathroomCabinetOpen.wav";
+        door.openable.closingAudio = "BathroomCabinetClose.wav";
+
+        MeshNodeCreateInfo& mirror = meshNodeCreateInfoSet.emplace_back();
+        mirror.meshName = "CabinetMirror";
+        mirror.blendingMode = BlendingMode::MIRROR;
+
+        meshNodes.Init(id, "BathroomCabinet", meshNodeCreateInfoSet);
+
+        Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
+        AssetManager::PrintModelMeshNames(model);
+    }
+
+    
 }

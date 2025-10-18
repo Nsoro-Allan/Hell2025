@@ -26,6 +26,7 @@
 #endif
 
 layout (binding = 6) uniform sampler2DArray woundMaskTextureArray;
+layout (binding = 7) uniform sampler2D WorldMirrorMaskTexture;
 
 #include "../common/lighting.glsl"
 #include "../common/post_processing.glsl"
@@ -50,6 +51,7 @@ in flat int EmissiveTextureIndex;
 
 uniform bool u_alphaDiscard;
 uniform bool u_flipNormalMapY;
+uniform bool u_useMirrorMatrix;
 
 void main() {
     vec3 emissiveColor = EmissiveColor;
@@ -77,6 +79,19 @@ void main() {
             discard;
         }    
     }
+
+
+
+    if (u_useMirrorMatrix) {
+       ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
+       float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
+       
+       if (mirrorMask < 1) {
+           discard;
+       }
+    }
+
+
 
     // Sensible defaults for wound texture
     vec4 woundBaseColor = vec4(0,0,0,0);

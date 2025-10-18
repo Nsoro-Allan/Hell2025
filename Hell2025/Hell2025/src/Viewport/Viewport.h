@@ -11,10 +11,22 @@ struct SpaceCoords {
     float localMouseY;
 };
 
+struct MirrorInfo {
+    glm::mat4 viewMatrix;
+    glm::vec3 reflectVector;
+    glm::vec3 normal;
+    glm::vec3 position;
+    bool valid = false;
+};
+
 struct Viewport {
 public:
     Viewport(const glm::vec2& position = { 0.0f, 0.0f }, const glm::vec2& size = { 1.0f, 1.0f }, bool isOrthographic = true);
     void Update();
+
+    void ClearMirrorInfo();
+    void UpdateMirrorInfo(glm::mat4 mirrorModelMatrix, glm::vec3 mirrorLocalForward);
+
     void SetOrthographic(float orthoSize, float nearPlane, float farPlane);
     void SetPerspective(float fov, float nearPlane, float farPlane);
     void SetPosition(const glm::vec2& position);
@@ -40,11 +52,14 @@ public:
     SpaceCoords GetGBufferSpaceCoords() const;
     SpaceCoords GetUISpaceCoords() const;
 
-    Frustum& GetFrustum() { return m_frustum; }
-    int GetLeftPixel()    { return m_leftPixel; }
-    int GetRightPixel()   { return m_rightPixel; }
-    int GetTopPixel()     { return m_topPixel; }
-    int GetBottomPixel()  { return m_bottomPixel; }
+    MirrorInfo& GetMirrorInfo() { return m_mirrorInfo; }
+
+    Frustum& GetFrustum()       { return m_frustum; }
+    Frustum& GetMirrorFrustum() { return m_mirrorFrustum; }
+    int GetLeftPixel()          { return m_leftPixel; }
+    int GetRightPixel()         { return m_rightPixel; }
+    int GetTopPixel()           { return m_topPixel; }
+    int GetBottomPixel()        { return m_bottomPixel; }
 
 private:
     glm::vec2 m_position;           // Top-left corner in normalized screen space (0-1)
@@ -66,9 +81,11 @@ private:
     glm::vec3 m_mouseRayDirPerspective;
     glm::vec3 m_mouseRayDirOrthographic;
     Frustum m_frustum;
+    Frustum m_mirrorFrustum; // this work for a single mirror only, closest to the player who owns this viewport
     ShadingMode m_viewportMode;
     SpaceCoords m_windowSpaceCoords;
     SpaceCoords m_gBufferSpaceCoords;
     SpaceCoords m_uiSpaceCoords;
+    MirrorInfo m_mirrorInfo;
     void UpdateProjectionMatrices();
 };
