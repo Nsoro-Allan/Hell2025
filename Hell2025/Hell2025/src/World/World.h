@@ -28,7 +28,6 @@
 #include "Types/Generics/GenericStatic.h"
 #include "Types/Interior/PictureFrame.h"
 #include "Types/Interior/Piano.h"
-#include "Types/Interior/Toilet.h"
 #include "Types/House/Door.h"
 #include "Types/House/HouseInstance.h"
 #include "Types/House/Plane.h"
@@ -182,7 +181,6 @@ namespace World {
     PictureFrame* GetPictureFrameByObjectId(uint64_t objectId);
     Plane* GetPlaneByObjectId(uint64_t objectID); 
     Tree* GetTreeByObjectId(uint64_t objectId);
-    Toilet* GetToiletByMeshNodeObjectId(uint64_t objectId);
     Wall* GetWallByObjectId(uint64_t objectID);
     Wall* GetWallByWallSegmentObjectId(uint64_t objectID);
     Shark* GetSharkByObjectId(uint64_t objectID);
@@ -226,16 +224,10 @@ namespace World {
     std::vector<Transform>& GetDoorAndWindowCubeTransforms();
     std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();
-    std::vector<Toilet>& GetToilets();;
     std::vector<Tree>& GetTrees();
     std::vector<Wall>& GetWalls();
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters();
-    std::vector<Window>& GetWindows();
+    Hell::SlotMap<Window>& GetWindows();
 
-    //std::vector<RenderItem>& GetRenderItems();
-    //std::vector<RenderItem>& GetRenderItemsBlended();
-    //std::vector<RenderItem>& GetRenderItemsAlphaDiscarded();
-    //std::vector<RenderItem>& GetRenderItemsHairTopLayer();
-    //std::vector<RenderItem>& GetRenderItemsHairBottomLayer();
     std::vector<RenderItem>& GetSkinnedRenderItems();
 }

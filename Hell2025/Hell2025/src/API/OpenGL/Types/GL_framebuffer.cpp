@@ -78,7 +78,14 @@ void OpenGLFrameBuffer::CreateDepthAttachment(GLenum internalFormat, GLenum minF
 }
 
 void OpenGLFrameBuffer::BindDepthAttachmentFrom(const OpenGLFrameBuffer& srcFrameBuffer) {
-    glNamedFramebufferTexture(m_handle, GL_DEPTH_ATTACHMENT, srcFrameBuffer.m_depthAttachment.handle, 0);
+    GLenum attach = (srcFrameBuffer.m_depthAttachment.internalFormat == GL_DEPTH24_STENCIL8 ||
+                     srcFrameBuffer.m_depthAttachment.internalFormat == GL_DEPTH32F_STENCIL8)
+        ? GL_DEPTH_STENCIL_ATTACHMENT
+        : GL_DEPTH_ATTACHMENT;
+
+    glNamedFramebufferTexture(m_handle, attach, srcFrameBuffer.m_depthAttachment.handle, 0);
+
+    //glNamedFramebufferTexture(m_handle, GL_DEPTH_ATTACHMENT, srcFrameBuffer.m_depthAttachment.handle, 0);
 }
 
 bool OpenGLFrameBuffer::StrCmp(const char* queryA, const char* queryB) {

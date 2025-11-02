@@ -105,19 +105,22 @@ namespace OpenGLRenderer {
 
     // Debug
     void UpdateDebugMesh();
-    void DrawPoint(glm::vec3 position, glm::vec3 color, bool obeyDepth = false, int exclusiveViewportIndex = -1);
-    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool obeyDepth = false, int exclusiveViewportIndex = -1, int ignoredViewportIndex = -1);
+    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool depthEnabled = false, int exclusiveViewportIndex = -1, int ignoredViewportIndex = -1);
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color);
+    void DrawPoint(glm::vec3 position, glm::vec3 color, bool depthEnabled = false, int exclusiveViewportIndex = -1);
+    void DrawPoint2D(const glm::ivec2& position, const glm::vec3& color);
     void DrawAABB(const AABB& aabb, const glm::vec3& color);
     void DrawAABB(const AABB& aabb, const glm::vec3& color, const glm::mat4& worldTransform);
+    void DrawFrustum(const Frustum& frustum, const glm::vec3& color);
     void DrawSphere(glm::vec3 position, float radius, glm::vec3 color);
     void DebugBlitFrameBufferTexture(const std::string& frameBufferName, const std::string& attachmentName, GLint dstX, GLint dstY, GLint width, GLint height);
     void DebugBlitOpenGLTexture(GLuint textureHandle, float scale);
     void BlitDebugTextures();
 
-    inline std::vector<DebugVertex> g_points;
-    inline std::vector<DebugVertex> g_lines;
-    inline std::vector<DebugVertex> g_pointsDepthAware;
-    inline std::vector<DebugVertex> g_linesDepthAware;
+    inline std::vector<DebugVertex2D> g_points2D;
+    inline std::vector<DebugVertex3D> g_points3D;
+    inline std::vector<DebugVertex2D> g_lines2D;
+    inline std::vector<DebugVertex3D> g_lines3D;
 
     void HotloadShaders();
     void CreateBlurBuffers();

@@ -1,5 +1,5 @@
 #include "Player.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Audio/Audio.h"

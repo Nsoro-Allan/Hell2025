@@ -2,25 +2,69 @@
 #include "AssetManagement/AssetManager.h"
 #include "Editor/Editor.h"
 #include "Physics/Physics.h"
-#include "Physics/Physics.h"
 #include "Renderer/RenderDataManager.h"
 #include "UniqueID.h"
 #include "Util.h"
-#include <unordered_map>
 
-void Window::Init(WindowCreateInfo createInfo) {
+Window::Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_createInfo = createInfo;
+    m_objectId = id;
 
-    Transform transform;
-    transform.position = m_createInfo.position;
-    transform.rotation = m_createInfo.rotation;  
-    m_modelMatrix = transform.to_mat4();   
-        
-    m_interiorMaterial = AssetManager::GetMaterialByName("Window");
-    m_exteriorMaterial = AssetManager::GetMaterialByName("WindowExterior");
+    m_transform.position = m_createInfo.position + spawnOffset.translation;
+    m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-    m_model = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("Window"));
-    m_glassModel = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("WindowGlass"));
+    std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+    MeshNodeCreateInfo& trimInterior = meshNodeCreateInfoSet.emplace_back();
+    trimInterior.meshName = "TrimInterior";
+    trimInterior.materialName = "Window";
+
+    MeshNodeCreateInfo& trimExterior = meshNodeCreateInfoSet.emplace_back();
+    trimExterior.meshName = "TrimExterior";
+    trimExterior.materialName = "WindowExterior";
+
+    MeshNodeCreateInfo& frameExteriorBottom = meshNodeCreateInfoSet.emplace_back();
+    frameExteriorBottom.meshName = "FrameExteriorBottom";
+    frameExteriorBottom.materialName = "WindowExterior";
+
+    MeshNodeCreateInfo& frameExteriorTop = meshNodeCreateInfoSet.emplace_back();
+    frameExteriorTop.meshName = "FrameExteriorTop";
+    frameExteriorTop.materialName = "WindowExterior";
+
+    MeshNodeCreateInfo& frameInteriorBottom = meshNodeCreateInfoSet.emplace_back();
+    frameInteriorBottom.meshName = "FrameInteriorBottom";
+    frameInteriorBottom.materialName = "Window";
+
+    MeshNodeCreateInfo& frameInteriorTop = meshNodeCreateInfoSet.emplace_back();
+    frameInteriorTop.meshName = "FrameInteriorTop";
+    frameInteriorTop.materialName = "Window";
+
+    MeshNodeCreateInfo& glassInteriorTop = meshNodeCreateInfoSet.emplace_back();
+    glassInteriorTop.meshName = "GlassInteriorTop";
+    glassInteriorTop.materialName = "WindowExterior";
+    glassInteriorTop.blendingMode = BlendingMode::GLASS;
+
+    MeshNodeCreateInfo& glassInteriorBottom = meshNodeCreateInfoSet.emplace_back();
+    glassInteriorBottom.meshName = "GlassInteriorBottom";
+    glassInteriorBottom.materialName = "WindowExterior";
+    glassInteriorBottom.blendingMode = BlendingMode::GLASS;
+
+    MeshNodeCreateInfo& glassExteriorTop = meshNodeCreateInfoSet.emplace_back();
+    glassExteriorTop.meshName = "GlassExteriorTop";
+    glassExteriorTop.materialName = "WindowExterior";
+    glassExteriorTop.blendingMode = BlendingMode::GLASS;
+
+    MeshNodeCreateInfo& glassExteriorBottom = meshNodeCreateInfoSet.emplace_back();
+    glassExteriorBottom.meshName = "GlassExteriorBottom";
+    glassExteriorBottom.materialName = "WindowExterior";
+    glassExteriorBottom.blendingMode = BlendingMode::GLASS;
+
+    MeshNodeCreateInfo& lock = meshNodeCreateInfoSet.emplace_back();
+    lock.meshName = "Lock";
+    lock.materialName = "Window";
+
+    m_meshNodes.Init(m_objectId, "Window", meshNodeCreateInfoSet);
+    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
 
     // Glass PhysX shapes
     PhysicsFilterData filterData;
@@ -31,9 +75,8 @@ void Window::Init(WindowCreateInfo createInfo) {
     filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
     filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
-    m_physicsId = Physics::CreateRigidStaticTriangleMeshFromModel(transform, "WindowGlassPhysX", filterData);
-    m_objectId = UniqueID::GetNextObjectId(ObjectType::WINDOW);
-
+    m_physicsId = Physics::CreateRigidStaticTriangleMeshFromModel(m_transform, "WindowGlassPhysX", filterData);
+    
     // Set PhysX user data
     PhysicsUserData userData;
     userData.physicsId = m_physicsId;
@@ -47,86 +90,13 @@ void Window::CleanUp() {
     Physics::MarkRigidStaticForRemoval(m_physicsId);
 }
 
-void Window::SetPosition(glm::vec3 position) {
+void Window::SetPosition(const glm::vec3& position) {
     m_createInfo.position = position;
-    
-    // TODO: abstract away duplciated code here and in init()
-    Transform transform;
-    transform.position = m_createInfo.position;
-    transform.rotation = m_createInfo.rotation;
-    m_modelMatrix = transform.to_mat4();
-    Physics::SetRigidStaticGlobalPose(m_physicsId, m_modelMatrix);
+    m_transform.position = position;
+    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+    Physics::SetRigidStaticGlobalPose(m_physicsId, m_transform.to_mat4());
 }
 
 void Window::Update(float deltaTime) {
-    UpdateRenderItems();
-}
-
-void Window::UpdateRenderItems() {
-    m_renderItems.clear();
-    m_glassRenderItems.clear();
-    
-    // Bail if models are invalid
-    if (!m_model) return;
-    if (!m_glassModel) return;
-
-    // Handle missing materials
-    if (!m_interiorMaterial) {
-        m_interiorMaterial = AssetManager::GetDefaultMaterial();
-    }
-    if (!m_exteriorMaterial) {
-        m_exteriorMaterial = AssetManager::GetDefaultMaterial();
-    }
-
-    static std::unordered_map<std::string, Material*> meshMaterialMap;
-    if (meshMaterialMap.empty()) {       
-        meshMaterialMap["SM_Window_01a"] = m_interiorMaterial;
-        meshMaterialMap["SM_Window_FaceA"] = m_interiorMaterial;
-        meshMaterialMap["SM_Window_FaceA_Bottom"] = m_interiorMaterial;
-        meshMaterialMap["SM_Window_FaceA_Top"] = m_interiorMaterial;
-        meshMaterialMap["SM_Window_FaceB"] = m_exteriorMaterial;
-        meshMaterialMap["SM_Window_FaceB_Bottom"] = m_exteriorMaterial;
-        meshMaterialMap["SM_Window_FaceB_Top"] = m_exteriorMaterial;
-    }
-
-    // Window render items
-    for (const uint32_t& meshIndex : m_model->GetMeshIndices()) {
-        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-        RenderItem& renderItem = m_renderItems.emplace_back();
-        renderItem.modelMatrix = m_modelMatrix;
-        renderItem.inverseModelMatrix = inverse(renderItem.modelMatrix);
-        renderItem.meshIndex = meshIndex;
-        renderItem.objectType = Util::EnumToInt(ObjectType::WINDOW);
-
-        // Dirty. Fix me. 
-        // Very error prone. Returns invalid pointer if name not found;
-        Material* material = meshMaterialMap[mesh->GetName()];
-
-        renderItem.baseColorTextureIndex = material->m_basecolor;
-        renderItem.rmaTextureIndex = material->m_rma;
-        renderItem.normalMapTextureIndex = material->m_normal;
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-    }
-        
-    // Glass render items
-    for (const uint32_t& meshIndex : m_glassModel->GetMeshIndices()) {
-        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-        RenderItem& renderItem = m_glassRenderItems.emplace_back();
-        renderItem.modelMatrix = m_modelMatrix;
-        renderItem.inverseModelMatrix = inverse(renderItem.modelMatrix);
-        renderItem.meshIndex = meshIndex;
-        renderItem.baseColorTextureIndex = m_exteriorMaterial->m_basecolor;
-        renderItem.rmaTextureIndex = m_exteriorMaterial->m_rma;
-        renderItem.normalMapTextureIndex = m_exteriorMaterial->m_normal;
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-    }
-}
-
-void Window::SubmitRenderItems() {
-    RenderDataManager::SubmitRenderItems(m_renderItems);
-    if (Editor::GetSelectedObjectId() == m_objectId) {
-        RenderDataManager::SubmitOutlineRenderItems(m_renderItems);
-    }
+    // Nothing as of yet
 }

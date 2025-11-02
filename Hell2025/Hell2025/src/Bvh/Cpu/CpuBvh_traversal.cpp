@@ -1,6 +1,6 @@
 #include "CpuBvh.h"
 #include "Renderer/Renderer.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellTypes.h"
 #include "UniqueID.h"
 #include "Util.h"

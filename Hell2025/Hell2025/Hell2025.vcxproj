@@ -252,6 +252,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\API\OpenGL\Types\GL_cubemapView.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_framebuffer.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_heightmap_mesh.cpp" />
+    <ClCompile Include="src\API\OpenGL\Types\GL_mesh.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_mesh_buffer.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_mesh_patch.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_shader.cpp" />
@@ -309,6 +310,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Common\UniqueID.cpp" />
     <ClCompile Include="src\Bible\Bible.cpp" />
     <ClCompile Include="src\Common\HellLogging.cpp" />
+    <ClCompile Include="src\Managers\MirrorManager.cpp" />
     <ClCompile Include="src\Managers\OpenableManager.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_left_panel.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_map_height.cpp" />
@@ -342,6 +344,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Ragdoll\RagdollInfo.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollManager.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
+    <ClCompile Include="src\Types\Mirror.cpp" />
     <ClCompile Include="src\Types\Exterior\Fence.cpp" />
     <ClCompile Include="src\Types\Exterior\PowerPoleSet.cpp" />
     <ClCompile Include="src\Types\Game\SpawnPoint.cpp" />
@@ -403,7 +406,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\House\WeatherBoards.cpp" />
     <ClCompile Include="src\Types\Generics\GenericStatic.cpp" />
     <ClCompile Include="src\Types\Core\GenericObject.cpp" />
-    <ClCompile Include="src\Types\Interior\Toilet.cpp" />
     <ClCompile Include="src\Types\Interior\Piano.cpp" />
     <ClCompile Include="src\Types\Interior\PictureFrame.cpp" />
     <ClCompile Include="src\Types\Renderer\Mesh.cpp" />
@@ -552,13 +554,15 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\GL_debug_ragdoll.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_solid_color.frag" />
     <None Include="res\shaders\OpenGL\GL_debug_solid_color.vert" />
+    <None Include="res\shaders\OpenGL\GL_debug_vertex_2D.frag" />
+    <None Include="res\shaders\OpenGL\GL_debug_vertex_2D.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_textured.frag" />
     <None Include="res\shaders\OpenGL\GL_debug_textured.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_texture_blit.frag" />
     <None Include="res\shaders\OpenGL\GL_debug_texture_blit.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_tile_view.comp" />
-    <None Include="res\shaders\OpenGL\gl_debug_vertex.frag" />
-    <None Include="res\shaders\OpenGL\gl_debug_vertex.vert" />
+    <None Include="res\shaders\OpenGL\GL_debug_vertex_3D.frag" />
+    <None Include="res\shaders\OpenGL\GL_debug_vertex_3D.vert" />
     <None Include="res\shaders\OpenGL\GL_debug_view.comp" />
     <None Include="res\shaders\OpenGL\GL_decals.frag" />
     <None Include="res\shaders\OpenGL\GL_decals.vert" />
@@ -658,7 +662,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\API\OpenGL\Renderer\GL_renderer.h" />
     <ClInclude Include="src\API\OpenGL\GL_util.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_cubemapView.h" />
-    <ClInclude Include="src\API\OpenGL\Types\GL_debug_mesh.hpp" />
+    <ClInclude Include="src\API\OpenGL\Types\GL_mesh.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_mesh_buffer.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_heightmap_mesh.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_indirectBuffer.hpp" />
@@ -694,7 +698,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\BackEnd\GLFWIntegration.h" />
     <ClInclude Include="src\Camera\Frustum.h" />
     <ClInclude Include="src\Common\CreateInfo.h" />
-    <ClInclude Include="src\Common\HellDefines.h" />
+    <ClInclude Include="src\Common\HellConstants.h" />
     <ClInclude Include="src\Common\HellFunctionTypes.h" />
     <ClInclude Include="src\Common\LoadingState.h" />
     <ClInclude Include="src\Config\Config.h" />
@@ -705,6 +709,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Bvh\Cpu\CpuBvh.h" />
     <ClInclude Include="src\Bible\Bible.h" />
     <ClInclude Include="src\Common\HellLogging.h" />
+    <ClInclude Include="src\Managers\MirrorManager.h" />
     <ClInclude Include="src\Managers\OpenableManager.h" />
     <ClInclude Include="src\Ragdoll\Ragdoll_util.h" />
     <ClInclude Include="src\Types\Characters\Enemies\Dobermann\Dobermann.h" />
@@ -729,6 +734,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Christmas\ChristmasPresent.h" />
     <ClInclude Include="src\Types\Christmas\ChristmasTree.h" />
     <ClInclude Include="src\Common\SlotMap.h" />
+    <ClInclude Include="src\Types\Mirror.h" />
     <ClInclude Include="src\Types\Effects\ScreenSpaceBloodDecal.h" />
     <ClInclude Include="src\Types\Effects\VolumetricBloodSplatter.h" />
     <ClInclude Include="src\Types\Characters\Allies\Mermaid\Mermaid.h" />
@@ -758,7 +764,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\House\WeatherBoards.h" />
     <ClInclude Include="src\Types\Generics\GenericStatic.h" />
     <ClInclude Include="src\Types\Core\GenericObject.h" />
-    <ClInclude Include="src\Types\Interior\Toilet.h" />
     <ClInclude Include="src\Types\Map\Map.h" />
     <ClInclude Include="src\Types\Map\MapInstance.h" />
     <ClInclude Include="src\Types\Interior\Piano.h" />

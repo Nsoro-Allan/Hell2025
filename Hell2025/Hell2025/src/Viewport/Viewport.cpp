@@ -1,11 +1,11 @@
 ﻿#include "Viewport.h"
-#include "HellDefines.h"
-#include "../BackEnd/BackEnd.h"
-#include "../Config/Config.h"
-#include "../Input/Input.h"
-#include "../Util/Util.h"
+#include "HellConstants.h"
+#include "BackEnd/BackEnd.h"
+#include "Config/Config.h"
+#include "Input/Input.h"
+#include "Util/Util.h"
 
-Viewport::Viewport(const glm::vec2& position, const glm::vec2& size, bool isOrthographic)
+Viewport::Viewport(uint32_t viewportIndex, const glm::vec2& position, const glm::vec2& size, bool isOrthographic)
     : m_position(position),
     m_size(size),
     m_isOrthographic(isOrthographic),
@@ -17,6 +17,7 @@ Viewport::Viewport(const glm::vec2& position, const glm::vec2& size, bool isOrth
     m_orthographicMatrix(glm::mat4(1.0f)),
     m_viewportMode(ShadingMode::SHADED) {
 
+    m_viewportIndex = viewportIndex;
     UpdateProjectionMatrices();
 }
 
@@ -182,6 +183,10 @@ void Viewport::SetPosition(const glm::vec2& position) {
 void Viewport::SetSize(const glm::vec2& size) {
     m_size = size;
     UpdateProjectionMatrices();
+}
+
+void Viewport::SetMirrorId(uint64_t mirrorId) {
+    m_mirrorId = mirrorId;
 }
 
 void Viewport::Show() {

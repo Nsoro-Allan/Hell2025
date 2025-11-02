@@ -1,5 +1,5 @@
 #include "InputMulti.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellLogging.h"
 #include "BackEnd/BackEnd.h"
 #include "BackEnd/GLFWIntegration.h"

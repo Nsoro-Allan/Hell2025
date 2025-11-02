@@ -95,15 +95,8 @@ namespace World {
                 }
             }
 
-            for (Toilet& toilet : GetToilets()) {
-                const std::vector<RenderItem>& renderItems = toilet.GetRenderItems();
-                for (const RenderItem& renderItem : renderItems) {
-                    CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
-                }
-            }
-
-            for (GenericObject& drawers: GetGenericObjects()) {
-                const std::vector<RenderItem>& renderItems = drawers.GetRenderItems();
+            for (GenericObject& genericObject: GetGenericObjects()) {
+                const std::vector<RenderItem>& renderItems = genericObject.GetRenderItems();
                 for (const RenderItem& renderItem : renderItems) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                 }

@@ -49,7 +49,7 @@ namespace Renderer {
             OpenGLRenderer::PreGameLogicComputePasses();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // Vulkan TODO:Renderer::PreGameLogicComputePasses();
+            Logging::ToDo() << "Vulkan: PreGameLogicComputePasses()";
         }
     }
 
@@ -58,7 +58,7 @@ namespace Renderer {
             OpenGLRenderer::RenderGame();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // Vulkan TODO:Renderer::RenderLoadingScreen();
+            Logging::ToDo() << "Vulkan: RenderGame()";
         }
     }
 
@@ -67,7 +67,7 @@ namespace Renderer {
             OpenGLRenderer::HotloadShaders();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            //VulkanRenderer::HotloadShaders();
+            Logging::ToDo() << "Vulkan: HotloadShaders()";
         }
     }
 
@@ -76,7 +76,7 @@ namespace Renderer {
             OpenGLRenderer::RecalculateAllHeightMapData(blitWorldMap);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: RecalculateAllHeightMapData()";
         }
     }
 
@@ -85,7 +85,7 @@ namespace Renderer {
             OpenGLRenderer::DrawPoint(position, color, obeyDepth, exclusiveViewportIndex);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: DrawPoint()";
         }
     }
 
@@ -94,7 +94,16 @@ namespace Renderer {
             OpenGLRenderer::DrawLine(begin, end, color, obeyDepth, exclusiveViewportIndex, ignoredViewportIndex);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: DrawLine()";
+        }
+    }
+
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawLine2D(begin, end, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: DrawLine2D()";
         }
     }
 
@@ -103,7 +112,7 @@ namespace Renderer {
             OpenGLRenderer::DrawAABB(aabb, color);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: DrawAABB()";
         }
     }
 
@@ -112,17 +121,25 @@ namespace Renderer {
             OpenGLRenderer::DrawAABB(aabb, color, worldTransform);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: DrawAABB()";
         }
     }
 
+    void DrawFrustum(const Frustum& frustum, const glm::vec3& color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawFrustum(frustum, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: DrawFrustum()";
+        }
+    }
 
     void DrawSphere(glm::vec3 position, float radius, glm::vec3 color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawSphere(position, radius, color);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TODO
+            Logging::ToDo() << "Vulkan: DrawSphere()";
         }
     }
 
@@ -131,7 +148,7 @@ namespace Renderer {
             OpenGLRenderer::ReadBackHeightMapData(map);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            Logging::ToDo() << "Vulkan TODO: Renderer::GetHeightMapData()";
+            Logging::ToDo() << "Vulkan: ReadBackHeightMapData()";
         }
     }
 
@@ -176,8 +193,7 @@ namespace Renderer {
             OpenGLRenderer::ClearAllWoundMasks();
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            Logging::ToDo() << "Vulkan TODO: Renderer::ClearAllWoundMasks()";
-            //VulkanRenderer::ClearAllWoundMasks();
+            Logging::ToDo() << "Vulkan: InitWoundMaskArray()";
         }
     }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
 #include "Types/Renderer/MeshNodes.h"

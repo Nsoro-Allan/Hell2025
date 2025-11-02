@@ -277,7 +277,6 @@ void main() {
 		    vec3 spotLightDir = flashlightDir.xyz;
             vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
 
-
             float fresnelReflect = 0.9;
             float spotLightRadius = 20.0;
             float spotLightStregth = 4.5;
@@ -558,7 +557,7 @@ void main() {
 
    // finalColor = indirect;
 
-    vec3 ambientTerm = baseColor.rgb * vec3(0.00325);
+    vec3 ambientTerm = baseColor.rgb * vec3(0.005);
 
     finalColor = directLighting. rgb + moonLighting  + ambientTerm;
 

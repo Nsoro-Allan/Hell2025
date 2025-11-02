@@ -2,7 +2,7 @@
 #include "HellTypes.h"
 #include "Types/Game/AnimatedGameObject.h"
 #include "CreateInfo.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "Pathfinding/AStar.h"
 #include "Physics/Types/CharacterController.h"
 

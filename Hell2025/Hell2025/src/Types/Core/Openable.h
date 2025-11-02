@@ -1,7 +1,7 @@
 #pragma once
 #include "Audio/Audio.h"
 #include "CreateInfo.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellEnums.h"
 #include "Util.h"
 #include "UniqueID.h"

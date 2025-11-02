@@ -1,6 +1,6 @@
 ﻿#include "Gizmo.h"
 #include "HellEnums.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 
 #include "Audio/Audio.h"
 #include "Config/Config.h"

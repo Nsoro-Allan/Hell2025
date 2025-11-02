@@ -14,7 +14,8 @@
 #include "HellLogging.h"
 #include "Physics/Physics.h"
 
-
+#include "Types/Mirror.h"
+#include "Managers/MirrorManager.h"
 
 namespace OpenGLRenderer {
 
@@ -259,22 +260,22 @@ namespace OpenGLRenderer {
         glBindVertexArray(0);
     }
 
+    struct ScreenRect {
+        int x0, y0, x1, y1;
+        bool valid;
+    };
+
+    static inline glm::ivec2 NDCToScreen(const glm::vec3& ndc, int viewportWidth, int viewportHeight) {
+        float sx = (ndc.x + 1.0f) * 0.5f * float(viewportWidth);
+        float sy = (1.0f - ndc.y) * 0.5f * float(viewportHeight);
+        return glm::ivec2((int)sx, (int)sy);
+    }
+
+
     void MirrorGeometryPass() {
         const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
-
-        if (RenderDataManager::GetMirrorRenderItems().empty()) {
-            return;
-        }
-
-        // Render the mirror "stencil" mask
-        glEnable(GL_DEPTH_TEST);
-        glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-        Mesh* mesh = AssetManager::GetMeshByIndex(mirrorRenderItem.meshIndex);
-        if (!mesh) {
-            Logging::Error() << "couldn't find your mirror mesh";
-        }
 
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* gBufferBackup = GetFrameBuffer("GBufferBackup");
@@ -288,18 +289,42 @@ namespace OpenGLRenderer {
         if (!houseGeometryShader) return;
         if (!solidColorShader) return;
 
+        // Render the mirror mask
+        // - First you copy the depth buffer from the GBuffer so you can render your mirror plane against scene depth
+        // - Then you just do a standard stencil buffer mask write for each viewport
         OpenGLRenderer::BlitFrameBufferDepth(gBuffer, gBufferBackup);
 
         gBuffer->Bind();
-        gBuffer->DrawBuffers({ "MirrorMask" });
         gBuffer->BindDepthAttachmentFrom(*gBufferBackup);
 
         solidColorShader->Bind();
+
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glDepthMask(GL_FALSE); // Test depth, but don't write it
+        glDepthFunc(GL_LEQUAL);
+
+        glEnable(GL_STENCIL_TEST);
+        glStencilMask(0xFF);
+        glClearStencil(0);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+        glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
+
+                Mirror* mirror = MirrorManager::GetMirrorByObjectId(viewport->GetMirrorId());
+                if (!mirror) continue;
+
+                Mesh* mesh = AssetManager::GetMeshByIndex(mirror->GetGlobalMeshIndex());
+                if (!mesh) continue;
 
                 solidColorShader->SetMat4("u_projectionView", viewportData[i].projectionView);
                 solidColorShader->SetMat4("u_model", mirrorRenderItem.modelMatrix);
@@ -308,70 +333,23 @@ namespace OpenGLRenderer {
             }
         }
 
-        AABB localAabb = AABB(mesh->aabbMin, mesh->aabbMax);
+        glDepthMask(GL_TRUE);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        glm::mat4 mirrorModelMatrix = mirrorRenderItem.modelMatrix;
-        glm::vec3 mirrorLocalForward = glm::vec3(-1.0f, 0.0f, 0.0f);
-        glm::vec3 mirrorLocalCenter = 0.5f * (localAabb.GetBoundsMin() + localAabb.GetBoundsMax());
+        gBuffer->Bind();
+        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
 
-        glm::vec3 mirrorPlanePoint = glm::vec3(mirrorModelMatrix * glm::vec4(mirrorLocalCenter, 1.0f));
+        // Clear the depth buffer so that the mirror world has a clean depth state to test against
+        gBuffer->ClearDepthAttachment();
 
-        glm::mat3 N = glm::transpose(glm::inverse(glm::mat3(mirrorModelMatrix)));
-        glm::vec3 mirrorWorldForward = glm::normalize(N * mirrorLocalForward);
-
-        glm::mat4 mirrorViewMatrices[4];
-        glm::vec3 mirrorReflectVectors[4];
-        glm::vec3 mirrorNormals[4];
-        glm::vec3 mirrorPositions[4];
-        glm::vec4 mirrorClipPlanes[4];
-
-        for (int i = 0; i < 4; i++) {
-            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
-            if (viewport->IsVisible()) {
-                glm::vec3 cameraPosition = viewportData[i].viewPos;
-                glm::vec3 cameraUp = glm::normalize(viewportData[i].cameraUp);
-                glm::vec3 cameraForward = glm::normalize(viewportData[i].cameraForward);
-
-                // Ensure normal faces the viewer
-                if (glm::dot(mirrorWorldForward, cameraPosition - mirrorPlanePoint) < 0.0f) {
-                    mirrorWorldForward = -mirrorWorldForward;
-                }
-
-                glm::vec4 planeWorld = glm::vec4(mirrorWorldForward, -glm::dot(mirrorWorldForward, mirrorPlanePoint) + 1e-4f);
-
-                float signedDistanceFromCamera = glm::dot(mirrorWorldForward, cameraPosition) + planeWorld.w;
-                glm::vec3 mirrorCameraPos = cameraPosition - 2.0f * signedDistanceFromCamera * mirrorWorldForward;
-                glm::vec3 R = glm::normalize(cameraForward - 2.0f * glm::dot(mirrorWorldForward, cameraForward) * mirrorWorldForward);
-                glm::vec3 reflectedUp = cameraUp - 2.0f * glm::dot(mirrorWorldForward, cameraUp) * mirrorWorldForward;
-                glm::vec3 right = glm::normalize(glm::cross(R, reflectedUp));
-
-                reflectedUp = glm::normalize(glm::cross(right, R));
-
-                // outputs
-                mirrorViewMatrices[i] = glm::lookAt(mirrorCameraPos, mirrorCameraPos + R, reflectedUp);;
-                mirrorReflectVectors[i] = R;
-                mirrorNormals[i] = mirrorWorldForward;
-                mirrorPositions[i] = mirrorCameraPos;
-                mirrorClipPlanes[i] = planeWorld;
-
-                //DrawPoint(mirrorPlanePoint, WHITE);
-                //DrawLine(mirrorPlanePoint, mirrorPlanePoint + mirrorWorldForward, WHITE);
-                //DrawPoint(cameraPosition, YELLOW);
-                //DrawPoint(mirrorCameraPos, PINK);
-                //DrawLine(mirrorCameraPos, mirrorCameraPos + R, PINK);
-                //DrawAABB(localAabb, BLUE, mirrorRenderItem.modelMatrix);
-            }
-        }
+        SetRasterizerState("GeometryPass_NonBlended");
 
         glEnable(GL_CLIP_DISTANCE0);
         glFrontFace(GL_CW);
 
-        gBuffer->Bind();
-        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition" });
-        gBuffer->Bind();
-        gBuffer->ClearDepthAttachment();
-
-        SetRasterizerState("GeometryPass_NonBlended");
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0x00);
 
         geometryShader->Bind();
         geometryShader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
@@ -384,11 +362,12 @@ namespace OpenGLRenderer {
             if (viewport->IsVisible()) {
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
 
-                geometryShader->SetBool("u_useMirrorMatrix", true);
-                geometryShader->SetMat4("u_mirrorViewMatrix", mirrorViewMatrices[i]);
-                geometryShader->SetVec4("u_mirrorClipPlane", mirrorClipPlanes[i]);
+                Mirror* mirror = MirrorManager::GetMirrorByObjectId(viewport->GetMirrorId());
+                if (!mirror) continue;
 
-                glBindTextureUnit(7, gBuffer->GetColorAttachmentHandleByName("MirrorMask")); // put me somewhere better
+                geometryShader->SetBool("u_useMirrorMatrix", true);
+                geometryShader->SetMat4("u_mirrorViewMatrix", mirror->GetViewMatrix(i));
+                geometryShader->SetVec4("u_mirrorClipPlane", mirror->GetClipPlane(i));
 
                 OpenGLRenderer::SetViewport(gBuffer, viewport);
                 if (BackEnd::RenderDocFound()) {
@@ -416,14 +395,15 @@ namespace OpenGLRenderer {
             if (!viewport->IsVisible()) continue;
             if (glHouseMeshBuffer.GetIndexCount() <= 0) continue;
 
+            Mirror* mirror = MirrorManager::GetMirrorByObjectId(viewport->GetMirrorId());
+            if (!mirror) continue;
+
             OpenGLRenderer::SetViewport(gBuffer, viewport);
+
             houseGeometryShader->SetInt("u_viewportIndex", i);
-
             houseGeometryShader->SetBool("u_useMirrorMatrix", true);
-            houseGeometryShader->SetMat4("u_mirrorViewMatrix", mirrorViewMatrices[i]);
-            houseGeometryShader->SetVec4("u_mirrorClipPlane", mirrorClipPlanes[i]);
-
-            glBindTextureUnit(7, gBuffer->GetColorAttachmentHandleByName("MirrorMask")); // put me somewhere better
+            houseGeometryShader->SetMat4("u_mirrorViewMatrix", mirror->GetViewMatrix(i));
+            houseGeometryShader->SetVec4("u_mirrorClipPlane", mirror->GetClipPlane(i));
 
             const std::vector<HouseRenderItem>& renderItems = RenderDataManager::GetHouseRenderItems();
 
@@ -444,8 +424,11 @@ namespace OpenGLRenderer {
         houseGeometryShader->SetBool("u_useMirrorMatrix", false);
 
         // Clean up
+        glStencilMask(0xFF);
         glDisable(GL_CLIP_DISTANCE0);
         glFrontFace(GL_CCW);
+        glDisable(GL_STENCIL_TEST);
+
         gBuffer->BindDepthAttachmentFrom(*gBuffer);
     }
 }

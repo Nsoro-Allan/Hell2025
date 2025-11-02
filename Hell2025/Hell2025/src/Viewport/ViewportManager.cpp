@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "ViewportManager.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "Util.h"
 #include "BackEnd/BackEnd.h"
 #include "Config/Config.h"
@@ -8,17 +8,20 @@
 #include "Imgui/ImguiBackEnd.h"
 #include "Input/Input.h"
 #include "Editor/Editor.h"
+#include "Managers/MirrorManager.h"
 #include "Renderer/Renderer.h"
 
 namespace ViewportManager {
     std::vector<Viewport> g_viewports;
 
     void Init() {
-        g_viewports.resize(4);
-        g_viewports[0].SetPerspective(1.0f, NEAR_PLANE, FAR_PLANE);
-        g_viewports[1].SetPerspective(1.0f, NEAR_PLANE, FAR_PLANE);
-        g_viewports[2].SetPerspective(1.0f, NEAR_PLANE, FAR_PLANE);
-        g_viewports[3].SetPerspective(1.0f, NEAR_PLANE, FAR_PLANE);
+        g_viewports.clear();
+        
+        for (int i = 0; i < 4; i++) {
+            g_viewports.emplace_back(Viewport(i));
+            g_viewports[i].SetPerspective(1.0f, NEAR_PLANE, FAR_PLANE);
+        }
+
         Update();
     }
 
@@ -122,10 +125,27 @@ namespace ViewportManager {
             }
         }
 
+        // Update screen space coords
         for (Viewport& viewport : g_viewports) {
             viewport.Update();
         }
 
+        // Find closest mirror    
+        for (Viewport& viewport : g_viewports) {
+            uint64_t mirrorId = 0;
+
+            if (viewport.IsVisible() && Editor::IsClosed()) {
+                // TODO: select the closest mirror
+
+                for (Mirror& mirror : MirrorManager::GetMirrors()) {
+                    if (mirror.IsFacingViewportCamera(viewport.GetViewportIndex())) {
+                        mirrorId = mirror.GetObjectId();;
+                    }
+                }
+            }
+
+            viewport.SetMirrorId(mirrorId);
+        }
     }
 
     Viewport* GetViewportByIndex(int32_t viewportIndex) {

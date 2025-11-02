@@ -24,23 +24,7 @@ in vec3 EmissiveColor;
 
 uniform bool u_flipNormalMapY;
 
-
-// temporarily here
-uniform bool u_useMirrorMatrix;
-uniform mat4 u_mirrorViewMatrix;
-uniform mat4 u_mirrorClipPlane;
-
 void main() {
-
-    if (u_useMirrorMatrix) {
-           ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
-           float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
-           
-           if (mirrorMask < 1) {
-               discard;
-           }
-    }
-
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
     vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
    

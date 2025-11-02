@@ -1,13 +1,14 @@
 #include "RenderDataManager.h"
 #include "AssetManagement/AssetManager.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "BackEnd/BackEnd.h"
 #include "Camera/Frustum.h"
 #include "Core/Game.h"
 #include "Config/Config.h"
-#include "Ocean/Ocean.h"
 #include "Editor/Editor.h"
 #include "Input/Input.h"
+#include "Managers/MirrorManager.h"
+#include "Ocean/Ocean.h"
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
 #include <span>
@@ -156,13 +157,11 @@ namespace RenderDataManager {
             g_viewportData[i].height = resolutions.gBuffer.y * (int)viewport->GetSize().y;
             g_viewportData[i].xOffset = resolutions.gBuffer.x * (int)viewport->GetPosition().x;
             g_viewportData[i].yOffset = resolutions.gBuffer.y * (int)viewport->GetPosition().y;
-            g_viewportData[i].posX = (int)viewport->GetPosition().x;
-            g_viewportData[i].posY = (int)viewport->GetPosition().y;
-            g_viewportData[i].sizeX = (int)viewport->GetSize().x;
-            g_viewportData[i].sizeY = (int)viewport->GetSize().y;
+            g_viewportData[i].posX = viewport->GetPosition().x;
+            g_viewportData[i].posY = viewport->GetPosition().y;
+            g_viewportData[i].sizeX = viewport->GetSize().x;
+            g_viewportData[i].sizeY = viewport->GetSize().y;
             g_viewportData[i].viewPos = g_viewportData[i].inverseView[3];
-
-            //Renderer::DrawLine(g_viewportData[i].viewPos, glm::vec3(g_viewportData[i].viewPos) + cameraForward, WHITE);
 
             viewport->GetFrustum().Update(g_viewportData[i].projectionView);
 
@@ -252,22 +251,16 @@ namespace RenderDataManager {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (!viewport->IsVisible()) continue;
 
-            // If mirrors exist
-           //viewport->ClearMirrorInfo();
-           //
-           //if (RenderDataManager::GetMirrorRenderItems().size()) {
-           //    const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
-           //    glm::mat 
-           //    viewport->UpdateMirrorInfo(mirrorRenderItem.modelMatrix, localMirrorForward);
-           //}
-
             Frustum& frustum = viewport->GetFrustum();
             CreateDrawCommands(set.geometry[i], g_renderItems, &frustum, i);
             CreateDrawCommands(set.geometryBlended[i], g_renderItemsBlended, &frustum, i);
             CreateDrawCommands(set.geometryAlphaDiscarded[i], g_renderItemsAlphaDiscarded, &frustum, i);
             CreateDrawCommands(set.hairTopLayer[i], g_renderItemsHairTopLayer, &frustum, i);
             CreateDrawCommands(set.hairBottomLayer[i], g_renderItemsHairBottomLayer, &frustum, i);
-            CreateDrawCommands(set.mirrorRenderItems[i], g_renderItems, nullptr, i);
+
+            if (Mirror* mirror = MirrorManager::GetMirrorByObjectId(viewport->GetMirrorId())) {
+                CreateDrawCommands(set.mirrorRenderItems[i], g_renderItems, mirror->GetFrustum(i), i);
+            }
         }
 
         CreateDrawCommandsSkinned(set.skinnedGeometry, World::GetSkinnedRenderItems());
@@ -652,6 +645,10 @@ namespace RenderDataManager {
 
     void SubmitGlassRenderItem(const RenderItem& renderItem) {
         g_glassRenderItems.push_back(renderItem);
+    }
+
+    void SubmitRenderItemsGlass(const std::vector<RenderItem>& renderItems) {
+        g_glassRenderItems.insert(g_glassRenderItems.begin(), renderItems.begin(), renderItems.end());
     }
 
     void SubmitRenderItem(const HouseRenderItem& renderItem) {

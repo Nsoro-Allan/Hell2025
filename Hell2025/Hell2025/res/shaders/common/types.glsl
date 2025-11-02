@@ -29,7 +29,7 @@ struct ViewportData {
     vec4 flashlightPosition;
     
     float flashlightModifer;
-    bool isOrtho;
+    int isOrtho; //true or false
     float orthoSize;
     float fov;
     

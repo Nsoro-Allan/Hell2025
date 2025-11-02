@@ -38,8 +38,6 @@ namespace OpenGLRenderer {
         //OpenGLFrameBuffer* flashLightShadowMapFBO = GetFrameBuffer("FlashlightShadowMap");
         //glBindTextureUnit(8, flashLightShadowMapFBO->GetDepthAttachmentHandle());
 
-        std::vector<Window>& windows = World::GetWindows();
-        
 
         // Windows
         for (int i = 0; i < 4; i++) {
@@ -51,7 +49,7 @@ namespace OpenGLRenderer {
 
             Player* player = Game::GetLocalPlayerByIndex(i);
 
-            for (Window& window : windows) {           
+            for (Window& window : World::GetWindows()) {
                 for (const RenderItem& renderItem : window.GetGlassRenderItems()) {                    
                     shader->SetMat4("u_modelMatrix", renderItem.modelMatrix);
 
@@ -82,7 +80,7 @@ namespace OpenGLRenderer {
 
             Player* player = Game::GetLocalPlayerByIndex(i);
 
-            for (Window& window : windows) {
+            for (Window& window : World::GetWindows()) {
                 for (const RenderItem& renderItem : RenderDataManager::GetGlassRenderItems()) {
                     shader->SetMat4("u_modelMatrix", renderItem.modelMatrix);
 
@@ -108,7 +106,7 @@ namespace OpenGLRenderer {
         gBuffer->SetViewport();
         compositeShader->Bind();
         glBindImageTexture(0, gBuffer->GetColorAttachmentHandleByName("FinalLighting"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
-        glBindImageTexture(1, gBuffer->GetColorAttachmentHandleByName("Glass"), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+        glBindImageTexture(1, gBuffer->GetColorAttachmentHandleByName("Glass"), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16F);
         glDispatchCompute(gBuffer->GetWidth() / 16, gBuffer->GetHeight() / 4, 1);
 
         glDepthMask(GL_TRUE);

@@ -23,6 +23,7 @@
 #include "Input/InputMulti.h"
 #include "Managers/OpenableManager.h"
 #include "Managers/HouseManager.h"
+#include "Managers/MirrorManager.h"
 #include "Modelling/Unused/Modelling.h"
 #include "Physics/Physics.h"
 #include "Ragdoll/RagdollManager.h"
@@ -158,6 +159,7 @@ namespace BackEnd {
     
         AStarMap::Update();
         Game::Update();
+        MirrorManager::Update();
 
         Physics::UpdateAllRigidDynamics(deltaTime);
         Physics::UpdateActiveRigidDynamicAABBList();

@@ -32,6 +32,7 @@ namespace RenderDataManager {
     void SubmitDecalRenderItem(const RenderItem& renderItem);
     void SubmitRenderItem(const RenderItem& renderItem);
     void SubmitGlassRenderItem(const RenderItem& renderItem);
+    void SubmitRenderItemsGlass(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItems(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItemsBlended(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItemsAlphaDiscard(const std::vector<RenderItem>& renderItems);

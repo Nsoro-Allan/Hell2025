@@ -22,7 +22,11 @@ namespace World {
     }
     
     void Update(float deltaTime) {
-
+        if (Input::KeyPressed(HELL_KEY_LEFT)) {
+            static MermaidCreateInfo createInfo = GetMermaids()[0].GetCreateInfo();
+            createInfo.rotation.y += 0.05f;
+            GetMermaids()[0].Init(createInfo, SpawnOffset());
+        }
 
         if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
 
@@ -162,8 +166,8 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
-        for (Door& door : GetDoors())           door.Update(deltaTime);
-        for (GenericObject& drawers : GetGenericObjects())   drawers.Update(deltaTime); 
+        for (Door& door : GetDoors()) door.Update(deltaTime);
+        for (GenericObject& drawers : GetGenericObjects()) drawers.Update(deltaTime); 
 
         std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
         std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
@@ -174,7 +178,6 @@ namespace World {
         std::vector<PickUp>& pickUps = GetPickUps();
         std::vector<Tree>& trees = GetTrees();
         std::vector<Wall>& walls = GetWalls();
-        std::vector<Window>& windows = GetWindows();
 
         for (AnimatedGameObject& animatedGameObject : animatedGameObjects) {
             animatedGameObject.Update(deltaTime);
@@ -237,15 +240,11 @@ namespace World {
             shark.Update(deltaTime);
         }
 
-        for (Toilet& toilet: GetToilets()) {
-            toilet.Update(deltaTime);
-        }
-
         for (Tree& tree : trees) {
             tree.Update(deltaTime);
         }
 
-        for (Window& window : windows) {
+        for (Window& window : GetWindows()) {
             window.Update(deltaTime);
         }
 
@@ -305,10 +304,9 @@ namespace World {
 
     void UpdateDoorAndWindowCubeTransforms() {
         std::vector<Transform>& transforms = GetDoorAndWindowCubeTransforms();
-        std::vector<Window>& windows = GetWindows();
 
         transforms.clear();
-        transforms.reserve(World::GetDoors().size() + windows.size());
+        transforms.reserve(World::GetDoors().size() + GetWindows().size());
 
         for (Door& door : World::GetDoors()) {
             Transform& transform = transforms.emplace_back();
@@ -320,7 +318,7 @@ namespace World {
             transform.scale.z = 1.02f;
         }
 
-        for (Window& window : windows) {
+        for (Window& window : GetWindows()) {
             float windowMidPointFromGround = 1.4f;
 
             Transform& transform = transforms.emplace_back();

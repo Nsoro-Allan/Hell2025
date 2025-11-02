@@ -89,32 +89,6 @@ bool Frustum::IntersectsAABB(const AABB& aabb) {
     return true;
 }
 
-/*
-bool Frustum::IntersectsAABB(const RenderItem& renderItem) {
-    glm::vec3 aabbCorners[8] = {
-        glm::vec3(renderItem.aabbMin.x, renderItem.aabbMin.y, renderItem.aabbMax.z), // Near-bottom-left
-        glm::vec3(renderItem.aabbMax.x, renderItem.aabbMin.y, renderItem.aabbMin.z), // Near-bottom-right
-        glm::vec3(renderItem.aabbMin.x, renderItem.aabbMax.y, renderItem.aabbMin.z), // Near-top-left
-        glm::vec3(renderItem.aabbMax.x, renderItem.aabbMax.y, renderItem.aabbMin.z), // Near-top-right
-        glm::vec3(renderItem.aabbMin.x, renderItem.aabbMin.y, renderItem.aabbMax.z), // Far-bottom-left
-        glm::vec3(renderItem.aabbMax.x, renderItem.aabbMin.y, renderItem.aabbMax.z), // Far-bottom-right
-        glm::vec3(renderItem.aabbMin.x, renderItem.aabbMax.y, renderItem.aabbMax.z), // Far-top-left
-        glm::vec3(renderItem.aabbMax.x, renderItem.aabbMax.y, renderItem.aabbMax.z)  // Far-top-right
-    };
-    for (int i = 0; i < 6; ++i) {
-        int pointsOutside = 0;
-        for (int j = 0; j < 8; ++j) {
-            if (SignedDistance(aabbCorners[j], m_planes[i]) < 0.0f) {
-                pointsOutside++;
-            }
-        }
-        if (pointsOutside == 8) {
-            return false;
-        }
-    }
-    return true;
-}*/
-
 bool Frustum::IntersectsAABBFast(const AABB& aabb) {
     for (int i = 0; i < 6; ++i) {
         glm::vec3 min_corner = glm::vec3(
@@ -178,16 +152,18 @@ bool Frustum::IntersectsPoint(const glm::vec3 point) {
     return true;
 }
 
-//std::vector<glm::vec3> Frustum::GetFrustumCorners() {
-//    
-//
-//}
-
-FrustumPlane Frustum::CreatePlane(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3) {
+FrustumPlane Frustum::MakePlane(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2) {
     FrustumPlane plane;
-    plane.normal = glm::normalize(glm::cross(p2 - p1, p3 - p1));
-    plane.offset = -glm::dot(plane.normal, p1);
+    plane.normal = glm::normalize(glm::cross(p1 - p0, p2 - p0));
+    plane.offset = -glm::dot(plane.normal, p0);
     return plane;
+}
+
+FrustumPlane Frustum::MakePlane(const glm::vec3& n, const glm::vec3& p) {
+    FrustumPlane pl;
+    pl.normal = glm::normalize(n);
+    pl.offset = -glm::dot(pl.normal, p);
+    return pl;
 }
 
 float Frustum::SignedDistance(const glm::vec3& point, const FrustumPlane& plane) const {

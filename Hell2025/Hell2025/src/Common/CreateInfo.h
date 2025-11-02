@@ -1,7 +1,7 @@
 #pragma once
 #include "HellEnums.h"
 #include "HellTypes.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "Types/Game/SpawnPoint.h"
 #include <map>
 
@@ -286,7 +286,7 @@ struct MapCreateInfo {
 
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
-    std::vector<GenericObjectCreateInfo> genericGameObjects;
+    std::vector<GenericObjectCreateInfo> genericObjects;
     std::vector<PlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;

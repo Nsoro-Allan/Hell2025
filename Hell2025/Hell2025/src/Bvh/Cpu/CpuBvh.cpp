@@ -1,7 +1,7 @@
 #include "CpuBvh.h"
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "UniqueID.h"
 #include "Util.h"
 #include "Timer.hpp"

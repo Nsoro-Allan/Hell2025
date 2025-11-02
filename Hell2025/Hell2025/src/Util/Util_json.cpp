@@ -8,7 +8,7 @@ namespace Util {
         nlohmann::json json = nlohmann::json::parse(jsonString);
 
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
-        createInfoCollection.genericGameObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
+        createInfoCollection.genericObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
@@ -24,7 +24,7 @@ namespace Util {
     std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection) {
         nlohmann::json json;
         json["Doors"] = createInfoCollection.doors;
-        json["Drawers"] = createInfoCollection.genericGameObjects;
+        json["Drawers"] = createInfoCollection.genericObjects;
         json["Lights"] = createInfoCollection.lights;
         json["Pianos"] = createInfoCollection.pianos;
         json["PickUps"] = createInfoCollection.pickUps;

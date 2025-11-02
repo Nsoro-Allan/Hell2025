@@ -21,12 +21,10 @@
 #include "../Timer.hpp"
 #include <glm/gtx/matrix_decompose.hpp>
 
-#include "../Editor/Editor.h"
-#include "../Editor/Gizmo.h"
-#include "../Renderer/RenderDataManager.h"
-#include "../Viewport/ViewportManager.h"
+#include "Editor/Editor.h"
+#include "Editor/Gizmo.h"
+#include "Viewport/ViewportManager.h"
 
-#include "Input/Input.h"
 #include "API/OpenGL/Types/GL_texture_readback.h"
 #include "Tools/ImageTools.h"
 
@@ -101,8 +99,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["GBuffer"].CreateAttachment("FinalLighting", GL_RGBA16F, GL_LINEAR, GL_LINEAR);
         g_frameBuffers["GBuffer"].CreateAttachment("WorldPosition", GL_RGBA32F);
         g_frameBuffers["GBuffer"].CreateAttachment("Emissive", GL_RGBA8);
-        g_frameBuffers["GBuffer"].CreateAttachment("Glass", GL_RGBA8);
-        g_frameBuffers["GBuffer"].CreateAttachment("MirrorMask", GL_R8);
+        g_frameBuffers["GBuffer"].CreateAttachment("Glass", GL_RGBA16F);
         //g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F); // before you added stencil buffer
         g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
 
@@ -126,7 +123,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["Water"].CreateAttachment("Color", GL_RGBA16F);
         g_frameBuffers["Water"].CreateAttachment("UnderwaterMask", GL_R8);
         g_frameBuffers["Water"].CreateAttachment("WorldPosition", GL_RGBA32F);
-        g_frameBuffers["Water"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F);
+        g_frameBuffers["Water"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
 
         g_frameBuffers["WIP"] = OpenGLFrameBuffer("WIP", resolutions.gBuffer);
         g_frameBuffers["WIP"].CreateAttachment("WorldPosition", GL_RGBA32F);
@@ -136,7 +133,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["Outline"].CreateAttachment("Result", GL_R8);
 
         g_frameBuffers["Hair"] = OpenGLFrameBuffer("Hair", resolutions.hair);
-        g_frameBuffers["Hair"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F);
+        g_frameBuffers["Hair"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
         g_frameBuffers["Hair"].CreateAttachment("Lighting", GL_RGBA16F);
         g_frameBuffers["Hair"].CreateAttachment("ViewspaceDepth", GL_R32F);
         g_frameBuffers["Hair"].CreateAttachment("ViewspaceDepthPrevious", GL_R32F);
@@ -158,9 +155,6 @@ namespace OpenGLRenderer {
 
         g_frameBuffers["HeightMap"] = OpenGLFrameBuffer("HeightMap", HEIGHT_MAP_SIZE, HEIGHT_MAP_SIZE);
         g_frameBuffers["HeightMap"].CreateAttachment("Color", GL_R16F);
-
-        //g_frameBuffers["FlashlightShadowMap"] = OpenGLFrameBuffer("Flashlight", FLASHLIGHT_SHADOWMAP_SIZE, FLASHLIGHT_SHADOWMAP_SIZE);
-        //g_frameBuffers["FlashlightShadowMap"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8, GL_LINEAR, GL_LINEAR, GL_CLAMP_TO_BORDER, glm::vec4(1.0f));
 
         g_frameBuffers["FFT_band0"].Create("FFT_band0", Ocean::GetFFTResolution(0).x, Ocean::GetFFTResolution(0).y);
         g_frameBuffers["FFT_band0"].CreateAttachment("Displacement", GL_RGBA32F, GL_LINEAR, GL_LINEAR, GL_REPEAT);
@@ -296,7 +290,8 @@ namespace OpenGLRenderer {
         g_shaders["DebugTextured"] = OpenGLShader({ "GL_debug_textured.vert", "GL_debug_textured.frag" });
         g_shaders["DebugView"] = OpenGLShader({ "GL_debug_view.comp" });
         g_shaders["DebugTileView"] = OpenGLShader({ "GL_debug_tile_view.comp" });
-        g_shaders["DebugVertex"] = OpenGLShader({ "gl_debug_vertex.vert", "gl_debug_vertex.frag" });
+        g_shaders["DebugVertex2D"] = OpenGLShader({ "GL_debug_vertex_2D.vert", "GL_debug_vertex_2D.frag" });
+        g_shaders["DebugVertex3D"] = OpenGLShader({ "GL_debug_vertex_3D.vert", "GL_debug_vertex_3D.frag" });
         g_shaders["DecalPaintUVs"] = OpenGLShader({ "gl_decal_paint_uvs.vert", "gl_decal_paint_uvs.frag" });
         g_shaders["DecalPaintMask"] = OpenGLShader({ "gl_decal_paint_mask.comp" });
         g_shaders["Decals"] = OpenGLShader({ "GL_decals.vert", "GL_decals.frag" });
@@ -523,24 +518,6 @@ namespace OpenGLRenderer {
                 OpenGLRenderer::ClearFrameBufferByViewportUInt(miscFullSizeFBO, "ViewportIndex", viewport, i);
             }
         }
-
-        // Clear wound textures that need it
-        //std::vector<Kangaroo>& kangaroos = World::GetKangaroos();
-        //for (Kangaroo& kangaroo : kangaroos) {
-        //
-        //   // if (kangaroo.WoundTextureNeedsClearing()) {
-        //
-        //    if (Input::KeyPressed(HELL_KEY_P)) {
-        //        g_textureArrays["WoundMasks"].Clear(0.0f, 0.0f, 0.0f, 0.0f, 0);
-        //        kangaroo.MarkWoundTextureAsCleared();
-        //    }
-        //}
-
-        //std::vector<ChristmasTree>& christmasTrees = World::GetChristmasTrees();
-        //
-        //for (ChristmasTree& christmasTree : christmasTrees) {
-        //    DrawPoint(christmasTree.GetPosition(), RED);
-        //}
     }
 
     void MultiDrawIndirect(const std::vector<DrawIndexedIndirectCommand>& commands) {
@@ -735,34 +712,3 @@ namespace OpenGLRenderer {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//if (rasterizerState->depthTestEnabled) {
-//    glEnable(GL_DEPTH_TEST);
-//}
-//else {
-//    glDisable(GL_DEPTH_TEST);
-//}
-//

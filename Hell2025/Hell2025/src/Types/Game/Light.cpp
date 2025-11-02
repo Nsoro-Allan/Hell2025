@@ -10,7 +10,7 @@
 Light::Light(LightCreateInfo createInfo) {   
     m_createInfo = createInfo;
 
-    m_position = createInfo.position;
+    m_position = createInfo.position + glm::vec3(0, -0.1, 0);
     m_color = createInfo.color;
     m_radius = createInfo.radius;
     m_strength = createInfo.strength;
@@ -66,7 +66,6 @@ void Light::UpdateDirtyState() {
 
     m_dirty = false;
 
-    // Doors
     for (Door& door : World::GetDoors()) {
         if (door.MovedThisFrame()) {
             for (const RenderItem& renderItem : door.GetRenderItems()) {
@@ -79,17 +78,6 @@ void Light::UpdateDirtyState() {
         }
     }
 
-    // TODO: make this only actually affect lights in range
-    // TODO: make this only actually affect lights in range
-    // TODO: make this only actually affect lights in range
-    for (Toilet& toilet : World::GetToilets()) {
-        if (toilet.MovedThisFrame()) {
-            m_dirty = true;
-            return;
-        }
-    }
-
-    // Drawers
     for (GenericObject& drawers : World::GetGenericObjects()) {
         if (drawers.IsDirty()) {
             m_dirty = true;

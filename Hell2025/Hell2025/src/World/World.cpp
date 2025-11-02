@@ -1,6 +1,6 @@
 #include "World.h"
 #include "CreateInfo.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellLogging.h"
 #include "HellTypes.h"
 #include "UniqueID.h"
@@ -13,6 +13,7 @@
 #include "Input/Input.h"
 #include "Managers/HouseManager.h"
 #include "Managers/MapManager.h"
+#include "Managers/MirrorManager.h"
 #include "Renderer/GlobalIllumination.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
@@ -54,15 +55,14 @@ namespace World {
     std::vector<Shark> g_sharks;
     std::vector<SpawnPoint> g_spawnCampaignPoints;
     std::vector<SpawnPoint> g_spawnDeathmatchPoints;
-    std::vector<Toilet> g_toilets;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
     std::vector<Tree> g_trees;
     std::vector<Wall> g_walls;
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
-    std::vector<Window> g_windows;
 
     Hell::SlotMap<Door> g_doors;
     Hell::SlotMap<GenericObject> g_genericObjects;
+    Hell::SlotMap<Window> g_windows;
 
     // std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
 
@@ -86,8 +86,6 @@ namespace World {
     struct WorldState {
         bool oceanEnabled = true;
     } g_worldState;
-
-    void AddSectorAtLocation(SectorCreateInfo& sectorCreateInfo, SpawnOffset spawnOffset, bool loadHouses);
 
     void Init() {
         KangarooCreateInfo kangarooCreateInfo;
@@ -335,7 +333,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
-        for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericGameObjects)              AddGenericObject(createInfo, spawnOffset);
+        for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericObjects) AddGenericObject(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
@@ -349,16 +347,16 @@ namespace World {
     CreateInfoCollection GetCreateInfoCollection() {
         CreateInfoCollection createInfoCollection;
 
-        for (Door& door : World::GetDoors())                        createInfoCollection.doors.push_back(door.GetCreateInfo());
-        for (GenericObject& drawers : World::GetGenericObjects())                createInfoCollection.genericGameObjects.push_back(drawers.GetCreateInfo());
-        for (Light& light : World::GetLights())                     createInfoCollection.lights.push_back(light.GetCreateInfo());
-        for (Piano& piano : World::GetPianos())                     createInfoCollection.pianos.push_back(piano.GetCreateInfo());
-        for (PickUp& pickUp : World::GetPickUps())                  createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
-        for (Plane& plane : World::GetPlanes())                     createInfoCollection.planes.push_back(plane.GetCreateInfo());
-        for (PictureFrame& pictureFrame : World::GetPictureFrames()) createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
-        for (Tree& tree : World::GetTrees())                        createInfoCollection.trees.push_back(tree.GetCreateInfo());
-        for (Wall& wall : World::GetWalls())                        createInfoCollection.walls.push_back(wall.GetCreateInfo());
-        for (Window& window : World::GetWindows())                  createInfoCollection.windows.push_back(window.GetCreateInfo());
+        for (Door& door : World::GetDoors())                            createInfoCollection.doors.push_back(door.GetCreateInfo());
+        for (GenericObject& drawers : World::GetGenericObjects())       createInfoCollection.genericObjects.push_back(drawers.GetCreateInfo());
+        for (Light& light : World::GetLights())                         createInfoCollection.lights.push_back(light.GetCreateInfo());
+        for (Piano& piano : World::GetPianos())                         createInfoCollection.pianos.push_back(piano.GetCreateInfo());
+        for (PickUp& pickUp : World::GetPickUps())                      createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
+        for (Plane& plane : World::GetPlanes())                         createInfoCollection.planes.push_back(plane.GetCreateInfo());
+        for (PictureFrame& pictureFrame : World::GetPictureFrames())    createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
+        for (Tree& tree : World::GetTrees())                            createInfoCollection.trees.push_back(tree.GetCreateInfo());
+        for (Wall& wall : World::GetWalls())                            createInfoCollection.walls.push_back(wall.GetCreateInfo());
+        for (Window& window : World::GetWindows())                      createInfoCollection.windows.push_back(window.GetCreateInfo());
 
         return createInfoCollection;
     }
@@ -468,27 +466,6 @@ namespace World {
     GenericObject* GetGenericObjectById(uint64_t objectId) {
         return g_genericObjects.get(objectId);
     }
-
-
-
-
-
-
-    //Door* GetDoorByDoorFrameObjectId(uint64_t objectID) {
-    //    for (int i = 0; i < g_doors.size(); i++) {
-    //        Door& door = g_doors[i];
-    //        if (door.GetFrameObjectId() == objectID) {
-    //            return &g_doors[i];
-    //        }
-    //    }
-    //    return nullptr;
-    //}
-
-
-
-
-
-
 
     AnimatedGameObject* GetAnimatedGameObjectByIndex(int32_t index) {
         if (index >= 0 && index < g_animatedGameObjects.size()) {
@@ -613,16 +590,6 @@ namespace World {
         return nullptr;
     }
 
-    Toilet* GetToiletByMeshNodeObjectId(uint64_t objectId) {
-        for (Toilet& toilet : g_toilets) {
-            const MeshNodes& meshNodes = toilet.GetMeshNodes();
-            if (meshNodes.HasNodeWithObjectId(objectId)) {
-                return &toilet;
-            }
-        }
-        return nullptr;
-    }
-
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId) {
         for (Piano& piano : g_pianos) {
 
@@ -634,14 +601,8 @@ namespace World {
         return nullptr;
     }
 
-    void SetObjectPosition(uint64_t objectId, glm::vec3 position) {
-        GenericObject* drawers = World::GetGenericObjectById(objectId);
-        if (drawers) {
-            drawers->SetPosition(position);
-        }
-
-        Door* door = World::GetDoorByObjectId(objectId);
-        if (door) {
+    void SetObjectPosition(uint64_t objectId, glm::vec3 position) {    
+        if (Door* door = World::GetDoorByObjectId(objectId)) {
             door->SetPosition(position);
             UpdateClippingCubes();
             UpdateAllWallCSG();
@@ -650,39 +611,37 @@ namespace World {
             Physics::ForceZeroStepUpdate();
         }
 
-        Piano* piano = World::GetPianoByObjectId(objectId);
-        if (piano) {
+        if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
+            genericObject->SetPosition(position);
+        }
+
+        if (Piano* piano = World::GetPianoByObjectId(objectId)) {
             piano->SetPosition(position);
             Physics::ForceZeroStepUpdate();
         }
 
-        Plane* plane = World::GetPlaneByObjectId(objectId);
-        if (plane) {
+        if (Plane* plane = World::GetPlaneByObjectId(objectId)) {
             plane->UpdateWorldSpaceCenter(position);
             UpdateHouseMeshBuffer();
             UpdateWeatherBoardMeshBuffer();
         }
 
-        PictureFrame* pictureFrame = World::GetPictureFrameByObjectId(objectId);
-        if (pictureFrame) {
+        if (PictureFrame* pictureFrame = World::GetPictureFrameByObjectId(objectId)) {
             pictureFrame->SetPosition(position);
         }
 
-        Tree* tree = World::GetTreeByObjectId(objectId);
-        if (tree) {
+        if (Tree* tree = World::GetTreeByObjectId(objectId)) {
             tree->SetPosition(position);
         }
 
-        Wall* wall = World::GetWallByObjectId(objectId);
-        if (wall) {
+        if (Wall* wall = World::GetWallByObjectId(objectId)) {
             wall->UpdateWorldSpaceCenter(position);
             Physics::ForceZeroStepUpdate();
             UpdateHouseMeshBuffer();
             UpdateWeatherBoardMeshBuffer();
         }
 
-        Window* window = World::GetWindowByObjectId(objectId);
-        if (window) {
+        if (Window* window = World::GetWindowByObjectId(objectId)) {
             window->SetPosition(position);
             UpdateClippingCubes();
             UpdateAllWallCSG();
@@ -718,8 +677,11 @@ namespace World {
             g_genericObjects.erase(objectId);
             return true;
         }
-
-
+        if (g_windows.contains(objectId)) {
+            g_windows.get(objectId)->CleanUp();
+            g_windows.erase(objectId);
+            return true;
+        }
 
         for (int i = 0; i < g_pianos.size(); i++) {
             if (g_pianos[i].GetObjectId() == objectId) {
@@ -746,13 +708,6 @@ namespace World {
             if (g_walls[i].GetObjectId() == objectId) {
                 g_walls[i].CleanUp();
                 g_walls.erase(g_walls.begin() + i);
-                return true;
-            }
-        }
-        for (int i = 0; i < g_windows.size(); i++) {
-            if (g_windows[i].GetObjectId() == objectId) {
-                g_windows[i].CleanUp();
-                g_windows.erase(g_windows.begin() + i);
                 return true;
             }
         }
@@ -794,7 +749,7 @@ namespace World {
         MermaidCreateInfo mermaidCreateInfo;
         mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
         //mermaidCreateInfo.position = glm::vec3(500.0f, 29.5f, 500.0f);
-        mermaidCreateInfo.rotation.y = 0.25f;
+        mermaidCreateInfo.rotation.y = 0.05f;
         AddMermaid(mermaidCreateInfo);
 
         // remove meeeeeeeeeeeeeeeee
@@ -819,16 +774,16 @@ namespace World {
 
     void ClearAllObjects() {
         ResetWeatherboardMeshBuffer();
+        MirrorManager::CleanUp();
 
         for (BulletCasing& bulletCasing : g_bulletCasings)              bulletCasing.CleanUp();
         for (ChristmasLights& christmasLights : g_christmasLights)      christmasLights.CleanUp();
         for (ChristmasPresent& christmasPresent : g_christmasPresents)  christmasPresent.CleanUp();
         for (ChristmasTree& christmasTree : g_christmasTrees)           christmasTree.CleanUp();
         for (Door& door : g_doors)                                      door.CleanUp();
-        for (GenericObject& drawer : g_genericObjects)                               drawer.CleanUp();
+        for (GenericObject& drawer : g_genericObjects)                  drawer.CleanUp();
         for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
-        //for (GenericBouncable& genericBouncable : g_genericBouncables) genericStatic.CleanUp();
         for (GenericStatic& genericStatic : g_genericStatics)           genericStatic.CleanUp();
         //for (Kangaroo& kangaroo : g_kangaroos)                        kangaroo.CleanUp();
         for (Mermaid& mermaid : g_mermaids)                             mermaid.CleanUp();
@@ -868,7 +823,6 @@ namespace World {
         g_sharks.clear();
         g_spawnCampaignPoints.clear();
         g_spawnDeathmatchPoints.clear();
-        g_toilets.clear();
         g_trees.clear();
         g_walls.clear();
         g_windows.clear();
@@ -914,6 +868,19 @@ namespace World {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::GENERIC_OBJECT);
         g_genericObjects.emplace_with_id(id, id, createInfo, spawnOffset);
     }
+
+    void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::WINDOW);
+        g_windows.emplace_with_id(id, id, createInfo, spawnOffset);
+    }
+
+
+
+
+
+
+
+
 
     void AddBullet(BulletCreateInfo createInfo) {
         g_bullets.push_back(Bullet(createInfo));
@@ -981,10 +948,6 @@ namespace World {
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
         Mermaid& mermaid = g_mermaids.emplace_back();
         mermaid.Init(createInfo, spawnOffset);
-    }
-
-    void AddToilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset) {
-        g_toilets.push_back(Toilet(createInfo, spawnOffset));
     }
 
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo) {
@@ -1109,12 +1072,6 @@ namespace World {
 
     bool HasOcean() {
         return g_worldState.oceanEnabled;
-    }
-
-    void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset) {
-        Window& window = g_windows.emplace_back();
-        createInfo.position += spawnOffset.translation;
-        window.Init(createInfo);
     }
 
     void AddMapInstance(const std::string& mapName, int32_t spawnOffsetChunkX, int32_t spawnOffsetChunkZ) {
@@ -1264,13 +1221,12 @@ namespace World {
     std::vector<SpawnPoint>& GetCampaignSpawnPoints()                   { return g_spawnCampaignPoints; }
     std::vector<SpawnPoint>& GetDeathmatchSpawnPoints()                 { return g_spawnDeathmatchPoints; }
     std::vector<Transform>& GetDoorAndWindowCubeTransforms()            { return g_doorAndWindowCubeTransforms; }
-    std::vector<Toilet>& GetToilets()                                   { return g_toilets; }
     std::vector<Road>& GetRoads()                                       { return g_roads; }
     std::vector<Shark>& GetSharks()                                     { return g_sharks; }
     std::vector<Tree>& GetTrees()                                       { return g_trees; }
     std::vector<Wall>& GetWalls()                                       { return g_walls; }
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters() { return g_volumetricBloodSplatters; }
-    std::vector<Window>& GetWindows()                                   { return g_windows; }
+    Hell::SlotMap<Window>& GetWindows()                                 { return g_windows; }
 
     std::vector<GPULight>& GetGPULightsLowRes()                 { return g_gpuLightsLowRes; }
     std::vector<GPULight>& GetGPULightsMidRes()                 { return g_gpuLightsMidRes; }

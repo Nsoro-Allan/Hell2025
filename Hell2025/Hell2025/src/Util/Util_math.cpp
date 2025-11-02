@@ -1,5 +1,5 @@
 #include "Util.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include <numeric>
 #include <random>
 #include <glm/gtx/quaternion.hpp>

@@ -26,8 +26,25 @@ uniform mat4 u_model;
 // temporarily here
 uniform bool u_useMirrorMatrix;
 uniform mat4 u_mirrorViewMatrix;
-uniform vec3 u_mirrorNormal;
 uniform vec4 u_mirrorClipPlane;
+
+mat3 RotationX(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat3(1,0,0, 0,c,-s, 0,s,c);
+}
+
+mat3 RotationY(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat3(c,0,s, 0,1,0, -s,0,c);
+}
+
+mat3 RotationZ(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat3(c,-s,0, s,c,0, 0,0,1);
+}
 
 void main() {
     mat4 modelMatrix = u_model;
@@ -35,21 +52,24 @@ void main() {
 	mat4 projectionView = viewportData[u_viewportIndex].projectionView;            
     mat4 normalMatrix = transpose(inverseModelMatrix);
     
+    Normal = normalize(normalMatrix * vec4(vNormal, 0)).xyz;
+    Tangent = normalize(normalMatrix * vec4(vTangent, 0)).xyz;
+    BiTangent = normalize(cross(Normal, Tangent));
+    EmissiveColor = vec3(0,0,0);
     WorldPos = modelMatrix * vec4(vPosition, 1.0);
-
+    
     // Planar reflections
     if (u_useMirrorMatrix) {
         mat4 projection = viewportData[u_viewportIndex].projection;   
         projection[0][0] *= -1.0;      
         projectionView = projection * u_mirrorViewMatrix;
-
         gl_ClipDistance[0] = dot(WorldPos, u_mirrorClipPlane);
+
+        //vec3 shardRotation = vec3(0.00, 0.00, -0.0005);
+        //mat3 shardMatrix = RotationZ(shardRotation.z) * RotationY(shardRotation.y) * RotationX(shardRotation.x);
+        //WorldPos.xyz = shardMatrix * WorldPos.xyz;
     }
 
-    Normal = normalize(normalMatrix * vec4(vNormal, 0)).xyz;
-    Tangent = normalize(normalMatrix * vec4(vTangent, 0)).xyz;
-    BiTangent = normalize(cross(Normal, Tangent));
-    EmissiveColor = vec3(0,0,0);
     
 	TexCoord = vUV;
 	gl_Position = projectionView * WorldPos;

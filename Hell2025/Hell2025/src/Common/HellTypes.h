@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellEnums.h"
 #include "HellGlm.h"
 #include "Input/keycodes.h"
@@ -159,12 +159,18 @@ struct WeightedVertex {
 };
 
 #pragma pack(push, 1)
-struct DebugVertex {
+struct DebugVertex3D {
     glm::vec3 position;
     glm::vec3 color;
     glm::ivec2 pixelOffset;
+    int depthEnabled = 0;
     int exclusiveViewportIndex = -1;
     int ignoredViewportIndex = -1;
+};
+
+struct DebugVertex2D {
+    glm::ivec2 position;
+    glm::vec3 color;
 };
 #pragma pack(pop)
 

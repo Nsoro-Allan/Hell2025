@@ -1,5 +1,5 @@
 #include "Editor.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "Callbacks/Callbacks.h"
 #include "Gizmo.h"
 #include "BackEnd/BackEnd.h"

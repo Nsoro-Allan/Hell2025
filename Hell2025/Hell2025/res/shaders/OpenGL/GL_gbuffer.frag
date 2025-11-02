@@ -51,7 +51,6 @@ in flat int EmissiveTextureIndex;
 
 uniform bool u_alphaDiscard;
 uniform bool u_flipNormalMapY;
-uniform bool u_useMirrorMatrix;
 
 void main() {
     vec3 emissiveColor = EmissiveColor;
@@ -78,15 +77,6 @@ void main() {
         if (baseColor.a < 0.5) {
             discard;
         }    
-    }
-
-    if (u_useMirrorMatrix) {
-        ivec2 pixelCoords = ivec2(gl_FragCoord.xy);        
-        float mirrorMask = texelFetch(WorldMirrorMaskTexture, pixelCoords, 0).r;   
-        
-        if (mirrorMask < 1) {
-           discard;
-        }
     }
 
     // Sensible defaults for wound texture

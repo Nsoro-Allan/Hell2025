@@ -2,6 +2,7 @@
 #include "AssetManagement/AssetManager.h"
 #include "HellLogging.h"
 #include "Input/Input.h"
+#include "Managers/MirrorManager.h"
 #include "Managers/OpenableManager.h"
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
@@ -50,6 +51,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode.type = MeshNodeType::DEFAULT;
         meshNode.globalMeshIndex = globalMeshIndex;
         meshNode.customId = 0;
+        meshNode.nodeIndex = i;
     }
 
     // If the model contains armatures, store the first one (TODO: allow more maybe)
@@ -89,6 +91,10 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
             }
         }
 
+        // If blending mode is mirror, then add a new mirror to the world
+        if (meshNode->blendingMode == BlendingMode::MIRROR) {
+            MirrorManager::AddMirror(parentId, meshNode->nodeIndex, meshNode->globalMeshIndex);
+        }
 
         if (meshNode->type == MeshNodeType::RIGID_DYNAMIC) {
             // Break connection with parent
@@ -300,8 +306,6 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         }
     }
 
-
-
     for (MeshNode& meshNode : m_meshNodes) {
         if (meshNode.type == MeshNodeType::RIGID_DYNAMIC) {
             if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.physicsId)) {
@@ -325,8 +329,9 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
     UpdateAABBs(worldMatrix);
 
     m_renderItems.clear();
-    m_renderItemsBlended.clear();
     m_renderItemsAlphaDiscarded.clear();
+    m_renderItemsBlended.clear();
+    m_renderItemsGlass.clear();
     m_renderItemsHairTopLayer.clear();
     m_renderItemsHairBottomLayer.clear();
     m_renderItemsToiletWater.clear();
@@ -336,11 +341,13 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         MeshNode& meshNode = m_meshNodes[i];
         Material* material = GetMaterial(i);
         if (!material) continue;
-        
+
+        meshNode.worldModelMatrix = worldMatrix * meshNode.localModelMatrix;
+
         meshNode.renderItem.objectType = (int)UniqueID::GetType(meshNode.parentObjectId);
         meshNode.renderItem.openableId = meshNode.openableId;
         meshNode.renderItem.customId = meshNode.customId;
-        meshNode.renderItem.modelMatrix = worldMatrix * meshNode.localModelMatrix;
+        meshNode.renderItem.modelMatrix = meshNode.worldModelMatrix;
         meshNode.renderItem.inverseModelMatrix = glm::inverse(meshNode.renderItem.modelMatrix);
         meshNode.renderItem.meshIndex = GetGlobalMeshIndex(i);
         meshNode.renderItem.baseColorTextureIndex = material->m_basecolor;
@@ -358,18 +365,28 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
 
-        // VERY TEMPOARARY!!!!!!!!!!
-        //if (meshNode.blendingMode == BlendingMode::MIRROR) {
-        //
-        //}
+        if (meshNode.blendingMode == BlendingMode::MIRROR) {
+            static bool test = true;
+            if (Input::KeyPressed(HELL_KEY_M)) {
+                test = !test;
+            }
+
+            if (test) {
+                m_renderItemsMirror.push_back(meshNode.renderItem);
+                m_renderItemsGlass.push_back(meshNode.renderItem);
+            }
+            else {
+                m_renderItems.push_back(meshNode.renderItem);
+            }
+        }
 
         switch (meshNode.blendingMode) {
             case BlendingMode::BLEND_DISABLED:    m_renderItems.push_back(meshNode.renderItem);                 break;
-            case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(meshNode.renderItem);          break;
             case BlendingMode::ALPHA_DISCARDED:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
+            case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(meshNode.renderItem);          break;
+            case BlendingMode::GLASS:             m_renderItemsGlass.push_back(meshNode.renderItem);            break;
             case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(meshNode.renderItem);     break;
             case BlendingMode::HAIR_UNDER_LAYER:  m_renderItemsHairBottomLayer.push_back(meshNode.renderItem);  break;
-            case BlendingMode::MIRROR:            m_renderItemsMirror.push_back(meshNode.renderItem);           break;
             case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);      break;
             default: break;
         }
@@ -423,14 +440,44 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
     m_worldspaceAABB = found ? AABB(min, max) : AABB();
 }
 
-const glm::mat4& MeshNodes::GetMeshModelMatrix(int nodeIndex) const {
+const void MeshNodes::SubmitRenderItems() const {
+    RenderDataManager::SubmitRenderItems(m_renderItems);
+    RenderDataManager::SubmitRenderItemsAlphaDiscard(m_renderItemsAlphaDiscarded);
+    RenderDataManager::SubmitRenderItemsBlended(m_renderItemsBlended);
+    RenderDataManager::SubmitRenderItemsGlass(m_renderItemsGlass);
+    RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(m_renderItemsHairTopLayer);
+    RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(m_renderItemsHairBottomLayer);
+    RenderDataManager::SubmitRenderItemsMirror(m_renderItemsMirror);
+}
+
+const void MeshNodes::SubmitOutlineRenderItems() const {
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItems);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsAlphaDiscarded);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsBlended);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsGlass);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsHairTopLayer);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsHairBottomLayer);
+    RenderDataManager::SubmitOutlineRenderItems(m_renderItemsMirror);
+}
+
+const glm::mat4& MeshNodes::GetLocalModelMatrix(int nodeIndex) const {
     static const glm::mat4 identity = glm::mat4(1.0f);
     if (nodeIndex < 0) return identity;
-    
+
     size_t i = static_cast<size_t>(nodeIndex);
     if (i >= m_meshNodes.size()) return identity;
-    
+
     return m_meshNodes[i].localModelMatrix;
+}
+
+const glm::mat4& MeshNodes::GetWorldModelMatrix(int nodeIndex) const {
+    static const glm::mat4 identity = glm::mat4(1.0f);
+    if (nodeIndex < 0) return identity;
+
+    size_t i = static_cast<size_t>(nodeIndex);
+    if (i >= m_meshNodes.size()) return identity;
+
+    return m_meshNodes[i].worldModelMatrix;
 }
 
 const glm::mat4& MeshNodes::GetBoneLocalMatrix(const std::string& boneName) const {

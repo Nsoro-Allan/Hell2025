@@ -246,9 +246,9 @@ class ModelExporter:
 
 # Usage
 exporter = ModelExporter(
-    'C:/Hell2025/Hell2025/Hell2025/res/models/Fence.model',
+    'C:/Hell2025/Hell2025/Hell2025/res/models/Fireplace.model',
     rounding=6,
-    selected_only=False,
+    selected_only=True,
     scale=1.0,
     include_non_deforming=True
 )

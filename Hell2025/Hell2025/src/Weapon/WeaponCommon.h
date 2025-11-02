@@ -1,5 +1,5 @@
 #pragma once
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>

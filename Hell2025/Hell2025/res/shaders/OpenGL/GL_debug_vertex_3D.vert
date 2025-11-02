@@ -3,8 +3,9 @@
 layout (location = 0) in vec3 vPosition;
 layout (location = 1) in vec3 vColor;
 layout (location = 2) in ivec2 vPixelOffset;
-layout (location = 3) in int vExclusiveViewportIndex;
-layout (location = 4) in int vIgnoredViewportIndex;
+layout (location = 3) in int vDepthEnabled;
+layout (location = 4) in int vExclusiveViewportIndex;
+layout (location = 5) in int vIgnoredViewportIndex;
 
 uniform int u_viewportIndex;
 uniform mat4 u_projectionView;
@@ -20,5 +21,10 @@ void main() {
     }
     if (vIgnoredViewportIndex != -1 && vIgnoredViewportIndex == u_viewportIndex) {
        gl_Position = vec4(0, 0, 0, 0);
+    }
+    
+    // Manually disable depth testing
+    if (vDepthEnabled != 1) {
+        gl_Position.z = 0.00001 * gl_Position.w;
     }
 }

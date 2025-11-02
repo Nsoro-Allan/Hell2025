@@ -1,32 +1,33 @@
 #pragma once
-#include "HellTypes.h"
 #include "CreateInfo.h"
-#include "Types/Renderer/Model.h"
+#include "HellTypes.h"
+#include "Types/Renderer/MeshNodes.h"
 
 struct Window {
-    void Init(WindowCreateInfo createInfo);
+    Window() = default;
+    Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffset& spawnOffset);
+    Window(const Window&) = delete;
+    Window& operator=(const Window&) = delete;
+    Window(Window&&) noexcept = default;
+    Window& operator=(Window&&) noexcept = default;
+    ~Window() = default;
+
     void Update(float deltaTime);
     void CleanUp();
-    void SetPosition(glm::vec3 position);
-    void UpdateRenderItems();
-    void SubmitRenderItems();
-
-    const glm::vec3& GetPosition() const { return m_createInfo.position; }
-    const glm::vec3& GetRotation() const { return m_createInfo.rotation; }
-    const uint64_t GetObjectId() const { return m_objectId; }
-    const std::vector<RenderItem>& GetRenderItems() const { return m_renderItems; }
-    const std::vector<RenderItem>& GetGlassRenderItems() const { return m_glassRenderItems; }
-    const WindowCreateInfo& GetCreateInfo() const { return m_createInfo; }
+    void SetPosition(const glm::vec3& position);
+    
+    const uint64_t GetObjectId() const                          { return m_objectId; }
+    const MeshNodes& GetMeshNodes() const                       { return m_meshNodes; }
+    const glm::vec3& GetPosition() const                        { return m_transform.position; }
+    const glm::vec3& GetRotation() const                        { return m_transform.rotation; }
+    const std::vector<RenderItem>& GetRenderItems() const       { return m_meshNodes.GetRenderItems(); }
+    const std::vector<RenderItem>& GetGlassRenderItems() const  { return m_meshNodes.GetRenderItemsGlass(); }
+    const WindowCreateInfo& GetCreateInfo() const               { return m_createInfo; }
 
 private:
-    WindowCreateInfo m_createInfo;
     uint64_t m_objectId = 0;
     uint64_t m_physicsId = 0;
-    Material* m_interiorMaterial = nullptr;
-    Material* m_exteriorMaterial = nullptr;
-    Model* m_model = nullptr;
-    Model* m_glassModel = nullptr;
-    std::vector<RenderItem> m_renderItems;
-    std::vector<RenderItem> m_glassRenderItems;
-    glm::mat4 m_modelMatrix = glm::mat4(1.0f);
+    MeshNodes m_meshNodes;
+    Transform m_transform;
+    WindowCreateInfo m_createInfo;
 };

@@ -70,32 +70,20 @@ namespace World {
             }
         }
 
-        // Toilets
-        for (Toilet& toilet : GetToilets()) {
-            RenderDataManager::SubmitRenderItems(toilet.GetRenderItems());
-            // TODO: if (Editor::GetSelectedObjectId() == toilet.GetObjectId()) {
-            // TODO:     RenderDataManager::SubmitOutlineRenderItems(toilet.GetRenderItems());
-            // TODO: }
-        }
-
         // Generic Object 
         for (GenericObject& genericGameObject : GetGenericObjects()) {
-            RenderDataManager::SubmitRenderItems(genericGameObject.GetRenderItems());
-            RenderDataManager::SubmitRenderItemsBlended(genericGameObject.GetRenderItemsBlended());
-            RenderDataManager::SubmitRenderItemsAlphaDiscard(genericGameObject.GetRenderItemsAlphaDiscarded());
-            RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(genericGameObject.GetRenderItemsHairTopLayer());
-            RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(genericGameObject.GetRenderItemsHairBottomLayer());
-            RenderDataManager::SubmitRenderItemsMirror(genericGameObject.GetRenderItemsMirror());
-
-            // Is this object selected?
             if (Editor::GetSelectedObjectId() == genericGameObject.GetObjectId()) {
-                RenderDataManager::SubmitOutlineRenderItems(genericGameObject.GetRenderItems());
+                genericGameObject.GetMeshNodes().SubmitOutlineRenderItems();
             }
+            genericGameObject.GetMeshNodes().SubmitRenderItems();
         }
 
         // Window
         for (Window& window : GetWindows()) {
-            window.SubmitRenderItems();
+            if (Editor::GetSelectedObjectId() == window.GetObjectId()) {
+                window.GetMeshNodes().SubmitOutlineRenderItems();
+            }
+            window.GetMeshNodes().SubmitRenderItems();
         }
 
         // Trees

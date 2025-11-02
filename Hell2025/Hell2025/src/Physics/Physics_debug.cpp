@@ -53,7 +53,7 @@ namespace Physics {
         const PxRenderBuffer& renderBuffer = pxScene->getRenderBuffer();
         int vertexCount = renderBuffer.getNbLines() * 2;
 
-        static std::vector<DebugVertex> vertices;
+        static std::vector<DebugVertex3D> vertices;
         vertices.clear();
         vertices.resize(vertexCount);
 

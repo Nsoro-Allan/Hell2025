@@ -6,7 +6,7 @@
 #include "Physics/Physics.h"
 #include "World/World.h"
 
-#include "API/OpenGL/Types/GL_debug_mesh.hpp"
+#include "API/OpenGL/Types/GL_mesh.h"
 #include "API/OpenGL/Types/GL_mesh_buffer.h"
 
 #include "Pathfinding/AStarMap.h"
@@ -14,71 +14,77 @@
 #include "Core/Game.h"
 
 #include "Input/Input.h"
-#include "World/World.h"
 
 namespace OpenGLRenderer {
-
-    OpenGLDebugMesh g_debugMeshPoints;
-    OpenGLDebugMesh g_debugMeshLines;
-    OpenGLDebugMesh g_debugMeshDepthAwarePoints;
-    OpenGLDebugMesh g_debugMeshDepthAwareLines;
+    OpenGLMesh g_debugMeshPoints2D;
+    OpenGLMesh g_debugMeshPoints3D;
+    OpenGLMesh g_debugMeshLines2D;
+    OpenGLMesh g_debugMeshLines3D;
 
     inline int Index1D(int x, int y, int mapWidth) { return y * mapWidth + x; }
 
     void RenderAStarDebugMesh();
 
     void DebugPass() {
-        OpenGLShader* shader = GetShader("DebugVertex");
+        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
+
+        OpenGLShader* shader2D = GetShader("DebugVertex2D");
+        OpenGLShader* shader3D = GetShader("DebugVertex3D");
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
 
         if (!gBuffer) return;
-        if (!shader) return;
+        if (!shader2D) return;
+        if (!shader3D) return;
 
-        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
-
-        gBuffer->Bind();
-        gBuffer->DrawBuffer("FinalLighting");
-
-        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDisable(GL_BLEND);
         glPointSize(8.0f);
 
-        shader->Bind();
-
         UpdateDebugMesh();
+
+        // 3D
+        shader3D->Bind();
+        gBuffer->Bind();
+        gBuffer->DrawBuffer("FinalLighting");
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (!viewport->IsVisible()) continue;
 
             OpenGLRenderer::SetViewport(gBuffer, viewport);
-            shader->SetInt("u_viewportIndex", i);
-            shader->SetMat4("u_projectionView", viewportData[i].projectionView);
+            shader3D->SetInt("u_viewportIndex", i);
+            shader3D->SetMat4("u_projectionView", viewportData[i].projectionView);
 
-            glDisable(GL_DEPTH_TEST);
-            if (g_debugMeshLines.GetVertexCount() > 0) {
-                glBindVertexArray(g_debugMeshLines.GetVAO());
-                glDrawArrays(GL_LINES, 0, g_debugMeshLines.GetVertexCount());
-            }
-            if (g_debugMeshPoints.GetVertexCount() > 0) {
-                glBindVertexArray(g_debugMeshPoints.GetVAO());
-                glDrawArrays(GL_POINTS, 0, g_debugMeshPoints.GetVertexCount());
+            if (g_debugMeshLines3D.GetVertexCount() > 0) {
+                glBindVertexArray(g_debugMeshLines3D.GetVAO());
+                glDrawArrays(GL_LINES, 0, g_debugMeshLines3D.GetVertexCount());
             }
 
-            glEnable(GL_DEPTH_TEST);
-            if (g_debugMeshDepthAwareLines.GetVertexCount() > 0) {
-                glBindVertexArray(g_debugMeshDepthAwareLines.GetVAO());
-                glDrawArrays(GL_LINES, 0, g_debugMeshDepthAwareLines.GetVertexCount());
-            }
-            if (g_debugMeshDepthAwarePoints.GetVertexCount() > 0) {
-                glBindVertexArray(g_debugMeshPoints.GetVAO());
-                glDrawArrays(GL_POINTS, 0, g_debugMeshPoints.GetVertexCount());
+            if (g_debugMeshPoints3D.GetVertexCount() > 0) {
+                glBindVertexArray(g_debugMeshPoints3D.GetVAO());
+                glDrawArrays(GL_POINTS, 0, g_debugMeshPoints3D.GetVertexCount());
             }
         }
 
         if (Debug::GetDebugRenderMode() == DebugRenderMode::ASTAR_MAP) {
             RenderAStarDebugMesh();
+        }
+
+        // 2D
+        gBuffer->SetViewport();
+        shader2D->Bind();
+        shader2D->SetInt("u_viewportWidth", gBuffer->GetWidth());
+        shader2D->SetInt("u_viewportHeight", gBuffer->GetHeight());
+
+        if (g_debugMeshLines2D.GetVertexCount() > 0) {
+            glBindVertexArray(g_debugMeshLines2D.GetVAO());
+            glDrawArrays(GL_LINES, 0, g_debugMeshLines2D.GetVertexCount());
+        }
+
+        if (g_debugMeshPoints2D.GetVertexCount() > 0) {
+            glBindVertexArray(g_debugMeshPoints2D.GetVAO());
+            glDrawArrays(GL_POINTS, 0, g_debugMeshPoints2D.GetVertexCount());
         }
     }
 
@@ -93,7 +99,6 @@ namespace OpenGLRenderer {
         solidColorShader->Bind();
         solidColorShader->SetMat4("u_model", glm::mat4(1));
         solidColorShader->SetVec3("u_color", WHITE);
-
 
         // Line mesh
         if (debugGridMesh.GetIndexCount() > 0) {
@@ -222,26 +227,24 @@ namespace OpenGLRenderer {
         }
     }
 
-    void DrawPoint(glm::vec3 position, glm::vec3 color, bool obeyDepth, int exclusiveViewportIndex) {
-        if (obeyDepth) {
-            g_pointsDepthAware.push_back(DebugVertex(position, color, glm::ivec2(0,0), exclusiveViewportIndex));
-        }
-        else {
-            g_points.push_back(DebugVertex(position, color, glm::ivec2(0, 0), exclusiveViewportIndex));
-        }
+    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool depthEnabled, int exclusiveViewportIndex, int ignoredViewportIndex) {
+        DebugVertex3D v0 = DebugVertex3D(begin, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
+        DebugVertex3D v1 = DebugVertex3D(end, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
+        g_lines3D.push_back(v0);
+        g_lines3D.push_back(v1);
     }
 
-    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool obeyDepth, int exclusiveViewportIndex, int ignoredViewportIndex) {
-        DebugVertex v0 = DebugVertex(begin, color, glm::ivec2(0, 0), exclusiveViewportIndex);
-        DebugVertex v1 = DebugVertex(end, color, glm::ivec2(0, 0), exclusiveViewportIndex);
-        if (obeyDepth) {
-            g_linesDepthAware.push_back(v0);
-            g_linesDepthAware.push_back(v1);
-        }
-        else {
-            g_lines.push_back(v0);
-            g_lines.push_back(v1);
-        }
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color) {
+        g_lines2D.emplace_back(DebugVertex2D(begin, color));
+        g_lines2D.emplace_back(DebugVertex2D(end, color));
+    }
+
+    void DrawPoint(glm::vec3 position, glm::vec3 color, bool depthEnabled, int exclusiveViewportIndex) {
+        g_points3D.push_back(DebugVertex3D(position, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex));
+    }
+
+    void DrawPoint2D(const glm::ivec2& position, const glm::vec3& color) {
+        g_points2D.emplace_back(DebugVertex2D(position, color));
     }
 
     void DrawAABB(const AABB& aabb, const glm::vec3& color) {
@@ -290,6 +293,36 @@ namespace OpenGLRenderer {
         DrawLine(FrontBottomRight, BackBottomRight, color);
     }
 
+    void DrawFrustum(const Frustum& frustum, const glm::vec3& color) {
+        glm::vec3 ntl = frustum.GetCorner(0);
+        glm::vec3 ntr = frustum.GetCorner(1);
+        glm::vec3 nbl = frustum.GetCorner(2);
+        glm::vec3 nbr = frustum.GetCorner(3);
+
+        glm::vec3 ftl = frustum.GetCorner(4);
+        glm::vec3 ftr = frustum.GetCorner(5);
+        glm::vec3 fbl = frustum.GetCorner(6);
+        glm::vec3 fbr = frustum.GetCorner(7);
+
+        // near face
+        DrawLine(ntl, ntr, color);
+        DrawLine(ntr, nbr, color);
+        DrawLine(nbr, nbl, color);
+        DrawLine(nbl, ntl, color);
+
+        // far face
+        DrawLine(ftl, ftr, color);
+        DrawLine(ftr, fbr, color);
+        DrawLine(fbr, fbl, color);
+        DrawLine(fbl, ftl, color);
+
+        // connect near to far
+        DrawLine(ntl, ftl, color);
+        DrawLine(ntr, ftr, color);
+        DrawLine(nbl, fbl, color);
+        DrawLine(nbr, fbr, color);
+    }
+
     void DrawCircle(const glm::vec3 center, float radius, const glm::vec3 axisU, const glm::vec3 axisV, int segments, const glm::vec3 color) {
         const float step = glm::two_pi<float>() / float(segments);
         glm::vec3 prev = center + radius * axisU;
@@ -329,15 +362,15 @@ namespace OpenGLRenderer {
     }
 
     void UpdateDebugMesh() {
-        g_debugMeshPoints.UpdateVertexData(g_points);
-        g_debugMeshDepthAwarePoints.UpdateVertexData(g_pointsDepthAware);
-        g_debugMeshLines.UpdateVertexData(g_lines);
-        g_debugMeshDepthAwareLines.UpdateVertexData(g_linesDepthAware);
+        g_debugMeshLines2D.UpdateVertexData(g_lines2D);
+        g_debugMeshLines3D.UpdateVertexData(g_lines3D);
+        g_debugMeshPoints2D.UpdateVertexData(g_points2D);
+        g_debugMeshPoints3D.UpdateVertexData(g_points3D);
 
-        g_points.clear();
-        g_lines.clear();
-        g_pointsDepthAware.clear();
-        g_linesDepthAware.clear();
+        g_lines3D.clear();
+        g_lines2D.clear();
+        g_points2D.clear();
+        g_points3D.clear();
     }
 
     void RenderPointCloud() {

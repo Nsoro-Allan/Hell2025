@@ -193,20 +193,6 @@ void Player::UpdateInteract() {
                 door->Interact();
             }
         }
-
-        // Toilet stuff
-        if (interactObjectType == ObjectType::TOILET_LID) {
-            Toilet* toilet = World::GetToiletByMeshNodeObjectId(m_interactObjectId);
-            if (toilet) {
-                toilet->InteractWithLid();
-            }
-        }
-        if (interactObjectType == ObjectType::TOILET_SEAT) {
-            Toilet* toilet = World::GetToiletByMeshNodeObjectId(m_interactObjectId);
-            if (toilet) {
-                toilet->InteractWithSeat();
-            }
-        }
     }
 
     // PRESSING interact key

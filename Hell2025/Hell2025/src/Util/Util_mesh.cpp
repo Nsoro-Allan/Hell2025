@@ -1,5 +1,5 @@
 #include "Util.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 
 namespace Util {
 

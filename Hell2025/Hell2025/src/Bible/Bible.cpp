@@ -179,6 +179,7 @@ mystery.)";
             case GenericObjectType::DRAWERS_LARGE:      return ConfigureMeshNodesDrawersLarge(id, meshNodes);
             case GenericObjectType::TOILET:             return ConfigureMeshNodesToilet(id, meshNodes);
             case GenericObjectType::COUCH:              return ConfigureMeshNodesCouch(id, meshNodes);
+            case GenericObjectType::TEST_MODEL:         return ConfigureTestModel(id, meshNodes);
                 
 
             default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed from non-implemented GenericObjectType, type was: " << Util::GenericObjectTypeToString(type); return;

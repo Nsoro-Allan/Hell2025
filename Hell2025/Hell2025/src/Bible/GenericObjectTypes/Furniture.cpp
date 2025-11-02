@@ -39,4 +39,14 @@ namespace Bible {
         meshNodes.Init(id, "Couch", meshNodeCreateInfoSet);
 
     }
+
+    void ConfigureTestModel(uint64_t id, MeshNodes& meshNodes) {
+        std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+        meshNodes.Init(id, "Fireplace", meshNodeCreateInfoSet);
+
+        meshNodes.SetMeshMaterials("Ceiling2");
+        meshNodes.SetMaterialByMeshName("Body_Upper", "WallPaper");
+        meshNodes.SetMaterialByMeshName("Mantle", "FloorBoards");
+    }
 }

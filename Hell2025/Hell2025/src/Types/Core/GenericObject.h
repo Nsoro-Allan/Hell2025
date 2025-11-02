@@ -27,8 +27,9 @@ struct GenericObject {
     const GenericObjectCreateInfo& GetCreateInfo() const                    { return m_createInfo; }
     const GenericObjectType GetType() const                                 { return m_createInfo.type; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_meshNodes.GetRenderItems(); }
-    const std::vector<RenderItem>& GetRenderItemsBlended()const             { return m_meshNodes.GetRenderItemsBlended(); }
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_meshNodes.GetRenderItemsAlphaDiscarded(); }
+    const std::vector<RenderItem>& GetRenderItemsBlended()const             { return m_meshNodes.GetRenderItemsBlended(); }
+    const std::vector<RenderItem>& GetRenderItemsGlass()const               { return m_meshNodes.GetRenderItemsGlass(); }
     const std::vector<RenderItem>& GetRenderItemsHairTopLayer() const       { return m_meshNodes.GetRenderItemsHairTopLayer(); }
     const std::vector<RenderItem>& GetRenderItemsHairBottomLayer() const    { return m_meshNodes.GetRenderItemsHairBottomLayer(); }
     const std::vector<RenderItem>& GetRenderItemsMirror() const             { return m_meshNodes.GetRenderItemsMirror(); }

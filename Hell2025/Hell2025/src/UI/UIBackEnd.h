@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "Mesh2D.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 
 struct UIRenderItem {
     int baseVertex = 0;

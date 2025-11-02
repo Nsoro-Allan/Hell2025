@@ -45,6 +45,7 @@ enum class BlendingMode {
     HAIR_TOP_LAYER,
     TOILET_WATER,
     MIRROR,
+    GLASS,
     DO_NOT_RENDER
 };
 
@@ -83,6 +84,7 @@ enum class ObjectType : uint16_t {
     HEIGHT_MAP,
     PLANE,
     LIGHT,
+    MIRROR,
     PICK_UP,
     TREE,
     PIANO,
@@ -92,9 +94,6 @@ enum class ObjectType : uint16_t {
     RAGDOLL_PLAYER,
     SHARK,
     SPAWN_POINT,
-    TOILET,
-    TOILET_SEAT,
-    TOILET_LID,
     WALL,
     WALL_SEGMENT,
     WINDOW,
@@ -455,7 +454,8 @@ enum struct GenericObjectType {
     COUCH,
     BATHROOM_BASIN,
     BATHROOM_CABINET,
-    BATHROOM_TOWEL_RACK,    
+    BATHROOM_TOWEL_RACK,
+    TEST_MODEL,
     UNDEFINED
 };
 

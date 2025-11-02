@@ -11,17 +11,9 @@ struct SpaceCoords {
     float localMouseY;
 };
 
-struct MirrorInfo {
-    glm::mat4 viewMatrix;
-    glm::vec3 reflectVector;
-    glm::vec3 normal;
-    glm::vec3 position;
-    bool valid = false;
-};
-
 struct Viewport {
 public:
-    Viewport(const glm::vec2& position = { 0.0f, 0.0f }, const glm::vec2& size = { 1.0f, 1.0f }, bool isOrthographic = true);
+    Viewport(uint32_t viewportIndex, const glm::vec2& position = { 0.0f, 0.0f }, const glm::vec2& size = { 1.0f, 1.0f }, bool isOrthographic = true);
     void Update();
 
     void ClearMirrorInfo();
@@ -31,6 +23,7 @@ public:
     void SetPerspective(float fov, float nearPlane, float farPlane);
     void SetPosition(const glm::vec2& position);
     void SetSize(const glm::vec2& size);
+    void SetMirrorId(uint64_t mirrorId);
     void Show();
     void Hide();
     void SetViewportMode(ShadingMode viewportMode);
@@ -52,14 +45,15 @@ public:
     SpaceCoords GetGBufferSpaceCoords() const;
     SpaceCoords GetUISpaceCoords() const;
 
-    MirrorInfo& GetMirrorInfo() { return m_mirrorInfo; }
-
+    uint64_t& GetMirrorId()     { return m_mirrorId; }
     Frustum& GetFrustum()       { return m_frustum; }
-    Frustum& GetMirrorFrustum() { return m_mirrorFrustum; }
+    uint32_t GetViewportIndex() { return m_viewportIndex; }
     int GetLeftPixel()          { return m_leftPixel; }
     int GetRightPixel()         { return m_rightPixel; }
     int GetTopPixel()           { return m_topPixel; }
     int GetBottomPixel()        { return m_bottomPixel; }
+    float GetNearPlane()        { return m_nearPlane; }
+    float GetFarPlane()         { return m_farPlane; }
 
 private:
     glm::vec2 m_position;           // Top-left corner in normalized screen space (0-1)
@@ -76,16 +70,17 @@ private:
     float m_bottomPixel;
     bool m_isVisible = true;
     bool m_hasHover = false;
+    uint32_t m_viewportIndex = 0;
     glm::mat4 m_perspectiveMatrix;
     glm::mat4 m_orthographicMatrix;
     glm::vec3 m_mouseRayDirPerspective;
     glm::vec3 m_mouseRayDirOrthographic;
     Frustum m_frustum;
-    Frustum m_mirrorFrustum; // this work for a single mirror only, closest to the player who owns this viewport
     ShadingMode m_viewportMode;
     SpaceCoords m_windowSpaceCoords;
     SpaceCoords m_gBufferSpaceCoords;
     SpaceCoords m_uiSpaceCoords;
-    MirrorInfo m_mirrorInfo;
+    uint64_t m_mirrorId = 0;
+
     void UpdateProjectionMatrices();
 };

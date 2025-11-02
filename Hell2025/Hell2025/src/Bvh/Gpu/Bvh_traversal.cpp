@@ -1,6 +1,6 @@
 #include "Bvh.h"
 #include "Renderer/Renderer.h"
-#include "HellDefines.h"
+#include "HellConstants.h"
 #include "HellTypes.h"
 #include "Util.h"
 
@@ -95,7 +95,7 @@ namespace Bvh::Gpu {
 
             // Intersect primitives
             if (node.primitiveCount > 0) {
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     int index = node.firstChildOrPrimitive + i * 12;
 
                     glm::vec3 p0, e1, e2, normal;
@@ -180,7 +180,7 @@ namespace Bvh::Gpu {
             if (node.primitiveCount > 0) {
 
                 // It is, so now iterate the instances and check for a ray hit on those
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     const GpuPrimitiveInstance& instance = instances[node.firstChildOrPrimitive + i];
                     BvhRayResult localRayResult = MeshAnyHit(instance, rayOrigin, rayDir, maxDistance);
                         
@@ -240,7 +240,7 @@ namespace Bvh::Gpu {
             if (node.primitiveCount > 0) {
 
                 // IF so, then check intersections with the triangles within it
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     int index = node.firstChildOrPrimitive + i * 12;
 
                     glm::vec3 p0, e1, e2, normal;
@@ -337,7 +337,7 @@ namespace Bvh::Gpu {
             if (node.primitiveCount > 0) {
 
                 // It is, so now iterate the instances and check for a ray hit on those
-                for (int i = 0; i < node.primitiveCount; i++) {
+                for (uint32_t i = 0; i < node.primitiveCount; i++) {
                     const GpuPrimitiveInstance& instance = instances[node.firstChildOrPrimitive + i];
                     BvhRayResult localRayResult = MeshClosestHit(instance, rayOrigin, rayDir, rayResult.distanceToHit);
                     
