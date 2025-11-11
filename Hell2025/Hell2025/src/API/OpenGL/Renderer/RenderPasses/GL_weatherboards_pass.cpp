@@ -9,11 +9,6 @@
 
 namespace OpenGLRenderer {
 
-
-   // OpenGLMeshBuffer g_weathboardMeshBuffer;
-
-
-
     void WeatherBoardsPass() {
 
 
@@ -45,7 +40,6 @@ namespace OpenGLRenderer {
 
         glBindVertexArray(weatherboardMeshBuffer.GetGLMeshBuffer().GetVAO());
 
-
        //for (Vertex& vertex : vertices) {
        //
        //    if (vertex.position.z > 0.5f) {
@@ -57,7 +51,6 @@ namespace OpenGLRenderer {
        //
        //}
 
-
         Material* material = AssetManager::GetMaterialByName("WeatherBoards0");
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(material->m_basecolor)->GetGLTexture().GetHandle());
@@ -67,6 +60,7 @@ namespace OpenGLRenderer {
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(material->m_rma)->GetGLTexture().GetHandle());
 
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
             int indexCount = weatherboardMeshBuffer.GetGLMeshBuffer().GetIndexCount();

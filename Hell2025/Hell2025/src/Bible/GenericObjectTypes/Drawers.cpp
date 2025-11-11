@@ -6,11 +6,11 @@ namespace Bible {
 
         MeshNodeCreateInfo& largeFrame = meshNodeCreateInfoSet.emplace_back();
         largeFrame.meshName = "DrawersSmallFrame";
-        largeFrame.materialName = "T_Main_01a";
+        largeFrame.materialName = "Drawers_Frame";
 
         MeshNodeCreateInfo& drawer1st = meshNodeCreateInfoSet.emplace_back();
         drawer1st.type = MeshNodeType::OPENABLE;
-        drawer1st.materialName = "T_Drawers_01a";
+        drawer1st.materialName = "Drawers_Drawers";
         drawer1st.meshName = "DrawersSmall1st";
         drawer1st.openable.additionalTriggerMeshNames = { "Handle1st" };
         drawer1st.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -25,7 +25,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer2nd = meshNodeCreateInfoSet.emplace_back();
         drawer2nd.type = MeshNodeType::OPENABLE;
-        drawer2nd.materialName = "T_Drawers_01a";
+        drawer2nd.materialName = "Drawers_Drawers";
         drawer2nd.meshName = "DrawersSmall2nd";
         drawer2nd.openable.additionalTriggerMeshNames = { "Handle2st" };
         drawer2nd.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -40,7 +40,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer3rd = meshNodeCreateInfoSet.emplace_back();
         drawer3rd.type = MeshNodeType::OPENABLE;
-        drawer3rd.materialName = "T_Drawers_01a";
+        drawer3rd.materialName = "Drawers_Drawers";
         drawer3rd.meshName = "DrawersSmall3rd";
         drawer3rd.openable.additionalTriggerMeshNames = { "Handle3rd" };
         drawer3rd.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -55,7 +55,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer4th = meshNodeCreateInfoSet.emplace_back();
         drawer4th.type = MeshNodeType::OPENABLE;
-        drawer4th.materialName = "T_Drawers_01a";
+        drawer4th.materialName = "Drawers_Drawers";
         drawer4th.meshName = "DrawersSmall4th";
         drawer4th.openable.additionalTriggerMeshNames = { "Handle4th" };
         drawer4th.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -69,19 +69,19 @@ namespace Bible {
         drawer4th.openable.lockedAudio = "Locked.wav";
 
         MeshNodeCreateInfo& handle1st = meshNodeCreateInfoSet.emplace_back();
-        handle1st.materialName = "T_Handles_01a";
+        handle1st.materialName = "Drawers_Handles";
         handle1st.meshName = "Handle1st";
 
         MeshNodeCreateInfo& handle2nd = meshNodeCreateInfoSet.emplace_back();
-        handle2nd.materialName = "T_Handles_01a";
+        handle2nd.materialName = "Drawers_Handles";
         handle2nd.meshName = "Handle2nd";
 
         MeshNodeCreateInfo& handle3rd = meshNodeCreateInfoSet.emplace_back();
-        handle3rd.materialName = "T_Handles_01a";
+        handle3rd.materialName = "Drawers_Handles";
         handle3rd.meshName = "Handle3rd";
 
         MeshNodeCreateInfo& handle4th = meshNodeCreateInfoSet.emplace_back();
-        handle4th.materialName = "T_Handles_01a";
+        handle4th.materialName = "Drawers_Handles";
         handle4th.meshName = "Handle4th";
 
         meshNodes.Init(id, "DrawersSmall", meshNodeCreateInfoSet);
@@ -92,11 +92,11 @@ namespace Bible {
 
         MeshNodeCreateInfo& largeFrame = meshNodeCreateInfoSet.emplace_back();
         largeFrame.meshName = "DrawersLargeFrame";
-        largeFrame.materialName = "T_Main_01a";
+        largeFrame.materialName = "Drawers_Frame";
 
         MeshNodeCreateInfo& drawerTopL = meshNodeCreateInfoSet.emplace_back();
         drawerTopL.type = MeshNodeType::OPENABLE;
-        drawerTopL.materialName = "T_Drawers_01a";
+        drawerTopL.materialName = "Drawers_Drawers";
         drawerTopL.meshName = "DrawersLarge_TopL";
         drawerTopL.openable.additionalTriggerMeshNames = { "Handle_TopL" };
         drawerTopL.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -111,7 +111,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawerTopR = meshNodeCreateInfoSet.emplace_back();
         drawerTopR.type = MeshNodeType::OPENABLE;
-        drawerTopR.materialName = "T_Drawers_01a";
+        drawerTopR.materialName = "Drawers_Drawers";
         drawerTopR.meshName = "DrawersLarge_TopR";
         drawerTopR.openable.additionalTriggerMeshNames = { "Handle_TopR" };
         drawerTopR.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -126,7 +126,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer2nd = meshNodeCreateInfoSet.emplace_back();
         drawer2nd.type = MeshNodeType::OPENABLE;
-        drawer2nd.materialName = "T_Drawers_01a";
+        drawer2nd.materialName = "Drawers_Drawers";
         drawer2nd.meshName = "DrawersLarge_2nd";
         drawer2nd.openable.additionalTriggerMeshNames = { "Handle_2nd" };
         drawer2nd.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -141,7 +141,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer3rd = meshNodeCreateInfoSet.emplace_back();
         drawer3rd.type = MeshNodeType::OPENABLE;
-        drawer3rd.materialName = "T_Drawers_01a";
+        drawer3rd.materialName = "Drawers_Drawers";
         drawer3rd.meshName = "DrawersLarge_3rd";
         drawer3rd.openable.additionalTriggerMeshNames = { "Handle_3rd" };
         drawer3rd.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -156,7 +156,7 @@ namespace Bible {
 
         MeshNodeCreateInfo& drawer4th = meshNodeCreateInfoSet.emplace_back();
         drawer4th.type = MeshNodeType::OPENABLE;
-        drawer4th.materialName = "T_Drawers_01a";
+        drawer4th.materialName = "Drawers_Drawers";
         drawer4th.meshName = "DrawersLarge_4th";
         drawer4th.openable.additionalTriggerMeshNames = { "Handle_4th" };
         drawer4th.openable.openAxis = OpenAxis::TRANSLATE_Z;
@@ -170,23 +170,23 @@ namespace Bible {
         drawer4th.openable.lockedAudio = "Locked.wav";
 
         MeshNodeCreateInfo& handleTopL = meshNodeCreateInfoSet.emplace_back();
-        handleTopL.materialName = "T_Handles_01a";
+        handleTopL.materialName = "Drawers_Handles";
         handleTopL.meshName = "Handle_TopL";
 
         MeshNodeCreateInfo& handleTopR = meshNodeCreateInfoSet.emplace_back();
-        handleTopR.materialName = "T_Handles_01a";
+        handleTopR.materialName = "Drawers_Handles";
         handleTopR.meshName = "Handle_TopR";
 
         MeshNodeCreateInfo& handle2nd = meshNodeCreateInfoSet.emplace_back();
-        handle2nd.materialName = "T_Handles_01a";
+        handle2nd.materialName = "Drawers_Handles";
         handle2nd.meshName = "Handle_2nd";
 
         MeshNodeCreateInfo& handle3rd = meshNodeCreateInfoSet.emplace_back();
-        handle3rd.materialName = "T_Handles_01a";
+        handle3rd.materialName = "Drawers_Handles";
         handle3rd.meshName = "Handle_3rd";
 
         MeshNodeCreateInfo& handle4th = meshNodeCreateInfoSet.emplace_back();
-        handle4th.materialName = "T_Handles_01a";
+        handle4th.materialName = "Drawers_Handles";
         handle4th.meshName = "Handle_4th";
 
         meshNodes.Init(id, "DrawersLarge", meshNodeCreateInfoSet);

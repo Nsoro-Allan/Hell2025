@@ -82,7 +82,7 @@ enum class ObjectType : uint16_t {
     GENERIC_BOUNCABLE,
     GENERIC_STATIC,
     HEIGHT_MAP,
-    PLANE,
+    HOUSE_PLANE,
     LIGHT,
     MIRROR,
     PICK_UP,
@@ -332,6 +332,12 @@ enum struct TrimType {
     PLASTER
 };
 
+enum struct HousePlaneType {
+    FLOOR,
+    CEILING,
+    UNDEFINED
+};
+
 enum struct WallType {
     INTERIOR,
     WEATHER_BOARDS,
@@ -456,6 +462,7 @@ enum struct GenericObjectType {
     BATHROOM_CABINET,
     BATHROOM_TOWEL_RACK,
     TEST_MODEL,
+    TEST_MODEL2,
     UNDEFINED
 };
 

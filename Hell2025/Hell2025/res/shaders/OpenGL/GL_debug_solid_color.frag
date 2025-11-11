@@ -9,10 +9,6 @@ in vec2 TexCoords;
 uniform bool u_isPath;
 
 void main() {
-    if (WorldPos.y < 30) {
-        discard;
-    }
-    
     FragOut.rgb = u_color * 0.5;
     FragOut.rgb = vec3(TexCoords, 0);
 	FragOut.a = 1.0;

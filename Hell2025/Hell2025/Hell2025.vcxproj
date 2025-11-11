@@ -310,6 +310,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Common\UniqueID.cpp" />
     <ClCompile Include="src\Bible\Bible.cpp" />
     <ClCompile Include="src\Common\HellLogging.cpp" />
+    <ClCompile Include="src\Editor\Editor_settings.cpp" />
     <ClCompile Include="src\Managers\MirrorManager.cpp" />
     <ClCompile Include="src\Managers\OpenableManager.cpp" />
     <ClCompile Include="src\Editor\Editors\Editor_left_panel.cpp" />
@@ -344,6 +345,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Ragdoll\RagdollInfo.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollManager.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
+    <ClCompile Include="src\Types\Core\Openable.cpp" />
     <ClCompile Include="src\Types\Mirror.cpp" />
     <ClCompile Include="src\Types\Exterior\Fence.cpp" />
     <ClCompile Include="src\Types\Exterior\PowerPoleSet.cpp" />
@@ -426,7 +428,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\Renderer\TextureArray.cpp" />
     <ClCompile Include="src\Types\Game\Decal.cpp" />
     <ClCompile Include="src\Types\House\Door.cpp" />
-    <ClCompile Include="src\Types\House\Plane.cpp" />
+    <ClCompile Include="src\Types\House\HousePlane.cpp" />
     <ClCompile Include="src\Types\Game\PickUp.cpp" />
     <ClCompile Include="src\Types\Exterior\Tree.cpp" />
     <ClCompile Include="src\Types\House\Wall.cpp" />
@@ -780,7 +782,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Game\Bullet.h" />
     <ClInclude Include="src\Types\Game\Decal.h" />
     <ClInclude Include="src\Types\House\Door.h" />
-    <ClInclude Include="src\Types\House\Plane.h" />
+    <ClInclude Include="src\Types\House\HousePlane.h" />
     <ClInclude Include="src\Types\Game\PickUp.h" />
     <ClInclude Include="src\Types\Exterior\Tree.h" />
     <ClInclude Include="src\Types\House\Wall.h" />

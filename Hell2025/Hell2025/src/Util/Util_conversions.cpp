@@ -146,12 +146,15 @@ namespace Util {
     }
 
     //ObjectType StringToObjectType(const std::string& str)                     { return magic_enum::enum_cast<ObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
+
+    HousePlaneType StringToHousePlaneType(const std::string& str)       { return magic_enum::enum_cast<HousePlaneType>(str).value_or(HousePlaneType::UNDEFINED); }
     GenericObjectType StringToGenericObjectType(const std::string& str) { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
     BlendingMode StringToBlendingMode(const std::string& str)           { return magic_enum::enum_cast<BlendingMode>(str).value_or(BlendingMode::BLENDED); }
     
     std::string EditorStateToString(const EditorState& editorState)             { return std::string(magic_enum::enum_name(editorState)); }
     std::string EditorSelectionModeToString(const EditorSelectionMode& mode)    { return std::string(magic_enum::enum_name(mode)); }
     std::string GenericObjectTypeToString(GenericObjectType type)               { return std::string(magic_enum::enum_name(type)); }
+    std::string HousePlaneTypeToString(HousePlaneType type)                     { return std::string(magic_enum::enum_name(type)); }
     std::string ObjectTypeToString(ObjectType type)                             { return std::string(magic_enum::enum_name(type)); }
     std::string OpenStateToString(OpenState type)                               { return std::string(magic_enum::enum_name(type)); }
     std::string BlendingModeToString(BlendingMode mode)                         { return std::string(magic_enum::enum_name(mode)); }

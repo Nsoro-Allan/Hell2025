@@ -54,7 +54,7 @@ namespace World {
             decal.SubmitRenderItem();
         }
 
-        for (Plane& housePlane : GetPlanes()) {
+        for (HousePlane& housePlane : GetHousePlanes()) {
             housePlane.SubmitRenderItem();
         }
 

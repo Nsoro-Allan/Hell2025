@@ -30,7 +30,7 @@
 #include "Types/Interior/Piano.h"
 #include "Types/House/Door.h"
 #include "Types/House/HouseInstance.h"
-#include "Types/House/Plane.h"
+#include "Types/House/HousePlane.h"
 #include "Types/House/Wall.h"
 #include "Types/House/Window.h"
 #include "Types/Map/Map.h"
@@ -97,7 +97,7 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddHousePlane(PlaneCreateInfo createInfo, SpawnOffset spawnOffset);
+    void AddHousePlane(HousePlaneCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddKangaroo(const KangarooCreateInfo& createInfo);
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -168,22 +168,21 @@ namespace World {
 
     CreateInfoCollection GetCreateInfoCollection();
 
-    AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectID);
-    Door* GetDoorByObjectId(uint64_t objectID);
-    Door* GetDoorByDoorFrameObjectId(uint64_t objectID);
+    AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectId);
 
+    Door* GetDoorByObjectId(uint64_t objectId);
     GenericObject* GetGenericObjectById(uint64_t objectId);
+    HousePlane* GetHousePlaneByObjectId(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);
     PianoKey* GetPianoKeyByObjectId(uint64_t objectId);
     PickUp* GetPickUpByObjectId(uint64_t objectID);
     PictureFrame* GetPictureFrameByObjectId(uint64_t objectId);
-    Plane* GetPlaneByObjectId(uint64_t objectID); 
     Tree* GetTreeByObjectId(uint64_t objectId);
-    Wall* GetWallByObjectId(uint64_t objectID);
-    Wall* GetWallByWallSegmentObjectId(uint64_t objectID);
-    Shark* GetSharkByObjectId(uint64_t objectID);
+    Wall* GetWallByObjectId(uint64_t objectId);
+    Wall* GetWallByWallSegmentObjectId(uint64_t objectId);
+    Shark* GetSharkByObjectId(uint64_t objectId);
     Window* GetWindowByObjectId(uint64_t objectId);
     GameObject* GetGameObjectByIndex(int32_t index);
     GameObject* GetGameObjectByName(const std::string& name);
@@ -210,7 +209,7 @@ namespace World {
     std::vector<GenericBouncable>& GetGenericBouncables();
     std::vector<GenericStatic>& GetGenericStatics();
     std::vector<HeightMapChunk>& GetHeightMapChunks();
-    std::vector<Plane>& GetPlanes();
+    Hell::SlotMap<HousePlane>& GetHousePlanes();
     std::vector<Light>& GetLights();
     std::vector<Kangaroo>& GetKangaroos();
     std::vector<MapInstance>& GetMapInstances();
@@ -225,7 +224,7 @@ namespace World {
     std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();
     std::vector<Tree>& GetTrees();
-    std::vector<Wall>& GetWalls();
+    Hell::SlotMap<Wall>& GetWalls();
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters();
     Hell::SlotMap<Window>& GetWindows();
 

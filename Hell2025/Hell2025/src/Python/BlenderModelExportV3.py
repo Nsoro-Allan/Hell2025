@@ -184,8 +184,13 @@ class ModelExporter:
                         p3 = (self.conv3 @ v.co) * self.scale
                         n3 = (self.conv3 @ loop.normal).normalized()
                         t3 = (self.conv3 @ loop.tangent).normalized() if mesh.uv_layers.active else mathutils.Vector((0,0,0))
-                        uv = mesh.uv_layers.active.data[li].uv if mesh.uv_layers.active else mathutils.Vector((0.0, 0.0))
-                        uv2 = (uv.x, 1.0 - uv.y)
+
+                        if mesh.uv_layers.active:
+                            uv = mesh.uv_layers.active.data[li].uv
+                            uv2 = (uv.x, 1.0 - uv.y)
+                        else:
+                            uv = (0.0, 0.0)
+                            uv2 = (0.0, 0.0)
 
                         key = (round(p3.x, self.rounding), round(p3.y, self.rounding), round(p3.z, self.rounding),
                                round(uv2[0], self.rounding), round(uv2[1], self.rounding))

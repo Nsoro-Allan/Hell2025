@@ -13,7 +13,6 @@ layout (binding = 2) uniform sampler2D rmaTexture;
 layout (binding = 7) uniform sampler2D FlashlightCookieTexture;
 layout (binding = 8) uniform sampler2DArray FlashlighShadowMapTextureArray;
 
-
 readonly restrict layout(std430, binding = 1) buffer rendererDataBuffer { RendererData  rendererData;   };
 readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer { ViewportData  viewportData[]; };
 readonly restrict layout(std430, binding = 4) buffer lightsBuffer       { Light         lights[];       };

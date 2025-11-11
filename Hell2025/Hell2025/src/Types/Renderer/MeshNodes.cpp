@@ -159,6 +159,30 @@ bool MeshNodes::HasNodeWithObjectId(uint64_t objectId) const {
     return false;
 }
 
+bool MeshNodes::MeshNodeIsOpen(const std::string& meshName) {
+    const MeshNode* meshNode = GetMeshNodeByMeshName(meshName);
+    if (!meshNode) return false;
+
+    if (Openable* openable = OpenableManager::GetOpenableByOpenableId(meshNode->openableId)) {
+        if (openable->IsOpen()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool MeshNodes::MeshNodeIsClosed(const std::string& meshName) {
+    const MeshNode* meshNode = GetMeshNodeByMeshName(meshName);
+    if (!meshNode) return false;
+
+    if (Openable* openable = OpenableManager::GetOpenableByOpenableId(meshNode->openableId)) {
+        if (openable->IsClosed()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void MeshNodes::CleanUp() {
     m_modelName = "";
     m_nodeCount = 0;

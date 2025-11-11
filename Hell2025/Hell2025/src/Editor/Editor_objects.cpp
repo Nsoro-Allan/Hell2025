@@ -28,7 +28,9 @@ namespace Editor {
         float maxRayDistance = 2000;
         glm::vec3 rayOrigin = GetMouseRayOriginByViewportIndex(GetHoveredViewportIndex());
         glm::vec3 rayDir = GetMouseRayDirectionByViewportIndex(GetHoveredViewportIndex());
-        PhysXRayResult physxRayResult = Physics::CastPhysXRay(rayOrigin, rayDir, maxRayDistance, true);
+        bool backfaceCulling = BackfaceCullingEnabled();
+
+        PhysXRayResult physxRayResult = Physics::CastPhysXRay(rayOrigin, rayDir, maxRayDistance, backfaceCulling);
         if (physxRayResult.hitFound) {
             SetHoveredObjectType(physxRayResult.userData.objectType);
             SetHoveredObjectId(physxRayResult.userData.objectId);
@@ -115,12 +117,12 @@ namespace Editor {
 
 
         // HACKKK
-        if (Plane* plane = World::GetPlaneByObjectId(GetSelectedObjectId())) {
+        if (HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId())) {
 
             plane->DrawEdges(OUTLINE_COLOR);
             plane->DrawVertices(OUTLINE_COLOR);
 
-            // Draw hovered verets and HACK to select it
+            // Draw hovered verts and HACK to select it
             for (int i = 0; i < 4; i++) {
 
                 glm::vec3 position = plane->GetVertices()[i].position;
@@ -196,8 +198,8 @@ namespace Editor {
                 }
             }
 
-            if (GetSelectedObjectType() == ObjectType::PLANE) {
-                Plane* plane = World::GetPlaneByObjectId(GetSelectedObjectId());
+            if (GetSelectedObjectType() == ObjectType::HOUSE_PLANE) {
+                HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId());
                 if (plane) {
                     // is this IF neccesssary? write safer less confusing logic!!!
                     if (GetEditorSelectionMode() == EditorSelectionMode::OBJECT) {
@@ -322,10 +324,10 @@ namespace Editor {
                 // HACK
                 // HACK
                 // HACK
-                if (GetSelectedObjectType() == ObjectType::PLANE) {
-                    if (Plane* plane = World::GetPlaneByObjectId(GetSelectedObjectId())) {
+                if (GetSelectedObjectType() == ObjectType::HOUSE_PLANE) {
+                    if (HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId())) {
 
-                        PlaneCreateInfo& createInfo = plane->GetCreateInfo();
+                        HousePlaneCreateInfo& createInfo = plane->GetCreateInfo();
 
                         if (g_selectedVertexIndex == 0) {
                             createInfo.p0 = Gizmo::GetPosition();

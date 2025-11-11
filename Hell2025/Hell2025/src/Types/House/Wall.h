@@ -13,7 +13,14 @@ struct BoardVertexData {
 };
 
 struct Wall {
-    void Init(WallCreateInfo createInfo, const SpawnOffset& spawnOffset);
+    Wall() = default;
+    Wall(uint64_t id, const WallCreateInfo& createInfo, const SpawnOffset& spawnOffset);
+    Wall(const Wall&) = delete;
+    Wall& operator=(const Wall&) = delete;
+    Wall(Wall&&) noexcept = default;
+    Wall& operator=(Wall&&) noexcept = default;
+    ~Wall() = default;
+
     void CleanUp();
     void UpdateSegmentsAndVertexData();
     void UpdateWorldSpaceCenter(glm::vec3 worldSpaceCenter);

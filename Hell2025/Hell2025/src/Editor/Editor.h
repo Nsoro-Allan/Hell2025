@@ -7,6 +7,7 @@
 #include <string>
 
 namespace Editor {
+
     void Init();
     void ResetCameras();
     void ResetViewports();
@@ -40,6 +41,11 @@ namespace Editor {
     void UpdateGizmoInteract();
 
     float GetScalingFactor(int targetSizeInPixels);
+
+    // Settings
+    void SetBackfaceCulling(bool value);
+    bool BackfaceCullingEnabled();
+    bool BackfaceCullingDisabled();
 
     // Object hover
     void UpdateObjectHover();
@@ -111,10 +117,15 @@ namespace Editor {
 
     std::string GetNextEditorName(const std::string& desiredName, ObjectType objectType);
 
+    std::string GetNextAvailableGenericObjectName(GenericObjectType type);
+    std::string GetNextAvailableHousePlaneName(HousePlaneType type);
     std::string GetNextAvailableTreeName(TreeType type);
 
-    std::vector<std::string> GetTreeNames();
-
+    const std::vector<std::string>& GetCeilingNames();
+    const std::vector<std::string>& GetGenericObjectNames();
+    const std::vector<std::string>& GetFloorNames();
+    const std::vector<std::string>& GetTreeNames(); 
+    const std::vector<std::string>& GetUndefinedHousePlanes();
 
     void CloseAllEditorWindows();
 
@@ -144,7 +155,6 @@ namespace Editor {
 
     // Ray intersections
     glm::vec3 GetMouseRayPlaneIntersectionPoint(glm::vec3 planeOrigin, glm::vec3 planeNormal);
-    PhysXRayResult GetEditorPhysXMouseRayHit();
 
     int GetActiveViewportIndex();
     int GetHoveredViewportIndex();

@@ -25,13 +25,4 @@ namespace Editor {
             return hitPosition;
         }
     }
-
-    PhysXRayResult GetEditorPhysXMouseRayHit() {
-        int viewportIndex = Editor::GetHoveredViewportIndex();
-        const Viewport* viewport = ViewportManager::GetViewportByIndex(viewportIndex);
-        const glm::vec3 rayOrigin = Editor::GetMouseRayOriginByViewportIndex(viewportIndex);
-        const glm::vec3 rayDir = Editor::GetMouseRayDirectionByViewportIndex(viewportIndex);
-        float maxRayDistance = 1000;
-        return Physics::CastPhysXRay(rayOrigin, rayDir, maxRayDistance, true);
-    }
 }

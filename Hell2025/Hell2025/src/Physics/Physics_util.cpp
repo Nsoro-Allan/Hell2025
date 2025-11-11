@@ -132,10 +132,10 @@ namespace Physics {
         PxReal maxDistance = rayLength;
         PxRaycastBuffer hit;
         PxHitFlags outputFlags = PxHitFlag::ePOSITION | PxHitFlag::eNORMAL;// | PxHitFlag::eMESH_BOTH_SIDES;
-       //if (cullBackFacing) {
-       //    outputFlags |= PxHitFlag::eMESH_BOTH_SIDES;
-       //}
 
+        if (!cullBackFacing) {
+            outputFlags |= PxHitFlag::eMESH_BOTH_SIDES;
+        }
 
         PxQueryFilterData filterData = PxQueryFilterData();
         filterData.data.word0 = 0xFFFFFFFF; // Or a specific bit for "ray"

@@ -29,6 +29,7 @@ namespace OpenGLRenderer {
         gBuffer->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         shader->Bind();
         shader->SetMat4("u_model", glm::mat4(1));
@@ -39,11 +40,9 @@ namespace OpenGLRenderer {
 
         glBindVertexArray(glHouseMeshBuffer.GetVAO());
 
-
-                // ATTENTION! You are not frustum culling your house mesh bro
-                // ATTENTION! You are not frustum culling your house mesh bro
-                // ATTENTION! You are not frustum culling your house mesh bro
-
+        // ATTENTION! You are not frustum culling your house mesh bro
+        // ATTENTION! You are not frustum culling your house mesh bro
+        // ATTENTION! You are not frustum culling your house mesh bro
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
@@ -111,6 +110,7 @@ namespace OpenGLRenderer {
         shader->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
 
@@ -131,6 +131,7 @@ namespace OpenGLRenderer {
                 }
             }
         }
+
         // Alpha discard
         shader->SetBool("u_alphaDiscard", true);
         for (int i = 0; i < 4; i++) {
@@ -145,10 +146,12 @@ namespace OpenGLRenderer {
                 }
             }
         }
-        shader->SetBool("u_alphaDiscard", false);
 
+        // Blended
+        shader->SetBool("u_alphaDiscard", false);
         gBuffer->DrawBuffers({ "BaseColor" });
         SetRasterizerState("GeometryPass_Blended");
+        EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
@@ -163,9 +166,11 @@ namespace OpenGLRenderer {
             }
         }
 
+        // Skinned mesh
         shader->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         glBindVertexArray(OpenGLBackEnd::GetSkinnedVertexDataVAO());
         glBindBuffer(GL_ARRAY_BUFFER, OpenGLBackEnd::GetSkinnedVertexDataVBO());
@@ -187,6 +192,7 @@ namespace OpenGLRenderer {
         OpenGLShader* christmasLightWireShader = GetShader("ChristmasLightsWire");
         christmasLightWireShader->Bind();
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
@@ -220,6 +226,7 @@ namespace OpenGLRenderer {
         OpenGLShader* ragdollShader = GetShader("DebugRagdoll");
         ragdollShader->Bind();
         SetRasterizerState("GeometryPass_NonBlended");
+        EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);

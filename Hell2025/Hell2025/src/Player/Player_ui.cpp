@@ -251,11 +251,6 @@ void Player::UpdateUI() {
             }
 
 
-            //text = Debug::GetText();
-
-
-
-
             UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);
         }
     

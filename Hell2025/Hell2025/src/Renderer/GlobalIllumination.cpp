@@ -71,7 +71,7 @@ namespace GlobalIllumination {
         g_triangles.clear();
 
         // Store floor and ceilings triangles
-        for (Plane& plane : World::GetPlanes()) {
+        for (HousePlane& plane : World::GetHousePlanes()) {
             for (uint32_t i = 0; i < plane.GetIndices().size(); i+=3) {
                 Triangle& triangle = g_triangles.emplace_back();
 

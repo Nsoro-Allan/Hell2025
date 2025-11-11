@@ -504,7 +504,6 @@ namespace OpenGLRenderer {
         gBuffer->ClearAttachment("WorldPosition", 0, 0);
         gBuffer->ClearAttachment("Emissive", 0, 0, 0, 0);
         gBuffer->ClearAttachment("Glass", 0, 1, 0, 0);
-        gBuffer->ClearAttachment("MirrorMask", 0, 0, 0, 0);
         gBuffer->ClearDepthAttachment();
 
         // Decal mask
@@ -709,6 +708,12 @@ namespace OpenGLRenderer {
         OpenGLSSBO* ssbo = GetSSBO(name);
         if (ssbo && size > 0) {
             ssbo->Update(size, data);
+        }
+    }
+
+    void EditorRasterizerStateOverride() {
+        if (Editor::IsOpen() && Editor::BackfaceCullingDisabled()) {
+            glDisable(GL_CULL_FACE);
         }
     }
 }

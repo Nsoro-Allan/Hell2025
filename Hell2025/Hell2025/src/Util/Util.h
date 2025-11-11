@@ -165,6 +165,7 @@ namespace Util {
     std::string BlendingModeToString(BlendingMode mode);
     std::string GenericObjectTypeToString(GenericObjectType houseType);
     std::string HouseTypeToString(HouseType houseType);
+    std::string HousePlaneTypeToString(HousePlaneType type);
     std::string InventoryStateToString(InventoryState state);
     std::string LightTypeToString(LightType type);
     std::string PickUpTypeToString(PickUpType type);
@@ -180,8 +181,8 @@ namespace Util {
     BlendingMode StringToBlendingMode(const std::string& str);
     GenericObjectType StringToGenericObjectType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);
+    HousePlaneType StringToHousePlaneType(const std::string& str);
     LightType StringToLightType(const std::string& str);
-    //ObjectType StringToObjectType(const std::string& str);
     PickUpType StringToPickUpType(const std::string& str);
     PictureFrameType StringToPictureFrameType(const std::string& str);
     TreeType StringToTreeType(const std::string& str);

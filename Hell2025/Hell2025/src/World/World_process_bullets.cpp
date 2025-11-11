@@ -139,7 +139,7 @@ namespace World {
 
                     // Plaster decal
                     if (objectType == ObjectType::WALL_SEGMENT ||
-                        objectType == ObjectType::PLANE ||
+                        objectType == ObjectType::HOUSE_PLANE ||
                         objectType == ObjectType::DOOR ||
                         objectType == ObjectType::PIANO) {
                         decalCreateInfo.decalType = DecalType::PLASTER;

@@ -5,12 +5,15 @@
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
 #include "World/World.h"
-#include "UniqueID.h"
 
-void Wall::Init(WallCreateInfo createInfo, const SpawnOffset& spawnOffset) {
-    m_objectId = UniqueID::GetNextObjectId(ObjectType::WALL); // Only do this once
+Wall::Wall(uint64_t id, const WallCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
+    m_objectId = id;
     m_createInfo = createInfo;
     m_spawnOffset = spawnOffset;
+
+    for (glm::vec3& point : m_createInfo.points) {
+        point += spawnOffset.translation;
+    }
 
     UpdateSegmentsAndVertexData();
     //std::cout << "Wall::Init(): " << Util::WallTypeToString(m_createInfo.wallType) << "\n";

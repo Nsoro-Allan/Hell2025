@@ -11,6 +11,9 @@
 namespace Editor {
     EditorUI::LeftPanel g_leftPanel;
 
+    EditorUI::CollapsingHeader g_settingsHeader;
+    EditorUI::CheckBox g_backfaceCulling;
+
     EditorUI::CollapsingHeader g_mapPropertiesHeader;
     EditorUI::CollapsingHeader g_objectPropertiesHeader;
     EditorUI::CollapsingHeader g_outlinerHeader;
@@ -28,6 +31,10 @@ namespace Editor {
         g_mapPropertiesHeader.SetTitle("Map Editor");
         g_objectPropertiesHeader.SetTitle("Properties");
 
+        g_settingsHeader.SetTitle("Settings");
+        g_backfaceCulling.SetText("Backface culling");
+        g_backfaceCulling.SetState(BackfaceCullingEnabled());
+
         UpdateOutliner();
     }
 
@@ -41,9 +48,10 @@ namespace Editor {
 
                 g_outlinerHeader.SetTitle("Outliner");
 
-                std::vector<std::string> gameObjects = { "shit", "fuck" };
-
-                g_outliner.SetItems("Game Objects", gameObjects);
+                g_outliner.SetItems("Ceilings", GetCeilingNames());
+                g_outliner.SetItems("Floors", GetFloorNames());
+                g_outliner.SetItems("Generic Objects", GetGenericObjectNames());
+                g_outliner.SetItems("House Planes", GetUndefinedHousePlanes());
                 g_outliner.SetItems("Trees", GetTreeNames());
 
                 g_objectNameInput.SetLabel("Name");
@@ -80,6 +88,14 @@ namespace Editor {
 
     void BeginLeftPanel() {
         g_leftPanel.BeginImGuiElement();
+
+        // Settings
+        if (g_settingsHeader.CreateImGuiElement()) {
+            if (g_backfaceCulling.CreateImGuiElements()) {
+                SetBackfaceCulling(g_backfaceCulling.GetState());
+            }
+            ImGui::Dummy(ImVec2(0.0f, 10.0f));
+        }
 
         // Map properties
         if (GetEditorMode() == EditorMode::MAP_HEIGHT_EDITOR ||

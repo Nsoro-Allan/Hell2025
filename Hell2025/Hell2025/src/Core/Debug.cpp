@@ -6,6 +6,7 @@
 #include "Core/Game.h"
 #include "Input/Input.h"
 #include "Editor/Editor.h"
+#include "Managers/MirrorManager.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Physics/Physics.h"
@@ -29,21 +30,44 @@ namespace Debug {
         UpdateDebugText();
     }
     void UpdateDebugText() {
-        if (!g_showDebugText) return;
 
-        //AddText("Editor State: " + Util::EditorStateToString(Editor::GetEditorState()));
+        if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER) return;
+        if (Debug::GetDebugTextMode() == DebugTextMode::NONE)       return;
+        if (Editor::IsOpen())                                       return;
 
-        std::string text = "SHIT\n";
-        std::string text2 = "SHIT\n";
-        UIBackEnd::BlitText(MidiFileManager::GetDebugTextTime(), "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
-        UIBackEnd::BlitText(MidiFileManager::GetDebugTextEvents(), "StandardFont", 250, 0, Alignment::TOP_LEFT, 2.0f);
-        UIBackEnd::BlitText(MidiFileManager::GetDebugTextVelocity(), "StandardFont", 500, 0, Alignment::TOP_LEFT, 2.0f);
-        UIBackEnd::BlitText(MidiFileManager::GetDebugTextTimeDurations(), "StandardFont", 750, 0, Alignment::TOP_LEFT, 2.0f);
+        // Midi notes
+        if (MidiFileManager::IsPlaying()) {
+            UIBackEnd::BlitText(MidiFileManager::GetDebugTextTime(), "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
+            UIBackEnd::BlitText(MidiFileManager::GetDebugTextEvents(), "StandardFont", 250, 0, Alignment::TOP_LEFT, 2.0f);
+            UIBackEnd::BlitText(MidiFileManager::GetDebugTextVelocity(), "StandardFont", 500, 0, Alignment::TOP_LEFT, 2.0f);
+            UIBackEnd::BlitText(MidiFileManager::GetDebugTextTimeDurations(), "StandardFont", 750, 0, Alignment::TOP_LEFT, 2.0f);
+            return;
+        }
+
+        // Regular global debug
+        std::string text = "";
+
+        // Mirrors
+        if (true) {
+            text += "Mirror count: " + std::to_string(MirrorManager::GetMirrors().size()) + "\n";
+            for (Mirror& mirror : MirrorManager::GetMirrors()) {
+                text += "- " + Util::Vec3ToString(mirror.GetWorldCenter()) + "\n";
+            }
+        }
+
+
+        UIBackEnd::BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
+
+        return;
+
 
         const DebugRenderMode& debugRenderMode = Debug::GetDebugRenderMode();
         if (debugRenderMode != DebugRenderMode::NONE) {
             AddText("Line Mode: " + Util::DebugRenderModeToString(debugRenderMode));
         }
+
+        std::string text2 = "SHIT\n";
+        UIBackEnd::BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
 
         return;
 

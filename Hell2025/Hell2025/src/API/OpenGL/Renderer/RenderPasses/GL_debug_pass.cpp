@@ -221,7 +221,6 @@ namespace OpenGLRenderer {
             glBindTextureUnit(3, gBuffer->GetColorAttachmentHandleByName("RMA"));
             glBindTextureUnit(4, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
             glBindTextureUnit(5, miscFullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
-            glBindTextureUnit(6, gBuffer->GetColorAttachmentHandleByName("MirrorMask"));
 
             glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
         }

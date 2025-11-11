@@ -60,6 +60,8 @@ struct MeshNodes {
     bool NodeExists(const std::string& meshName);
     bool BoneExists(const std::string& boneName);
     bool HasNodeWithObjectId(uint64_t objectId) const;
+    bool MeshNodeIsOpen(const std::string& meshName);
+    bool MeshNodeIsClosed(const std::string& meshName);
 
     int32_t GetGlobalMeshIndex(int nodeIndex);
     Material* GetMaterial(int nodeIndex);

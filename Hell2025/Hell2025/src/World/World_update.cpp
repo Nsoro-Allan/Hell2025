@@ -177,7 +177,6 @@ namespace World {
         std::vector<Piano>& pianos = GetPianos();
         std::vector<PickUp>& pickUps = GetPickUps();
         std::vector<Tree>& trees = GetTrees();
-        std::vector<Wall>& walls = GetWalls();
 
         for (AnimatedGameObject& animatedGameObject : animatedGameObjects) {
             animatedGameObject.Update(deltaTime);
@@ -248,7 +247,7 @@ namespace World {
             window.Update(deltaTime);
         }
 
-        for (Wall& wall : walls) {
+        for (Wall& wall : GetWalls()) {
           //  wall.CreateTrims();                         // REMOVE ME FOR THE LOVE OF JEBUS!!!
             // Nothing as of yet. Probably ever.
         }

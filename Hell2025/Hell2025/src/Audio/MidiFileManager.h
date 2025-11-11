@@ -14,6 +14,8 @@ namespace MidiFileManager {
     void AddDebugTextVelocity(const std::string& text);
     void AddDebugTextDurations(const std::string& text);
 
+    bool IsPlaying();
+
     std::string GetDebugTextTime();
     std::string GetDebugTextEvents();
     std::string GetDebugTextVelocity();

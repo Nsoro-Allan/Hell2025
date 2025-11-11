@@ -13,6 +13,8 @@ struct OpenableCreateInfo {
     std::string closingAudio = UNDEFINED_STRING;
     std::string openedAudio = UNDEFINED_STRING;
     std::string closedAudio = UNDEFINED_STRING;
+    std::string prerequisiteOpenMeshName = UNDEFINED_STRING;
+    std::string prerequisiteClosedMeshName = UNDEFINED_STRING;
     std::vector<std::string> additionalTriggerMeshNames;
     float minOpenValue = 0.0f;
     float maxOpenValue = HELL_PI * 0.5f;
@@ -143,16 +145,18 @@ struct WindowCreateInfo {
     glm::vec3 rotation;
 };
 
-struct PlaneCreateInfo {
+struct HousePlaneCreateInfo {
     glm::vec3 p0 = glm::vec3(0.0f);
     glm::vec3 p1 = glm::vec3(0.0f);
     glm::vec3 p2 = glm::vec3(0.0f);
     glm::vec3 p3 = glm::vec3(0.0f);
     std::string materialName = "";
+    std::string editorName = UNDEFINED_STRING;
     float textureScale = 1.0f;
     float textureOffsetU = 0.0f;
     float textureOffsetV = 0.0f;
     float textureRotation = 0.0f;
+    HousePlaneType type = HousePlaneType::UNDEFINED;
 };
 
 struct PianoCreateInfo {
@@ -268,7 +272,7 @@ struct SectorCreateInfo {
 
 struct HouseCreateInfo {
     std::vector<DoorCreateInfo> doors;
-    std::vector<PlaneCreateInfo> planes;
+    std::vector<HousePlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;
     std::vector<PictureFrameCreateInfo> pictureFrames;
@@ -287,7 +291,7 @@ struct MapCreateInfo {
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
     std::vector<GenericObjectCreateInfo> genericObjects;
-    std::vector<PlaneCreateInfo> planes;
+    std::vector<HousePlaneCreateInfo> planes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;
     std::vector<PickUpCreateInfo> pickUps;

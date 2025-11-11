@@ -4,8 +4,6 @@
 #include "Util.h"
 #include <fstream>
 
-std::vector<WallCreateInfo> walls;
-
 namespace nlohmann {
     void to_json(nlohmann::json& j, const glm::vec3& v) {
         j = json::array({ v.x, v.y, v.z });
@@ -33,6 +31,22 @@ namespace nlohmann {
             {"Position", houseLocation.position},
             {"Rotation", houseLocation.rotation},
             {"Type", Util::HouseTypeToString(houseLocation.type)}
+        };
+    }
+
+    void to_json(nlohmann::json& j, const HousePlaneCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"P0", createInfo.p0},
+            {"P1", createInfo.p1},
+            {"P2", createInfo.p2},
+            {"P3", createInfo.p3},
+            {"TextureScale", createInfo.textureScale},
+            {"TextureOffsetU", createInfo.textureOffsetU},
+            {"TextureOffsetV", createInfo.textureOffsetV},
+            {"TextureRotation", createInfo.textureRotation},
+            {"Material", createInfo.materialName},
+            {"Type", Util::HousePlaneTypeToString(createInfo.type)},
+            {"EditorName", createInfo.editorName}
         };
     }
 
@@ -70,20 +84,6 @@ namespace nlohmann {
         };
     }
 
-    void to_json(nlohmann::json& j, const PlaneCreateInfo& createInfo) {
-        j = nlohmann::json{
-            {"P0", createInfo.p0},
-            {"P1", createInfo.p1},
-            {"P2", createInfo.p2},
-            {"P3", createInfo.p3},
-            {"TextureScale", createInfo.textureScale},
-            {"TextureOffsetU", createInfo.textureOffsetU},
-            {"TextureOffsetV", createInfo.textureOffsetV},
-            {"TextureRotation", createInfo.textureRotation},
-            {"Material", createInfo.materialName},
-        };
-    }
-
     void to_json(nlohmann::json& j, const SpawnPoint& spawnPoint) {
         j = nlohmann::json{
             {"Position", spawnPoint.GetPosition()},
@@ -96,7 +96,8 @@ namespace nlohmann {
             {"Position", createInfo.position},
             {"Rotation", createInfo.rotation},
             {"Scale", createInfo.scale},
-            {"Type", Util::TreeTypeToString(createInfo.type)}
+            {"Type", Util::TreeTypeToString(createInfo.type)},
+            {"EditorName", createInfo.editorName}
         };
     }
 
@@ -165,7 +166,21 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation) {
         houseLocation.position = j.value("Position", glm::vec3(0.0f));
         houseLocation.rotation = j.value("Rotation", 0.0f);
-        houseLocation.type = Util::StringToHouseType(j.value("Type", "UNDEFINED"));
+        houseLocation.type = Util::StringToHouseType(j.value("Type", UNDEFINED_STRING));
+    }
+
+    void from_json(const nlohmann::json& j, HousePlaneCreateInfo& info) {
+        info.p0 = j.value("P0", glm::vec3(0.0f));
+        info.p1 = j.value("P1", glm::vec3(0.0f));
+        info.p2 = j.value("P2", glm::vec3(0.0f));
+        info.p3 = j.value("P3", glm::vec3(0.0f));
+        info.textureScale = j.value("TextureScale", 1.0f);
+        info.textureOffsetU = j.value("TextureOffsetU", 0.0f);
+        info.textureOffsetV = j.value("TextureOffsetV", 0.0f);
+        info.textureRotation = j.value("TextureRotation", 0.0f);
+        info.materialName = j.value("Material", "CheckerBoard");
+        info.type = Util::StringToHousePlaneType(j.value("Type", UNDEFINED_STRING));
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
     }
 
     void from_json(const nlohmann::json& j, LightCreateInfo& info) {
@@ -191,19 +206,7 @@ namespace nlohmann {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
         info.scale = j.value("Scale", glm::vec3(0.0f));
-        info.type = Util::StringToPictureFrameType(j.value("Type", "UNDEFINED"));
-    }
-
-    void from_json(const nlohmann::json& j, PlaneCreateInfo& info) {
-        info.p0 = j.value("P0", glm::vec3(0.0f));
-        info.p1 = j.value("P1", glm::vec3(0.0f));
-        info.p2 = j.value("P2", glm::vec3(0.0f));
-        info.p3 = j.value("P3", glm::vec3(0.0f));
-        info.textureScale = j.value("TextureScale", 1.0f);
-        info.textureOffsetU = j.value("TextureOffsetU", 0.0f);
-        info.textureOffsetV = j.value("TextureOffsetV", 0.0f);
-        info.textureRotation = j.value("TextureRotation", 0.0f);
-        info.materialName = j.value("Material", "CheckerBoard");
+        info.type = Util::StringToPictureFrameType(j.value("Type", UNDEFINED_STRING));
     }
 
     void from_json(const nlohmann::json& j, TreeCreateInfo& info) {
@@ -211,6 +214,7 @@ namespace nlohmann {
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
         info.rotation = j.value("Scale", glm::vec3(1.0f));
         info.type = Util::StringToTreeType(j.value("Type", UNDEFINED_STRING));
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
     }
 
     void from_json(const nlohmann::json& j, WallCreateInfo& info) {
@@ -445,7 +449,7 @@ namespace JSON {
         HouseCreateInfo houseCreateInfo;
         houseCreateInfo.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
         houseCreateInfo.lights = json.value("Lights", std::vector<LightCreateInfo>{});
-        houseCreateInfo.planes = json.value("Planes", std::vector<PlaneCreateInfo>{});
+        houseCreateInfo.planes = json.value("Planes", std::vector<HousePlaneCreateInfo>{});
         houseCreateInfo.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         houseCreateInfo.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
         houseCreateInfo.walls = json.value("Walls", std::vector<WallCreateInfo>{});

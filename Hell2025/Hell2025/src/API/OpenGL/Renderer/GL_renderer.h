@@ -146,6 +146,7 @@ namespace OpenGLRenderer {
 
     // Misc
     void CreateGrassGeometry();
+    void EditorRasterizerStateOverride();
 
     // Texture readback
     bool IsMouseRayWorldPositionReadBackReady();

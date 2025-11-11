@@ -5,35 +5,39 @@ namespace Bible {
     void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-        MeshNodeCreateInfo& largeFrame = meshNodeCreateInfoSet.emplace_back();
-        largeFrame.meshName = "Body";
-        largeFrame.materialName = "Toilet";
+        MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
+        body.meshName = "Body";
+        body.materialName = "Toilet";
 
-        MeshNodeCreateInfo& drawer1st = meshNodeCreateInfoSet.emplace_back();
-        drawer1st.type = MeshNodeType::OPENABLE;
-        drawer1st.materialName = "Toilet";
-        drawer1st.meshName = "Lid";
-        drawer1st.openable.openAxis = OpenAxis::ROTATE_X;
-        drawer1st.openable.initialOpenState = OpenState::OPEN;
-        drawer1st.openable.minOpenValue = 0.0f;
-        drawer1st.openable.maxOpenValue = 1.7f;
-        drawer1st.openable.openSpeed = 6.825f;
-        drawer1st.openable.closeSpeed = 6.825f;
-        drawer1st.openable.openingAudio = "DrawerOpen.wav";
-        drawer1st.openable.closingAudio = "DrawerClose.wav";
+        MeshNodeCreateInfo& lid = meshNodeCreateInfoSet.emplace_back();
+        lid.type = MeshNodeType::OPENABLE;
+        lid.materialName = "Toilet";
+        lid.meshName = "Lid";
+        lid.openable.openAxis = OpenAxis::ROTATE_X;
+        lid.openable.initialOpenState = OpenState::OPEN;
+        lid.openable.minOpenValue = 0.0f;
+        lid.openable.maxOpenValue = 1.7f;
+        lid.openable.openSpeed = 6.825f;
+        lid.openable.closeSpeed = 6.825f;
+        lid.openable.openingAudio = "ToiletLidUp.wav";
+        lid.openable.closingAudio = "ToiletLidDown.wav";
+        lid.openable.audioVolume = 0.75f;
+        lid.openable.prerequisiteClosedMeshName = "Seat";
 
-        MeshNodeCreateInfo& drawer2nd = meshNodeCreateInfoSet.emplace_back();
-        drawer2nd.type = MeshNodeType::OPENABLE;
-        drawer2nd.materialName = "Toilet";
-        drawer2nd.meshName = "Seat";
-        drawer2nd.openable.openAxis = OpenAxis::ROTATE_X;
-        drawer2nd.openable.initialOpenState = OpenState::CLOSED;
-        drawer2nd.openable.minOpenValue = 0.0f;
-        drawer2nd.openable.maxOpenValue = 1.7;
-        drawer2nd.openable.openSpeed = 7.25f;
-        drawer2nd.openable.closeSpeed = 7.25f;
-        drawer2nd.openable.openingAudio = "DrawerOpen.wav";
-        drawer2nd.openable.closingAudio = "DrawerClose.wav";
+        MeshNodeCreateInfo& seat = meshNodeCreateInfoSet.emplace_back();
+        seat.type = MeshNodeType::OPENABLE;
+        seat.materialName = "Toilet";
+        seat.meshName = "Seat";
+        seat.openable.openAxis = OpenAxis::ROTATE_X;
+        seat.openable.initialOpenState = OpenState::CLOSED;
+        seat.openable.minOpenValue = 0.0f;
+        seat.openable.maxOpenValue = 1.7;
+        seat.openable.openSpeed = 7.25f;
+        seat.openable.closeSpeed = 7.25f;
+        seat.openable.openingAudio = "ToiletSeatUp.wav";
+        seat.openable.closingAudio = "ToiletSeatDown.wav";
+        seat.openable.audioVolume = 0.75f;
+        seat.openable.prerequisiteOpenMeshName = "Lid";
 
         meshNodes.Init(id, "Toilet", meshNodeCreateInfoSet);
     }
@@ -56,7 +60,6 @@ namespace Bible {
         meshNodes.Init(id, "BathroomBasin", meshNodeCreateInfoSet);
 
         Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
-        AssetManager::PrintModelMeshNames(model);
     }
 
     void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes& meshNodes) {
@@ -87,7 +90,6 @@ namespace Bible {
         meshNodes.Init(id, "BathroomCabinet", meshNodeCreateInfoSet);
 
         Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
-        AssetManager::PrintModelMeshNames(model);
     }
 
     

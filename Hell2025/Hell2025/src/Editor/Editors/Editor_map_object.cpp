@@ -29,10 +29,6 @@ namespace Editor {
         } g_imguiElements;
     }
 
-    //void InitMapObjectEditorFileMenu();
-    //void InitMapObjectEditorPropertiesElements();
-    //void ReconfigureMapObjectEditorImGuiElements();
-
     void OpenMapObjectEditor() {
         // If it's closed, open it
         if (IsClosed()) {
@@ -57,13 +53,9 @@ namespace Editor {
         // Init UI
         InitFileMenuImGuiElements();
         InitLeftPanel();
-        //ReconfigureMapObjectEditorImGuiElements();
 
         Audio::PlayAudio(AUDIO_SELECT, 1.0f);
     }
-
-    
-
 
     void CreateMapObjectEditorImGuiElements() {
         BeginLeftPanel();

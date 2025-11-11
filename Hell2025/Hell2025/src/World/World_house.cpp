@@ -142,7 +142,7 @@ namespace World {
         for (Piano& piano : GetPianos()) {
             houseCreateInfo.pianos.emplace_back(piano.GetCreateInfo());
         }
-        for (Plane& plane : GetPlanes()) {
+        for (HousePlane& plane : GetHousePlanes()) {
             houseCreateInfo.planes.emplace_back(plane.GetCreateInfo());
         }
         for (PictureFrame& pictureFrame : GetPictureFrames()) {
@@ -176,7 +176,7 @@ namespace World {
                 wallSegment.SetMeshIndex(meshIndex);
             }
         }
-        for (Plane& housePlane : GetPlanes()) {
+        for (HousePlane& housePlane : GetHousePlanes()) {
             uint32_t meshIndex = g_houseMeshBuffer.AddMesh(housePlane.GetVertices(), housePlane.GetIndices());
             housePlane.SetMeshIndex(meshIndex);
         }
