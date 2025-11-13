@@ -1,5 +1,5 @@
 #include "ImguiBackend.h"
-#include "BackEnd/GLFWIntegration.h"
+#include "BackEnd/Integration/GLFW.h"
 #include "BackEnd/BackEnd.h"
 #include "Config/Config.h"
 #include "Input/Input.h"
@@ -24,7 +24,7 @@ namespace ImGuiBackEnd {
 
     void Init() {
         const Resolutions& resolutions = Config::GetResolutions();
-        GLFWwindow* window = (GLFWwindow*)GLFWIntegration::GetWindowPointer();
+        GLFWwindow* window = (GLFWwindow*)BackEnd::GLFW::GetWindowPointer();
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();

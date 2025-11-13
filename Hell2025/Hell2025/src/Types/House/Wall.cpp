@@ -129,13 +129,38 @@ void Wall::SetMaterial(const std::string& materialName) {
     }
 }
 
+void Wall::SetHeight(float value) {
+    m_createInfo.height = value;
+    UpdateSegmentsAndVertexData();
+}
+
+void Wall::SetTextureScale(float value) {
+    m_createInfo.textureScale = value;
+    UpdateSegmentsAndVertexData();
+}
+
+void Wall::SetTextureOffsetU(float value) {
+    m_createInfo.textureOffsetU = value;
+    UpdateSegmentsAndVertexData();
+}
+
+void Wall::SetTextureOffsetV(float value) {
+    m_createInfo.textureOffsetV = value;
+    UpdateSegmentsAndVertexData();
+}
+
 void Wall::SetFloorTrimType(TrimType trimType) {
     m_createInfo.floorTrimType = trimType;
-    UpdateSegmentsAndVertexData(); // neccesary?
+    UpdateSegmentsAndVertexData();
 }
 void Wall::SetCeilingTrimType(TrimType trimType) {
     m_createInfo.ceilingTrimType = trimType;
-    UpdateSegmentsAndVertexData(); // neccesary?
+    UpdateSegmentsAndVertexData();
+}
+
+void Wall::SetCeilingTrimHeight(float value) {
+    m_createInfo.ceilingTrimHeight = value;
+    UpdateSegmentsAndVertexData();
 }
 
 glm::vec3 Wall::GetPointByIndex(int pointIndex) {
@@ -164,7 +189,7 @@ void Wall::CreateTrims() {
 
             Transform t;
             t.position = start;
-            t.position.y += m_createInfo.height;
+            t.position.y += m_createInfo.ceilingTrimHeight;
             t.rotation.y = Util::EulerYRotationBetweenTwoPoints(start, end);
             t.scale.x = glm::distance(start, end);
 

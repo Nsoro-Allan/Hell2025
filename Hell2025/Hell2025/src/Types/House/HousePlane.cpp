@@ -88,11 +88,27 @@ void HousePlane::UpdateWorldSpaceCenter(glm::vec3 worldSpaceCenter) {
 }
 
 void HousePlane::SetMaterial(const std::string& materialName) {
+    m_createInfo.materialName = materialName;
     m_material = AssetManager::GetMaterialByName(materialName);
 }
 
 void HousePlane::SetMeshIndex(uint32_t index) {
     m_meshIndex = index;
+}
+
+void HousePlane::SetTextureScale(float value) {
+    m_createInfo.textureScale = value;
+    UpdateVertexDataFromCreateInfo();
+}
+
+void HousePlane::SetTextureOffsetU(float value) {
+    m_createInfo.textureOffsetU = value;
+    UpdateVertexDataFromCreateInfo();
+}
+
+void HousePlane::SetTextureOffsetV(float value) {
+    m_createInfo.textureOffsetV = value;
+    UpdateVertexDataFromCreateInfo();
 }
 
 void HousePlane::CreatePhysicsObject() {

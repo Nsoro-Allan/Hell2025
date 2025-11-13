@@ -27,7 +27,6 @@ struct RigidDynamicCreateInfo {
     Transform offsetTransform;
     PhysicsFilterData filterData;
     float mass = 1.0f;
-
 };
 
 struct RigidStaticCreateInfo {
@@ -38,7 +37,7 @@ struct MeshNodeCreateInfo {
     std::string meshName;
     std::string materialName = UNDEFINED_STRING;
     MeshNodeType type = MeshNodeType::DEFAULT;
-    BlendingMode blendingMode = BlendingMode::BLEND_DISABLED;
+    BlendingMode blendingMode = BlendingMode::DEFAULT;
     OpenableCreateInfo openable;
     RigidDynamicCreateInfo rigidDynamic;
     RigidStaticCreateInfo rigidStatic;
@@ -126,23 +125,23 @@ struct DobermannCreateInfo {
 };
 
 struct MermaidCreateInfo {
-    glm::vec3 position;
-    glm::vec3 rotation;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
 };
 
 struct KangarooCreateInfo {
-    glm::vec3 position;
-    glm::vec3 rotation;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
 };
 
 struct DoorCreateInfo {
-    glm::vec3 position;
-    glm::vec3 rotation;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
 };
 
 struct WindowCreateInfo {
-    glm::vec3 position;
-    glm::vec3 rotation;
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
 };
 
 struct HousePlaneCreateInfo {
@@ -156,6 +155,7 @@ struct HousePlaneCreateInfo {
     float textureOffsetU = 0.0f;
     float textureOffsetV = 0.0f;
     float textureRotation = 0.0f;
+    uint64_t parentDoorId = 0;
     HousePlaneType type = HousePlaneType::UNDEFINED;
 };
 
@@ -167,11 +167,13 @@ struct PianoCreateInfo {
 struct WallCreateInfo {
     std::vector<glm::vec3> points;
     std::string materialName = "";
+    std::string editorName = UNDEFINED_STRING;
     float height = 2.4f;
     float textureScale = 1.0f;
     float textureOffsetU = 0.0f;
     float textureOffsetV = 0.0f;
     float textureRotation = 0.0f;
+    float ceilingTrimHeight = 2.4f;
     bool useReversePointOrder = false;
     TrimType ceilingTrimType = TrimType::NONE;
     TrimType floorTrimType = TrimType::NONE;
@@ -291,7 +293,7 @@ struct MapCreateInfo {
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
     std::vector<GenericObjectCreateInfo> genericObjects;
-    std::vector<HousePlaneCreateInfo> planes;
+    std::vector<HousePlaneCreateInfo> housePlanes;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;
     std::vector<PickUpCreateInfo> pickUps;

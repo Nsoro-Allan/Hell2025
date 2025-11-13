@@ -7,6 +7,7 @@
 #include "Renderer/RenderDataManager.h"
 #include "UniqueID.h"
 #include "Util.h"
+#include "World/World.h"
 
 Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_objectId = id;
@@ -45,6 +46,29 @@ Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spa
     Physics::SetRigidStaticUserData(m_physicsId, userData);
 
     m_lifeTime = 0;
+
+    UpdateFloor();
+}
+
+void Door::UpdateFloor() {
+    float half_w = 0.05f;
+    float half_d = 0.4f;
+
+    Transform transform;
+    transform.position = m_position;
+    transform.rotation = m_rotation;
+
+    HousePlaneCreateInfo createInfo;
+    createInfo.p0 = glm::vec3(transform.to_mat4() * glm::vec4(-half_w, 0.0f, -half_d, 1.0f));
+    createInfo.p1 = glm::vec3(transform.to_mat4() * glm::vec4(-half_w, 0.0f, +half_d, 1.0f));
+    createInfo.p2 = glm::vec3(transform.to_mat4() * glm::vec4(+half_w, 0.0f, +half_d, 1.0f));
+    createInfo.p3 = glm::vec3(transform.to_mat4() * glm::vec4(+half_w, 0.0f, -half_d, 1.0f));
+    createInfo.parentDoorId = GetObjectId();
+
+    createInfo.textureScale = 0.4f;
+    createInfo.materialName = "FloorBoards";
+
+    World::AddHousePlane(createInfo, SpawnOffset());
 }
 
 void Door::CleanUp() {

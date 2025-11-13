@@ -45,7 +45,7 @@ namespace AssetManager {
             }
         }
 
-        // Look for textures with _ALB suffix, create a material, and search for accompaning _NRM & _RMA textures
+        // Look for textures with _ALB suffix, create a material, and search for accompanying _NRM & _RMA textures
         materials.clear();
 
         for (int i = 0; i < textures.size(); i++) {

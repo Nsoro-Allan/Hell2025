@@ -2,7 +2,7 @@
 #include "HellConstants.h"
 #include "HellLogging.h"
 #include "BackEnd/BackEnd.h"
-#include "BackEnd/GLFWIntegration.h"
+#include "BackEnd/Integration/GLFW.h"
 #include <iostream>
 #include "keycodes.h"
 
@@ -191,7 +191,7 @@ namespace InputMulti {
 
         // Out of window focus? then remove any detected input
         HWND activeWindow = GetActiveWindow();
-        HWND myWindow = (HWND)GLFWIntegration::GetWin32Window();
+        HWND myWindow = (HWND)BackEnd::GLFW::GetWin32Window();
         if ((void*)myWindow != (void*)activeWindow) {
             for (KeyboardState& state : g_keyboardStates) {
                 for (int i = 0; i < 350; i++) {

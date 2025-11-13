@@ -114,23 +114,23 @@ namespace OpenGLRenderer {
        // RaytraceScene();
     }
 
-    void RaytraceScene() {
-        OpenGLShader* shader = GetShader("RaytraceScene");
-        OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");
-
-        if (!miscFullSizeFBO) return;
-        if (!shader) return;
-
-        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
-
-        shader->Bind();
-        shader->SetMat4("u_projectionMatrix", viewportData[0].projection);
-        shader->SetMat4("u_viewMatrix", viewportData[0].view);
-
-        glBindImageTexture(0, miscFullSizeFBO->GetColorAttachmentHandleByName("RaytracedScene"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
-
-        glDispatchCompute(miscFullSizeFBO->GetWidth() / 8, miscFullSizeFBO->GetHeight() / 8, 1);
-    }
+    //////void RaytraceScene() {
+    //////    OpenGLShader* shader = GetShader("RaytraceScene");
+    //////    OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");
+    //////
+    //////    if (!miscFullSizeFBO) return;
+    //////    if (!shader) return;
+    //////
+    //////    const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
+    //////
+    //////    shader->Bind();
+    //////    shader->SetMat4("u_projectionMatrix", viewportData[0].projection);
+    //////    shader->SetMat4("u_viewMatrix", viewportData[0].view);
+    //////
+    //////    glBindImageTexture(0, miscFullSizeFBO->GetColorAttachmentHandleByName("RaytracedScene"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8);
+    //////
+    //////    glDispatchCompute(miscFullSizeFBO->GetWidth() / 8, miscFullSizeFBO->GetHeight() / 8, 1);
+    //////}
 
     void DrawPointCloud() {
         if (g_pointCloudVao == 0) return;

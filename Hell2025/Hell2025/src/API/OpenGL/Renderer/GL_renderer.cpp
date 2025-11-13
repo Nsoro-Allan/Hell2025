@@ -100,7 +100,6 @@ namespace OpenGLRenderer {
         g_frameBuffers["GBuffer"].CreateAttachment("WorldPosition", GL_RGBA32F);
         g_frameBuffers["GBuffer"].CreateAttachment("Emissive", GL_RGBA8);
         g_frameBuffers["GBuffer"].CreateAttachment("Glass", GL_RGBA16F);
-        //g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH_COMPONENT32F); // before you added stencil buffer
         g_frameBuffers["GBuffer"].CreateDepthAttachment(GL_DEPTH32F_STENCIL8);
 
         g_frameBuffers["GBufferBackup"] = OpenGLFrameBuffer("GBufferBackup", resolutions.gBuffer);
@@ -116,7 +115,6 @@ namespace OpenGLRenderer {
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLightingIntermediate", GL_RGBA16F);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLighting", GL_RGBA16F);
         g_frameBuffers["MiscFullSize"].CreateAttachment("ScreenSpaceBloodDecalMask", GL_R8);
-        g_frameBuffers["MiscFullSize"].CreateAttachment("RaytracedScene", GL_RGBA8);
         g_frameBuffers["MiscFullSize"].CreateAttachment("ViewportIndex", GL_R8UI, GL_NEAREST, GL_NEAREST);
 
         g_frameBuffers["Water"] = OpenGLFrameBuffer("Water", resolutions.gBuffer);

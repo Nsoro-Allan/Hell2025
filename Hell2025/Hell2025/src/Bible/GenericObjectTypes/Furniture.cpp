@@ -37,7 +37,6 @@ namespace Bible {
         cushion4.materialName = "Couch";
 
         meshNodes.Init(id, "Couch", meshNodeCreateInfoSet);
-
     }
 
     void ConfigureTestModel(uint64_t id, MeshNodes& meshNodes) {
@@ -45,18 +44,22 @@ namespace Bible {
 
         meshNodes.Init(id, "Fireplace", meshNodeCreateInfoSet);
 
+        meshNodes.SetMeshMaterials("NumGrid");
+        meshNodes.SetMeshMaterials("Ceiling2");
         meshNodes.SetMeshMaterials("WallPaper");
-
+        meshNodes.SetMeshMaterials("PlasterRed");
         meshNodes.SetMeshMaterials("T_Walls");
 
-        meshNodes.SetMaterialByMeshName("Fireplace_Bricks_low", "T_Fireplace");
-        meshNodes.SetMaterialByMeshName("Fireplace_Cap_low", "T_Fireplace");
-        meshNodes.SetMaterialByMeshName("Fireplace_Log_Tray_low", "T_Fireplace");
-        meshNodes.SetMaterialByMeshName("Fireplace_Log_Try_Holder_low", "T_Fireplace");
-        meshNodes.SetMaterialByMeshName("Fireplace_Floor_low", "T_Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Wall_Damage", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Wall_Damage.001", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Bricks_low", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Cap_low", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Log_Tray_low", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Log_Try_Holder_low", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Floor_low", "Fireplace");
 
-        meshNodes.SetMaterialByMeshName("Fireplace_Mantle_low", "T_Fireplace");
-        meshNodes.SetMaterialByMeshName("Fireplace_Mantle_Trim_low", "T_Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Mantle_low", "Fireplace");
+        meshNodes.SetMaterialByMeshName("Fireplace_Mantle_Trim_low", "Fireplace");
 
         meshNodes.SetMaterialByMeshName("Fireplace_Wood_Log1_low", "T_Firewood");
         meshNodes.SetMaterialByMeshName("Fireplace_Wood_Log2_low", "T_Firewood");
@@ -66,19 +69,22 @@ namespace Bible {
         meshNodes.SetMaterialByMeshName("Fireplace_Coal1_low", "T_Firewood");
         meshNodes.SetMaterialByMeshName("Fireplace_Coal2_low", "T_Firewood");
 
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Wood_Log1_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Wood_Log2_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Wood_Log3_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Wood_Log4_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Wood_Log5_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Coal1_low", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("Fireplace_Coal2_low", BlendingMode::DO_NOT_RENDER);
+        meshNodes.SetMaterialByMeshName("Fireplace_Walls_Chipped", "T_WallsChippedEdges");
+        meshNodes.SetBlendingModeByMeshName("Fireplace_Walls_Chipped", BlendingMode::ALPHA_DISCARD);
+
+
+        meshNodes.SetMaterialByMeshName("TrimMiddle", "FloorBoards");
+        meshNodes.SetMaterialByMeshName("TrimMiddleArch", "FloorBoards");
+        meshNodes.SetMaterialByMeshName("TrimCeiling", "FloorBoards");
     }
 
     void ConfigureTestModel2(uint64_t id, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         meshNodes.Init(id, "DeerTest", meshNodeCreateInfoSet);
-        meshNodes.SetMeshMaterials("WallPaper");
+        meshNodes.SetMeshMaterials("Deer");
+        meshNodes.SetMaterialByMeshName("DeerIris", "DeerIris");
+        meshNodes.SetMaterialByMeshName("DeerSclera", "Scelra");
+        meshNodes.SetBlendingModeByMeshName("DeerSclera", BlendingMode::GLASS);
     }
 }

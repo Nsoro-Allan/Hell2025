@@ -35,7 +35,8 @@
 #include "Weapon/WeaponManager.h"
 #include "World/World.h"
 
-#include "GLFWIntegration.h"
+#include "Integration/GLFW.h"
+#include "Integration/SDL.h"
 
 #define NOMINMAX
 #ifdef _WIN32
@@ -63,7 +64,7 @@ namespace BackEnd {
         CheckForRenderDoc();
 
         Config::Init();
-        if (!GLFWIntegration::Init(api, windowMode)) {
+        if (!GLFW::Init(api, windowMode)) {
             return false;
         }
         if (GetAPI() == API::OPENGL) {
@@ -127,7 +128,7 @@ namespace BackEnd {
     }
 
     void BeginFrame() {
-        GLFWIntegration::BeginFrame(g_api);
+        GLFW::BeginFrame(g_api);
         RenderDataManager::BeginFrame();
         if (GetAPI() == API::OPENGL) {
             OpenGLBackEnd::BeginFrame();
@@ -138,7 +139,7 @@ namespace BackEnd {
         }
         //Physics::ClearCollisionReports();
 
-        if (!GLFWIntegration::WindowHasFocus()) {
+        if (!GLFW::WindowHasFocus()) {
             InputMulti::ResetState();
         }
         Game::BeginFrame();
@@ -185,7 +186,7 @@ namespace BackEnd {
     }
 
     void EndFrame() {
-        GLFWIntegration::EndFrame(g_api);
+        GLFW::EndFrame(g_api);
         UIBackEnd::EndFrame();
         Debug::EndFrame();
         World::EndFrame();
@@ -207,7 +208,7 @@ namespace BackEnd {
     }
 
     void CleanUp() {
-        GLFWIntegration::Destroy();
+        GLFW::Destroy();
     }
 
     void SetAPI(API api) {
@@ -224,68 +225,68 @@ namespace BackEnd {
     }
 
     void SetCursor(int cursor) {
-        GLFWIntegration::SetCursor(cursor);
+        GLFW::SetCursor(cursor);
     }
 
     // Window
     void* GetWindowPointer() {
-        return GLFWIntegration::GetWindowPointer();;
+        return GLFW::GetWindowPointer();;
     }
 
     const WindowedMode& GetWindowedMode() {
-        return GLFWIntegration::GetWindowedMode();
+        return GLFW::GetWindowedMode();
     }
 
     void BackEnd::SetWindowedMode(const WindowedMode& windowedMode) {
-        GLFWIntegration::SetWindowedMode(windowedMode);
+        GLFW::SetWindowedMode(windowedMode);
     }
 
     void BackEnd::ToggleFullscreen() {
-        GLFWIntegration::ToggleFullscreen();
+        GLFW::ToggleFullscreen();
     }
 
     void BackEnd::ForceCloseWindow() {
-        GLFWIntegration::ForceCloseWindow();
+        GLFW::ForceCloseWindow();
     }
 
     bool BackEnd::WindowIsOpen() {
-        return GLFWIntegration::WindowIsOpen();
+        return GLFW::WindowIsOpen();
     }
 
     bool BackEnd::WindowHasFocus() {
-        return GLFWIntegration::WindowHasFocus();
+        return GLFW::WindowHasFocus();
     }
 
     bool BackEnd::WindowHasNotBeenForceClosed() {
-        return GLFWIntegration::WindowHasNotBeenForceClosed();
+        return GLFW::WindowHasNotBeenForceClosed();
     }
 
     bool BackEnd::WindowIsMinimized() {
-        return GLFWIntegration::WindowIsMinimized();
+        return GLFW::WindowIsMinimized();
     }
 
     int BackEnd::GetWindowedWidth() {
-        return GLFWIntegration::GetWindowedWidth();
+        return GLFW::GetWindowedWidth();
     }
 
     int BackEnd::GetWindowedHeight() {
-        return GLFWIntegration::GetWindowedHeight();
+        return GLFW::GetWindowedHeight();
     }
 
     int BackEnd::GetCurrentWindowWidth() {
-        return GLFWIntegration::GetCurrentWindowWidth();
+        return GLFW::GetCurrentWindowWidth();
     }
 
     int BackEnd::GetCurrentWindowHeight() {
-        return GLFWIntegration::GetCurrentWindowHeight();
+        return GLFW::GetCurrentWindowHeight();
     }
 
     int BackEnd::GetFullScreenWidth() {
-        return GLFWIntegration::GetFullScreenWidth();
+        return GLFW::GetFullScreenWidth();
     }
 
     int BackEnd::GetFullScreenHeight() {
-        return GLFWIntegration::GetFullScreenHeight();
+        return GLFW::GetFullScreenHeight();
     }
 
     int GetPresentTargetWidth() {

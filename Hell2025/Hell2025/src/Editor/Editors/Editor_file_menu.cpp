@@ -71,7 +71,8 @@ namespace Editor {
 
             if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
                 EditorUI::FileMenuNode& build = g_fileMenu.AddMenuNode("Build", Shortcut::NONE, nullptr);
-                build.AddChild("Wall", Shortcut::NONE, Callbacks::BeginAddingWall);
+                build.AddChild("Floor", Shortcut::NONE, Editor::PlaceHousePlane, HousePlaneType::FLOOR);
+                build.AddChild("Wall", Shortcut::NONE, Editor::SetEditorState, EditorState::PLACE_WALL);
             }
         }
 

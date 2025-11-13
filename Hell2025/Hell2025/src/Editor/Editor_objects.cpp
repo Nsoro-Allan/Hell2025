@@ -246,56 +246,7 @@ namespace Editor {
 
         UpdateGizmoInteract();
 
-        // if (Input::KeyPressed(HELL_KEY_SPACE)) {
-        //     int wallCount = World::GetWalls().size() - 1;
-        //     Wall& wall = World::GetWalls()[wallCount];
-        //     wall.SetMaterial("BathroomWall");
-        //     wall.SetFloorTrimType(TrimType::NONE);
-        //     World::UpdateHouseMeshBuffer();
-        // }
-
-        //if (Input::KeyPressed(HELL_KEY_SPACE)) {
-        //    //DoorCreateInfo createInfo;
-        //    //createInfo.position = Game::GetLocalPlayerByIndex(0)->GetFootPosition();
-        //    //createInfo.rotation = glm::vec3(0.0f);
-        //    //World::AddDoor(createInfo, SpawnOffset());
-        //
-        //    float xMin = 8.2f;
-        //    float xMax = 10.1f;
-        //    float zMin = 1.5f;
-        //    float zMax = -0.5f;
-        //
-        //    //LightCreateInfo createInfo = World::GetLights()[0].GetCreateInfo();
-        //    //createInfo.position.x = (xMin + xMax) * 0.5f;
-        //    //createInfo.position.z = (zMin + zMax) * 0.5f;
-        //    //createInfo.radius = 3.0f;
-        //    //World::AddLight(createInfo);
-        //
-        //    PlaneCreateInfo createInfo = World::GetPlanes()[1].GetCreateInfo();
-        //    createInfo.p0 = glm::vec3(xMin, 2.4f, zMin);
-        //    createInfo.p1 = glm::vec3(xMin, 2.4f, zMax);
-        //    createInfo.p2 = glm::vec3(xMax, 2.4f, zMax);
-        //    createInfo.p3 = glm::vec3(xMax, 2.4f, zMin);
-        //    //createInfo.textureScale = 1.0f;
-        //    //createInfo.materialName = "BathroomFloor";
-        //    World::AddHousePlane(createInfo, SpawnOffset());
-        //    World::UpdateHouseMeshBuffer();
-        //    std::cout << "created plane\n";
-        //
-        //
-        //}
-
-        //for (Plane& plane : World::GetPlanes()) {
-        //
-        //    PlaneCreateInfo createInfo = plane.GetCreateInfo();
-        //    Renderer::DrawPoint(createInfo.p0, PURPLE);
-        //    Renderer::DrawPoint(createInfo.p1, PURPLE);
-        //    Renderer::DrawPoint(createInfo.p2, PURPLE);
-        //    Renderer::DrawPoint(createInfo.p3, PURPLE);
-        //}
-
         if (GetEditorState() == EditorState::GIZMO_TRANSLATING) {
-
 
             if (GetEditorSelectionMode() == EditorSelectionMode::OBJECT) {
                 World::SetObjectPosition(GetSelectedObjectId(), Gizmo::GetPosition());

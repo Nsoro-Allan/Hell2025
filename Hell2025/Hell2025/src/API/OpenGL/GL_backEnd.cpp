@@ -3,7 +3,7 @@
 #include "GL_backend.h"
 #include "AssetManagement/BakeQueue.h"
 #include "AssetManagement/AssetManager.h"
-#include "BackEnd/GLFWIntegration.h"
+#include "BackEnd/Integration/GLFW.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -42,7 +42,7 @@ namespace OpenGLBackEnd {
 
     void Init() {
 
-        GLFWIntegration::MakeContextCurrent();
+        BackEnd::GLFW::MakeContextCurrent();
 
         // Init glad
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {

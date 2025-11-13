@@ -4,7 +4,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
 
-#include "Input/InputMulti2.h"
+//#include "Input/InputMulti2.h"
 
 #include <iostream>
 #include <string>
@@ -17,7 +17,7 @@
 #include <Windows.h>
 #endif
 
-namespace SDLIntegration {
+namespace Backend::SDL {
     SDL_Window* g_window = nullptr;
     SDL_GLContext g_glContext = nullptr;
 
@@ -178,7 +178,7 @@ namespace SDLIntegration {
                     break;
             }
 
-            InputMulti::ProcessEvent(e);
+            // TODO InputMulti::ProcessEvent(e);
         }
 
         Uint32 flags = SDL_GetWindowFlags(g_window);

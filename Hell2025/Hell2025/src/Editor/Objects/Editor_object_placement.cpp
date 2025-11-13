@@ -10,7 +10,8 @@ namespace Editor {
     uint64_t g_placementObjectId = 0;
     EditorState g_lastPlacementState = EditorState::IDLE;
 
-    void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
+    //void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
+    void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal);
     void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
 
     void UpdateObjectPlacement() {
@@ -30,7 +31,10 @@ namespace Editor {
                 if (rayResult.hitFound) {
 
                     if (GetPlacementObjectType() == ObjectType::GENERIC_OBJECT) {
-                        PlaceGenericObject(GetGenericPlacementObjectType(), rayResult.hitPosition, rayResult.hitNormal);
+                        PlaceGenericObject(GetPlacementObjectSubtype().genericObject, rayResult.hitPosition, rayResult.hitNormal);
+                    }
+                    if (GetPlacementObjectType() == ObjectType::HOUSE_PLANE) {
+                        PlaceHousePlane(GetPlacementObjectSubtype().housePlane, rayResult.hitPosition, rayResult.hitNormal);
                     }
                 }
             }
@@ -82,17 +86,29 @@ namespace Editor {
         }
     }
 
-    void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
-        Logging::ToDo() << "You called Editor::PlaceObject(...) but its old and broken probably, like only makes DRAWERS LARGE";
-        if (objectType == ObjectType::GENERIC_OBJECT) {
-            GenericObjectCreateInfo createInfo;
-            createInfo.position = hitPosition;
-            createInfo.rotation.y = 0.0f;
-            createInfo.type = GenericObjectType::DRAWERS_LARGE;
-            World::AddGenericObject(createInfo, SpawnOffset());
-            ExitObjectPlacement();
-            return;
-        }
+    //void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+    //    if (objectType == ObjectType::GENERIC_OBJECT) {
+    //        GenericObjectCreateInfo createInfo;
+    //        createInfo.position = hitPosition;
+    //        createInfo.rotation.y = 0.0f;
+    //        createInfo.type = GenericObjectType::DRAWERS_LARGE;
+    //        World::AddGenericObject(createInfo, SpawnOffset());
+    //        ExitObjectPlacement();
+    //        return;
+    //    }
+    //}
+
+
+    void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+        HousePlaneCreateInfo createInfo; 
+        createInfo.p0 = hitPosition + glm::vec3(-1.0f, 0.0f, -1.0f);
+        createInfo.p1 = hitPosition + glm::vec3(-1.0f, 0.0f, 1.0f);
+        createInfo.p2 = hitPosition + glm::vec3(1.0f, 0.0f, 1.0f);
+        createInfo.p3 = hitPosition + glm::vec3(1.0f, 0.0f, -1.0f);
+        createInfo.type = housePlaneType;
+        World::AddHousePlane(createInfo, SpawnOffset()); 
+        World::UpdateHouseMeshBuffer();
+        ExitObjectPlacement();
     }
 
     void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
@@ -102,7 +118,6 @@ namespace Editor {
         createInfo.type = genericObjectType;
         World::AddGenericObject(createInfo, SpawnOffset());
         ExitObjectPlacement();
-        return;
     }
 
     void ExitObjectPlacement() {

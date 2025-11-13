@@ -28,10 +28,12 @@ namespace Editor {
     float g_verticalDividerXPos = 0.2f;
     float g_horizontalDividerYPos = 0.2f;
 
+    ObjectType g_placementObjectType = ObjectType::NO_TYPE;
+    PlacementObjectSubtype g_placementObjectSubtype;
+
     ObjectType g_hoveredObjectType = ObjectType::NO_TYPE;
-    ObjectType g_selectedObjectType = ObjectType::NO_TYPE;
-    ObjectType g_placementObjectType = ObjectType::NO_TYPE;    
-    GenericObjectType g_placementGenericObjectType = GenericObjectType::UNDEFINED;
+    ObjectType g_selectedObjectType = ObjectType::NO_TYPE; 
+    //GenericObjectType g_placementGenericObjectType = GenericObjectType::UNDEFINED;
 
     uint64_t g_hoveredObjectId = 0;
     uint64_t g_selectedObjectId = 0;
@@ -295,21 +297,34 @@ namespace Editor {
 
     void PlaceObject(ObjectType objectType) {
         SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectSubtype.Reset();
         g_placementObjectType = objectType;
+    }
+
+    void PlaceHousePlane(HousePlaneType housePlaneType) {
+        SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectSubtype.Reset();
+        g_placementObjectSubtype.housePlane = housePlaneType;
+        g_placementObjectType = ObjectType::HOUSE_PLANE;
     }
 
     void PlaceGenericObject(GenericObjectType genericObjectType) {
         SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectSubtype.Reset();
+        g_placementObjectSubtype.genericObject = genericObjectType;
         g_placementObjectType = ObjectType::GENERIC_OBJECT;
-        g_placementGenericObjectType = genericObjectType;
     }
 
     ObjectType GetPlacementObjectType() {
         return g_placementObjectType;
     }
 
-    GenericObjectType GetGenericPlacementObjectType() {
-        return g_placementGenericObjectType;
+    PlacementObjectSubtype GetPlacementObjectSubtype() {
+        return g_placementObjectSubtype;
+    }
+
+    void ResetPlacementObjectSubtype() {
+        g_placementObjectSubtype.Reset();
     }
 
     void SetEditorMode(EditorMode editorMode) {

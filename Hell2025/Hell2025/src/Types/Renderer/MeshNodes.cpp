@@ -38,7 +38,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         m_localIndexMap[mesh->GetName()] = i;
 
         MeshNode& meshNode = m_meshNodes[i];
-        meshNode.blendingMode = BlendingMode::BLEND_DISABLED;
+        meshNode.blendingMode = BlendingMode::DEFAULT;
         meshNode.materialIndex = AssetManager::GetMaterialIndexByName(DEFAULT_MATERIAL_NAME);
         meshNode.transform = Transform();
         meshNode.transformPreviousFrame = Transform(glm::vec3(666.0f)); // Forces dirty
@@ -405,8 +405,8 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         }
 
         switch (meshNode.blendingMode) {
-            case BlendingMode::BLEND_DISABLED:    m_renderItems.push_back(meshNode.renderItem);                 break;
-            case BlendingMode::ALPHA_DISCARDED:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
+            case BlendingMode::DEFAULT:    m_renderItems.push_back(meshNode.renderItem);                 break;
+            case BlendingMode::ALPHA_DISCARD:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
             case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(meshNode.renderItem);          break;
             case BlendingMode::GLASS:             m_renderItemsGlass.push_back(meshNode.renderItem);            break;
             case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(meshNode.renderItem);     break;

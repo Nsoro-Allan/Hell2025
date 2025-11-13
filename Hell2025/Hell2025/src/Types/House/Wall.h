@@ -31,9 +31,15 @@ struct Wall {
     void FlipFaces();
     bool AddPointToEnd(glm::vec3 point, bool supressWarning = true);
     bool UpdatePointPosition(int pointIndex, glm::vec3 position, bool supressWarning = true);
-    void SetMaterial(const std::string& materialName);
-    void SetFloorTrimType(TrimType trimType);
+
     void SetCeilingTrimType(TrimType trimType);
+    void SetFloorTrimType(TrimType trimType);
+    void SetHeight(float value);
+    void SetTextureScale(float value);
+    void SetTextureOffsetU(float value);
+    void SetTextureOffsetV(float value);
+    void SetCeilingTrimHeight(float value);
+    void SetMaterial(const std::string& materialName);
 
     glm::vec3 GetPointByIndex(int pointIndex); 
 
@@ -45,6 +51,7 @@ struct Wall {
     std::vector<WallSegment>& GetWallSegments()                             { return m_wallSegments; }
     const uint64_t GetObjectId() const                                      { return m_objectId; }
     const WallCreateInfo& GetCreateInfo() const                             { return m_createInfo; }
+    const std::string& GetEditorName() const                                { return m_createInfo.editorName; }
 
 
     std::vector<BoardVertexData> m_boardVertexDataSet;
@@ -56,11 +63,7 @@ private:
     TrimType m_ceilingTrimType = TrimType::NONE;
     TrimType m_floorTrimType = TrimType::NONE;
     glm::vec3 m_worldSpaceCenter = glm::vec3(0.0f);
-    //std::vector<glm::vec3> m_points;
-
     std::vector<RenderItem> m_weatherBoardstopRenderItems;
-
-    //std::vector<glm::mat4> m_weatherboardStopMatrices;
     std::vector<WallSegment> m_wallSegments;
     std::vector<Trim> m_trims;
     WallCreateInfo m_createInfo;

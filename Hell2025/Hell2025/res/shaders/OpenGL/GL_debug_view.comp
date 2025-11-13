@@ -52,10 +52,17 @@ void main() {
     }
     else if (rendererData.rendererOverrideState == 3) {
         finalColor = rma;
-        finalColor = vec3(rma.r);
-        finalColor = vec3(mirrorMask, 0, 0);
     }
     else if (rendererData.rendererOverrideState == 4) {
+        finalColor = vec3(rma.r);
+    }
+    else if (rendererData.rendererOverrideState == 5) {
+        finalColor =  vec3(rma.g);
+    }
+    else if (rendererData.rendererOverrideState == 6) {
+        finalColor = vec3(rma.b);
+    }
+    else if (rendererData.rendererOverrideState == 7) {
         return;
         vec3 lightDir = normalize(inverseView[2].xyz);
         float ndotl = max(dot(normal.xyz, lightDir), 0.0);

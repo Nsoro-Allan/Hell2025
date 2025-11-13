@@ -38,9 +38,9 @@ enum class BakeState {
 };
 
 enum class BlendingMode { 
-    BLEND_DISABLED, 
+    ALPHA_DISCARD,
     BLENDED,
-    ALPHA_DISCARDED,
+    DEFAULT,
     HAIR_UNDER_LAYER,
     HAIR_TOP_LAYER,
     TOILET_WATER,
@@ -179,6 +179,7 @@ enum struct EditorState {
     // Object placement REMOVEEEEEEE MEEEEEEEE
     PLACE_DOOR,
     PLACE_DRAWERS,
+    PLACE_FLOOR,
     PLACE_HOUSE,
     PLACE_PICTURE_FRAME,
     PLACE_TREE,
@@ -214,7 +215,8 @@ enum WeaponAction {
     ADS_IDLE,
     ADS_FIRE,
     MELEE,
-    TOGGLING_AUTO
+    TOGGLING_AUTO,
+    UNDEFINED
 };
 
 enum class ShellEjectionState {
@@ -277,12 +279,14 @@ enum DebugRenderMode {
 
 enum struct LightType {
     LAMP_POST = 0,
-    HANGING_LIGHT 
+    HANGING_LIGHT,
+    UNDEFINED
 };
 
 enum struct EditorViewportSplitMode {
     SINGLE,
-    FOUR_WAY_SPLIT
+    FOUR_WAY_SPLIT,
+    UNDEFINED
 };
 
 enum struct PickUpType {
@@ -318,18 +322,21 @@ enum struct OpeningState {
     CLOSED,
     CLOSING,
     OPEN,
-    OPENING
+    OPENING,
+    UNDEFINED
 };
 
 enum struct DecalType {
     GLASS,
-    PLASTER
+    PLASTER,
+    UNDEFINED
 };
 
 enum struct TrimType {
     NONE,
     TIMBER,
-    PLASTER
+    PLASTER,
+    UNDEFINED
 };
 
 enum struct HousePlaneType {
@@ -341,7 +348,7 @@ enum struct HousePlaneType {
 enum struct WallType {
     INTERIOR,
     WEATHER_BOARDS,
-    NONE
+    UNDEFINED
 };
 
 enum struct TreeType {
@@ -357,6 +364,9 @@ enum class RendererOverrideState {
     BASE_COLOR,
     NORMALS,
     RMA,
+    ROUGHNESS,
+    METALIC,
+    AO,
     CAMERA_NDOTL,
     TILE_HEATMAP,
     STATE_COUNT,
@@ -366,7 +376,8 @@ enum class OpenState {
     OPEN,
     OPENING,
     CLOSED,
-    CLOSING
+    CLOSING,
+    UNDEFINED
 };
 
 enum class PictureFrameType {
@@ -382,7 +393,8 @@ enum class SharkMovementState {
     FOLLOWING_PATH, 
     FOLLOWING_PATH_ANGRY, 
     ARROW_KEYS, 
-    HUNT_PLAYER 
+    HUNT_PLAYER,
+    UNDEFINED
 };
 
 enum class SharkHuntingState { 
@@ -395,7 +407,7 @@ enum class SharkMovementDirection {
     STRAIGHT,
     LEFT,
     RIGHT,
-    NONE
+    UNDEFINED
 };
 
 enum class RaycastIgnoreFlags : uint32_t {
@@ -407,7 +419,8 @@ enum class RaycastIgnoreFlags : uint32_t {
 enum class ChristmasPresentType : uint32_t {
     SMALL = 0,
     MEDIUM,
-    LARGE
+    LARGE,
+    UNDEFINED
 };
 
 
@@ -428,7 +441,8 @@ enum struct InventoryState {
     MAIN_SCREEN,
     EXAMINE_ITEM,
     MOVING_ITEM,
-    ROTATING_ITEM
+    ROTATING_ITEM,
+    UNDEFINED
 };
 
 enum class DebugTextMode{

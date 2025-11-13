@@ -338,7 +338,7 @@ namespace World {
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
         for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)   AddPictureFrame(createInfo, spawnOffset);
-        for (HousePlaneCreateInfo& createInfo : createInfoCollection.planes)                 AddHousePlane(createInfo, spawnOffset);
+        for (HousePlaneCreateInfo& createInfo : createInfoCollection.housePlanes)       AddHousePlane(createInfo, spawnOffset);
         for (TreeCreateInfo& createInfo : createInfoCollection.trees)                   AddTree(createInfo, spawnOffset);
         for (WallCreateInfo& createInfo : createInfoCollection.walls)                   AddWall(createInfo, spawnOffset);
         for (WindowCreateInfo& createInfo : createInfoCollection.windows)               AddWindow(createInfo, spawnOffset);
@@ -352,11 +352,17 @@ namespace World {
         for (Light& light : World::GetLights())                         createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                         createInfoCollection.pianos.push_back(piano.GetCreateInfo());
         for (PickUp& pickUp : World::GetPickUps())                      createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
-        for (HousePlane& plane : World::GetHousePlanes())                         createInfoCollection.planes.push_back(plane.GetCreateInfo());
         for (PictureFrame& pictureFrame : World::GetPictureFrames())    createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
         for (Tree& tree : World::GetTrees())                            createInfoCollection.trees.push_back(tree.GetCreateInfo());
         for (Wall& wall : World::GetWalls())                            createInfoCollection.walls.push_back(wall.GetCreateInfo());
         for (Window& window : World::GetWindows())                      createInfoCollection.windows.push_back(window.GetCreateInfo());
+
+        // Conditionals
+        for (HousePlane& housePlane : World::GetHousePlanes()) {
+            if (housePlane.GetParentDoorId() == 0) {
+                createInfoCollection.housePlanes.push_back(housePlane.GetCreateInfo());
+            }
+        }
 
         return createInfoCollection;
     }
@@ -889,10 +895,9 @@ namespace World {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::WALL);
            
         // Assign editor name
-        // TODO: if (createInfo.editorName == UNDEFINED_STRING ||
-        // TODO:     createInfo.editorName == "Undefined") {
-        // TODO:     createInfo.editorName = Editor::GetNextAvailableHousePlaneName(createInfo.type);
-        // TODO: }
+        if (createInfo.editorName == UNDEFINED_STRING) {
+            createInfo.editorName = Editor::GetNextAvailableWallName();
+        }
 
         g_walls.emplace_with_id(id, id, createInfo, spawnOffset);
 

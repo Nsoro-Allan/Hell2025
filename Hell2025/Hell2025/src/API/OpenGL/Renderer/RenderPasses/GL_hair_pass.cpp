@@ -70,7 +70,7 @@ namespace OpenGLRenderer {
         gBuffer->Bind();
         gBuffer->DrawBuffer("FinalLighting");
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);        
         // glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE); // remove me
 

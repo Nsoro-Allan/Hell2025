@@ -64,7 +64,7 @@
       "Position": [
         4.450918674468994,
         0.0,
-        0.20000000298023224
+        0.24192732572555542
       ],
       "Rotation": [
         0.0,
@@ -87,9 +87,9 @@
   ],
   "Drawers": [
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Drawers Large",
       "Position": [
-        6.702599048614502,
+        6.446389675140381,
         0.0,
         -2.6500000953674316
       ],
@@ -106,11 +106,11 @@
       "Type": "DRAWERS_LARGE"
     },
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Drawers Small",
       "Position": [
         7.75,
         0.0,
-        -0.8500000238418579
+        2.4251389503479004
       ],
       "Rotation": [
         0.0,
@@ -125,7 +125,7 @@
       "Type": "DRAWERS_SMALL"
     },
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Toilet",
       "Position": [
         10.100000381469727,
         0.0,
@@ -144,7 +144,7 @@
       "Type": "TOILET"
     },
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Basin",
       "Position": [
         8.848943710327148,
         0.0,
@@ -163,7 +163,7 @@
       "Type": "BATHROOM_BASIN"
     },
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Cabinet",
       "Position": [
         8.850412368774414,
         1.2000000476837158,
@@ -182,7 +182,7 @@
       "Type": "BATHROOM_CABINET"
     },
     {
-      "EditorName": "UNDEFINED_STRING",
+      "EditorName": "Couch",
       "Position": [
         4.550000190734863,
         0.0,
@@ -199,6 +199,63 @@
         1.0
       ],
       "Type": "COUCH"
+    },
+    {
+      "EditorName": "Generic Object",
+      "Position": [
+        8.097176551818848,
+        0.0,
+        -1.3723235130310059
+      ],
+      "Rotation": [
+        3.1415927410125732,
+        1.5099580252808664e-07,
+        3.1415927410125732
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "TEST_MODEL"
+    },
+    {
+      "EditorName": "Generic Object 2",
+      "Position": [
+        7.654694557189941,
+        1.7543894052505493,
+        -1.3717327117919922
+      ],
+      "Rotation": [
+        3.1415927410125732,
+        -1.1920928955078125e-07,
+        3.1415927410125732
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "TEST_MODEL2"
+    },
+    {
+      "EditorName": "Generic Object 3",
+      "Position": [
+        0.9011871814727783,
+        1.352935791015625,
+        2.9013688564300537
+      ],
+      "Rotation": [
+        0.0,
+        1.5707963705062866,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "TEST_MODEL2"
     }
   ],
   "Lights": [
@@ -330,6 +387,7 @@
   ],
   "Planes": [
     {
+      "EditorName": "UNDEFINED_STRING",
       "Material": "FloorBoards",
       "P0": [
         -5.049999713897705,
@@ -342,159 +400,259 @@
         6.150000095367432
       ],
       "P2": [
-        8.84999942779541,
+        0.0,
         0.0,
         6.150000095367432
       ],
       "P3": [
-        8.84999942779541,
         0.0,
-        -2.9499998092651367
+        0.0,
+        -2.950000047683716
       ],
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.4000000059604645
+      "TextureScale": 0.4000000059604645,
+      "Type": "UNDEFINED"
     },
     {
+      "EditorName": "UNDEFINED_STRING 2",
       "Material": "Ceiling2",
       "P0": [
         9.0,
-        2.4000000953674316,
+        2.6772918701171875,
         -2.999999761581421
       ],
       "P1": [
         9.0,
-        2.4000000953674316,
+        2.6772918701171875,
         6.0
       ],
       "P2": [
         0.0,
-        2.4000000953674316,
+        2.6772918701171875,
         6.0
       ],
       "P3": [
         0.0,
-        2.4000000953674316,
+        2.6772918701171875,
         -2.999999761581421
       ],
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 1.0
+      "TextureScale": 1.0,
+      "Type": "UNDEFINED"
     },
     {
+      "EditorName": "UNDEFINED_STRING 3",
       "Material": "BathroomFloor",
       "P0": [
         4.5,
         0.0,
-        1.5
+        1.5499999523162842
       ],
       "P1": [
         4.5,
-        0.019999999552965164,
-        6.099999904632568
+        0.0,
+        5.949999809265137
       ],
       "P2": [
         8.899999618530273,
-        0.019999999552965164,
-        6.099999904632568
+        0.0,
+        5.949999809265137
       ],
       "P3": [
         8.899999618530273,
+        0.0,
+        1.5499999523162842
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.6000000238418579,
+      "Type": "UNDEFINED"
+    },
+    {
+      "EditorName": "UNDEFINED_STRING 4",
+      "Material": "BathroomFloor",
+      "P0": [
+        8.899999618530273,
+        2.380000114440918,
+        2.0
+      ],
+      "P1": [
+        8.899999618530273,
+        2.380000114440918,
+        6.099999904632568
+      ],
+      "P2": [
+        4.5,
+        2.380000114440918,
+        6.099999904632568
+      ],
+      "P3": [
+        4.5,
+        2.380000114440918,
+        2.0
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.6000000238418579,
+      "Type": "UNDEFINED"
+    },
+    {
+      "EditorName": "UNDEFINED_STRING 5",
+      "Material": "BathroomFloor",
+      "P0": [
+        10.100000381469727,
+        0.009999999776482582,
+        1.5
+      ],
+      "P1": [
+        10.100000381469727,
+        0.009999999776482582,
+        -0.5
+      ],
+      "P2": [
+        8.199999809265137,
+        0.009999999776482582,
+        -0.5
+      ],
+      "P3": [
+        8.199999809265137,
+        0.009999999776482582,
+        1.5
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 1.0,
+      "Type": "UNDEFINED"
+    },
+    {
+      "EditorName": "UNDEFINED_STRING 6",
+      "Material": "Ceiling2",
+      "P0": [
+        8.199999809265137,
+        2.4000000953674316,
+        1.5
+      ],
+      "P1": [
+        8.199999809265137,
+        2.4000000953674316,
+        -0.5
+      ],
+      "P2": [
+        10.100000381469727,
+        2.4000000953674316,
+        -0.5
+      ],
+      "P3": [
+        10.100000381469727,
+        2.4000000953674316,
+        1.5
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 1.0,
+      "Type": "UNDEFINED"
+    },
+    {
+      "EditorName": "Floor",
+      "Material": "FloorBoards",
+      "P0": [
+        0.15000000596046448,
+        0.0,
+        -2.8499999046325684
+      ],
+      "P1": [
+        0.15000000596046448,
+        0.0,
+        2.8499999046325684
+      ],
+      "P2": [
+        4.349999904632568,
+        0.0,
+        2.8499999046325684
+      ],
+      "P3": [
+        4.349999904632568,
+        0.0,
+        -2.8499999046325684
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4000000059604645,
+      "Type": "FLOOR"
+    },
+    {
+      "EditorName": "Floor 2",
+      "Material": "FloorBoards",
+      "P0": [
+        0.10000000149011612,
+        0.0,
+        3.0
+      ],
+      "P1": [
+        0.10000000149011612,
+        0.0,
+        6.0
+      ],
+      "P2": [
+        4.400000095367432,
+        0.0,
+        6.0
+      ],
+      "P3": [
+        4.400000095367432,
+        0.0,
+        3.0
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4000000059604645,
+      "Type": "FLOOR"
+    },
+    {
+      "EditorName": "Floor 3",
+      "Material": "FloorBoards",
+      "P0": [
+        4.5,
+        0.0,
+        -2.9000000953674316
+      ],
+      "P1": [
+        4.5,
         0.0,
         1.4500000476837158
       ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": 0.0,
-      "TextureRotation": 0.0,
-      "TextureScale": 0.6000000238418579
-    },
-    {
-      "Material": "BathroomFloor",
-      "P0": [
-        8.899999618530273,
-        2.380000114440918,
-        2.0
-      ],
-      "P1": [
-        8.899999618530273,
-        2.380000114440918,
-        6.099999904632568
-      ],
       "P2": [
-        4.5,
-        2.380000114440918,
-        6.099999904632568
+        8.100000381469727,
+        0.0,
+        1.4500000476837158
       ],
       "P3": [
-        4.5,
-        2.380000114440918,
-        2.0
+        8.100000381469727,
+        0.0,
+        -2.9000000953674316
       ],
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.6000000238418579
-    },
-    {
-      "Material": "BathroomFloor",
-      "P0": [
-        10.100000381469727,
-        0.009999999776482582,
-        1.5
-      ],
-      "P1": [
-        10.100000381469727,
-        0.009999999776482582,
-        -0.5
-      ],
-      "P2": [
-        8.199999809265137,
-        0.009999999776482582,
-        -0.5
-      ],
-      "P3": [
-        8.199999809265137,
-        0.009999999776482582,
-        1.5
-      ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": 0.0,
-      "TextureRotation": 0.0,
-      "TextureScale": 1.0
-    },
-    {
-      "Material": "Ceiling2",
-      "P0": [
-        8.199999809265137,
-        2.4000000953674316,
-        1.5
-      ],
-      "P1": [
-        8.199999809265137,
-        2.4000000953674316,
-        -0.5
-      ],
-      "P2": [
-        10.100000381469727,
-        2.4000000953674316,
-        -0.5
-      ],
-      "P3": [
-        10.100000381469727,
-        2.4000000953674316,
-        1.5
-      ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": 0.0,
-      "TextureRotation": 0.0,
-      "TextureScale": 1.0
+      "TextureScale": 0.4000000059604645,
+      "Type": "FLOOR"
     }
   ],
   "Trees": [],
   "Walls": [
     {
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall",
       "Height": 2.6000001430511475,
       "Material": "Ceiling2",
       "Points": [
@@ -534,7 +692,9 @@
       "WallType": "WEATHER_BOARDS"
     },
     {
-      "Height": 2.4000000953674316,
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall 2",
+      "Height": 2.700000047683716,
       "Material": "Ceiling2",
       "Points": [
         [
@@ -573,6 +733,8 @@
       "WallType": "INTERIOR"
     },
     {
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall 3",
       "Height": 2.4000000953674316,
       "Material": "BathroomFloor",
       "Points": [
@@ -612,8 +774,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "Height": 2.4000000953674316,
-      "Material": "WallPaper",
+      "CeilingTrimHeight": 2.700000047683716,
+      "EditorName": "Wall 4",
+      "Height": 2.700000047683716,
+      "Material": "PlasterRed",
       "Points": [
         [
           4.5,
@@ -641,8 +805,8 @@
           -2.9000000953674316
         ]
       ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": -0.20000000298023224,
+      "TextureOffsetU": -1.0,
+      "TextureOffsetV": -1.0,
       "TextureRotation": 0.0,
       "TextureScale": 0.4000000059604645,
       "TrimTypeCeiling": "TIMBER",
@@ -651,6 +815,8 @@
       "WallType": "INTERIOR"
     },
     {
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall 5",
       "Height": 2.4000000953674316,
       "Material": "Ceiling2",
       "Points": [
@@ -690,6 +856,8 @@
       "WallType": "INTERIOR"
     },
     {
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall 6",
       "Height": 2.4000000953674316,
       "Material": "BathroomWall",
       "Points": [
@@ -780,7 +948,7 @@
     },
     {
       "Position": [
-        6.730839729309082,
+        6.4859700202941895,
         0.0,
         -2.950000047683716
       ],

@@ -71,7 +71,7 @@ namespace OpenGLRenderer {
 
         gBuffer->ClearDepthAttachment();
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         glm::vec3 cameraPosition = glm::vec3(0, 0, 1.5f); // Remember the item is rendered at (0,0,0)
 

@@ -40,7 +40,7 @@ Tree::Tree(TreeCreateInfo createInfo) {
         m_model = AssetManager::GetModelByName("BlackBerries");
         m_meshNodes.Init(m_objectId, "BlackBerries", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Leaves", "Leaves_BlackBerry");
-        m_meshNodes.SetBlendingModeByMeshName("Leaves", BlendingMode::ALPHA_DISCARDED);
+        m_meshNodes.SetBlendingModeByMeshName("Leaves", BlendingMode::ALPHA_DISCARD);
         m_meshNodes.SetMaterialByMeshName("Trunk", "TreeLarge_0");
         m_meshNodes.SetMaterialByMeshName("Trunk2", "TreeLarge_0");
         collisionCaspuleRadius = 0.9f;

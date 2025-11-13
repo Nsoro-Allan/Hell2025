@@ -96,16 +96,7 @@ namespace Util {
     std::string FloatToString(float value, int precision = 3);
     std::string DoubleToString(double value, int precision = 3);
 
-    std::string CameraViewToString(const CameraView& cameraView);
-    std::string DebugRenderModeToString(const DebugRenderMode& mode);
-    std::string EditorModeToString(const EditorMode& editorMode);
-    std::string EditorStateToString(const EditorState& state);
-    std::string EditorSelectionModeToString(const EditorSelectionMode& mode);
-    std::string ImageDataTypeToString(const ImageDataType& imageDataType);
-    std::string SharkMovementStateToString(const SharkMovementState& state);
-    std::string SharkHuntingStateToString(const SharkHuntingState& state);
-    std::string ViewportModeToString(const ShadingMode& viewportMode);
-    std::string WeaponActionToString(const WeaponAction& weaponAction);
+
 
     const char* CopyConstChar(const char* text);
     bool StrCmp(const char* queryA, const char* queryB);
@@ -161,23 +152,33 @@ namespace Util {
     glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);
     glm::mat4 aiMatrix3x3ToGlm(const aiMatrix3x3& from); 
 
-    // Type to string Conversions
+    // Enum to string Conversions
     std::string BlendingModeToString(BlendingMode mode);
+    std::string CameraViewToString(CameraView cameraView);
+    std::string DebugRenderModeToString(DebugRenderMode mode);
+    std::string EditorModeToString(EditorMode editorMode);
+    std::string EditorSelectionModeToString(EditorSelectionMode mode);
+    std::string EditorStateToString(EditorState state);
     std::string GenericObjectTypeToString(GenericObjectType houseType);
-    std::string HouseTypeToString(HouseType houseType);
     std::string HousePlaneTypeToString(HousePlaneType type);
+    std::string HouseTypeToString(HouseType houseType);
+    std::string ImageDataTypeToString(ImageDataType imageDataType);
     std::string InventoryStateToString(InventoryState state);
     std::string LightTypeToString(LightType type);
-    std::string PickUpTypeToString(PickUpType type);
     std::string ObjectTypeToString(ObjectType type);
     std::string OpenStateToString(OpenState mode);
-    std::string PictureFrameTypeToString(PictureFrameType type);
+    std::string PickUpTypeToString(PickUpType type);
     std::string PhysicsTypeToString(PhysicsType type);
+    std::string PictureFrameTypeToString(PictureFrameType type);
+    std::string SharkHuntingStateToString(SharkHuntingState state);
+    std::string SharkMovementStateToString(SharkMovementState state);
     std::string TreeTypeToString(TreeType type);
     std::string TrimTypeToString(TrimType type);
+    std::string ViewportModeToString(ShadingMode viewportMode);
     std::string WallTypeToString(WallType type);
+    std::string WeaponActionToString(WeaponAction weaponAction);
 
-    // String to type conversions
+    // String to Enum conversions
     BlendingMode StringToBlendingMode(const std::string& str);
     GenericObjectType StringToGenericObjectType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);

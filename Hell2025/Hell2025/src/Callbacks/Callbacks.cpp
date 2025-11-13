@@ -81,10 +81,6 @@ namespace Callbacks {
         Editor::SetEditorState(EditorState::PLACE_TREE);
     }
 
-    void BeginAddingWall() {
-        Editor::SetEditorState(EditorState::PLACE_WALL);
-    }
-
     void BeginAddingWindow() {
         Editor::SetEditorState(EditorState::PLACE_WINDOW);
     }

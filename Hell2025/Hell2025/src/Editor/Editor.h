@@ -8,6 +8,16 @@
 
 namespace Editor {
 
+    struct PlacementObjectSubtype {
+        GenericObjectType genericObject = GenericObjectType::UNDEFINED;
+        HousePlaneType housePlane = HousePlaneType::UNDEFINED;
+
+        void Reset() {
+            genericObject = GenericObjectType::UNDEFINED;
+            housePlane = HousePlaneType::UNDEFINED;
+        }
+    };
+
     void Init();
     void ResetCameras();
     void ResetViewports();
@@ -120,22 +130,27 @@ namespace Editor {
     std::string GetNextAvailableGenericObjectName(GenericObjectType type);
     std::string GetNextAvailableHousePlaneName(HousePlaneType type);
     std::string GetNextAvailableTreeName(TreeType type);
+    std::string GetNextAvailableWallName();
 
     const std::vector<std::string>& GetCeilingNames();
     const std::vector<std::string>& GetGenericObjectNames();
     const std::vector<std::string>& GetFloorNames();
-    const std::vector<std::string>& GetTreeNames(); 
-    const std::vector<std::string>& GetUndefinedHousePlanes();
+    const std::vector<std::string>& GetTreeNames();
+    const std::vector<std::string>& GetUndefinedHousePlaneNames();
+    const std::vector<std::string>& GetWallNames();
 
     void CloseAllEditorWindows();
 
     void Save();
 
     // Object placement
-    void PlaceObject(ObjectType objectType); // suss!!!!!!!!!!!
+    //void PlaceObject(ObjectType objectType); // suss!!!!!!!!!!!
+    void PlaceHousePlane(HousePlaneType housePlaneType);
     void PlaceGenericObject(GenericObjectType objectType);
     ObjectType GetPlacementObjectType();
-    GenericObjectType GetGenericPlacementObjectType();
+    //GenericObjectType GetGenericPlacementObjectType();
+    PlacementObjectSubtype GetPlacementObjectSubtype();
+    void ResetPlacementObjectSubtype();
 
     void UpdateDoorPlacement();
     void UpdatePictureFramePlacement();

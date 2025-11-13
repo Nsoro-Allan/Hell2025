@@ -15,7 +15,7 @@
 #include "../API/Vulkan/Managers/VK_device_manager.h"
 #include <unordered_map>
 
-namespace GLFWIntegration {
+namespace BackEnd::GLFW {
     GLFWwindow* g_window = NULL;
     WindowedMode g_windowedMode = WindowedMode::WINDOWED;
     GLFWmonitor* g_monitor;

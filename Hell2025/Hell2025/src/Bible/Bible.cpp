@@ -37,7 +37,7 @@ of shit.)";
         InventoryItemInfo& goldenGlock = m_inventoryItems["GoldenGlock"];
         goldenGlock.m_name = "GoldenGlock"; // make a helper CreateInventoryItem() function to fill this out based on unordered map key
         goldenGlock.m_examineModelName = "Glock2";
-        goldenGlock.m_meshMaterialNames["GlockNew"] = "T_Glock22.V2_01a";
+        goldenGlock.m_meshMaterialNames["GlockNew"] = "GlockGold";
         goldenGlock.m_meshMaterialNames["GlockRedDotGlassNew"] = "TX_LeupoldGlass_01a";
         goldenGlock.m_meshMaterialNames["GlockRedDotNew"] = "TX_LeupoldRedDot_01a";
         goldenGlock.m_meshMaterialNames["GlockSuppressorNew"] = "TX_Supressor_01a";

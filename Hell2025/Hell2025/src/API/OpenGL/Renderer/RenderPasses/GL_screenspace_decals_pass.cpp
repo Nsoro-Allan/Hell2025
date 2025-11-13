@@ -74,7 +74,7 @@ namespace OpenGLRenderer {
         miscFullSizeFBO->Bind();
         miscFullSizeFBO->DrawBuffers({ "ScreenSpaceBloodDecalMask" });
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         glBindTextureUnit(0, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
         glBindTextureUnit(1, gBuffer->GetColorAttachmentHandleByName("Normal"));

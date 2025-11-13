@@ -196,11 +196,16 @@ namespace Editor {
     void UpdateHouseEditor() {
         // Restrict renderer states
         RendererSettings& rendererSettings = Renderer::GetCurrentRendererSettings();
-        while (rendererSettings.rendererOverrideState != RendererOverrideState::NONE &&
-               rendererSettings.rendererOverrideState != RendererOverrideState::CAMERA_NDOTL) {
+        while (rendererSettings.rendererOverrideState == RendererOverrideState::NONE ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::RMA ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::NORMALS ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::METALIC ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::ROUGHNESS ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::TILE_HEATMAP ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::STATE_COUNT ||
+               rendererSettings.rendererOverrideState == RendererOverrideState::AO) {
             Renderer::NextRendererOverrideState();
         }
-
 
         // Test mouse hover on point
         //glm::vec3 testPoint = glm::vec3(0, 1, 0);

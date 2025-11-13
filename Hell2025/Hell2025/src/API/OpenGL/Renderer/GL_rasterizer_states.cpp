@@ -19,12 +19,19 @@ namespace OpenGLRenderer {
         emissivePass->depthMask = false;
         emissivePass->depthFunc = GL_LESS;
 
-        OpenGLRasterizerState* geometryPassNonBlended = CreateRasterizerState("GeometryPass_NonBlended");
-        geometryPassNonBlended->depthTestEnabled = true;
-        geometryPassNonBlended->blendEnable = false;
-        geometryPassNonBlended->cullfaceEnable = true;
-        geometryPassNonBlended->depthMask = true;
-        geometryPassNonBlended->depthFunc = GL_LESS;
+        OpenGLRasterizerState* geometryPassDefault = CreateRasterizerState("GeometryPass_Default");
+        geometryPassDefault->depthTestEnabled = true;
+        geometryPassDefault->blendEnable = false;
+        geometryPassDefault->cullfaceEnable = true;
+        geometryPassDefault->depthMask = true;
+        geometryPassDefault->depthFunc = GL_LESS;
+
+        OpenGLRasterizerState* geometryPassAlphaDiscard = CreateRasterizerState("GeometryPass_AlphaDiscard");
+        geometryPassAlphaDiscard->depthTestEnabled = true;
+        geometryPassAlphaDiscard->blendEnable = false;
+        geometryPassAlphaDiscard->cullfaceEnable = true;
+        geometryPassAlphaDiscard->depthMask = true;
+        geometryPassAlphaDiscard->depthFunc = GL_LEQUAL;
 
         OpenGLRasterizerState* geometryPassBlended = CreateRasterizerState("GeometryPass_Blended");
         geometryPassBlended->depthTestEnabled = true;

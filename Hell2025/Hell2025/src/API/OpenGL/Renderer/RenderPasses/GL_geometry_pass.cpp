@@ -28,7 +28,7 @@ namespace OpenGLRenderer {
 
         gBuffer->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         EditorRasterizerStateOverride();
 
         shader->Bind();
@@ -73,6 +73,7 @@ namespace OpenGLRenderer {
 
     void GeometryPass() {
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
+        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("GBuffer");
@@ -84,41 +85,22 @@ namespace OpenGLRenderer {
         if (!editorMeshShader) return;
         if (!woundMaskArray) return;
 
-
-        // Test clear
-        int clearIndex = -1;
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_0)) {
-            clearIndex = 0;
-        }
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_1)) {
-            clearIndex = 1;
-        }
-        if (clearIndex != -1) {
-            woundMaskArray->Clear(0, 0, 0, 0, clearIndex);
-        }
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_2)) {
-            ClearAllWoundMasks();
-        }
-
-        gBuffer->Bind();
-        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition" });
-
-        const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
-
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-
-        shader->Bind();
-        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
-        SetRasterizerState("GeometryPass_NonBlended");
-        EditorRasterizerStateOverride();
-
-        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
-
-        OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D_ARRAY, woundMaskArray->GetHandle());
 
-        // Non blended
+        gBuffer->Bind();
+        gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
+
+        shader->Bind();
+        shader->SetBool("u_flipNormalMapY", ShouldFlipNormalMapY());
+
+        OpenGLFrameBuffer* decalMasksFBO = GetFrameBuffer("DecalMasks");
+
+        SetRasterizerState("GeometryPass_Default");
+        EditorRasterizerStateOverride();
+
+        // Default (Non blended)
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (viewport->IsVisible()) {
@@ -134,6 +116,9 @@ namespace OpenGLRenderer {
 
         // Alpha discard
         shader->SetBool("u_alphaDiscard", true);
+        SetRasterizerState("GeometryPass_AlphaDiscard"); 
+        EditorRasterizerStateOverride();
+
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (viewport->IsVisible()) {
@@ -169,7 +154,7 @@ namespace OpenGLRenderer {
         // Skinned mesh
         shader->Bind();
         gBuffer->DrawBuffers({ "BaseColor", "Normal", "RMA", "WorldPosition", "Emissive" });
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         EditorRasterizerStateOverride();
 
         glBindVertexArray(OpenGLBackEnd::GetSkinnedVertexDataVAO());
@@ -191,7 +176,7 @@ namespace OpenGLRenderer {
 
         OpenGLShader* christmasLightWireShader = GetShader("ChristmasLightsWire");
         christmasLightWireShader->Bind();
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
@@ -225,7 +210,7 @@ namespace OpenGLRenderer {
 
         OpenGLShader* ragdollShader = GetShader("DebugRagdoll");
         ragdollShader->Bind();
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {
@@ -266,18 +251,6 @@ namespace OpenGLRenderer {
 
         glBindVertexArray(0);
     }
-
-    struct ScreenRect {
-        int x0, y0, x1, y1;
-        bool valid;
-    };
-
-    static inline glm::ivec2 NDCToScreen(const glm::vec3& ndc, int viewportWidth, int viewportHeight) {
-        float sx = (ndc.x + 1.0f) * 0.5f * float(viewportWidth);
-        float sy = (1.0f - ndc.y) * 0.5f * float(viewportHeight);
-        return glm::ivec2((int)sx, (int)sy);
-    }
-
 
     void MirrorGeometryPass() {
         const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
@@ -349,7 +322,7 @@ namespace OpenGLRenderer {
         // Clear the depth buffer so that the mirror world has a clean depth state to test against
         gBuffer->ClearDepthAttachment();
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         glEnable(GL_CLIP_DISTANCE0);
         glFrontFace(GL_CW);

@@ -1,6 +1,7 @@
 #include "HellLogging.h"
 #include "API/OpenGL/Renderer/GL_renderer.h"
 #include "API/OpenGL/GL_backend.h"
+#include "Editor/Editor.h"
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
 #include "Core/Game.h"
@@ -28,6 +29,8 @@ namespace OpenGLRenderer {
     }
 
     void RayMarchFog() {
+        if (Editor::IsOpen()) return;
+
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 
         OpenGLShader* rayMarchShader = GetShader("FogRayMarch");

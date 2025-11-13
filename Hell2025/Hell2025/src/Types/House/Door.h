@@ -18,6 +18,7 @@ struct Door {
     void UpdateRenderItems(); 
     void SubmitRenderItems();
     void Interact();
+    void UpdateFloor();
 
     const bool MovedThisFrame() const                       { return m_movedThisFrame; }
     const uint64_t GetObjectId() const                      { return m_objectId; }

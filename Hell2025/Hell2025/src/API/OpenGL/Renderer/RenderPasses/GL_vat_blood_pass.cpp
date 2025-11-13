@@ -9,7 +9,7 @@
 namespace OpenGLRenderer {
 
     void VatBloodPass() {
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 

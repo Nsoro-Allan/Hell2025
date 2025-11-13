@@ -1,6 +1,5 @@
 ﻿#include "API/OpenGL/Renderer/GL_renderer.h"
 
-#include "BackEnd/GLFWIntegration.h"
 #include "Input/Input.h"
 #include "GLFW/glfw3.h"
 #include "imgui/imgui.h"

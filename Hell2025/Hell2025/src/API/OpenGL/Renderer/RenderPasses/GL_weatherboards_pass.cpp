@@ -59,7 +59,7 @@ namespace OpenGLRenderer {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(material->m_rma)->GetGLTexture().GetHandle());
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
         EditorRasterizerStateOverride();
 
         for (int i = 0; i < 4; i++) {

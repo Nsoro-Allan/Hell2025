@@ -13,7 +13,7 @@ namespace Util {
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
         createInfoCollection.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
-        createInfoCollection.planes = json.value("Planes", std::vector<HousePlaneCreateInfo>{});
+        createInfoCollection.housePlanes = json.value("Planes", std::vector<HousePlaneCreateInfo>{});
         createInfoCollection.trees = json.value("Trees", std::vector<TreeCreateInfo>{});
         createInfoCollection.walls = json.value("Walls", std::vector<WallCreateInfo>{});
         createInfoCollection.windows = json.value("Windows", std::vector<WindowCreateInfo>{});
@@ -29,7 +29,7 @@ namespace Util {
         json["Pianos"] = createInfoCollection.pianos;
         json["PickUps"] = createInfoCollection.pickUps;
         json["PictureFrames"] = createInfoCollection.pictureFrames;
-        json["Planes"] = createInfoCollection.planes;
+        json["Planes"] = createInfoCollection.housePlanes;
         json["Trees"] = createInfoCollection.trees;
         json["Walls"] = createInfoCollection.walls;
         json["Windows"] = createInfoCollection.windows;

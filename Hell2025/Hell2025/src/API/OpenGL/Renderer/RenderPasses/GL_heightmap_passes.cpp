@@ -273,7 +273,7 @@ namespace OpenGLRenderer {
         shader->SetFloat("u_worldWidth", World::GetWorldSpaceWidth());
         shader->SetFloat("u_worldDepth", World::GetWorldSpaceDepth());
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         Material* material = AssetManager::GetDefaultMaterial();
         int materialIndex = AssetManager::GetMaterialIndexByName("Ground_MudVeg");

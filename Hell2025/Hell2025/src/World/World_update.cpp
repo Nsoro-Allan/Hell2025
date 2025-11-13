@@ -212,6 +212,11 @@ namespace World {
             gameObject.Update(deltaTime);
         }
 
+        for (HousePlane& housePlane : GetHousePlanes()) {
+            //housePlane.DrawVertices(GREEN);
+            //housePlane.DrawEdges(GREEN);
+        }
+
         for (Kangaroo& kangaroo : GetKangaroos()) {
             kangaroo.Update(deltaTime);
         }
@@ -248,7 +253,7 @@ namespace World {
         }
 
         for (Wall& wall : GetWalls()) {
-          //  wall.CreateTrims();                         // REMOVE ME FOR THE LOVE OF JEBUS!!!
+            //  wall.CreateTrims();                         // REMOVE ME FOR THE LOVE OF JEBUS!!!
             // Nothing as of yet. Probably ever.
         }
 

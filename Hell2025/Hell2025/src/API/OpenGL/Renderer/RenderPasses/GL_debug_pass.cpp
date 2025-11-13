@@ -202,11 +202,15 @@ namespace OpenGLRenderer {
 
             glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
         }
+
         // Other modes
         if (rendererSettings.rendererOverrideState == RendererOverrideState::BASE_COLOR ||
             rendererSettings.rendererOverrideState == RendererOverrideState::NORMALS ||
             rendererSettings.rendererOverrideState == RendererOverrideState::RMA ||
-            rendererSettings.rendererOverrideState == RendererOverrideState::CAMERA_NDOTL) {
+            rendererSettings.rendererOverrideState == RendererOverrideState::METALIC ||
+            rendererSettings.rendererOverrideState == RendererOverrideState::AO ||
+            rendererSettings.rendererOverrideState == RendererOverrideState::CAMERA_NDOTL ||
+            rendererSettings.rendererOverrideState == RendererOverrideState::ROUGHNESS ) {
 
             OpenGLShader* shader = GetShader("DebugView");
             if (!shader) return;

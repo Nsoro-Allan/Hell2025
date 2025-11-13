@@ -113,8 +113,12 @@ void main() {
     normalMap = mix(normalMap, woundNormalMap, woundMask);
     rma = mix(rma, woundRma, woundMask);
 
+    
+
+
     mat3 tbn = mat3(normalize(Tangent), normalize(BiTangent), normalize(Normal));
     normalMap.rgb = normalMap.rgb * 2.0 - 1.0;
+    //normalMap = mix(normalMap, vec3(0, 0, 1), 0.5);
     normalMap = normalize(normalMap);
     
     if (u_flipNormalMapY) {

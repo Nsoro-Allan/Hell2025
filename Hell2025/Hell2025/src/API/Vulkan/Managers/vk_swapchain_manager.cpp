@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include "../BackEnd/GLFWIntegration.h"
+#include "BackEnd/BackEnd.h"
 
 namespace VulkanSwapchainManager {
     VkSwapchainKHR g_swapchain = VK_NULL_HANDLE;
@@ -58,8 +58,8 @@ namespace VulkanSwapchainManager {
         vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &capabilities);
 
         if (capabilities.currentExtent.width == UINT32_MAX) {
-            g_swapchainExtent.width = GLFWIntegration::GetCurrentWindowWidth();
-            g_swapchainExtent.height = GLFWIntegration::GetCurrentWindowHeight(); // Corrected height
+            g_swapchainExtent.width = BackEnd::GetCurrentWindowWidth();
+            g_swapchainExtent.height = BackEnd::GetCurrentWindowHeight(); // Corrected height
             // Clamp the extent to the min/max extents from capabilities
             g_swapchainExtent.width = std::clamp(g_swapchainExtent.width,
                 capabilities.minImageExtent.width, capabilities.maxImageExtent.width);

@@ -275,6 +275,17 @@ namespace AssetManager {
         return g_materials;
     }
 
+    std::vector<std::string> GetMaterialNames() {
+        std::vector<std::string> result;
+        result.reserve(g_materials.size());
+
+        for (Material& material : g_materials) {
+            result.push_back(material.m_name);
+        }
+
+        return result;
+    }
+
     std::vector<Model>& GetModels() {
         return g_models;
     }

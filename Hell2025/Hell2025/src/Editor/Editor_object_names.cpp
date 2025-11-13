@@ -26,6 +26,13 @@ namespace Editor {
                 }
             }
         }
+        else if (objectType == ObjectType::WALL) {
+            for (const Wall& wall : World::GetWalls()) {
+                if (wall.GetEditorName() == desiredName) {
+                    return false;
+                }
+            }
+        }
         else {
             Logging::Warning() << "Editor::NameAvailable() is missing implementation for object type '" << Util::ObjectTypeToString(objectType) << "'";
         }
@@ -90,6 +97,10 @@ namespace Editor {
         return GetNextEditorName(desiredName, ObjectType::TREE);
     }
 
+    std::string GetNextAvailableWallName() {
+        return GetNextEditorName("Wall", ObjectType::WALL);
+    }
+
     const std::vector<std::string>& GetCeilingNames() {
         static std::vector<std::string> names;
         names.clear();
@@ -141,7 +152,7 @@ namespace Editor {
         return names;
     }
 
-    const std::vector<std::string>& GetUndefinedHousePlanes() {
+    const std::vector<std::string>& GetUndefinedHousePlaneNames() {
         static std::vector<std::string> names;
         names.clear();
         names.reserve(World::GetHousePlanes().size());
@@ -153,4 +164,18 @@ namespace Editor {
         }
         return names;
     }
+
+    const std::vector<std::string>& GetWallNames() {
+        static std::vector<std::string> names;
+
+        names.clear();
+        names.reserve(World::GetWalls().size());
+
+        for (const Wall& wall : World::GetWalls()) {
+            names.push_back(wall.GetEditorName());
+        }
+
+        return names;
+    }
+
 }

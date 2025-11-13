@@ -1,4 +1,5 @@
 #include "Editor/Editor.h"
+#include "AssetManagement/AssetManager.h"
 #include "HellLogging.h"
 #include "Imgui/ImguiBackEnd.h"
 #include <ImGui/imgui.h>
@@ -26,6 +27,27 @@ namespace Editor {
     EditorUI::FloatSliderInput g_rotationY;
     EditorUI::FloatSliderInput g_rotationZ;
     EditorUI::Outliner g_outliner;
+    EditorUI::DropDown g_materialDropDown;
+
+    EditorUI::FloatInput g_textureScale;
+    EditorUI::FloatSliderInput g_textureOffsetU;
+    EditorUI::FloatSliderInput g_textureOffsetV;
+
+    EditorUI::FloatInput g_heightFloatInput;
+    EditorUI::FloatInput g_ceilingTrimHeightFloatInput;
+
+    EditorUI::FloatInput g_housePlaneP0X;
+    EditorUI::FloatInput g_housePlaneP0Y;
+    EditorUI::FloatInput g_housePlaneP0Z;
+    EditorUI::FloatInput g_housePlaneP1X;
+    EditorUI::FloatInput g_housePlaneP1Y;
+    EditorUI::FloatInput g_housePlaneP1Z;
+    EditorUI::FloatInput g_housePlaneP2X;
+    EditorUI::FloatInput g_housePlaneP2Y;
+    EditorUI::FloatInput g_housePlaneP2Z;
+    EditorUI::FloatInput g_housePlaneP3X;
+    EditorUI::FloatInput g_housePlaneP3Y;
+    EditorUI::FloatInput g_housePlaneP3Z;
 
     void InitLeftPanel() {
         g_mapPropertiesHeader.SetTitle("Map Editor");
@@ -35,7 +57,33 @@ namespace Editor {
         g_backfaceCulling.SetText("Backface culling");
         g_backfaceCulling.SetState(BackfaceCullingEnabled());
 
-        UpdateOutliner();
+        g_materialDropDown.SetText("Material");
+        g_materialDropDown.SetOptions(AssetManager::GetMaterialNames());
+
+        g_heightFloatInput.SetText("Height");
+        g_heightFloatInput.SetRange(0.1f, 100.0f);
+        g_ceilingTrimHeightFloatInput.SetText("Top Trim Height");
+        g_ceilingTrimHeightFloatInput.SetRange(0.1f, 100.0f);
+
+        g_textureScale.SetText("Tex Scale");
+        g_textureScale.SetRange(0.00f, 100.0f);
+        g_textureOffsetU.SetText("Tex Offset U");
+        g_textureOffsetU.SetRange(-1.0f, 1.0f);
+        g_textureOffsetV.SetText("Tex Offset V");
+        g_textureOffsetV.SetRange(-1.0f, 1.0f);
+
+        g_housePlaneP0X.SetText("P0 X");
+        g_housePlaneP0Y.SetText("P0 Y");
+        g_housePlaneP0Z.SetText("P0 Z");
+        g_housePlaneP1X.SetText("P1 X");
+        g_housePlaneP1Y.SetText("P1 Y");
+        g_housePlaneP1Z.SetText("P1 Z");
+        g_housePlaneP2X.SetText("P2 X");
+        g_housePlaneP2Y.SetText("P2 Y");
+        g_housePlaneP2Z.SetText("P2 Z");
+        g_housePlaneP3X.SetText("P3 X");
+        g_housePlaneP3Y.SetText("P3 Y");
+        g_housePlaneP3Z.SetText("P3 Z");
     }
 
     void UpdateOutliner() {
@@ -51,8 +99,9 @@ namespace Editor {
                 g_outliner.SetItems("Ceilings", GetCeilingNames());
                 g_outliner.SetItems("Floors", GetFloorNames());
                 g_outliner.SetItems("Generic Objects", GetGenericObjectNames());
-                g_outliner.SetItems("House Planes", GetUndefinedHousePlanes());
+                g_outliner.SetItems("House Planes", GetUndefinedHousePlaneNames());
                 g_outliner.SetItems("Trees", GetTreeNames());
+                g_outliner.SetItems("Walls", GetWallNames());
 
                 g_objectNameInput.SetLabel("Name");
 
@@ -87,6 +136,8 @@ namespace Editor {
     }
 
     void BeginLeftPanel() {
+        bool houseMeshUpdateRequired = false;
+
         g_leftPanel.BeginImGuiElement();
 
         // Settings
@@ -117,12 +168,13 @@ namespace Editor {
         }
 
         // Object properties
-        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {
+        if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR || GetEditorMode() == EditorMode::HOUSE_EDITOR) {
             if (g_objectPropertiesHeader.CreateImGuiElement()) {
                 if (GetSelectedObjectType() != ObjectType::NO_TYPE) {
                     g_objectNameInput.CreateImGuiElement();
                 }
 
+                // Trees (LIKELY BROKEN)
                 if (GetSelectedObjectType() == ObjectType::TREE) {
                     Tree* tree = World::GetTreeByObjectId(GetSelectedObjectId());
                     if (tree) {
@@ -136,10 +188,140 @@ namespace Editor {
                     }
                 }
 
+                // Doors (BARELY FUNCITONAL)
+                if (Door* door = World::GetDoorByObjectId(GetSelectedObjectId())) {
+                    g_positionX.SetValue(door->GetPosition().x);
+                    g_positionY.SetValue(door->GetPosition().y);
+                    g_positionZ.SetValue(door->GetPosition().z);
+                    g_rotationY.SetValue(door->GetRotation().y);
+
+                    if (g_positionX.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_positionY.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_positionZ.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_rotationY.CreateImGuiElements()) {}; // TODO
+                }
+
+                // House planes (aka floors and ceilings)
+                if (HousePlane* housePlane = World::GetHousePlaneByObjectId(GetSelectedObjectId())) {
+                    bool housePlaneUpdated = false;
+
+                    g_materialDropDown.SetCurrentOption(housePlane->GetCreateInfo().materialName);
+                    g_housePlaneP0X.SetValue(housePlane->GetCreateInfo().p0.x);
+                    g_housePlaneP0Y.SetValue(housePlane->GetCreateInfo().p0.y);
+                    g_housePlaneP0Z.SetValue(housePlane->GetCreateInfo().p0.z);
+                    g_housePlaneP1X.SetValue(housePlane->GetCreateInfo().p1.x);
+                    g_housePlaneP1Y.SetValue(housePlane->GetCreateInfo().p1.y);
+                    g_housePlaneP1Z.SetValue(housePlane->GetCreateInfo().p1.z);
+                    g_housePlaneP2X.SetValue(housePlane->GetCreateInfo().p2.x);
+                    g_housePlaneP2Y.SetValue(housePlane->GetCreateInfo().p2.y);
+                    g_housePlaneP2Z.SetValue(housePlane->GetCreateInfo().p2.z);
+                    g_housePlaneP3X.SetValue(housePlane->GetCreateInfo().p3.x);
+                    g_housePlaneP3Y.SetValue(housePlane->GetCreateInfo().p3.y);
+                    g_housePlaneP3Z.SetValue(housePlane->GetCreateInfo().p3.z);
+                    g_textureOffsetU.SetValue(housePlane->GetCreateInfo().textureOffsetU);
+                    g_textureOffsetV.SetValue(housePlane->GetCreateInfo().textureOffsetV);
+                    g_textureScale.SetValue(housePlane->GetCreateInfo().textureScale);
+
+                    if (g_materialDropDown.CreateImGuiElements()) {
+                        housePlane->SetMaterial(g_materialDropDown.GetSelectedOptionText());
+                        houseMeshUpdateRequired = true;
+                        housePlaneUpdated = true;
+                    }
+
+                    if (g_housePlaneP0X.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP0Y.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP0Z.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP1X.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP1Y.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP1Z.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP2X.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP2Y.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP2Z.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP3X.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP3Y.CreateImGuiElements()) housePlaneUpdated = true;
+                    if (g_housePlaneP3Z.CreateImGuiElements()) housePlaneUpdated = true;
+
+                    if (g_textureScale.CreateImGuiElements()) {
+                        housePlane->SetTextureScale(g_textureScale.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+                    if (g_textureOffsetU.CreateImGuiElements()) {
+                        housePlane->SetTextureOffsetU(g_textureOffsetU.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+                    if (g_textureOffsetV.CreateImGuiElements()) {
+                        housePlane->SetTextureOffsetV(g_textureOffsetV.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+
+                    if (housePlaneUpdated) {
+                        HousePlaneCreateInfo& createInfo = housePlane->GetCreateInfo();
+                        createInfo.p0.x = g_housePlaneP0X.GetValue();
+                        createInfo.p0.y = g_housePlaneP0Y.GetValue();
+                        createInfo.p0.z = g_housePlaneP0Z.GetValue();
+                        createInfo.p1.x = g_housePlaneP1X.GetValue();
+                        createInfo.p1.y = g_housePlaneP1Y.GetValue();
+                        createInfo.p1.z = g_housePlaneP1Z.GetValue();
+                        createInfo.p2.x = g_housePlaneP2X.GetValue();
+                        createInfo.p2.y = g_housePlaneP2Y.GetValue();
+                        createInfo.p2.z = g_housePlaneP2Z.GetValue();
+                        createInfo.p3.x = g_housePlaneP3X.GetValue();
+                        createInfo.p3.y = g_housePlaneP3Y.GetValue();
+                        createInfo.p3.z = g_housePlaneP3Z.GetValue();
+                        housePlane->UpdateVertexDataFromCreateInfo();
+                        houseMeshUpdateRequired = true;
+                    }
+                }
+
+                // Walls
+                if (Wall* wall = World::GetWallByObjectId(GetSelectedObjectId())) {
+                    g_materialDropDown.SetCurrentOption(wall->GetCreateInfo().materialName);
+                    g_heightFloatInput.SetValue(wall->GetCreateInfo().height);
+                    g_ceilingTrimHeightFloatInput.SetValue(wall->GetCreateInfo().ceilingTrimHeight);
+                    g_textureOffsetU.SetValue(wall->GetCreateInfo().textureOffsetU);
+                    g_textureOffsetV.SetValue(wall->GetCreateInfo().textureOffsetV);
+                    g_textureScale.SetValue(wall->GetCreateInfo().textureScale);
+
+                    // Material
+                    if (g_materialDropDown.CreateImGuiElements()) {
+                        wall->SetMaterial(g_materialDropDown.GetSelectedOptionText());
+                        houseMeshUpdateRequired = true;
+                    }
+
+                    // Height
+                    if (g_heightFloatInput.CreateImGuiElements()) {
+                        wall->SetHeight(g_heightFloatInput.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+
+                    // Ceiling Trim Height
+                    if (g_ceilingTrimHeightFloatInput.CreateImGuiElements()) {
+                        wall->SetCeilingTrimHeight(g_ceilingTrimHeightFloatInput.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+
+                    // Texture settings
+                    if (g_textureScale.CreateImGuiElements()) {
+                        wall->SetTextureScale(g_textureScale.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+                    if (g_textureOffsetU.CreateImGuiElements()) {
+                        wall->SetTextureOffsetU(g_textureOffsetU.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+                    if (g_textureOffsetV.CreateImGuiElements()) {
+                        wall->SetTextureOffsetV(g_textureOffsetV.GetValue());
+                        houseMeshUpdateRequired = true;
+                    }
+                }
+
                 ImGui::Dummy(ImVec2(0.0f, 20.0f));
             }
         }
-        
+
+        if (houseMeshUpdateRequired) {
+            World::UpdateHouseMeshBuffer();
+        }
     }
 
     void EndLeftPanel() {

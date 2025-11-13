@@ -2,7 +2,7 @@
 #include "HellEnums.h"
 #include <vector>
 
-namespace SDLIntegration {
+namespace Backend::SDL {
     bool Init(API api, WindowedMode windowedMode);
     void Destroy();
     void BeginFrame(API api);

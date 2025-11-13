@@ -1,8 +1,9 @@
 #include "VK_device_manager.h"
 #include <iostream>
 #include <vector>
-#include "../BackEnd/BackEnd.h"
-#include "../BackEnd/GLFWIntegration.h"
+#include "BackEnd/BackEnd.h"
+#include "BackEnd/Integration/GLFW.h"
+#include "BackEnd/Integration/SDL.h"
 
 namespace VulkanDeviceManager {
     VkInstance g_instance = VK_NULL_HANDLE;
@@ -72,7 +73,7 @@ namespace VulkanDeviceManager {
     }
 
     bool CreateSurface() {
-        return GLFWIntegration::CreateSurface(&g_surface);
+        return BackEnd::GLFW::CreateSurface(&g_surface);
     }
 
     bool CreateInstance() {
@@ -92,7 +93,7 @@ namespace VulkanDeviceManager {
         }
 
         // Get required extensions from GLFW
-        std::vector<const char*> extensions = GLFWIntegration::GetRequiredInstanceExtensions();
+        std::vector<const char*> extensions = BackEnd::GLFW::GetRequiredInstanceExtensions();
         if (g_enableValidationLayers) {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME); // Add debug utils extension
         }

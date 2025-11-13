@@ -180,7 +180,7 @@ namespace OpenGLRenderer {
 
         shader->Bind();
 
-        SetRasterizerState("GeometryPass_NonBlended");
+        SetRasterizerState("GeometryPass_Default");
 
         static bool skip = false;
 

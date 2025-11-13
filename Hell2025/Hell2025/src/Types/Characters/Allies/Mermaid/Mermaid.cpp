@@ -46,7 +46,7 @@ void Mermaid::Update(float deltaTime) {
         m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
     }
     else {
-        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::BLEND_DISABLED);
+        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DEFAULT);
     }
 }
 

@@ -103,6 +103,8 @@ namespace nlohmann {
 
     void to_json(nlohmann::json& j, const WallCreateInfo& createInfo) {
         j = nlohmann::json{
+            {"EditorName", createInfo.editorName},
+            {"CeilingTrimHeight", createInfo.ceilingTrimHeight},
             {"Height", createInfo.height},
             {"Material", createInfo.materialName},
             {"Points", createInfo.points},
@@ -219,6 +221,7 @@ namespace nlohmann {
 
     void from_json(const nlohmann::json& j, WallCreateInfo& info) {
         info.height = j.value("Height", 2.4f);
+        info.ceilingTrimHeight = j.value("CeilingTrimHeight", 2.4f);
         info.materialName = j.value("Material", "CheckerBoard");
         info.points = j.value("Points", std::vector<glm::vec3>{});
         info.textureScale = j.value("TextureScale", 1.0f);
@@ -229,6 +232,7 @@ namespace nlohmann {
         info.floorTrimType = Util::StringToTrimType(j.value("TrimTypeFloor", "NONE"));
         info.wallType = Util::StringToWallType(j.value("WallType", "NONE"));
         info.useReversePointOrder = j.value("UseReversePointOrder", false);
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
     }
 
     void from_json(const nlohmann::json& j, WindowCreateInfo& info) {
