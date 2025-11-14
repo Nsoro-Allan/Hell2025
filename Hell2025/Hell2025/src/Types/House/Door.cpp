@@ -64,6 +64,7 @@ void Door::UpdateFloor() {
     createInfo.p2 = glm::vec3(transform.to_mat4() * glm::vec4(+half_w, 0.0f, +half_d, 1.0f));
     createInfo.p3 = glm::vec3(transform.to_mat4() * glm::vec4(+half_w, 0.0f, -half_d, 1.0f));
     createInfo.parentDoorId = GetObjectId();
+    createInfo.type = HousePlaneType::FLOOR;
 
     createInfo.textureScale = 0.4f;
     createInfo.materialName = "FloorBoards";

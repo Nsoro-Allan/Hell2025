@@ -9,6 +9,7 @@
 #include "Viewport/ViewportManager.h"
 
 #include "Ragdoll/RagdollManager.h"
+#include "Pathfinding/NavMesh.h"
 
 namespace World {
 
@@ -22,6 +23,9 @@ namespace World {
     }
     
     void Update(float deltaTime) {
+
+        NavMesh::RenderDebug();
+
         if (Input::KeyPressed(HELL_KEY_LEFT)) {
             static MermaidCreateInfo createInfo = GetMermaids()[0].GetCreateInfo();
             createInfo.rotation.y += 0.05f;
