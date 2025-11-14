@@ -4,7 +4,7 @@
 #include "Util.h"
 
 const std::vector<const char*> bigLandscapeImages = {
-    "Picture_RainbowMage",
+    //"Picture_RainbowMage",
     "Picture_SHNakedLady",
     "Picture_Minotaur"
 };

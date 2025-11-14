@@ -32,11 +32,13 @@ const double kScale = 1000.0;
 
 namespace NavMesh {
     std::vector<NavTri> g_navMesh;
+    bool g_doThis = false;
 
     glm::vec3 g_destination = glm::vec3(666.0f);
 
     struct FloorLevelPaths {
-        Clipper2Lib::PathsD paths;
+        Clipper2Lib::PathsD floorPaths; 
+        Clipper2Lib::PathsD obstaclePaths; // Piano, couches, etc
         float y = 0.0f;
     };
 
@@ -53,6 +55,92 @@ namespace NavMesh {
         return path;
     }
 
+
+
+
+
+
+    void WallCornerTest() {
+        for (Wall& wall : World::GetWalls()) {
+            int count = wall.GetPointCount();
+            if (count < 3) continue;
+
+            std::vector<glm::vec2> pts;
+            pts.reserve(count);
+            for (int i = 0; i < count; ++i) {
+                const glm::vec3& p = wall.GetPointByIndex(i);
+                pts.emplace_back(p.x, p.z); // 2D projection
+            }
+
+            float area2 = 0.0f;
+            for (int i = 0; i < count; ++i) {
+                const glm::vec2& a = pts[i];
+                const glm::vec2& b = pts[(i + 1) % count];
+                area2 += a.x * b.y - b.x * a.y;
+            }
+            bool ccw = area2 > 0.0f; // True if polygon is CCW
+
+            for (int i = 0; i < count; ++i) {
+                int prev = (i - 1 + count) % count;
+                int next = (i + 1) % count;
+
+                glm::vec2 e1 = glm::normalize(pts[i] - pts[prev]);
+                glm::vec2 e2 = glm::normalize(pts[next] - pts[i]);
+
+                float cross = e1.x * e2.y - e1.y * e2.x; // Z of 2D cross
+
+                bool internal;
+                if (ccw)
+                    internal = cross < 0.0f;  // Concave for CCW
+                else
+                    internal = cross > 0.0f;  // Concave for CW
+
+                const glm::vec3& p = wall.GetPointByIndex(i);
+                glm::vec3 pos = p + glm::vec3(0.0f, wall.GetCreateInfo().height, 0.0f);
+
+                Renderer::DrawPoint(pos, internal ? BLUE : RED);
+
+                if (internal) {
+                    const glm::vec3& a = wall.GetPointByIndex(i);
+                    const glm::vec3& b = wall.GetPointByIndex(next);
+
+                    float yRot = Util::EulerYRotationBetweenTwoPoints(a, b);
+
+                    Transform transform;
+                    transform.rotation.y = yRot;
+
+                    glm::vec3 forward = glm::vec3(transform.to_mat4() * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
+
+                    Renderer::DrawLine(pos, pos + forward, BLUE);
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    inline void AddObstacleTri(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, std::unordered_map<int, FloorLevelPaths>& floorLevels) {
+        float y = (a.y + b.y + c.y) * (1.0f / 3.0f);
+        int key = (int)std::round(y * 1000.0f);
+
+        std::vector<glm::vec2> poly;
+        poly.reserve(3);
+        poly.emplace_back(a.x, a.z);
+        poly.emplace_back(b.x, b.z);
+        poly.emplace_back(c.x, c.z);
+
+        FloorLevelPaths& level = floorLevels[key];
+        level.y = y;
+        level.obstaclePaths.push_back(ConvertToClipperPath(poly));
+    }
+
     inline bool PointsEqual(const glm::vec3& a, const glm::vec3& b, float epsilon = 0.0001f) {
         glm::vec3 d = a - b;
         return d.x * d.x + d.y * d.y + d.z * d.z <= epsilon * epsilon;
@@ -64,11 +152,65 @@ namespace NavMesh {
         return sameDir || oppoDir;
     }
 
+
+
+
+
+
+
+    double ComputeSignedArea(const std::vector<glm::vec2>& points) {
+        double area = 0.0;
+        size_t n = points.size();
+        for (size_t i = 0; i < n; ++i) {
+            size_t j = (i + 1) % n;
+            area += (points[j].x - points[i].x) * (points[j].y + points[i].y);
+        }
+        return area * 0.5;
+    }
+
+    std::vector<glm::vec2> FlattenEarcutInput(const std::vector<std::vector<glm::vec2>>& earcutInput) {
+        std::vector<glm::vec2> finalVertices;
+        for (const auto& polygon : earcutInput) {
+            finalVertices.insert(finalVertices.end(), polygon.begin(), polygon.end());
+        }
+        return finalVertices;
+    }
+
+    std::vector<std::vector<glm::vec2>> ConvertClipperToEarcut(const Clipper2Lib::PathsD& solution) {
+        std::vector<std::vector<glm::vec2>> earcutInput;
+        std::vector<uint32_t> holeIndices;
+
+        size_t totalVertices = 0;
+        for (size_t i = 0; i < solution.size(); ++i) {
+            std::vector<glm::vec2> polygon;
+            for (const auto& p : solution[i]) {
+                polygon.emplace_back(p.x, p.y);
+            }
+
+            if (!polygon.empty()) {
+                if (ComputeSignedArea(polygon) < 0) {
+                    holeIndices.push_back(totalVertices);
+                }
+                totalVertices += polygon.size();
+                earcutInput.push_back(std::move(polygon));
+            }
+        }
+
+        return earcutInput;
+    }
+
+
+
+
+
+
+
     void CreateNavMesh() {
         g_navMesh.clear();
 
         std::unordered_map<int, FloorLevelPaths> floorLevels;
 
+        // Collect floor quads
         for (HousePlane& housePlane : World::GetHousePlanes()) {
             if (housePlane.GetType() != HousePlaneType::FLOOR) continue;
 
@@ -86,50 +228,67 @@ namespace NavMesh {
 
             FloorLevelPaths& level = floorLevels[key];
             level.y = y;
-            level.paths.push_back(ConvertToClipperPath(floorPoly));
+            level.floorPaths.push_back(ConvertToClipperPath(floorPoly));
         }
 
+        // Collect obstacle tris
+        std::vector<NavTri> blockerTris;
+        NavTri& t = blockerTris.emplace_back();
+        t.v[0] = glm::vec3(36.0f, 31, 36.0f);
+        t.v[1] = glm::vec3(37.0f, 31, 35.0f);
+        t.v[2] = glm::vec3(37.0f, 31, 35.5f);
+        for (const NavTri& tri : blockerTris) {
+            AddObstacleTri(tri.v[0], tri.v[1], tri.v[2], floorLevels);
+        }
+
+          // 3) Boolean ops + triangulation per level
         for (auto& it : floorLevels) {
             FloorLevelPaths& level = it.second;
-            if (level.paths.empty()) continue;
+            if (level.floorPaths.empty()) continue;
 
             Clipper2Lib::PathsD empty;
-            Clipper2Lib::PathsD solution = Clipper2Lib::Union(level.paths, empty, Clipper2Lib::FillRule::NonZero);
+            Clipper2Lib::PathsD floorUnion =
+                Clipper2Lib::Union(level.floorPaths, empty, Clipper2Lib::FillRule::NonZero);
+
+            Clipper2Lib::PathsD solution;
+
+            if (!level.obstaclePaths.empty()) {
+                Clipper2Lib::PathsD obstacleUnion =
+                    Clipper2Lib::Union(level.obstaclePaths, empty, Clipper2Lib::FillRule::NonZero);
+
+                solution = Clipper2Lib::Difference(
+                    floorUnion,
+                    obstacleUnion,
+                    Clipper2Lib::FillRule::NonZero);
+            }
+            else {
+                solution = floorUnion;
+            }
+
             if (solution.empty()) continue;
 
-            for (const Clipper2Lib::PathD& path : solution) {
-                if (path.empty()) continue;
+            // Re-use your wall helpers so holes are handled correctly
+            std::vector<std::vector<glm::vec2>> earcutInput = ConvertClipperToEarcut(solution);
+            std::vector<glm::vec2> verts2D = FlattenEarcutInput(earcutInput);
+            std::vector<uint32_t> indices = mapbox::earcut<uint32_t>(earcutInput);
 
-                std::vector<std::vector<glm::vec2>> polygon;
-                polygon.emplace_back();
-                auto& ring = polygon.back();
-                ring.reserve(path.size());
-                for (const auto& p : path) {
-                    ring.emplace_back((float)p.x, (float)p.y);
-                }
+            std::vector<glm::vec3> verts3D;
+            verts3D.reserve(verts2D.size());
+            for (const glm::vec2& v : verts2D) {
+                verts3D.emplace_back(v.x, level.y, v.y);
+            }
 
-                std::vector<uint32_t> indices = mapbox::earcut<uint32_t>(polygon);
-                const std::vector<glm::vec2>& verts = ring;
-
-                for (size_t i = 0; i + 2 < indices.size(); i += 3) {
-                    uint32_t i0 = indices[i + 0];
-                    uint32_t i1 = indices[i + 1];
-                    uint32_t i2 = indices[i + 2];
-
-                    const glm::vec2& v0 = verts[i0];
-                    const glm::vec2& v1 = verts[i1];
-                    const glm::vec2& v2 = verts[i2];
-
-                    NavTri tri;
-                    tri.v[0] = glm::vec3(v0.x, level.y, v0.y);
-                    tri.v[1] = glm::vec3(v1.x, level.y, v1.y);
-                    tri.v[2] = glm::vec3(v2.x, level.y, v2.y);
-
-                    g_navMesh.push_back(tri);
-                }
+            for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+                NavTri tri;
+                tri.v[0] = verts3D[indices[i + 0]];
+                tri.v[1] = verts3D[indices[i + 1]];
+                tri.v[2] = verts3D[indices[i + 2]];
+                g_navMesh.push_back(tri);
             }
         }
 
+
+        // Neighbor building
         for (int i = 0; i < (int)g_navMesh.size(); ++i) {
             for (int e = 0; e < 3; ++e) {
                 g_navMesh[i].neighbor[e] = -1;
@@ -154,6 +313,15 @@ namespace NavMesh {
     }
 
     void RenderDebug() {
+        //WallCornerTest();
+
+        if (Input::KeyPressed(HELL_KEY_O)) {
+            g_doThis = !g_doThis;
+        }
+
+        if (!g_doThis) return;
+
+
         glm::vec3 viewPos = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
 
         // Place destination
@@ -167,17 +335,6 @@ namespace NavMesh {
             RenderNavTri(navTri, RED);
         }
 
-        //for (NavTri& navTri : g_navMesh) {
-        //    if (PointInNavTriXZ(navTri, viewPos)) {
-        //
-        //        if (navTri.neighbor[0] != -1) RenderNavTri(g_navMesh[navTri.neighbor[0]], BLUE);
-        //        if (navTri.neighbor[1] != -1) RenderNavTri(g_navMesh[navTri.neighbor[1]], BLUE);
-        //        if (navTri.neighbor[2] != -1) RenderNavTri(g_navMesh[navTri.neighbor[2]], BLUE);
-        //
-        //        RenderNavTri(navTri, GREEN);
-        //    }
-        //}
-
         // Find path
         std::vector<glm::vec3> rawPath = FindPath(viewPos, g_destination);
         std::vector<glm::vec3> pulledPath = PullPath(rawPath);
@@ -189,6 +346,16 @@ namespace NavMesh {
                 Renderer::DrawLine(path[i], path[i + 1], WHITE);
             }
         }
+
+
+        NavTri t;
+        t.v[0] = glm::vec3(36.0f, 31, 36.0f);
+        t.v[1] = glm::vec3(37.0f, 31, 35.0f);
+        t.v[2] = glm::vec3(37.0f, 31, 35.5f);
+
+        Renderer::DrawLine(t.v[0], t.v[1], YELLOW);
+        Renderer::DrawLine(t.v[1], t.v[2], YELLOW);
+        Renderer::DrawLine(t.v[2], t.v[0], YELLOW);
     }
 
     void RenderNavTri(const NavTri& navTri, const glm::vec3& color) {
@@ -225,58 +392,6 @@ namespace NavMesh {
         const float eps = 0.0001f;
         return u >= -eps && v >= -eps && w >= -eps;
     }
-
-
-
-
-
-    static int FindContainingTriIndex(const glm::vec3& p) {
-        for (int i = 0; i < (int)g_navMesh.size(); ++i) {
-            if (PointInNavTriXZ(g_navMesh[i], p)) return i;
-        }
-        return -1;
-    }
-
-    static float TriArea2(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) {
-        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
-    }
-
-    static bool GetSharedPortalXZ(int triA, int triB, glm::vec2& out0, glm::vec2& out1) {
-        const NavTri& tA = g_navMesh[triA];
-        const NavTri& tB = g_navMesh[triB];
-
-        glm::vec3 shared3[2];
-        int count = 0;
-
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                if (PointsEqual(tA.v[i], tB.v[j])) {
-                    shared3[count++] = tA.v[i];
-                    if (count == 2) {
-                        out0 = glm::vec2(shared3[0].x, shared3[0].z);
-                        out1 = glm::vec2(shared3[1].x, shared3[1].z);
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    static glm::vec3 LiftToNavMesh(const glm::vec2& p2) {
-        glm::vec3 p3(p2.x, 0.0f, p2.y);
-        int triIndex = FindContainingTriIndex(p3);
-        if (triIndex >= 0) {
-            const NavTri& tri = g_navMesh[triIndex];
-            p3.y = tri.v[0].y;
-        }
-        return p3;
-    }
-
-
-
-
-
 
     std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest) {
         std::vector<glm::vec3> result;
@@ -419,12 +534,53 @@ namespace NavMesh {
         return result;
     }
 
-   
+    int FindContainingTriIndex(const glm::vec3& p) {
+        for (int i = 0; i < (int)g_navMesh.size(); ++i) {
+            if (PointInNavTriXZ(g_navMesh[i], p)) return i;
+        }
+        return -1;
+    }
+
+    float TriArea2(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c) {
+        return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+    }
+
+    bool GetSharedPortalXZ(int triA, int triB, glm::vec2& out0, glm::vec2& out1) {
+        const NavTri& tA = g_navMesh[triA];
+        const NavTri& tB = g_navMesh[triB];
+
+        glm::vec3 shared3[2];
+        int count = 0;
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if (PointsEqual(tA.v[i], tB.v[j])) {
+                    shared3[count++] = tA.v[i];
+                    if (count == 2) {
+                        out0 = glm::vec2(shared3[0].x, shared3[0].z);
+                        out1 = glm::vec2(shared3[1].x, shared3[1].z);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    glm::vec3 LiftToNavMesh(const glm::vec2& p2) {
+        glm::vec3 p3(p2.x, 0.0f, p2.y);
+        int triIndex = FindContainingTriIndex(p3);
+        if (triIndex >= 0) {
+            const NavTri& tri = g_navMesh[triIndex];
+            p3.y = tri.v[0].y;
+        }
+        return p3;
+    }
 
     std::vector<glm::vec3> PullPath(const std::vector<glm::vec3>& path) {
         if (path.size() <= 2 || g_navMesh.empty()) return path;
 
-        // 1) Rebuild triangle sequence
+        // Rebuild triangle sequence
         std::vector<int> triPath;
         triPath.reserve(path.size());
 
@@ -440,7 +596,7 @@ namespace NavMesh {
 
         if (triPath.size() <= 1) return path;
 
-        // 2) Build portals: [0] start, [1..n-1] shared edges, [n] end
+        // Build portals
         struct Portal {
             glm::vec2 left;
             glm::vec2 right;
@@ -469,7 +625,7 @@ namespace NavMesh {
 
         const int nPortals = (int)portals.size();
 
-        // 3) Funnel (string pulling) in 2D
+        // Funnel (aka 2D string pulling)
         std::vector<glm::vec2> out2D;
         out2D.reserve(nPortals);
         out2D.push_back(start2D);
@@ -538,7 +694,7 @@ namespace NavMesh {
         // Add final point
         out2D.push_back(end2D);
 
-        // 4) Lift back to 3D on navmesh surface
+        // Lift back to 3D on navmesh surface
         std::vector<glm::vec3> result;
         result.reserve(out2D.size());
         for (const glm::vec2& p2 : out2D) {

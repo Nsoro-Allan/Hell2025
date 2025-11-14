@@ -22,7 +22,7 @@ void Dobermann::Init(DobermannCreateInfo createInfo) {
     animatedGameObject->SetPosition(createInfo.position);
     animatedGameObject->SetRagdollV2Id(m_ragdollV2Id);
     animatedGameObject->SetAnimationModeToBindPose();
-    //animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_idle_sit", 1.0f);
+    animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Lay", 1.0f);
     DisableRagdollRender();
 
     int32_t woundMaskIndex = Renderer::GetNextFreeWoundMaskIndexAndMarkItTaken();
@@ -61,7 +61,30 @@ void Dobermann::Update(float deltaTime) {
         }
     }
 
-    // Ragdoll renering
+    static bool gettingUp = false;
+
+    if (Input::KeyPressed(HELL_KEY_LEFT)) {
+        animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Lay", 1.0f);
+        gettingUp = false;
+    }
+    if (Input::KeyPressed(HELL_KEY_RIGHT)) {
+        animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Walk", 1.0f);
+        gettingUp = false;
+    }
+    if (Input::KeyPressed(HELL_KEY_UP)) {
+        animatedGameObject->PlayAnimation("MainLayer", "Dobermann_Lay_to_Walk", 1.0f);
+        gettingUp = true;
+    }
+    if (Input::KeyPressed(HELL_KEY_DOWN)) {
+        gettingUp = false;
+        animatedGameObject->PlayAnimation("MainLayer", "Dobermann_Stretch_to_Lay", 1.0f);
+    }
+
+    if (animatedGameObject->IsAllAnimationsComplete() && gettingUp) {
+        animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Walk", 1.0f);
+    }
+
+    // Ragdoll rendering
     if (m_renderRagdoll) {
         animatedGameObject->DisableRendering();
         ragdoll->EnableRendering();

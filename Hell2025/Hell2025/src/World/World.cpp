@@ -183,7 +183,7 @@ namespace World {
         //dobermannCreateInfo.position = glm::vec3(41.0f, 31.0f, 35.0f);
         //AddDobermann(dobermannCreateInfo);
 
-        dobermannCreateInfo.position = glm::vec3(37.25f, 31.0f, 35.5f);
+        dobermannCreateInfo.position = glm::vec3(36.8f, 31.0f, 35.5f);
         AddDobermann(dobermannCreateInfo);
 
         // Add all this to the map editor tomorrow

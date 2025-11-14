@@ -46,7 +46,6 @@ void main() {
     // Renderer override states
     if (rendererData.rendererOverrideState == 1) {
         finalColor = baseColor;
-        finalColor = vec3(0);
     }
     else if (rendererData.rendererOverrideState == 2) {
         finalColor = normal;
@@ -62,6 +61,7 @@ void main() {
     }
     else if (rendererData.rendererOverrideState == 6) {
         finalColor = vec3(rma.b);
+        finalColor = vec3(0);
     }
     else if (rendererData.rendererOverrideState == 7) {
         return;

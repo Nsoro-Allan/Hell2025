@@ -351,7 +351,7 @@
     {
       "Position": [
         4.400000095367432,
-        1.59394109249115,
+        1.7387012243270874,
         -1.0892318487167358
       ],
       "Rotation": [
@@ -369,7 +369,7 @@
     {
       "Position": [
         4.5,
-        1.6308715343475342,
+        1.7044951915740967,
         -1.371124267578125
       ],
       "Rotation": [
@@ -692,7 +692,7 @@
       "WallType": "WEATHER_BOARDS"
     },
     {
-      "CeilingTrimHeight": 2.4000000953674316,
+      "CeilingTrimHeight": 2.700000047683716,
       "EditorName": "Wall 2",
       "Height": 2.700000047683716,
       "Material": "Ceiling2",
@@ -893,6 +893,87 @@
       "TextureScale": 0.4166666567325592,
       "TrimTypeCeiling": "TIMBER",
       "TrimTypeFloor": "NONE",
+      "UseReversePointOrder": false,
+      "WallType": "INTERIOR"
+    },
+    {
+      "CeilingTrimHeight": 2.4000000953674316,
+      "EditorName": "Wall 7",
+      "Height": 2.4000000953674316,
+      "Material": "Ceiling2",
+      "Points": [
+        [
+          7.400000095367432,
+          0.0,
+          10.300000190734863
+        ],
+        [
+          7.400000095367432,
+          0.0,
+          13.5
+        ],
+        [
+          4.0,
+          0.0,
+          13.5
+        ],
+        [
+          4.0,
+          0.0,
+          16.0
+        ],
+        [
+          1.5,
+          0.0,
+          16.0
+        ],
+        [
+          1.5,
+          0.0,
+          12.0
+        ],
+        [
+          4.0,
+          0.0,
+          12.0
+        ],
+        [
+          4.0,
+          0.0,
+          8.5
+        ],
+        [
+          5.5,
+          0.0,
+          8.5
+        ],
+        [
+          5.5,
+          0.0,
+          10.0
+        ],
+        [
+          6.0,
+          0.0,
+          10.0
+        ],
+        [
+          6.0,
+          0.0,
+          9.5
+        ],
+        [
+          7.400000095367432,
+          0.0,
+          10.300000190734863
+        ]
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": -1.399999976158142,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4166666567325592,
+      "TrimTypeCeiling": "TIMBER",
+      "TrimTypeFloor": "TIMBER",
       "UseReversePointOrder": false,
       "WallType": "INTERIOR"
     }
