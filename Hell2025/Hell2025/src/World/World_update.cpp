@@ -24,6 +24,8 @@ namespace World {
     
     void Update(float deltaTime) {
 
+        //std::cout << "Fireplace Count: " << GetFireplaces().size() << "\n";
+
         NavMesh::RenderDebug();
 
         if (Input::KeyPressed(HELL_KEY_LEFT)) {
@@ -250,6 +252,20 @@ namespace World {
 
         for (Tree& tree : trees) {
             tree.Update(deltaTime);
+        }
+
+        for (Fireplace& fireplace : GetFireplaces()) {
+            fireplace.Update(deltaTime);
+        }
+
+        for (TrimSet& trimSet : GetTrimSets()) {
+            if (trimSet.GetType() == TrimSetType::CEILING) {
+                trimSet.RenderDebug(RED);
+            }
+            if (trimSet.GetType() == TrimSetType::MIDDLE) {
+                trimSet.RenderDebug(GREEN);
+            }
+            trimSet.Update();
         }
 
         for (Window& window : GetWindows()) {

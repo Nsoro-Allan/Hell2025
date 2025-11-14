@@ -63,6 +63,11 @@ struct RenderItem {
     int32_t padding2 = 0;               // Unused
 };
 
+struct AABBRayResult {
+    bool hitFound = false;
+    glm::vec3 hitPosition = glm::vec3(0.0f);
+};
+
 struct HouseRenderItem {
     int baseColorTextureIndex = 0;
     int normalMapTextureIndex = 0;

@@ -95,8 +95,15 @@ namespace World {
                 }
             }
 
-            for (GenericObject& genericObject: GetGenericObjects()) {
+            for (GenericObject& genericObject : GetGenericObjects()) {
                 const std::vector<RenderItem>& renderItems = genericObject.GetRenderItems();
+                for (const RenderItem& renderItem : renderItems) {
+                    CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
+                }
+            }
+
+            for (Fireplace& fireplace : GetFireplaces()) {
+                const std::vector<RenderItem>& renderItems = fireplace.GetRenderItems();
                 for (const RenderItem& renderItem : renderItems) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                 }

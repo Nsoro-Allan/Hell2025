@@ -29,8 +29,10 @@
 #include "Types/Interior/PictureFrame.h"
 #include "Types/Interior/Piano.h"
 #include "Types/House/Door.h"
+#include "Types/House/Fireplace.h"
 #include "Types/House/HouseInstance.h"
 #include "Types/House/HousePlane.h"
+#include "Types/House/TrimSet.h"
 #include "Types/House/Wall.h"
 #include "Types/House/Window.h"
 #include "Types/Map/Map.h"
@@ -93,6 +95,7 @@ namespace World {
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
     void AddDecal(const DecalCreateInfo& createInfo);
     void AddDobermann(DobermannCreateInfo& createInfo);
+    void AddFireplace(FireplaceCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGenericObject(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -107,6 +110,7 @@ namespace World {
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddToilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddVATBlood(glm::vec3 position, glm::vec3 front);
     void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset);
@@ -171,6 +175,7 @@ namespace World {
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectId);
 
     Door* GetDoorByObjectId(uint64_t objectId);
+    Fireplace* GetFireplaceById(uint64_t objectId);
     GenericObject* GetGenericObjectById(uint64_t objectId);
     HousePlane* GetHousePlaneByObjectId(uint64_t objectId);
 
@@ -205,6 +210,7 @@ namespace World {
     std::vector<Dobermann>& GetDobermanns();
     Hell::SlotMap<GenericObject>& GetGenericObjects();
     std::vector<Fence>& GetFences();
+    Hell::SlotMap<Fireplace>& GetFireplaces();
     std::vector<GameObject>& GetGameObjects();
     std::vector<GenericBouncable>& GetGenericBouncables();
     std::vector<GenericStatic>& GetGenericStatics();
@@ -224,6 +230,7 @@ namespace World {
     std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();
     std::vector<Tree>& GetTrees();
+    Hell::SlotMap<TrimSet>& GetTrimSets();
     Hell::SlotMap<Wall>& GetWalls();
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters();
     Hell::SlotMap<Window>& GetWindows();

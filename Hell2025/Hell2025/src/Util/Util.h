@@ -64,6 +64,7 @@ namespace Util {
     std::vector<glm::vec3> GenerateCirclePoints(const glm::vec3& center, const glm::vec3& forward, float radius, int numPoints);
 
     // Raycasting
+    AABBRayResult RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxDistance, const AABB& aabb, const glm::mat4& worldTransform);
     CubeRayResult CastCubeRay(const glm::vec3& rayOrigin, const glm::vec3 rayDir, std::vector<Transform>& cubeTransforms, float maxDistance = 99999);
     glm::vec3 GetMouseRayDir(glm::mat4 projection, glm::mat4 view, int windowWidth, int windowHeight, int mouseX, int mouseY);
     bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, float& t);
@@ -160,6 +161,7 @@ namespace Util {
     std::string EditorSelectionModeToString(EditorSelectionMode mode);
     std::string EditorStateToString(EditorState state);
     std::string GenericObjectTypeToString(GenericObjectType houseType);
+    std::string FireplaceTypeToString(FireplaceType type);
     std::string HousePlaneTypeToString(HousePlaneType type);
     std::string HouseTypeToString(HouseType houseType);
     std::string ImageDataTypeToString(ImageDataType imageDataType);
@@ -181,6 +183,7 @@ namespace Util {
     // String to Enum conversions
     BlendingMode StringToBlendingMode(const std::string& str);
     GenericObjectType StringToGenericObjectType(const std::string& str);
+    FireplaceType StringToFireplaceType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);
     HousePlaneType StringToHousePlaneType(const std::string& str);
     LightType StringToLightType(const std::string& str);

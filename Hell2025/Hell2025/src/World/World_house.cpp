@@ -127,37 +127,6 @@ namespace World {
 
     }
 
-    void SaveHouse() {
-
-        std::string filename = "TestHouse.json";
-
-        HouseCreateInfo houseCreateInfo;
-
-        for (Door& door : GetDoors()) {
-            houseCreateInfo.doors.emplace_back(door.GetCreateInfo());
-        }
-        for (Light& light : GetLights()) {
-            houseCreateInfo.lights.emplace_back(light.GetCreateInfo());
-        }
-        for (Piano& piano : GetPianos()) {
-            houseCreateInfo.pianos.emplace_back(piano.GetCreateInfo());
-        }
-        for (HousePlane& plane : GetHousePlanes()) {
-            houseCreateInfo.planes.emplace_back(plane.GetCreateInfo());
-        }
-        for (PictureFrame& pictureFrame : GetPictureFrames()) {
-            houseCreateInfo.pictureFrames.emplace_back(pictureFrame.GetCreateInfo());
-        }
-        for (Window& window : GetWindows()) {
-            houseCreateInfo.windows.emplace_back(window.GetCreateInfo());
-        }
-        for (Wall& wall: GetWalls()) {
-            houseCreateInfo.walls.emplace_back(wall.GetCreateInfo());
-        }
-
-        JSON::SaveHouse("res/houses/" + filename, houseCreateInfo);
-    }
-
     // Find out why this isn't required for windows and doors, yet still somehow updates all this shit
     void RecreateHouseMesh() {
         UpdateClippingCubes();

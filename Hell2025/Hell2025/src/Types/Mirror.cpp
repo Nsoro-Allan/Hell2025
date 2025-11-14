@@ -71,9 +71,10 @@ Mirror::Mirror(uint64_t id, uint64_t parentId, uint32_t meshNodeIndex, uint32_t 
     m_localNormal = glm::normalize(vertices[0].normal);
 }
 
-void Mirror::Update(const glm::mat4& worldMatrix ) {
+void Mirror::Update(const glm::mat4& worldMatrix) {
     m_worldCenter = glm::vec3(worldMatrix * glm::vec4(m_localCenter, 1.0f)); 
     m_worldNormal = glm::normalize(glm::vec3(worldMatrix * glm::vec4(m_localNormal, 0.0f)));
+    m_worldMatrix = worldMatrix;
 
     m_worldCorners.clear();
 
@@ -131,6 +132,7 @@ void Mirror::Update(const glm::mat4& worldMatrix ) {
             m_projectionMatrices[i] = glm::perspective(viewport->GetPerspectiveFOV(), aspect, viewport->GetNearPlane(), m_farDistance);
 
             // Update frustum for frustum culling
+            m_farDistance = 100;
             m_frustums[i].Update(m_projectionMatrices[i] * m_viewMatrices[i]);
 
             // Is this mirror facing away from this viewport's camera?

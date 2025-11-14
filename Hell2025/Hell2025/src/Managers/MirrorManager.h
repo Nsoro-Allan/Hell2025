@@ -9,6 +9,5 @@ namespace MirrorManager {
     void CleanUp();
 
     Mirror* GetMirrorByObjectId(uint64_t objectId);
-    Mirror* GetTestMirror();
     Hell::SlotMap<Mirror>& GetMirrors();
 }

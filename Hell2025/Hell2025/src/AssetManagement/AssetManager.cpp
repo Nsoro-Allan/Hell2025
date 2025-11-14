@@ -14,7 +14,6 @@
 
 #include "Managers/HouseManager.h"
 #include "Managers/MapManager.h"
-#include "World/SectorManager.h"
 
 #include <unordered_map>
 #include <future>
@@ -106,7 +105,6 @@ namespace AssetManager {
 
             HouseManager::Init();
             MapManager::Init();
-            SectorManager::LoadSectorsFromDisk();
             Renderer::InitWoundMaskArray();
             World::Init();
 

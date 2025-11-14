@@ -11,6 +11,7 @@ namespace Editor {
     EditorState g_lastPlacementState = EditorState::IDLE;
 
     //void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
+    void PlaceFireplace(FireplaceType fireplaceType, glm::vec3 hitPosition);
     void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal);
     void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
 
@@ -35,6 +36,9 @@ namespace Editor {
                     }
                     if (GetPlacementObjectType() == ObjectType::HOUSE_PLANE) {
                         PlaceHousePlane(GetPlacementObjectSubtype().housePlane, rayResult.hitPosition, rayResult.hitNormal);
+                    }
+                    if (GetPlacementObjectType() == ObjectType::FIREPLACE) {
+                        PlaceFireplace(GetPlacementObjectSubtype().fireplace, rayResult.hitPosition);
                     }
                 }
             }
@@ -98,6 +102,13 @@ namespace Editor {
     //    }
     //}
 
+    void PlaceFireplace(FireplaceType fireplaceType, glm::vec3 hitPosition) {
+        FireplaceCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        createInfo.type = fireplaceType;
+        World::AddFireplace(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
 
     void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
         HousePlaneCreateInfo createInfo; 

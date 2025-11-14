@@ -7,6 +7,7 @@
 
 namespace nlohmann {
     void to_json(nlohmann::json& j, const DoorCreateInfo& info);
+    void to_json(nlohmann::json& j, const FireplaceCreateInfo& info);
     void to_json(nlohmann::json& j, const GenericObjectCreateInfo& info);
     void to_json(nlohmann::json& j, const HouseLocation& houseLocation);
     void to_json(nlohmann::json& j, const HousePlaneCreateInfo& info);
@@ -21,6 +22,7 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const WindowCreateInfo& info);
 
     void from_json(const nlohmann::json& j, DoorCreateInfo& info);
+    void from_json(const nlohmann::json& j, FireplaceCreateInfo& info);
     void from_json(const nlohmann::json& j, GenericObjectCreateInfo& info);
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation);
     void from_json(const nlohmann::json& j, HousePlaneCreateInfo& info);
@@ -47,13 +49,4 @@ namespace nlohmann {
 namespace JSON {
     bool LoadJsonFromFile(nlohmann::json& json, const std::string filepath);
     void SaveToFile(nlohmann::json& json, const std::string& filepath);
-
-    void SaveHouse(const std::string& filepath, HouseCreateInfo& houseCreateInfo);
-    void SaveMap(const std::string& filepath, MapCreateInfo& mapCreateInfo);
-    void SaveSector(const std::string& filepath, SectorCreateInfo& sectorCreateInfo);
-
-    HouseCreateInfo LoadHouse(const std::string& filepath);
-    MapCreateInfo LoadMap(const std::string& filepath);
-    SectorCreateInfo LoadSector(const std::string& filepath);
-
 }

@@ -78,6 +78,7 @@ enum class ObjectType : uint16_t {
     DOOR,
     DOOR_FRAME,
     DRAWER,
+    FIREPLACE,
     GAME_OBJECT,
     GENERIC_BOUNCABLE,
     GENERIC_STATIC,
@@ -87,6 +88,7 @@ enum class ObjectType : uint16_t {
     MIRROR,
     PICK_UP,
     TREE,
+    TRIM_SET,
     PIANO,
     PICTURE_FRAME,
     RAGDOLL_ENEMY,
@@ -339,6 +341,13 @@ enum struct TrimType {
     UNDEFINED
 };
 
+enum struct TrimSetType {
+    FLOOR,
+    MIDDLE,
+    CEILING,
+    UNDEFINED
+};
+
 enum struct HousePlaneType {
     FLOOR,
     CEILING,
@@ -464,6 +473,11 @@ enum struct HouseType {
     MEDIUM_HOUSE,
     LARGE_HOUSE,
     NAMED,
+    UNDEFINED
+};
+
+enum struct FireplaceType {
+    DEFAULT,
     UNDEFINED
 };
 

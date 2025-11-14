@@ -16,7 +16,6 @@
 #include "Renderer/Renderer.h"
 #include "Viewport/ViewportManager.h"
 #include "World/World.h"
-#include "World/SectorManager.h"
 
 namespace Editor {
     EditorMode g_editorMode = EditorMode::UNDEFINED;
@@ -299,6 +298,13 @@ namespace Editor {
         SetEditorState(EditorState::PLACE_OBJECT);
         g_placementObjectSubtype.Reset();
         g_placementObjectType = objectType;
+    }
+
+    void PlaceFireplace(FireplaceType fireplaceType) {
+        SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectSubtype.Reset();
+        g_placementObjectSubtype.fireplace = fireplaceType;
+        g_placementObjectType = ObjectType::FIREPLACE;
     }
 
     void PlaceHousePlane(HousePlaneType housePlaneType) {

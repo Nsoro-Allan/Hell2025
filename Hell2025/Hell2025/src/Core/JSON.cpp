@@ -16,6 +16,15 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const FireplaceCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"Position", createInfo.position},
+            {"Type", Util::FireplaceTypeToString(createInfo.type)},
+            {"EditorName", createInfo.editorName},
+            {"YEulerRotation", createInfo.yEulerRotation}
+        };
+    }
+
     void to_json(nlohmann::json& j, const GenericObjectCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
@@ -104,9 +113,9 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const WallCreateInfo& createInfo) {
         j = nlohmann::json{
             {"EditorName", createInfo.editorName},
-            {"CeilingTrimHeight", createInfo.ceilingTrimHeight},
             {"Height", createInfo.height},
             {"Material", createInfo.materialName},
+            {"MiddleTrimHeight", createInfo.middleTrimHeight},
             {"Points", createInfo.points},
             {"TextureScale", createInfo.textureScale},
             {"TextureOffsetU", createInfo.textureOffsetU},
@@ -165,6 +174,13 @@ namespace nlohmann {
         info.type = Util::StringToGenericObjectType(j.value("Type", UNDEFINED_STRING));
     }
 
+    void from_json(const nlohmann::json& j, FireplaceCreateInfo& info) {
+        info.position = j.value("Position", glm::vec3(0.0f));
+        info.yEulerRotation = j.value("YEulerRotation", 0.0f);
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
+        info.type = Util::StringToFireplaceType(j.value("Type", UNDEFINED_STRING));
+    }
+    
     void from_json(const nlohmann::json& j, HouseLocation& houseLocation) {
         houseLocation.position = j.value("Position", glm::vec3(0.0f));
         houseLocation.rotation = j.value("Rotation", 0.0f);
@@ -221,7 +237,7 @@ namespace nlohmann {
 
     void from_json(const nlohmann::json& j, WallCreateInfo& info) {
         info.height = j.value("Height", 2.4f);
-        info.ceilingTrimHeight = j.value("CeilingTrimHeight", 2.4f);
+        info.middleTrimHeight = j.value("MiddleTrimHeight", 2.4f);
         info.materialName = j.value("Material", "CheckerBoard");
         info.points = j.value("Points", std::vector<glm::vec3>{});
         info.textureScale = j.value("TextureScale", 1.0f);
@@ -322,189 +338,6 @@ namespace JSON {
             return false;
         }
 
-    }
-
-    SectorCreateInfo LoadSector(const std::string& filepath) {
-        SectorCreateInfo info;
-
-        // Try to parse the JSON
-        nlohmann::json json;
-        if (!LoadJsonFromFile(json, filepath)) {
-            std::cerr << "JSON::LoadSector() failed to open file: " << filepath << "\n";
-            return info;
-        }
-
-        FileInfo fileInfo = Util::GetFileInfoFromPath(filepath);
-
-        SectorCreateInfo sectorCreateInfo;
-        sectorCreateInfo.sectorName = fileInfo.name;
-
-        sectorCreateInfo.heightMapName = json.value("HeightMapName", "");
-        if (sectorCreateInfo.heightMapName == "None") {
-            sectorCreateInfo.heightMapName = "";
-        }
-
-        // Load Game Objects
-        for (auto& jsonObject : json["GameObjects"]) {
-            GameObjectCreateInfo& createInfo = sectorCreateInfo.gameObjects.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.rotation = jsonObject["rotation"];
-            createInfo.scale = jsonObject["scale"];
-            createInfo.modelName = jsonObject["modelName"];
-            createInfo.meshRenderingInfoSet = jsonObject["meshRenderingInfo"];
-        }
-
-        // Load lights
-        for (auto& jsonObject : json["Lights"]) {
-            LightCreateInfo& createInfo = sectorCreateInfo.lights.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.color = jsonObject["color"];
-            createInfo.radius = jsonObject["radius"];
-            createInfo.strength = jsonObject["strength"];
-            createInfo.type = Util::StringToLightType(jsonObject["type"]);
-        }
-
-        // Load Pickups
-        for (auto& jsonObject : json["PickUps"]) {
-            PickUpCreateInfo& createInfo = sectorCreateInfo.pickUps.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.rotation = jsonObject["rotation"];
-            createInfo.pickUpType = jsonObject["type"];
-        }
-
-        // Load Trees
-        for (auto& jsonObject : json["Trees"]) {
-            TreeCreateInfo& createInfo = sectorCreateInfo.trees.emplace_back();
-            createInfo.position = jsonObject["position"];
-            createInfo.rotation = jsonObject["rotation"];
-            createInfo.scale = jsonObject["scale"];
-            createInfo.type = Util::StringToTreeType(jsonObject.value<std::string>("type", std::string("TREE_LARGE_0")));
-        }
-
-        return sectorCreateInfo;
-    }
-
-    void SaveSector(const std::string& filepath, SectorCreateInfo& sectorCreateInfo) {
-
-        nlohmann::json json;
-
-        json["HeightMapName"] = sectorCreateInfo.heightMapName;
-        json["Lights"] = nlohmann::json::array();
-        json["GameObjects"] = nlohmann::json::array();
-
-        // Save Game Objects
-        for (const GameObjectCreateInfo& createInfo : sectorCreateInfo.gameObjects) {
-            json["GameObjects"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "rotation", createInfo.rotation },
-                { "scale", createInfo.scale },
-                { "modelName", createInfo.modelName },
-                { "meshRenderingInfo", createInfo.meshRenderingInfoSet },
-            });
-        }
-
-        // Save lights
-        for (const LightCreateInfo& createInfo : sectorCreateInfo.lights) {
-            json["Lights"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "color", createInfo.color },
-                { "type", createInfo.type },
-                { "radius", createInfo.radius },
-                { "strength", createInfo.strength }
-            });
-        }
-
-        // Save PickUps
-        for (const PickUpCreateInfo& createInfo : sectorCreateInfo.pickUps) {
-            json["PickUps"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "rotation", createInfo.rotation },
-                { "type", createInfo.pickUpType }
-            });
-        }
-
-        // Save Trees
-        for (const TreeCreateInfo& createInfo : sectorCreateInfo.trees) {
-            json["Trees"].push_back(nlohmann::json{
-                { "position", createInfo.position },
-                { "rotation", createInfo.rotation },
-                { "scale", createInfo.scale },
-                { "type", Util::TreeTypeToString(createInfo.type) }
-            });
-        }
-
-        JSON::SaveToFile(json, filepath);
-    }
-
-    MapCreateInfo LoadMap(const std::string& filepath) {
-        MapCreateInfo mapCreateInfo;
-        // TODO: 
-        std::cout << "TODO: JSON::LoadMap()\n";
-        return mapCreateInfo;
-    }
-
-    HouseCreateInfo LoadHouse(const std::string& filepath) {
-        nlohmann::json json;
-        if (!LoadJsonFromFile(json, filepath)) {
-            std::cerr << "JSON::LoadHouse() failed to open file: " << filepath << "\n";
-            return HouseCreateInfo();
-        }
-
-        HouseCreateInfo houseCreateInfo;
-        houseCreateInfo.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
-        houseCreateInfo.lights = json.value("Lights", std::vector<LightCreateInfo>{});
-        houseCreateInfo.planes = json.value("Planes", std::vector<HousePlaneCreateInfo>{});
-        houseCreateInfo.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
-        houseCreateInfo.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
-        houseCreateInfo.walls = json.value("Walls", std::vector<WallCreateInfo>{});
-        houseCreateInfo.windows = json.value("Windows", std::vector<WindowCreateInfo>{});
-        return houseCreateInfo;
-    }
-    
-    void SaveHouse(const std::string& filepath, HouseCreateInfo& houseCreateInfo) {
-        nlohmann::json json;
-        json["Doors"] = houseCreateInfo.doors;
-        json["Lights"] = houseCreateInfo.lights;
-        json["Planes"] = houseCreateInfo.planes;
-        json["Pianos"] = houseCreateInfo.pianos;
-        json["PictureFrames"] = houseCreateInfo.pictureFrames;
-        json["Walls"] = houseCreateInfo.walls;
-        json["Windows"] = houseCreateInfo.windows;
-        JSON::SaveToFile(json, filepath);
-
-        //nlohmann::json json;
-        //
-        //for (const DoorCreateInfo& createInfo : houseCreateInfo.doors) {
-        //    json["Doors"].push_back(nlohmann::json(createInfo));
-        //}
-        //for (const LightCreateInfo& createInfo : houseCreateInfo.lights) {
-        //    json["Lights"].push_back(nlohmann::json(createInfo));
-        //}
-        //for (const PlaneCreateInfo& createInfo : houseCreateInfo.planes) {
-        //    json["Planes"].push_back(nlohmann::json(createInfo));
-        //}
-        //for (const PianoCreateInfo& createInfo : houseCreateInfo.pianos) {
-        //    json["Pianos"].push_back(nlohmann::json(createInfo));
-        //}
-        //for (const WallCreateInfo& createInfo : houseCreateInfo.walls) {
-        //    json["Walls"].push_back(nlohmann::json(createInfo));
-        //}
-        //for (const WindowCreateInfo& createInfo : houseCreateInfo.windows) {
-        //    json["Windows"].push_back(nlohmann::json(createInfo));
-        //}
-        //
-        //JSON::SaveToFile(json, filepath);
-    }
-
-    void SaveMap(const std::string& filepath, MapCreateInfo& mapCreateInfo) {
-        nlohmann::json json;
-        json["Name"] = mapCreateInfo.name;
-        json["Width"] = mapCreateInfo.width;
-        json["Depth"] = mapCreateInfo.depth;
-        //json["SectorLocations"] = mapCreateInfo.sectorLocations;
-        JSON::SaveToFile(json, filepath);
-
-        std::cout << "TODO: JSON::SaveMap()\n";
     }
 
     void SaveToFile(nlohmann::json& json, const std::string& filepath) {

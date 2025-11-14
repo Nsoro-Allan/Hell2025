@@ -15,11 +15,39 @@ Wall::Wall(uint64_t id, const WallCreateInfo& createInfo, const SpawnOffset& spa
         point += spawnOffset.translation;
     }
 
-    UpdateSegmentsAndVertexData();
-    //std::cout << "Wall::Init(): " << Util::WallTypeToString(m_createInfo.wallType) << "\n";
+    UpdateSegmentsTrimsAndVertexData();
 }
 
-void Wall::UpdateSegmentsAndVertexData() {
+
+void Wall::CreateTrimSets() {
+    // Remove any existing trim sets belonging to this wall
+    World::RemoveObject(m_trimSetFloorId);
+    World::RemoveObject(m_trimSetMiddleId);
+    World::RemoveObject(m_trimSetCeilingId);
+
+    m_trimSetMiddleId = 0;
+    m_trimSetCeilingId = 0;
+
+    // Trims Middle
+    TrimSetCreateInfo createInfoMiddle;
+    for (const glm::vec3& point : m_createInfo.points) {
+        glm::vec3 trimPoint = point + glm::vec3(0.0f, m_createInfo.middleTrimHeight, 0.0f);
+        createInfoMiddle.points.push_back(trimPoint);
+        createInfoMiddle.type = TrimSetType::MIDDLE;
+    }
+    m_trimSetMiddleId = World::AddTrimSet(createInfoMiddle, SpawnOffset());
+
+    //// Trims Top
+    //TrimSetCreateInfo createInfoTop;
+    //for (const glm::vec3& point : m_createInfo.points) {
+    //    glm::vec3 trimPoint = point + glm::vec3(0.0f, m_createInfo.height, 0.0f);
+    //    createInfoTop.points.push_back(trimPoint);
+    //    createInfoTop.type = TrimSetType::CEILING;
+    //}
+    //m_trimSetCeilingId = World::AddTrimSet(createInfoTop, SpawnOffset());
+}
+
+void Wall::UpdateSegmentsTrimsAndVertexData() {
     CleanUp();
 
     for (WallSegment& wallSegment : m_wallSegments) {
@@ -66,11 +94,14 @@ void Wall::UpdateSegmentsAndVertexData() {
         CreateCSGVertexData();
         CreateTrims();
     }
+
+
+    CreateTrimSets();
 }
 
 void Wall::FlipFaces() {
     m_createInfo.useReversePointOrder = !m_createInfo.useReversePointOrder;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 void Wall::UpdateWorldSpaceCenter(glm::vec3 worldSpaceCenter) {
@@ -78,7 +109,7 @@ void Wall::UpdateWorldSpaceCenter(glm::vec3 worldSpaceCenter) {
     for (glm::vec3& point : m_createInfo.points) {
         point += offset;
     }
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 bool Wall::AddPointToEnd(glm::vec3 point, bool supressWarning) {
@@ -90,7 +121,7 @@ bool Wall::AddPointToEnd(glm::vec3 point, bool supressWarning) {
     }
 
     m_createInfo.points.push_back(point);
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
     return true;
 }
 
@@ -117,7 +148,7 @@ bool Wall::UpdatePointPosition(int pointIndex, glm::vec3 position, bool supressW
     }
 
     m_createInfo.points[pointIndex] = position;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
     return true;
 }
 
@@ -125,42 +156,43 @@ void Wall::SetMaterial(const std::string& materialName) {
     if (Material* material = AssetManager::GetMaterialByName(materialName)) {
         m_createInfo.materialName = materialName;
         m_material = AssetManager::GetMaterialByName(materialName);
-        UpdateSegmentsAndVertexData();
+        UpdateSegmentsTrimsAndVertexData();
     }
 }
 
 void Wall::SetHeight(float value) {
     m_createInfo.height = value;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 void Wall::SetTextureScale(float value) {
     m_createInfo.textureScale = value;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 void Wall::SetTextureOffsetU(float value) {
     m_createInfo.textureOffsetU = value;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 void Wall::SetTextureOffsetV(float value) {
     m_createInfo.textureOffsetV = value;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
 void Wall::SetFloorTrimType(TrimType trimType) {
     m_createInfo.floorTrimType = trimType;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 void Wall::SetCeilingTrimType(TrimType trimType) {
     m_createInfo.ceilingTrimType = trimType;
-    UpdateSegmentsAndVertexData();
+    UpdateSegmentsTrimsAndVertexData();
 }
 
-void Wall::SetCeilingTrimHeight(float value) {
-    m_createInfo.ceilingTrimHeight = value;
-    UpdateSegmentsAndVertexData();
+void Wall::SetMiddleTrimHeight(float value) {
+    m_createInfo.middleTrimHeight = value;
+    UpdateSegmentsTrimsAndVertexData(); // Necessary???????? check me
+    CreateTrimSets();
 }
 
 glm::vec3 Wall::GetPointByIndex(int pointIndex) {
@@ -172,6 +204,10 @@ glm::vec3 Wall::GetPointByIndex(int pointIndex) {
 }
 
 void Wall::CleanUp() {
+    World::RemoveObject(m_trimSetFloorId);
+    World::RemoveObject(m_trimSetMiddleId);
+    World::RemoveObject(m_trimSetCeilingId);
+
     for (WallSegment& wallSegment : m_wallSegments) {
         wallSegment.CleanUp();
     }
@@ -189,7 +225,7 @@ void Wall::CreateTrims() {
 
             Transform t;
             t.position = start;
-            t.position.y += m_createInfo.ceilingTrimHeight;
+            t.position.y += m_createInfo.height;
             t.rotation.y = Util::EulerYRotationBetweenTwoPoints(start, end);
             t.scale.x = glm::distance(start, end);
 

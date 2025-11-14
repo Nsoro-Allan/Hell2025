@@ -2,6 +2,61 @@
 #include "AssetManagement/AssetManager.h"
 
 namespace Util {
+
+
+    bool RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 inverseRayDir, float minDistance, float maxDistance, const glm::vec3& aabbBoundsMin, const glm::vec3& aabbBoundsMax, float& t) {
+        // Compute t values for the slabs defined by the AABB
+        glm::vec3 t1(
+            (aabbBoundsMin[0] - rayOrigin[0]) * inverseRayDir[0],
+            (aabbBoundsMin[1] - rayOrigin[1]) * inverseRayDir[1],
+            (aabbBoundsMin[2] - rayOrigin[2]) * inverseRayDir[2]
+        );
+
+        glm::vec3 t2(
+            (aabbBoundsMax[0] - rayOrigin[0]) * inverseRayDir[0],
+            (aabbBoundsMax[1] - rayOrigin[1]) * inverseRayDir[1],
+            (aabbBoundsMax[2] - rayOrigin[2]) * inverseRayDir[2]
+        );
+
+        // For each axis, tmin is the minimum and tmax is the maximum of t1 and t2
+        glm::vec3 tminVec = glm::min(t1, t2);
+        glm::vec3 tmaxVec = glm::max(t1, t2);
+
+        // Compute the overall tmin and tmax
+        float tmin = std::max({ tminVec.x, tminVec.y, tminVec.z, minDistance });
+        float tmax = std::min({ tmaxVec.x, tmaxVec.y, tmaxVec.z, maxDistance });
+
+        t = tmin;
+        return tmin <= tmax;
+    }
+
+    AABBRayResult RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxDistance, const AABB& aabb, const glm::mat4& worldTransform) {
+        AABBRayResult result;
+
+        glm::mat4 inverseWorldTransform = glm::inverse(worldTransform);
+
+        const float globalMinDistance = 0.001f;
+        glm::vec3 localOrigin = glm::vec3(inverseWorldTransform * glm::vec4(rayOrigin, 1.0f));
+        glm::vec3 localEnd = glm::vec3(inverseWorldTransform * glm::vec4(rayOrigin + rayDir * maxDistance, 1.0f));
+        glm::vec3 localDir = glm::normalize(localEnd - localOrigin);
+        float localMaxDistance = glm::length(localEnd - localOrigin);
+        float localMinDistance = globalMinDistance * localMaxDistance / maxDistance;
+
+        glm::vec3 inverseLocalRayDir = 1.0f / localDir;
+        glm::vec3 boundsMin = aabb.GetBoundsMin();
+        glm::vec3 boundsMax = aabb.GetBoundsMax();
+        float t = 0.0f;
+
+        if (RayIntersectAABB(localOrigin, inverseLocalRayDir, localMinDistance, localMaxDistance, boundsMin, boundsMax, t)) {
+            glm::vec3 localHitPos = localOrigin + (localDir * t);
+            glm::vec3 worldHitPos = worldTransform * glm::vec4(localHitPos, 1.0f);
+            result.hitPosition = worldHitPos;
+            result.hitFound = true;
+        }
+
+        return result;
+    }
+
     CubeRayResult CastCubeRay(const glm::vec3& rayOrigin, const glm::vec3 rayDir, std::vector<Transform>& cubeTransforms, float maxDistance) {
         CubeRayResult rayResult;
         rayResult.distanceToHit = std::numeric_limits<float>::max();

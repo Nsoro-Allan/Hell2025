@@ -6,7 +6,6 @@
 #include "Editor/Gizmo.h"
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
-#include "World/SectorManager.h"
 #include "World/World.h"
 #include "Viewport/ViewportManager.h"
 

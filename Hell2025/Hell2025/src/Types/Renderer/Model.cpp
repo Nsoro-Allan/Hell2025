@@ -8,6 +8,11 @@ void Model::SetFileInfo(FileInfo fileInfo) {
 
 void Model::AddMeshIndex(uint32_t index) {
     m_meshIndices.push_back(index);
+    
+    // Map global mesh index to mesh name
+    if (Mesh* mesh = AssetManager::GetMeshByIndex(index)) {
+        m_meshNameToGlobalMeshIndexMap[mesh->GetName()] = index;
+    }
 }
 
 void Model::SetName(std::string modelName) {
@@ -25,4 +30,10 @@ void Model::SetLoadingState(LoadingState loadingState) {
 
 LoadingState Model::GetLoadingState() const {
     return m_loadingState.GetLoadingState();
+}
+
+uint32_t Model::GetGlobalMeshIndexByMeshName(const std::string& meshName) {
+    auto it = m_meshNameToGlobalMeshIndexMap.find(meshName);
+    if (it == m_meshNameToGlobalMeshIndexMap.end()) return -1;
+    return (int32_t)it->second;
 }

@@ -118,6 +118,17 @@ namespace World {
             }
         }
 
+        for (TrimSet& trimSet : GetTrimSets()) {
+            RenderDataManager::SubmitRenderItems(trimSet.GetRenderItems());
+        }
+
+        for (Fireplace& fireplace: GetFireplaces()) {
+            RenderDataManager::SubmitRenderItems(fireplace.GetRenderItems());             
+            if (Editor::GetSelectedObjectId() == fireplace.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(fireplace.GetRenderItems());
+            }
+        }
+
         for (Wall& wall : GetWalls()) {
             wall.SubmitRenderItems();
             RenderDataManager::SubmitRenderItems(wall.GetWeatherBoardstopRenderItems());

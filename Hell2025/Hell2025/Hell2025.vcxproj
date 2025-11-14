@@ -347,6 +347,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Ragdoll\RagdollManager.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
     <ClCompile Include="src\Types\Core\Openable.cpp" />
+    <ClCompile Include="src\Types\House\Fireplace.cpp" />
+    <ClCompile Include="src\Types\House\TrimSet.cpp" />
     <ClCompile Include="src\Types\Mirror.cpp" />
     <ClCompile Include="src\Types\Exterior\Fence.cpp" />
     <ClCompile Include="src\Types\Exterior\PowerPoleSet.cpp" />
@@ -505,7 +507,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Util\Util_mesh.cpp" />
     <ClCompile Include="src\Viewport\ViewportManager.cpp" />
     <ClCompile Include="src\Managers\HouseManager.cpp" />
-    <ClCompile Include="src\World\SectorManager.cpp" />
     <ClCompile Include="src\World\World.cpp" />
     <ClCompile Include="src\World\World_bvh.cpp" />
     <ClCompile Include="src\World\World_house.cpp" />
@@ -739,6 +740,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Christmas\ChristmasPresent.h" />
     <ClInclude Include="src\Types\Christmas\ChristmasTree.h" />
     <ClInclude Include="src\Common\SlotMap.h" />
+    <ClInclude Include="src\Types\House\Fireplace.h" />
+    <ClInclude Include="src\Types\House\TrimSet.h" />
     <ClInclude Include="src\Types\Mirror.h" />
     <ClInclude Include="src\Types\Effects\ScreenSpaceBloodDecal.h" />
     <ClInclude Include="src\Types\Effects\VolumetricBloodSplatter.h" />
@@ -848,7 +851,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Util\Util.h" />
     <ClInclude Include="src\Viewport\ViewportManager.h" />
     <ClInclude Include="src\Managers\HouseManager.h" />
-    <ClInclude Include="src\World\SectorManager.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="vendor\magic_enum\MagicEnum.hpp" />
     <ClInclude Include="vendor\stb_image\stb_image.h" />

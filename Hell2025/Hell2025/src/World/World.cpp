@@ -18,7 +18,6 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Physics/Physics.h"
-#include "World/SectorManager.h"
 
 #include "Pathfinding/AStarMap.h"
 
@@ -38,6 +37,7 @@ namespace World {
     std::vector<Dobermann> g_dobermanns;
     std::vector<Decal> g_decals;
     std::vector<Fence> g_fences;
+    Hell::SlotMap<Fireplace> g_fireplaces;
     std::vector<GameObject> g_gameObjects;
     std::vector<GenericStatic> g_genericStatics;
     std::vector<GenericBouncable> g_genericBouncables;
@@ -56,6 +56,7 @@ namespace World {
     std::vector<SpawnPoint> g_spawnDeathmatchPoints;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
     std::vector<Tree> g_trees;
+    Hell::SlotMap<TrimSet> g_trimSets;
     Hell::SlotMap<Wall> g_walls;
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
 
@@ -333,6 +334,7 @@ namespace World {
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
         for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
+        for (FireplaceCreateInfo& createInfo : createInfoCollection.fireplaces)         AddFireplace(createInfo, spawnOffset);
         for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericObjects) AddGenericObject(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
@@ -348,6 +350,7 @@ namespace World {
         CreateInfoCollection createInfoCollection;
 
         for (Door& door : World::GetDoors())                            createInfoCollection.doors.push_back(door.GetCreateInfo());
+        for (Fireplace& fireplace : World::GetFireplaces())             createInfoCollection.fireplaces.push_back(fireplace.GetCreateInfo());
         for (GenericObject& drawers : World::GetGenericObjects())       createInfoCollection.genericObjects.push_back(drawers.GetCreateInfo());
         for (Light& light : World::GetLights())                         createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                         createInfoCollection.pianos.push_back(piano.GetCreateInfo());
@@ -473,6 +476,10 @@ namespace World {
 
     GenericObject* GetGenericObjectById(uint64_t objectId) {
         return g_genericObjects.get(objectId);
+    }
+
+    Fireplace* GetFireplaceById(uint64_t objectId) {
+        return g_fireplaces.get(objectId);
     }
 
     HousePlane* GetHousePlaneByObjectId(uint64_t objectId) {
@@ -613,6 +620,10 @@ namespace World {
             genericObject->SetPosition(position);
         }
 
+        if (Fireplace* fireplace= World::GetFireplaceById(objectId)) {
+            fireplace->SetPosition(position);
+        }
+
         if (Piano* piano = World::GetPianoByObjectId(objectId)) {
             piano->SetPosition(position);
             Physics::ForceZeroStepUpdate();
@@ -650,9 +661,11 @@ namespace World {
     }
 
     void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
-        GenericObject* drawers = World::GetGenericObjectById(objectId);
-        if (drawers) {
-            drawers->SetRotation(rotation);
+        if (Fireplace* fireplace = World::GetFireplaceById(objectId)) {
+            fireplace->SetYEulerRotation(rotation.y);
+        }
+        if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
+            genericObject->SetRotation(rotation);
         }
     }
 
@@ -665,9 +678,16 @@ namespace World {
     }
 
     bool RemoveObject(uint64_t objectId) {
+        if (objectId == 0) return false;
+
         if (g_doors.contains(objectId)) {
             g_doors.get(objectId)->CleanUp();
             g_doors.erase(objectId);
+            return true;
+        }
+        if (g_fireplaces.contains(objectId)) {
+            g_fireplaces.get(objectId)->CleanUp();
+            g_fireplaces.erase(objectId);
             return true;
         }
         if (g_genericObjects.contains(objectId)) {
@@ -680,7 +700,11 @@ namespace World {
             g_housePlanes.erase(objectId);
             return true;
         }
-
+        if (g_trimSets.contains(objectId)) {
+            g_trimSets.get(objectId)->CleanUp();
+            g_trimSets.erase(objectId);
+            return true;
+        }
         if (g_windows.contains(objectId)) {
             g_windows.get(objectId)->CleanUp();
             g_windows.erase(objectId);
@@ -775,6 +799,7 @@ namespace World {
         for (ChristmasPresent& christmasPresent : g_christmasPresents)  christmasPresent.CleanUp();
         for (ChristmasTree& christmasTree : g_christmasTrees)           christmasTree.CleanUp();
         for (Door& door : g_doors)                                      door.CleanUp();
+        for (Fireplace& fireplace : g_fireplaces)                       fireplace.CleanUp();
         for (GenericObject& drawer : g_genericObjects)                  drawer.CleanUp();
         for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
@@ -789,6 +814,7 @@ namespace World {
         for (SpawnPoint& spawnPoint : g_spawnCampaignPoints)            spawnPoint.CleanUp();
         for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints)          spawnPoint.CleanUp();
         for (Tree& tree : g_trees)                                      tree.CleanUp();
+        for (TrimSet& trimSet : g_trimSets)                             trimSet.CleanUp();
         for (Wall& wall : g_walls)                                      wall.CleanUp();
         for (Window& window : g_windows)                                window.CleanUp();
 
@@ -802,6 +828,7 @@ namespace World {
         g_christmasTrees.clear();
         g_decals.clear();
         g_doors.clear();
+        g_fireplaces.clear();
         g_genericObjects.clear();
         g_fences.clear();
         g_gameObjects.clear();
@@ -818,6 +845,7 @@ namespace World {
         g_spawnCampaignPoints.clear();
         g_spawnDeathmatchPoints.clear();
         g_trees.clear();
+        g_trimSets.clear();
         g_walls.clear();
         g_windows.clear();
     }
@@ -849,7 +877,7 @@ namespace World {
 
     void UpdateAllWallCSG() {
         for (Wall& wall : GetWalls()) {
-            wall.UpdateSegmentsAndVertexData();
+            wall.UpdateSegmentsTrimsAndVertexData();
         }
     }
 
@@ -904,11 +932,16 @@ namespace World {
         return id;
     }
 
+    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::TRIM_SET);
+        g_trimSets.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
+    }
 
-
-
-
-
+    void AddFireplace(FireplaceCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::FIREPLACE);
+        g_fireplaces.emplace_with_id(id, id, createInfo, spawnOffset);
+    }
 
     void AddBullet(BulletCreateInfo createInfo) {
         g_bullets.push_back(Bullet(createInfo));
@@ -1209,6 +1242,7 @@ namespace World {
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
     Hell::SlotMap<GenericObject>& GetGenericObjects()                   { return g_genericObjects; }
     std::vector<Fence>& GetFences()                                     { return g_fences; }
+    Hell::SlotMap<Fireplace>& GetFireplaces()                           { return g_fireplaces; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }
     std::vector<GenericStatic>& GetGenericStatics()                     { return g_genericStatics; }
@@ -1227,6 +1261,7 @@ namespace World {
     std::vector<Road>& GetRoads()                                       { return g_roads; }
     std::vector<Shark>& GetSharks()                                     { return g_sharks; }
     std::vector<Tree>& GetTrees()                                       { return g_trees; }
+    Hell::SlotMap<TrimSet>& GetTrimSets()                               { return g_trimSets; }
     Hell::SlotMap<Wall>& GetWalls()                                     { return g_walls; }
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters() { return g_volumetricBloodSplatters; }
     Hell::SlotMap<Window>& GetWindows()                                 { return g_windows; }

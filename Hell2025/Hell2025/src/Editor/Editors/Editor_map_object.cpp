@@ -7,7 +7,6 @@
 #include "Editor/Gizmo.h"
 #include "Managers/MapManager.h"
 #include "Renderer/Renderer.h"
-#include "World/SectorManager.h"
 #include "World/World.h"
 
 #include "Imgui/ImguiBackEnd.h"

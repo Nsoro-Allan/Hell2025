@@ -16,9 +16,6 @@ public:
     Viewport(uint32_t viewportIndex, const glm::vec2& position = { 0.0f, 0.0f }, const glm::vec2& size = { 1.0f, 1.0f }, bool isOrthographic = true);
     void Update();
 
-    void ClearMirrorInfo();
-    void UpdateMirrorInfo(glm::mat4 mirrorModelMatrix, glm::vec3 mirrorLocalForward);
-
     void SetOrthographic(float orthoSize, float nearPlane, float farPlane);
     void SetPerspective(float fov, float nearPlane, float farPlane);
     void SetPosition(const glm::vec2& position);

@@ -51,8 +51,16 @@ namespace Debug {
         if (true) {
             text += "Mirror count: " + std::to_string(MirrorManager::GetMirrors().size()) + "\n";
             for (Mirror& mirror : MirrorManager::GetMirrors()) {
-                text += "- " + Util::Vec3ToString(mirror.GetWorldCenter()) + "\n";
+                text += "- ";
+                text += std::to_string(mirror.GetObjectId()) + " ";
+                text += Util::Vec3ToString(mirror.GetWorldCenter()) + "\n";
             }
+
+            Viewport* viewport = ViewportManager::GetViewportByIndex(0);
+
+            text += " ";
+            text += "Viewport Mirror ID: " + std::to_string(viewport->GetMirrorId()) + "\n";
+
         }
 
 

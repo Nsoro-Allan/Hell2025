@@ -17,6 +17,7 @@ struct Model {
     void SetName(std::string modelName);
     void SetAABB(glm::vec3 aabbMin, glm::vec3 aabbMax);
     void SetLoadingState(LoadingState loadingState);
+    uint32_t GetGlobalMeshIndexByMeshName(const std::string& meshName);
 
     LoadingState GetLoadingState() const;
     const FileInfo& GetFileInfo() const                       { return m_fileInfo; }
@@ -40,4 +41,5 @@ private:
     glm::vec3 m_aabbMax = glm::vec3(-std::numeric_limits<float>::max());
     std::string m_name = "undefined";
     std::vector<uint32_t> m_meshIndices;
+    std::unordered_map<std::string, uint32_t> m_meshNameToGlobalMeshIndexMap;
 };

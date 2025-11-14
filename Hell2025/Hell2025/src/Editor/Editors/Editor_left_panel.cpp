@@ -34,7 +34,7 @@ namespace Editor {
     EditorUI::FloatSliderInput g_textureOffsetV;
 
     EditorUI::FloatInput g_heightFloatInput;
-    EditorUI::FloatInput g_ceilingTrimHeightFloatInput;
+    EditorUI::FloatInput g_middleTrimHeightFloatInput;
 
     EditorUI::FloatInput g_housePlaneP0X;
     EditorUI::FloatInput g_housePlaneP0Y;
@@ -62,8 +62,8 @@ namespace Editor {
 
         g_heightFloatInput.SetText("Height");
         g_heightFloatInput.SetRange(0.1f, 100.0f);
-        g_ceilingTrimHeightFloatInput.SetText("Top Trim Height");
-        g_ceilingTrimHeightFloatInput.SetRange(0.1f, 100.0f);
+        g_middleTrimHeightFloatInput.SetText("Middle Trim Height");
+        g_middleTrimHeightFloatInput.SetRange(0.1f, 100.0f);
 
         g_textureScale.SetText("Tex Scale");
         g_textureScale.SetRange(0.00f, 100.0f);
@@ -277,7 +277,7 @@ namespace Editor {
                 if (Wall* wall = World::GetWallByObjectId(GetSelectedObjectId())) {
                     g_materialDropDown.SetCurrentOption(wall->GetCreateInfo().materialName);
                     g_heightFloatInput.SetValue(wall->GetCreateInfo().height);
-                    g_ceilingTrimHeightFloatInput.SetValue(wall->GetCreateInfo().ceilingTrimHeight);
+                    g_middleTrimHeightFloatInput.SetValue(wall->GetCreateInfo().middleTrimHeight);
                     g_textureOffsetU.SetValue(wall->GetCreateInfo().textureOffsetU);
                     g_textureOffsetV.SetValue(wall->GetCreateInfo().textureOffsetV);
                     g_textureScale.SetValue(wall->GetCreateInfo().textureScale);
@@ -294,9 +294,9 @@ namespace Editor {
                         houseMeshUpdateRequired = true;
                     }
 
-                    // Ceiling Trim Height
-                    if (g_ceilingTrimHeightFloatInput.CreateImGuiElements()) {
-                        wall->SetCeilingTrimHeight(g_ceilingTrimHeightFloatInput.GetValue());
+                    // Middle Trim Height
+                    if (g_middleTrimHeightFloatInput.CreateImGuiElements()) {
+                        wall->SetMiddleTrimHeight(g_middleTrimHeightFloatInput.GetValue());
                         houseMeshUpdateRequired = true;
                     }
 

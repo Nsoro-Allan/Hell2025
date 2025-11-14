@@ -253,7 +253,6 @@ namespace OpenGLRenderer {
     }
 
     void MirrorGeometryPass() {
-        const RenderItem& mirrorRenderItem = RenderDataManager::GetMirrorRenderItems()[0];
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 
@@ -306,8 +305,10 @@ namespace OpenGLRenderer {
                 Mesh* mesh = AssetManager::GetMeshByIndex(mirror->GetGlobalMeshIndex());
                 if (!mesh) continue;
 
+                glm::mat4 modelMatrix = mirror->GetWorldMatrix();
+
                 solidColorShader->SetMat4("u_projectionView", viewportData[i].projectionView);
-                solidColorShader->SetMat4("u_model", mirrorRenderItem.modelMatrix);
+                solidColorShader->SetMat4("u_model", modelMatrix);
 
                 glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), mesh->baseVertex);
             }

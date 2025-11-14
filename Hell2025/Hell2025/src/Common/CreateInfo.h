@@ -5,6 +5,18 @@
 #include "Types/Game/SpawnPoint.h"
 #include <map>
 
+struct TrimSetCreateInfo {
+    TrimSetType type = TrimSetType::CEILING;
+    std::vector<glm::vec3> points;
+};
+
+struct FireplaceCreateInfo {
+    FireplaceType type = FireplaceType::DEFAULT;
+    glm::vec3 position = glm::vec3(0.0f);
+    float yEulerRotation = 0.0f;
+    std::string editorName = UNDEFINED_STRING;
+};
+
 struct OpenableCreateInfo {
     OpenState initialOpenState = OpenState::CLOSED;
     OpenAxis openAxis = OpenAxis::TRANSLATE_Z;
@@ -173,7 +185,7 @@ struct WallCreateInfo {
     float textureOffsetU = 0.0f;
     float textureOffsetV = 0.0f;
     float textureRotation = 0.0f;
-    float ceilingTrimHeight = 2.4f;
+    float middleTrimHeight = 2.4f;
     bool useReversePointOrder = false;
     TrimType ceilingTrimType = TrimType::NONE;
     TrimType floorTrimType = TrimType::NONE;
@@ -292,6 +304,7 @@ struct MapCreateInfo {
 
 struct CreateInfoCollection {
     std::vector<DoorCreateInfo> doors;
+    std::vector<FireplaceCreateInfo> fireplaces;
     std::vector<GenericObjectCreateInfo> genericObjects;
     std::vector<HousePlaneCreateInfo> housePlanes;
     std::vector<LightCreateInfo> lights;

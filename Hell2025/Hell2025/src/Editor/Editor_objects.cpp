@@ -198,6 +198,18 @@ namespace Editor {
                 }
             }
 
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            if (Fireplace* fireplace = World::GetFireplaceById(GetSelectedObjectId())) {
+                Gizmo::SetPosition(fireplace->GetPosition());
+            }
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
+
             if (GetSelectedObjectType() == ObjectType::HOUSE_PLANE) {
                 HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId());
                 if (plane) {

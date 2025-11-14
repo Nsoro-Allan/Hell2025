@@ -4,7 +4,6 @@
 #include "Editor/Editor.h"
 #include "HellLogging.h"
 #include "Managers/MapManager.h"
-#include "World/SectorManager.h"
 #include "World/World.h"
 
 #include <iostream>

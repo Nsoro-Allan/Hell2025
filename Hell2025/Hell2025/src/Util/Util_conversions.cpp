@@ -8,6 +8,7 @@ namespace Util {
     EditorMode StringToEditorMode(const std::string& str)                       { return magic_enum::enum_cast<EditorMode>(str).value_or(EditorMode::UNDEFINED); }
     EditorSelectionMode StringToEditorSelectionMode(const std::string& str)     { return magic_enum::enum_cast<EditorSelectionMode>(str).value_or(EditorSelectionMode::OBJECT); }
     EditorState StringToEditorState(const std::string& str)                     { return magic_enum::enum_cast<EditorState>(str).value_or(EditorState::IDLE); }
+    FireplaceType StringToFireplaceType(const std::string& str)                 { return magic_enum::enum_cast<FireplaceType>(str).value_or(FireplaceType::UNDEFINED); }
     GenericObjectType StringToGenericObjectType(const std::string& str)         { return magic_enum::enum_cast<GenericObjectType>(str).value_or(GenericObjectType::UNDEFINED); }
     HousePlaneType StringToHousePlaneType(const std::string& str)               { return magic_enum::enum_cast<HousePlaneType>(str).value_or(HousePlaneType::UNDEFINED); }
     HouseType StringToHouseType(const std::string& str)                         { return magic_enum::enum_cast<HouseType>(str).value_or(HouseType::UNDEFINED); }
@@ -34,6 +35,7 @@ namespace Util {
     std::string EditorSelectionModeToString(EditorSelectionMode mode)           { return std::string(magic_enum::enum_name(mode)); }
     std::string EditorStateToString(EditorState state)                          { return std::string(magic_enum::enum_name(state)); }
     std::string GenericObjectTypeToString(GenericObjectType houseType)          { return std::string(magic_enum::enum_name(houseType)); }
+    std::string FireplaceTypeToString(FireplaceType type)                       { return std::string(magic_enum::enum_name(type)); }
     std::string HousePlaneTypeToString(HousePlaneType type)                     { return std::string(magic_enum::enum_name(type)); }
     std::string HouseTypeToString(HouseType houseType)                          { return std::string(magic_enum::enum_name(houseType)); }
     std::string ImageDataTypeToString(ImageDataType imageDataType)              { return std::string(magic_enum::enum_name(imageDataType)); }

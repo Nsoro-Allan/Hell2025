@@ -9,6 +9,7 @@ namespace Util {
 
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
         createInfoCollection.genericObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
+        createInfoCollection.fireplaces = json.value("Fireplace", std::vector<FireplaceCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
@@ -25,6 +26,7 @@ namespace Util {
         nlohmann::json json;
         json["Doors"] = createInfoCollection.doors;
         json["Drawers"] = createInfoCollection.genericObjects;
+        json["Fireplaces"] = createInfoCollection.fireplaces;
         json["Lights"] = createInfoCollection.lights;
         json["Pianos"] = createInfoCollection.pianos;
         json["PickUps"] = createInfoCollection.pickUps;

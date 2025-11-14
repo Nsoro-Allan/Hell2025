@@ -95,7 +95,7 @@
       ],
       "Rotation": [
         0.0,
-        0.0,
+        0.005389070603996515,
         0.0
       ],
       "Scale": [
@@ -201,23 +201,23 @@
       "Type": "COUCH"
     },
     {
-      "EditorName": "Generic Object",
+      "EditorName": "Cabinet 2",
       "Position": [
-        8.097176551818848,
-        0.0,
-        -1.3723235130310059
+        5.199999809265137,
+        1.2153091430664063,
+        1.399999976158142
       ],
       "Rotation": [
-        3.1415927410125732,
-        1.5099580252808664e-07,
-        3.1415927410125732
+        6.2831854820251465,
+        -1.5707963705062866,
+        0.0
       ],
       "Scale": [
         1.0,
         1.0,
         1.0
       ],
-      "Type": "TEST_MODEL"
+      "Type": "BATHROOM_CABINET"
     },
     {
       "EditorName": "Generic Object 2",
@@ -256,6 +256,18 @@
         1.0
       ],
       "Type": "TEST_MODEL2"
+    }
+  ],
+  "Fireplaces": [
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        8.126897811889648,
+        0.0,
+        -1.3851619958877563
+      ],
+      "Type": "DEFAULT",
+      "YEulerRotation": 3.1415927410125732
     }
   ],
   "Lights": [
@@ -651,10 +663,10 @@
   "Trees": [],
   "Walls": [
     {
-      "CeilingTrimHeight": 2.4000000953674316,
       "EditorName": "Wall",
       "Height": 2.6000001430511475,
       "Material": "Ceiling2",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           0.0,
@@ -692,10 +704,10 @@
       "WallType": "WEATHER_BOARDS"
     },
     {
-      "CeilingTrimHeight": 2.700000047683716,
       "EditorName": "Wall 2",
       "Height": 2.700000047683716,
       "Material": "Ceiling2",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           0.10000000149011612,
@@ -733,10 +745,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "CeilingTrimHeight": 2.4000000953674316,
       "EditorName": "Wall 3",
       "Height": 2.4000000953674316,
       "Material": "BathroomFloor",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           4.5,
@@ -774,10 +786,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "CeilingTrimHeight": 2.700000047683716,
       "EditorName": "Wall 4",
       "Height": 2.700000047683716,
       "Material": "PlasterRed",
+      "MiddleTrimHeight": 2.259999990463257,
       "Points": [
         [
           4.5,
@@ -815,10 +827,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "CeilingTrimHeight": 2.4000000953674316,
       "EditorName": "Wall 5",
       "Height": 2.4000000953674316,
       "Material": "Ceiling2",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           0.10000000149011612,
@@ -856,10 +868,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "CeilingTrimHeight": 2.4000000953674316,
       "EditorName": "Wall 6",
       "Height": 2.4000000953674316,
       "Material": "BathroomWall",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           10.100000381469727,
@@ -897,10 +909,10 @@
       "WallType": "INTERIOR"
     },
     {
-      "CeilingTrimHeight": 2.4000000953674316,
       "EditorName": "Wall 7",
       "Height": 2.4000000953674316,
       "Material": "Ceiling2",
+      "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
           7.400000095367432,

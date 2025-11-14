@@ -10,10 +10,12 @@ namespace Editor {
 
     struct PlacementObjectSubtype {
         GenericObjectType genericObject = GenericObjectType::UNDEFINED;
+        FireplaceType fireplace = FireplaceType::UNDEFINED;
         HousePlaneType housePlane = HousePlaneType::UNDEFINED;
 
         void Reset() {
             genericObject = GenericObjectType::UNDEFINED;
+            fireplace = FireplaceType::UNDEFINED;
             housePlane = HousePlaneType::UNDEFINED;
         }
     };
@@ -146,6 +148,7 @@ namespace Editor {
     // Object placement
     //void PlaceObject(ObjectType objectType); // suss!!!!!!!!!!!
     void PlaceHousePlane(HousePlaneType housePlaneType);
+    void PlaceFireplace(FireplaceType fireplaceType);
     void PlaceGenericObject(GenericObjectType objectType);
     ObjectType GetPlacementObjectType();
     //GenericObjectType GetGenericPlacementObjectType();

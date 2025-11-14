@@ -56,13 +56,6 @@ void Viewport::Update() {
     );
 }
 
-void Viewport::ClearMirrorInfo() {
-}
-
-void Viewport::UpdateMirrorInfo(glm::mat4 mirrorModelMatrix, glm::vec3 mirrorLocalForward) {
-   
-}
-
 void Viewport::SetPerspective(float fov, float nearPlane, float farPlane) {
     m_isOrthographic = false;
     m_fov = fov;

@@ -14,7 +14,6 @@
 #include "Tools/ImageTools.h"
 #include "Util/Util.h"
 #include "Viewport/ViewportManager.h"
-#include "World/SectorManager.h"
 #include "World/World.h"
 
 #include "Pathfinding/AStarMap.h"
