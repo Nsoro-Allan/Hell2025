@@ -223,7 +223,7 @@ void Player::UpdateUI() {
             text += "Flip normal map Y: " + Util::BoolToString(OpenGLRenderer::ShouldFlipNormalMapY()) + "\n";
 
             // Override with BVH CPU RAYS if that render mode is set
-            if (Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS) {
+            if (Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS || true) {
                 text = "BVH ray hit: " + Util::BoolToString(m_bvhRayResult.hitFound) + "\n";
 
                 if (m_bvhRayResult.hitFound) {
@@ -235,6 +235,7 @@ void Player::UpdateUI() {
                     text += "- Parent Id: " + std::to_string(UniqueID::GetLocal(m_bvhRayResult.objectId)) + "\n";
                     text += "- Openable Id: " + std::to_string(m_bvhRayResult.openableId) + "\n";
                     text += "- Custom Id: " + std::to_string(m_bvhRayResult.customId) + "\n";
+                    text += "- Mesh node index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
 
                     if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.openableId)) {
                         text += "\n";

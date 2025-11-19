@@ -2,15 +2,23 @@
 #include "Core/Game.h"
 #include "Input/Input.h"
 #include "Viewport/ViewportManager.h"
+#include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 
 #include "Ragdoll/RagdollManager.h"
 #include "UniqueID.h"
 
+#include "BVH/Cpu/CpuBvh.h"
+
+
+#include "Types/Game/Decal2.h"
+
 namespace World {
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction);
 
     void ProcessBullets() {
+
+
         std::vector<Bullet>& bullets = GetBullets();
         std::vector<Bullet> newBullets;
         bool glassWasHit = false;
@@ -31,6 +39,27 @@ namespace World {
             }
 
             PhysXRayResult rayResult = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
+
+
+
+
+            // Testing out bvh ray casts for bullets. Maybe it's worthwhile over physx raycasts
+            uint64_t sceneBvhId = GetSceneBvhIdByViewportIndex(player->GetViewportIndex());
+            BvhRayResult bvhRayResult = Bvh::Cpu::ClosestHit(sceneBvhId, rayOrigin, bullet.GetDirection(), rayLength);
+
+            if (bvhRayResult.hitFound) {
+                Decal2CreateInfo decalCreateInfo;
+                decalCreateInfo.surfaceHitPosition = bvhRayResult.hitPosition;
+                decalCreateInfo.parentObjectId = bvhRayResult.objectId;
+                decalCreateInfo.localMeshNodeIndex = bvhRayResult.localMeshNodeIndex;
+                decalCreateInfo.surfaceHitNormal = bvhRayResult.hitNormal;
+
+                AddDecal2(decalCreateInfo);
+            }
+
+
+
+
 
             // On hit
             if (rayResult.hitFound) {

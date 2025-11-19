@@ -302,6 +302,7 @@ namespace Bvh::Cpu {
                     gpuInstance.openableId = instance.openableId;
                     gpuInstance.customId = instance.customId;
                     gpuInstance.globalMeshIndex = instance.globalMeshIndex;
+                    gpuInstance.localMeshNodeIndex = instance.localMeshNodeIndex;
                     Util::PackUint64(instance.objectId, gpuInstance.objectIdLowerBit, gpuInstance.objectIdUpperBit);
                 }
                 // Update the leaf node's pointer so it now points into the new, contiguous instance array

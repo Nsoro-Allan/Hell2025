@@ -60,7 +60,7 @@ struct RenderItem {
     int32_t woundBaseColorTextureIndex = 0;
     int32_t woundNormalMapTextureIndex = 0;
     int32_t woundRmaTextureIndex = 0;
-    int32_t padding2 = 0;               // Unused
+    int32_t localMeshNodeIndex = 0;
 };
 
 struct AABBRayResult {
@@ -627,6 +627,7 @@ struct PrimitiveInstance {
     uint32_t openableId;
     uint32_t customId;
     uint32_t globalMeshIndex;
+    uint32_t localMeshNodeIndex;
 };
 
 struct GpuPrimitiveInstance {
@@ -640,7 +641,7 @@ struct GpuPrimitiveInstance {
 
     uint32_t globalMeshIndex;
     uint32_t customId;
-    uint32_t padding1;
+    uint32_t localMeshNodeIndex;
     uint32_t padding2;
 };
 
@@ -661,8 +662,10 @@ struct BvhRayResult {
     uint32_t openableId = 0;
     uint32_t customId = 0;
     uint32_t globalMeshIndex = 0;
+    uint32_t localMeshNodeIndex = 0;
     float distanceToHit = std::numeric_limits<float>::max();
     glm::vec3 hitPosition = glm::vec3(0);
+    glm::vec3 hitNormal = glm::vec3(0.0f);
     glm::mat4 primitiveTransform = glm::mat4(1.0f);
     glm::vec3 nodeBoundsMin = glm::vec3(0.0f);
     glm::vec3 nodeBoundsMax = glm::vec3(0.0f);

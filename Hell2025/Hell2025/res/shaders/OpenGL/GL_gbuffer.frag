@@ -59,17 +59,17 @@ void main() {
     vec4 baseColor = texture(sampler2D(textureSamplers[BaseColorTextureIndex]), TexCoord);
     vec3 normalMap = texture(sampler2D(textureSamplers[NormalTextureIndex]), TexCoord).rgb;   
     vec3 rma = texture(sampler2D(textureSamplers[RMATextureIndex]), TexCoord).rgb;
-    vec3 emissiveMap = texture(sampler2D(textureSamplers[EmissiveTextureIndex]), TexCoord).rgb;
+    vec3 emissiveMapColor = texture(sampler2D(textureSamplers[EmissiveTextureIndex]), TexCoord).rgb;
 #else
     vec4 baseColor = texture2D(baseColorTexture, TexCoord);
     vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
     vec3 rma = texture2D(rmaTexture, TexCoord).rgb;
-    vec3 emissiveMap = vec3(0, 0, 0); // This means no emissive colors in RenderDoc. Fix that!
+    vec3 emissiveMapColor = vec3(0, 0, 0); // This means no emissive colors in RenderDoc. Fix that!
 #endif
 
     // Emissive
     if (EmissiveTextureIndex != -1) {
-        emissiveColor = emissiveMap;
+        emissiveColor *= emissiveMapColor;
     }
     EmissiveOut = vec4(emissiveColor, 0);
 

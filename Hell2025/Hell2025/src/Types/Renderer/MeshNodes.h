@@ -28,6 +28,7 @@ struct MeshNode {
     RenderItem renderItem;
     glm::mat4 localModelMatrix = glm::mat4(1.0f);
     glm::mat4 worldModelMatrix = glm::mat4(1.0f);
+    DecalType decalType = DecalType::PLASTER;
 
     bool isGold = false;              // Remove me when Carlos finishes Golden Glock texture set
 };

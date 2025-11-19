@@ -86,6 +86,7 @@ namespace Bible {
         mirror.meshName = "CabinetMirror";
         mirror.materialName = "BathroomCabinetMirror";
         mirror.blendingMode = BlendingMode::MIRROR;
+        mirror.decalType = DecalType::GLASS;
 
         meshNodes.Init(id, "BathroomCabinet", meshNodeCreateInfoSet);
 

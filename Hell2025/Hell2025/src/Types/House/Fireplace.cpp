@@ -50,6 +50,7 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
     m_wallWidth = 0.766488f * 2.0f;
     m_wallDepth = 0.425;
+    m_wallDepth = 0.450083f;
 
     glm::vec3 boundsMin = glm::vec3(-0.1f, 0.0f, -m_wallWidth * 0.5f);
     glm::vec3 boundsMax = glm::vec3(m_wallDepth, 2.7f, m_wallWidth * 0.5f);

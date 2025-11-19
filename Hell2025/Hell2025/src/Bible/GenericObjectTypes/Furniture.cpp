@@ -86,5 +86,6 @@ namespace Bible {
         meshNodes.SetMaterialByMeshName("DeerIris", "DeerIris");
         meshNodes.SetMaterialByMeshName("DeerSclera", "Scelra");
         meshNodes.SetBlendingModeByMeshName("DeerSclera", BlendingMode::GLASS);
+
     }
 }

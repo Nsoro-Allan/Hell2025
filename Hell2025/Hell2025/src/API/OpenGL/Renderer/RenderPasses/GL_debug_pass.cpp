@@ -225,6 +225,7 @@ namespace OpenGLRenderer {
             glBindTextureUnit(3, gBuffer->GetColorAttachmentHandleByName("RMA"));
             glBindTextureUnit(4, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
             glBindTextureUnit(5, miscFullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
+            glBindTextureUnit(7, gBuffer->GetColorAttachmentHandleByName("Emissive"));
 
             glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
         }

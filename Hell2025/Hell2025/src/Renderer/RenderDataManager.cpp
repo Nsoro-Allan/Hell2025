@@ -247,6 +247,12 @@ namespace RenderDataManager {
         SortRenderItems(g_renderItemsHairTopLayer);
         SortRenderItems(g_renderItemsHairBottomLayer);
 
+        // Lil hack to include bullet decals in mirrors
+        int count = g_renderItems.size() + g_renderItemsAlphaDiscarded.size();
+        std::vector<RenderItem> potentialMirrorItems(count);
+        potentialMirrorItems.insert(potentialMirrorItems.end(), g_renderItems.begin(), g_renderItems.end());
+        potentialMirrorItems.insert(potentialMirrorItems.end(), g_renderItemsAlphaDiscarded.begin(), g_renderItemsAlphaDiscarded.end());
+
         for (int i = 0; i < 4; i++) {
             Viewport* viewport = ViewportManager::GetViewportByIndex(i);
             if (!viewport->IsVisible()) continue;
@@ -259,7 +265,7 @@ namespace RenderDataManager {
             CreateDrawCommands(set.hairBottomLayer[i], g_renderItemsHairBottomLayer, &frustum, i);
 
             if (Mirror* mirror = MirrorManager::GetMirrorByObjectId(viewport->GetMirrorId())) {
-                CreateDrawCommands(set.mirrorRenderItems[i], g_renderItems, mirror->GetFrustum(i), i);
+                CreateDrawCommands(set.mirrorRenderItems[i], potentialMirrorItems, mirror->GetFrustum(i), i);
             }
         }
 

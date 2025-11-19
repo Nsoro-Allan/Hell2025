@@ -101,7 +101,7 @@ struct RenderItem {
     int woundBaseColorTextureIndex;
     int woundNormalMapTextureIndex;
     int woundRmaTextureIndex;
-    int padding2;                       // Unused
+    int localMeshNodeIndex;
 };
 
 struct Light {

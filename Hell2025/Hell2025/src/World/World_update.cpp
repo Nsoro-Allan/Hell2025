@@ -283,6 +283,23 @@ namespace World {
             light.Update(deltaTime);
         }
 
+
+
+
+
+        // And finally decals
+        for (Decal2& decal : GetNewDecals()) {
+            decal.Update();
+        }
+        if (Input::KeyPressed(HELL_KEY_BACKSPACE)) {
+            GetNewDecals().clear();
+        }
+
+
+
+
+
+
         CalculateGPULights();
 
         // Volumetric blood

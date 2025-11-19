@@ -134,6 +134,8 @@ namespace Bvh::Cpu {
                         rayResult.openableId = instance.openableId;
                         rayResult.customId = instance.customId;
                         rayResult.globalMeshIndex = instance.globalMeshIndex;
+                        rayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
+                        rayResult.hitNormal = -glm::vec3(instance.worldTransform * glm::vec4(normal, 0.0f)); // Bit suss that you have to negate this
                         Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, rayResult.objectId);
                         return rayResult;
                     }
@@ -280,6 +282,8 @@ namespace Bvh::Cpu {
                             closestRayResult.openableId = instance.openableId;
                             closestRayResult.customId = instance.customId;
                             closestRayResult.globalMeshIndex = instance.globalMeshIndex;
+                            closestRayResult.localMeshNodeIndex = instance.localMeshNodeIndex;
+                            closestRayResult.hitNormal = -glm::vec3(instance.worldTransform * glm::vec4(normal, 0.0f)); // Bit suss that you have to negate this
                             Util::UnpackUint64(instance.objectIdLowerBit, instance.objectIdUpperBit, closestRayResult.objectId);
 
                             // Update the ray's max distance to prune further bvh nodes

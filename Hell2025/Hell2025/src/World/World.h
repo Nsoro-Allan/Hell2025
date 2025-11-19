@@ -21,6 +21,7 @@
 #include "Types/Game/Bullet.h"
 #include "Types/Game/BulletCasing.h"
 #include "Types/Game/Decal.h"
+#include "Types/Game/Decal2.h"
 #include "Types/Game/GameObject.h"
 #include "Types/Game/Light.h"
 #include "Types/Game/PickUp.h"
@@ -86,6 +87,8 @@ namespace World {
     const uint32_t GetChunkCount(); 
     const HeightMapChunk* GetChunk(int x, int z);
 
+    void AddDecal2(Decal2CreateInfo createInfo);
+
     void AddBullet(BulletCreateInfo createInfo);
     void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddBulletCasing(BulletCasingCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -140,6 +143,7 @@ namespace World {
     //void RemoveAllHouseBvhs();
     void UpdatePlayerBvhs();
     BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance, int viewportIndex);
+    uint64_t GetSceneBvhIdByViewportIndex(int viewportIndex);
 
     const float GetWorldSpaceWidth();
     const float GetWorldSpaceDepth();
@@ -197,6 +201,7 @@ namespace World {
 
     size_t GetLightCount();
 
+
     std::vector<AnimatedGameObject>& GetAnimatedGameObjects();
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals();
     std::vector<Bullet>& GetBullets();
@@ -206,6 +211,7 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees();
     std::vector<ClippingCube>& GetClippingCubes();
     std::vector<Decal>& GetDecals();
+    std::vector<Decal2>& GetNewDecals();
     Hell::SlotMap<Door>& GetDoors();
     std::vector<Dobermann>& GetDobermanns();
     Hell::SlotMap<GenericObject>& GetGenericObjects();

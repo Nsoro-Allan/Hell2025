@@ -23,6 +23,7 @@ namespace World {
             instance.openableId= renderItem.openableId;
             instance.globalMeshIndex = renderItem.meshIndex;
             instance.customId = renderItem.customId;
+            instance.localMeshNodeIndex = renderItem.localMeshNodeIndex;
             Util::UnpackUint64(renderItem.objectIdLowerBit, renderItem.objectIdUpperBit, instance.objectId);
         }
     }
@@ -96,8 +97,10 @@ namespace World {
             }
 
             for (GenericObject& genericObject : GetGenericObjects()) {
-                const std::vector<RenderItem>& renderItems = genericObject.GetRenderItems();
-                for (const RenderItem& renderItem : renderItems) {
+                for (const RenderItem& renderItem : genericObject.GetRenderItems()) {
+                    CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
+                }
+                for (const RenderItem& renderItem : genericObject.GetRenderItemsHairTopLayer()) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                 }
             }
@@ -133,6 +136,11 @@ namespace World {
             }
             Bvh::Cpu::UpdateSceneBvh(viewportBvhData.sceneBvhId, viewportBvhData.instances);
         }
+    }
+
+    uint64_t GetSceneBvhIdByViewportIndex(int viewportIndex) {
+        if (viewportIndex < 0 || viewportIndex >= 4) return 0;
+        return g_viewportBvhData[viewportIndex].sceneBvhId;
     }
 
     BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance, int viewportIndex) {

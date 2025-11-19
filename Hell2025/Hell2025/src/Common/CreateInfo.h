@@ -55,6 +55,7 @@ struct MeshNodeCreateInfo {
     RigidStaticCreateInfo rigidStatic;
     bool isGold = false;
     int32_t customId;
+    DecalType decalType = DecalType::PLASTER;
 };
 
 struct GenericObjectCreateInfo {
@@ -123,6 +124,13 @@ struct DecalCreateInfo {
     glm::vec3 surfaceHitNormal = glm::vec3(0.0f);
     uint64_t parentPhysicsId = 0;
     uint64_t parentObjectId = 0;
+};
+
+struct Decal2CreateInfo {
+    uint32_t localMeshNodeIndex = 0;
+    uint64_t parentObjectId = 0;
+    glm::vec3 surfaceHitPosition = glm::vec3(0.0f);
+    glm::vec3 surfaceHitNormal = glm::vec3(0.0f);
 };
 
 struct ScreenSpaceBloodDecalCreateInfo {

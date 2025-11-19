@@ -60,6 +60,15 @@ namespace World {
     Hell::SlotMap<Wall> g_walls;
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
 
+
+
+
+    std::vector<Decal2> g_newDecals;
+
+
+
+
+
     Hell::SlotMap<Door> g_doors;
     Hell::SlotMap<GenericObject> g_genericObjects;
     Hell::SlotMap<HousePlane> g_housePlanes;
@@ -957,6 +966,11 @@ namespace World {
         decal.Init(createInfo);
     }
 
+    void AddDecal2(Decal2CreateInfo createInfo) {
+        g_newDecals.push_back(Decal2(createInfo));
+    }
+
+
     void AddDobermann(DobermannCreateInfo& createInfo) {
         Dobermann& dobermann = g_dobermanns.emplace_back();
         dobermann.Init(createInfo);
@@ -1238,6 +1252,7 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees()                     { return g_christmasTrees; }
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_decals; }
+    std::vector<Decal2>& GetNewDecals()                                 { return g_newDecals; }
     Hell::SlotMap<Door>& GetDoors()                                     { return g_doors; }
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
     Hell::SlotMap<GenericObject>& GetGenericObjects()                   { return g_genericObjects; }

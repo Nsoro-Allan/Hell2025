@@ -123,6 +123,7 @@ void Light::UpdateRenderItems() {
                 renderItem.baseColorTextureIndex = m_material->m_basecolor;
                 renderItem.normalMapTextureIndex = m_material->m_normal;
                 renderItem.rmaTextureIndex = m_material->m_rma;
+                renderItem.emissiveTextureIndex = AssetManager::GetTextureIndexByName("Light_EMI");
             }
             Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
             if (mesh->GetName() == "Lamp") {

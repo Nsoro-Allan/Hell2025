@@ -60,72 +60,6 @@ namespace NavMesh {
 
 
 
-    void WallCornerTest() {
-        for (Wall& wall : World::GetWalls()) {
-            int count = wall.GetPointCount();
-            if (count < 3) continue;
-
-            std::vector<glm::vec2> pts;
-            pts.reserve(count);
-            for (int i = 0; i < count; ++i) {
-                const glm::vec3& p = wall.GetPointByIndex(i);
-                pts.emplace_back(p.x, p.z); // 2D projection
-            }
-
-            float area2 = 0.0f;
-            for (int i = 0; i < count; ++i) {
-                const glm::vec2& a = pts[i];
-                const glm::vec2& b = pts[(i + 1) % count];
-                area2 += a.x * b.y - b.x * a.y;
-            }
-            bool ccw = area2 > 0.0f; // True if polygon is CCW
-
-            for (int i = 0; i < count; ++i) {
-                int prev = (i - 1 + count) % count;
-                int next = (i + 1) % count;
-
-                glm::vec2 e1 = glm::normalize(pts[i] - pts[prev]);
-                glm::vec2 e2 = glm::normalize(pts[next] - pts[i]);
-
-                float cross = e1.x * e2.y - e1.y * e2.x; // Z of 2D cross
-
-                bool internal;
-                if (ccw)
-                    internal = cross < 0.0f;  // Concave for CCW
-                else
-                    internal = cross > 0.0f;  // Concave for CW
-
-                const glm::vec3& p = wall.GetPointByIndex(i);
-                glm::vec3 pos = p + glm::vec3(0.0f, wall.GetCreateInfo().height, 0.0f);
-
-                Renderer::DrawPoint(pos, internal ? BLUE : RED);
-
-                if (internal) {
-                    const glm::vec3& a = wall.GetPointByIndex(i);
-                    const glm::vec3& b = wall.GetPointByIndex(next);
-
-                    float yRot = Util::EulerYRotationBetweenTwoPoints(a, b);
-
-                    Transform transform;
-                    transform.rotation.y = yRot;
-
-                    glm::vec3 forward = glm::vec3(transform.to_mat4() * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
-
-                    Renderer::DrawLine(pos, pos + forward, BLUE);
-                }
-            }
-        }
-    }
-
-
-
-
-
-
-
-
-
-
     inline void AddObstacleTri(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, std::unordered_map<int, FloorLevelPaths>& floorLevels) {
         float y = (a.y + b.y + c.y) * (1.0f / 3.0f);
         int key = (int)std::round(y * 1000.0f);
@@ -210,9 +144,15 @@ namespace NavMesh {
 
         std::unordered_map<int, FloorLevelPaths> floorLevels;
 
+     //   std::cout << "\n";
+            
         // Collect floor quads
         for (HousePlane& housePlane : World::GetHousePlanes()) {
             if (housePlane.GetType() != HousePlaneType::FLOOR) continue;
+           // if (housePlane.GetParentDoorId() != 0) continue;
+
+
+         //   std::cout << "\n";
 
             const HousePlaneCreateInfo& ci = housePlane.GetCreateInfo();
 
@@ -313,7 +253,6 @@ namespace NavMesh {
     }
 
     void RenderDebug() {
-        //WallCornerTest();
 
         if (Input::KeyPressed(HELL_KEY_O)) {
             g_doThis = !g_doThis;

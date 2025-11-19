@@ -72,6 +72,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode->isGold = createInfo.isGold;
         meshNode->type = createInfo.type;
         meshNode->customId = createInfo.customId;
+        meshNode->decalType = createInfo.decalType;
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 
@@ -379,6 +380,7 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         meshNode.renderItem.rmaTextureIndex = material->m_rma;
         meshNode.renderItem.aabbMin = glm::vec4(meshNode.worldspaceAabb.GetBoundsMin(), 0.0f);
         meshNode.renderItem.aabbMax = glm::vec4(meshNode.worldspaceAabb.GetBoundsMax(), 0.0f);
+        meshNode.renderItem.localMeshNodeIndex = i;
 
         // If this object is gold, replace basecolor and rma textures with that of gold material, normal map does not change
         if (m_isGold) {
