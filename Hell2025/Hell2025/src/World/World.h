@@ -101,8 +101,6 @@ namespace World {
     void AddFireplace(FireplaceCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGenericObject(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddHousePlane(HousePlaneCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddKangaroo(const KangarooCreateInfo& createInfo);
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -111,14 +109,11 @@ namespace World {
     void AddPiano(PianoCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddToilet(ToiletCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddVATBlood(glm::vec3 position, glm::vec3 front);
     void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset);
-
-    //void AddHouse(HouseCreateInfo houseCreateInfo, SpawnOffset spawnOffset);
 
     void PrintObjectCounts();
 
@@ -160,7 +155,6 @@ namespace World {
     const std::string& GetCurrentMapName();
 
     // House
-    void SaveHouse();
     void UpdateClippingCubes();
     void UpdateAllWallCSG();
     void UpdateHouseMeshBuffer();
@@ -202,7 +196,6 @@ namespace World {
 
     size_t GetLightCount();
 
-
     std::vector<AnimatedGameObject>& GetAnimatedGameObjects();
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals();
     std::vector<Bullet>& GetBullets();
@@ -219,8 +212,6 @@ namespace World {
     std::vector<Fence>& GetFences();
     Hell::SlotMap<Fireplace>& GetFireplaces();
     std::vector<GameObject>& GetGameObjects();
-    std::vector<GenericBouncable>& GetGenericBouncables();
-    std::vector<GenericStatic>& GetGenericStatics();
     std::vector<HeightMapChunk>& GetHeightMapChunks();
     Hell::SlotMap<HousePlane>& GetHousePlanes();
     std::vector<Light>& GetLights();

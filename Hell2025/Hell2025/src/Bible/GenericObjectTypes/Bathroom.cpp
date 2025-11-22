@@ -81,6 +81,7 @@ namespace Bible {
         door.openable.closeSpeed = 7.25f;
         door.openable.openingAudio = "BathroomCabinetOpen.wav";
         door.openable.closingAudio = "BathroomCabinetClose.wav";
+        door.openable.additionalTriggerMeshNames = { "CabinetMirror" };
 
         MeshNodeCreateInfo& mirror = meshNodeCreateInfoSet.emplace_back();
         mirror.meshName = "CabinetMirror";

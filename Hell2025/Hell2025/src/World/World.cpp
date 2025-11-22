@@ -39,8 +39,6 @@ namespace World {
     std::vector<Fence> g_fences;
     Hell::SlotMap<Fireplace> g_fireplaces;
     std::vector<GameObject> g_gameObjects;
-    std::vector<GenericStatic> g_genericStatics;
-    std::vector<GenericBouncable> g_genericBouncables;
     std::vector<Kangaroo> g_kangaroos;
     std::vector<HeightMapChunk> g_heightMapChunks;
     std::vector<Light> g_lights;
@@ -812,7 +810,6 @@ namespace World {
         for (GenericObject& drawer : g_genericObjects)                  drawer.CleanUp();
         for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
-        for (GenericStatic& genericStatic : g_genericStatics)           genericStatic.CleanUp();
         //for (Kangaroo& kangaroo : g_kangaroos)                        kangaroo.CleanUp();
         for (Mermaid& mermaid : g_mermaids)                             mermaid.CleanUp();
         for (HousePlane& housePlane : g_housePlanes)                              housePlane.CleanUp();
@@ -841,7 +838,6 @@ namespace World {
         g_genericObjects.clear();
         g_fences.clear();
         g_gameObjects.clear();
-        g_genericStatics.clear();
         //g_kangaroos.clear();
         g_lights.clear();
         g_mermaids.clear();
@@ -996,14 +992,6 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
         g_gameObjects.push_back(GameObject(createInfo));
-    }
-
-    void AddGenericBouncable(GenericBouncableCreateInfo createInfo, SpawnOffset spawnOffset) {
-        g_genericBouncables.push_back(GenericBouncable(createInfo, spawnOffset));
-    }
-
-    void AddGenericStatic(GenericStaticCreateInfo createInfo, SpawnOffset spawnOffset) {
-        g_genericStatics.push_back(GenericStatic(createInfo, spawnOffset));
     }
 
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1259,8 +1247,6 @@ namespace World {
     std::vector<Fence>& GetFences()                                     { return g_fences; }
     Hell::SlotMap<Fireplace>& GetFireplaces()                           { return g_fireplaces; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
-    std::vector<GenericBouncable>& GetGenericBouncables()               { return g_genericBouncables; }
-    std::vector<GenericStatic>& GetGenericStatics()                     { return g_genericStatics; }
     Hell::SlotMap<HousePlane>& GetHousePlanes()                         { return g_housePlanes; }
     std::vector<Light>& GetLights()                                     { return g_lights; };
     std::vector<Kangaroo>& GetKangaroos()                               { return g_kangaroos; }

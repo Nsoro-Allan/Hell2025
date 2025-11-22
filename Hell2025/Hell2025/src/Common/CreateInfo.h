@@ -67,32 +67,6 @@ struct GenericObjectCreateInfo {
     GenericObjectType type = GenericObjectType::UNDEFINED;
 };
 
-struct ToiletCreateInfo {
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f);
-};
-
-struct GenericStaticCreateInfo {
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f);
-    GenericStaticType type = GenericStaticType::COUCH;
-};
-
-struct GenericBouncableCreateInfo {
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::vec3 rotation = glm::vec3(0.0f);
-    GenericBouncableType type = GenericBouncableType::COUCH_CUSHION_0;
-};
-
-/*
-struct MeleeBulletWaveCreateInfo {
-    glm::vec3 startPos = glm::vec3(0.0f);
-    glm::vec3 localXYPlaneDir = glm::vec3(0.0f);
-    float startTime = 0.0f;
-    float maxTime = 0.0f;
-    float intervalDuration = 0.0f;;
-};*/
-
 struct ChristmasLightsCreateInfo {
     // Hanging lights
     glm::vec3 start = glm::vec3(0);

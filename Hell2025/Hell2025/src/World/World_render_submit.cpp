@@ -142,14 +142,6 @@ namespace World {
             RenderDataManager::SubmitRenderItems(fence.GetRenderItems());
         }
 
-        for (GenericBouncable& genericBouncable : GetGenericBouncables()) {
-            RenderDataManager::SubmitRenderItems(genericBouncable.GetRenderItems());
-        }
-
-        for (GenericStatic& genericStatics : GetGenericStatics()) {
-            RenderDataManager::SubmitRenderItems(genericStatics.GetRenderItems());
-        }
-
         for (ChristmasLights& christmasLights : GetChristmasLights()) {
             RenderDataManager::SubmitRenderItems(christmasLights.GetRenderItems());
         }
