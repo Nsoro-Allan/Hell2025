@@ -26,7 +26,6 @@ struct Wall {
     void UpdateWorldSpaceCenter(glm::vec3 worldSpaceCenter);
     void SubmitRenderItems();
     void CreateTrims();
-    void CreateTrimSets();
     void DrawSegmentVertices(glm::vec4 color);
     void DrawSegmentLines(glm::vec4 color);
     void FlipFaces();
@@ -39,10 +38,9 @@ struct Wall {
     void SetTextureScale(float value);
     void SetTextureOffsetU(float value);
     void SetTextureOffsetV(float value);
-    void SetMiddleTrimHeight(float value);
     void SetMaterial(const std::string& materialName);
 
-    glm::vec3 GetPointByIndex(int pointIndex); 
+    const glm::vec3& GetPointByIndex(int pointIndex); 
 
     const WallType GetWallType() const                                      { return m_createInfo.wallType; }
     const size_t GetPointCount() const                                      { return m_createInfo.points.size(); }
@@ -60,10 +58,6 @@ struct Wall {
 
 private:
     uint64_t m_objectId = 0;
-    uint64_t m_trimSetCeilingId = 0;
-    uint64_t m_trimSetMiddleId = 0;
-    uint64_t m_trimSetFloorId = 0;
-
     Material* m_material = nullptr;
     TrimType m_ceilingTrimType = TrimType::NONE;
     TrimType m_floorTrimType = TrimType::NONE;

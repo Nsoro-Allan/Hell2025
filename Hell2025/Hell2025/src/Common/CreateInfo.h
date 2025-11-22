@@ -6,8 +6,9 @@
 #include <map>
 
 struct TrimSetCreateInfo {
-    TrimSetType type = TrimSetType::CEILING;
-    std::vector<glm::vec3> points;
+	TrimSetType type = TrimSetType::CEILING;
+	std::vector<glm::vec3> points;
+	float trimScale = 1.0f;
 };
 
 struct FireplaceCreateInfo {

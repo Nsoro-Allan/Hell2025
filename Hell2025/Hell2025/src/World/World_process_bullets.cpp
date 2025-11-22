@@ -38,7 +38,7 @@ namespace World {
                 ignoredActors.insert(ignoredActors.end(), ragdollActors.begin(), ragdollActors.end());
             }
 
-            PhysXRayResult rayResult = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
+            PhysXRayResult rayResult;// = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
 
 
 

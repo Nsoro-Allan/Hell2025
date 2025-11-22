@@ -151,6 +151,7 @@ namespace World {
     void UpdateDoorAndWindowCubeTransforms();
     void ResetWeatherboardMeshBuffer();
     void UpdateAllHangingLightCords();
+    void UpdateTrims();
 
     // Util
     bool ObjectTypeIsInteractable(ObjectType objectType, uint64_t objectId, glm::vec3 playerCameraPosition, glm::vec3 rayHitPosition);

@@ -32,7 +32,7 @@ LoadingState Model::GetLoadingState() const {
     return m_loadingState.GetLoadingState();
 }
 
-uint32_t Model::GetGlobalMeshIndexByMeshName(const std::string& meshName) {
+int32_t Model::GetGlobalMeshIndexByMeshName(const std::string& meshName) {
     auto it = m_meshNameToGlobalMeshIndexMap.find(meshName);
     if (it == m_meshNameToGlobalMeshIndexMap.end()) return -1;
     return (int32_t)it->second;

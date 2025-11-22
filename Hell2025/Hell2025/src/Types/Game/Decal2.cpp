@@ -16,8 +16,7 @@ Decal2::Decal2(const Decal2CreateInfo& createInfo) {
     m_localNormal = glm::normalize(m_localNormal);
 
     // Offset along local normal to avoid z fighting
-    m_localPosition += m_localNormal * 0.01f;
-
+    m_localPosition += m_localNormal * 0.005f;
 
     // Determine type
     m_type = DecalType::PLASTER;
@@ -84,10 +83,14 @@ void Decal2::Update() {
 const glm::mat4& Decal2::GetParentWorldMatrix() {
     static glm::mat4 identity = glm::mat4(1.0f);
 
-    if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
-        MeshNodes& meshNodes = genericObject->GetMeshNodes();
-        return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
-    }
+	if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
+		MeshNodes& meshNodes = genericObject->GetMeshNodes();
+		return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
+	}
+
+	else if (Door* door = World::GetDoorByObjectId(m_createInfo.parentObjectId)) {
+        return door->GetDoorModelMatrix();
+	}
     
     return identity;
 }

@@ -32,7 +32,6 @@ struct TrimSet {
 
 private:
     std::vector<TrimCorner> m_corners;
-    //std::vector<glm::vec3> m_finalPoints;
     std::vector<glm::vec3> m_internalCorners;
     std::vector<glm::vec3> m_externalCorners;
     uint64_t m_objectId = 0;

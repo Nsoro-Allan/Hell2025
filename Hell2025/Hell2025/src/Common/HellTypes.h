@@ -64,8 +64,11 @@ struct RenderItem {
 };
 
 struct AABBRayResult {
-    bool hitFound = false;
-    glm::vec3 hitPosition = glm::vec3(0.0f);
+	bool hitFound = false;
+	glm::vec3 hitPositionWorld = glm::vec3(0.0f);
+	glm::vec3 hitPositionLocal = glm::vec3(0.0f);
+	glm::vec3 hitNormalWorld = glm::vec3(0.0f);
+	glm::vec3 hitNormalLocal = glm::vec3(0.0f);
 };
 
 struct HouseRenderItem {

@@ -8,21 +8,17 @@
 TrimSet::TrimSet(uint64_t id, const TrimSetCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_objectId = id;
     m_createInfo = createInfo;
-
-    //World::GetFireplaces();
-
     CreateRenderItems();
 }
 
 void TrimSet::CreateRenderItems() {
+    m_corners.clear();
+    m_externalCorners.clear();
+    m_internalCorners.clear();
+    m_renderItems.clear();
 
     // Find corners, by walking around the wall segment points, and check for raycast hits on all fireplace wall aabbs
-    m_corners.clear();
-
     for (int i = 0; i < m_createInfo.points.size(); i++) {
-
-        std::cout << "walking point: " << i << "\n";
-
         const glm::vec3& point = m_createInfo.points[i];
         const glm::vec3& nextPoint = m_createInfo.points[i + 1];
         float distanceToNextPoint = glm::distance(point, nextPoint);
@@ -41,8 +37,8 @@ void TrimSet::CreateRenderItems() {
             rayResult = Util::RayIntersectAABB(rayOrigin, rayDir, maxDistance, fireplace.GetWallsAABB(), fireplace.GetWorldMatrix());
 
             // Hit fireplace?
-            if (rayResult.hitFound) {
-                glm::vec3 pointA = rayResult.hitPosition;
+            if (rayResult.hitFound && rayResult.hitNormalLocal == glm::vec3(0.0f, 0.0f, 1.0f)) {
+                glm::vec3 pointA = rayResult.hitPositionWorld;
                 m_corners.push_back(TrimCorner(pointA));
 
                 // Because you always walk clockwise around the room, you can safely hack in the extra fireplace points with the following             
@@ -58,18 +54,8 @@ void TrimSet::CreateRenderItems() {
         }
     }
 
-
-
-
-
-
-
-
     // Figure out which corners are internal/external
-    m_internalCorners.clear();
-    m_externalCorners.clear();
-
-    int count = m_corners.size();
+    size_t count = m_corners.size();
     if (count < 3) return;
 
     std::vector<glm::vec2> pts;
@@ -96,7 +82,7 @@ void TrimSet::CreateRenderItems() {
 
         float cross = e1.x * e2.y - e1.y * e2.x; // Z of 2D cross
 
-        bool external;
+        bool external = false;
         if (ccw)
             external = cross < 0.0f;  // Concave for CCW
         else
@@ -107,46 +93,36 @@ void TrimSet::CreateRenderItems() {
 
         if (external) {
             m_corners[i].m_internal = false;
-        }        
+        }
     }
 
+    Material* material = nullptr;
+    Model* model = nullptr;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    m_renderItems.clear();
-
-    Material* material = AssetManager::GetMaterialByName("WoodTrims");
-    Model* model = AssetManager::GetModelByName("Trims");
-
-    std::string trimMeshName = "TrimMisc";
-    std::string internalCornerMeshName = "TrimMiscInternalCorner";
-    std::string externalCornerMeshName = "TrimMiscExternalCorner";
-
-    uint32_t trimMeshIndex = model->GetGlobalMeshIndexByMeshName(trimMeshName);
-    uint32_t internalCornerMeshIndex = model->GetGlobalMeshIndexByMeshName(internalCornerMeshName);
-    uint32_t externalCornerMeshIndex = model->GetGlobalMeshIndexByMeshName(externalCornerMeshName);
-
-    if (trimMeshIndex == -1 || internalCornerMeshIndex == -1 || externalCornerMeshIndex == -1) {
-        std::cout << "Shit fucked up\n";
-        return;
-    }
-    else {
-        std::cout << "Shit did not fuck up\n";
+    if (m_createInfo.type == TrimSetType::CEILING_FANCY) {
+		model = AssetManager::GetModelByName("TrimsCeilingFancy");
+		material = AssetManager::GetMaterialByName("WoodTrims");
     }
 
-    float cornerPieceSize = 0.135f;
+    if (!material) return;
+    if (!model) return;
+
+    std::string trimMeshName = "Trim";
+	std::string internalCornerMeshName = "InternalCorner";
+	std::string externalCornerMeshName = "ExternalCorner";
+
+    int32_t trimMeshIndex = model->GetGlobalMeshIndexByMeshName(trimMeshName);
+    int32_t internalCornerMeshIndex = model->GetGlobalMeshIndexByMeshName(internalCornerMeshName);
+    int32_t externalCornerMeshIndex = model->GetGlobalMeshIndexByMeshName(externalCornerMeshName);
+
+    float trimScale = m_createInfo.trimScale;
+    float trimLength = 1.0f * trimScale;
+    float internalCornerPieceSize = 0;
+
+    // Get internal corner piece size if the mesh index is valid
+    if (Mesh* internalCornerMesh = AssetManager::GetMeshByIndex(internalCornerMeshIndex)) {
+        internalCornerPieceSize = (internalCornerMesh->aabbMax.z - 0.01f) * trimScale; // 0.01cm safety threshold to avoid gaps
+    }
 
     for (int i = 0; i < m_corners.size() - 1; i++) {
 
@@ -160,94 +136,97 @@ void TrimSet::CreateRenderItems() {
         Transform cornerTransform;
         cornerTransform.position = m_corners[i].m_position;
         cornerTransform.rotation.y = Util::YRotationBetweenTwoPoints(point, nextPoint);
+        cornerTransform.scale *= trimScale;
 
-        RenderItem& renderItem = m_renderItems.emplace_back();
-        renderItem.modelMatrix = cornerTransform.to_mat4();
-        renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-        if (m_corners[i].m_internal) {
-            renderItem.meshIndex = internalCornerMeshIndex;
-        }
-        else {
-            renderItem.meshIndex = externalCornerMeshIndex;
-        }
-        renderItem.baseColorTextureIndex = material->m_basecolor;
-        renderItem.rmaTextureIndex = material->m_rma;
-        renderItem.normalMapTextureIndex = material->m_normal;
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+        // This "cursor" is the amount walked so far on this wall
+        float cursor = 0.0f;
 
-
-      
-       // if (false) // REMOVE ME WHEN U WANT YOUR TRIMS BACK!!!!!!!
-        // Make the trim render items
-        for (float j = 0.0f; j < distanceToNextPoint; j++) {
-
-            Transform transform;
-            transform.position = point + (directionToNextPoint * j);
-            transform.rotation.y = Util::YRotationBetweenTwoPoints(point, nextPoint);
-
-            // First piece needs space for corner piece is added (if internal)
-            if (j == 0.0f && m_corners[i].m_internal) {
-                transform.scale.x = 1.0f - cornerPieceSize;
-                transform.position += (directionToNextPoint * cornerPieceSize);
-            }
-
-            // Final piece is scaled to fit, plus space for corner piece is added
-            if (j > distanceToNextPoint - 1.0f) {
-
-                float distanceFromThisTrimSegmentToNextCorner = glm::distance(transform.position, nextPoint);
-
-                transform.scale.x = distanceFromThisTrimSegmentToNextCorner - cornerPieceSize;
-                
-                // Unless the next corner is an external corner, then you go all the way
-                if (!m_corners[i + 1].m_internal) {
-                    transform.scale.x += cornerPieceSize;
-                }
-
-                // This feels right, but you might be confused based on what you're seeing, aka this is not actually the true solution...
-                //if (j == 0.0f) {
-                //    transform.scale.x -= cornerPieceSize;
-                //}
-            }
-
+        // Internal corner
+        if (m_corners[i].m_internal && internalCornerMeshIndex != -1) {
             RenderItem& renderItem = m_renderItems.emplace_back();
-            renderItem.modelMatrix = transform.to_mat4();
+            renderItem.modelMatrix = cornerTransform.to_mat4();
             renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-            renderItem.meshIndex = trimMeshIndex;
+            renderItem.meshIndex = internalCornerMeshIndex;
+            renderItem.baseColorTextureIndex = material->m_basecolor;
+            renderItem.rmaTextureIndex = material->m_rma;
+            renderItem.normalMapTextureIndex = material->m_normal;
+            Util::UpdateRenderItemAABB(renderItem);
+            Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+
+            cursor += internalCornerPieceSize;
+        }
+        // External corner
+        else if (!m_corners[i].m_internal && externalCornerMeshIndex != -1) {
+            RenderItem& renderItem = m_renderItems.emplace_back();
+            renderItem.modelMatrix = cornerTransform.to_mat4();
+            renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+            renderItem.meshIndex = externalCornerMeshIndex;
             renderItem.baseColorTextureIndex = material->m_basecolor;
             renderItem.rmaTextureIndex = material->m_rma;
             renderItem.normalMapTextureIndex = material->m_normal;
             Util::UpdateRenderItemAABB(renderItem);
             Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
         }
-        //break;
+
+        // Make the trim segments
+        float distanceToWalk = distanceToNextPoint - trimLength;
+
+		if (m_corners[i + 1].m_internal) {
+            distanceToWalk -= internalCornerPieceSize;
+		}
+
+        while (cursor < distanceToWalk) {
+            Transform transform;
+            transform.position = point + (directionToNextPoint * cursor);
+            transform.rotation.y = Util::YRotationBetweenTwoPoints(point, nextPoint);
+			transform.scale = glm::vec3(trimScale);
+
+            if (trimMeshIndex != -1) {
+                RenderItem& renderItem = m_renderItems.emplace_back();
+                renderItem.modelMatrix = transform.to_mat4();
+                renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+                renderItem.meshIndex = trimMeshIndex;
+                renderItem.baseColorTextureIndex = material->m_basecolor;
+                renderItem.rmaTextureIndex = material->m_rma;
+                renderItem.normalMapTextureIndex = material->m_normal;
+                Util::UpdateRenderItemAABB(renderItem);
+                Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+            }
+
+            cursor += trimLength;
+        }
+
+        // Final trim segment
+        float finalDistance = distanceToNextPoint - cursor;
+
+        if (m_corners[i + 1].m_internal) {
+            finalDistance -= internalCornerPieceSize;
+        }
+
+        Transform transform;
+		transform.position = point + (directionToNextPoint * cursor);
+		transform.rotation.y = Util::YRotationBetweenTwoPoints(point, nextPoint);
+		transform.scale.x *= finalDistance;
+		transform.scale.y *= trimScale;
+		transform.scale.z *= trimScale;
+
+		RenderItem& renderItem = m_renderItems.emplace_back();
+		renderItem.modelMatrix = transform.to_mat4();
+		renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+		renderItem.meshIndex = trimMeshIndex;
+		renderItem.baseColorTextureIndex = material->m_basecolor;
+		renderItem.rmaTextureIndex = material->m_rma;
+		renderItem.normalMapTextureIndex = material->m_normal;
+		Util::UpdateRenderItemAABB(renderItem);
+		Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
     }
-
-
-
-
-
-
 }
 
 void TrimSet::Update() {
     if (Input::KeyPressed(HELL_KEY_T)) {
         CreateRenderItems();
+        std::cout << "Recreated TrimSet " << m_objectId << "\n";
     }
-
-    for (RenderItem& renderItem : m_renderItems) {
-
-        glm::vec3 point = renderItem.modelMatrix[3];
-
-        //Renderer::DrawPoint(point, GREEN);
-    }
-
-
-    //for (int i = 0; i < m_createInfo.points.size() - 1; i++) {
-    //for (int i = 0; i < 2; i++) {
-    //    const glm::vec3& point = m_createInfo.points[i];
-    //    Renderer::DrawPoint(point, BLUE);
-    //}
 }
 
 void TrimSet::CleanUp() {

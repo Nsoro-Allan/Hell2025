@@ -162,8 +162,7 @@ void Door::UpdateRenderItems() {
         renderItem.normalMapTextureIndex = m_material->m_normal;
         renderItem.objectType = Util::EnumToInt(ObjectType::DOOR_FRAME);
         Util::UpdateRenderItemAABB(renderItem);
-        //Util::PackUint64(m_frameObjectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
+        Util::PackUint64(0, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit); // ZERO ID!
     }
 }
 

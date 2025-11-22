@@ -100,7 +100,7 @@ namespace World {
                 for (const RenderItem& renderItem : genericObject.GetRenderItems()) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                 }
-                for (const RenderItem& renderItem : genericObject.GetRenderItemsHairTopLayer()) {
+                for (const RenderItem& renderItem : genericObject.GetRenderItemsMirror()) {
                     CreateObjectInstanceDataFromRenderItem(renderItem, frustum, viewportBvhData.instances);
                 }
             }

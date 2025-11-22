@@ -343,8 +343,9 @@ enum struct TrimType {
 
 enum struct TrimSetType {
     FLOOR,
-    MIDDLE,
-    CEILING,
+	MIDDLE,
+	CEILING,
+	CEILING_FANCY,
     UNDEFINED
 };
 

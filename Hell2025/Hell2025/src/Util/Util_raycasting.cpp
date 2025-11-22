@@ -4,7 +4,7 @@
 namespace Util {
 
 
-    bool RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 inverseRayDir, float minDistance, float maxDistance, const glm::vec3& aabbBoundsMin, const glm::vec3& aabbBoundsMax, float& t) {
+    bool RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 inverseRayDir, float minDistance, float maxDistance, const glm::vec3& aabbBoundsMin, const glm::vec3& aabbBoundsMax, float& t, glm::vec3& localNormal) {
         // Compute t values for the slabs defined by the AABB
         glm::vec3 t1(
             (aabbBoundsMin[0] - rayOrigin[0]) * inverseRayDir[0],
@@ -26,14 +26,32 @@ namespace Util {
         float tmin = std::max({ tminVec.x, tminVec.y, tminVec.z, minDistance });
         float tmax = std::min({ tmaxVec.x, tmaxVec.y, tmaxVec.z, maxDistance });
 
-        t = tmin;
-        return tmin <= tmax;
+		t = tmin;
+
+		if (tmin > tmax) {
+			return false;
+		}
+
+		// Determine the Local Normal based on which axis contributed the largest tminVec value
+		localNormal = glm::vec3(0.0f);
+		if (tmin == tminVec.x) {
+			localNormal.x = (t1.x < t2.x) ? -1.0f : 1.0f;
+		}
+		else if (tmin == tminVec.y) {
+			localNormal.y = (t1.y < t2.y) ? -1.0f : 1.0f;
+		}
+		else if (tmin == tminVec.z) {
+			localNormal.z = (t1.z < t2.z) ? -1.0f : 1.0f;
+		}
+
+		return true; // tmin <= tmax
     }
 
     AABBRayResult RayIntersectAABB(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxDistance, const AABB& aabb, const glm::mat4& worldTransform) {
         AABBRayResult result;
 
-        glm::mat4 inverseWorldTransform = glm::inverse(worldTransform);
+		glm::mat4 inverseWorldTransform = glm::inverse(worldTransform);
+		glm::mat3 normalMatrix = glm::transpose(glm::mat3(inverseWorldTransform));
 
         const float globalMinDistance = 0.001f;
         glm::vec3 localOrigin = glm::vec3(inverseWorldTransform * glm::vec4(rayOrigin, 1.0f));
@@ -45,13 +63,16 @@ namespace Util {
         glm::vec3 inverseLocalRayDir = 1.0f / localDir;
         glm::vec3 boundsMin = aabb.GetBoundsMin();
         glm::vec3 boundsMax = aabb.GetBoundsMax();
-        float t = 0.0f;
 
-        if (RayIntersectAABB(localOrigin, inverseLocalRayDir, localMinDistance, localMaxDistance, boundsMin, boundsMax, t)) {
-            glm::vec3 localHitPos = localOrigin + (localDir * t);
-            glm::vec3 worldHitPos = worldTransform * glm::vec4(localHitPos, 1.0f);
-            result.hitPosition = worldHitPos;
-            result.hitFound = true;
+        float t = 0.0f;
+        glm::vec3 hitNormalLocal = glm::vec3(0.0f);
+
+		if (RayIntersectAABB(localOrigin, inverseLocalRayDir, localMinDistance, localMaxDistance, boundsMin, boundsMax, t, hitNormalLocal)) {
+			result.hitFound = true;
+			result.hitPositionLocal = localOrigin + (localDir * t);
+			result.hitPositionWorld = worldTransform * glm::vec4(result.hitPositionLocal, 1.0f);
+			result.hitNormalLocal = hitNormalLocal;
+			result.hitNormalWorld = glm::normalize(normalMatrix * result.hitNormalLocal);
         }
 
         return result;

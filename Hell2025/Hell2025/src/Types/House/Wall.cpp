@@ -18,35 +18,6 @@ Wall::Wall(uint64_t id, const WallCreateInfo& createInfo, const SpawnOffset& spa
     UpdateSegmentsTrimsAndVertexData();
 }
 
-
-void Wall::CreateTrimSets() {
-    // Remove any existing trim sets belonging to this wall
-    World::RemoveObject(m_trimSetFloorId);
-    World::RemoveObject(m_trimSetMiddleId);
-    World::RemoveObject(m_trimSetCeilingId);
-
-    m_trimSetMiddleId = 0;
-    m_trimSetCeilingId = 0;
-
-    // Trims Middle
-    TrimSetCreateInfo createInfoMiddle;
-    for (const glm::vec3& point : m_createInfo.points) {
-        glm::vec3 trimPoint = point + glm::vec3(0.0f, m_createInfo.middleTrimHeight, 0.0f);
-        createInfoMiddle.points.push_back(trimPoint);
-        createInfoMiddle.type = TrimSetType::MIDDLE;
-    }
-    m_trimSetMiddleId = World::AddTrimSet(createInfoMiddle, SpawnOffset());
-
-    //// Trims Top
-    //TrimSetCreateInfo createInfoTop;
-    //for (const glm::vec3& point : m_createInfo.points) {
-    //    glm::vec3 trimPoint = point + glm::vec3(0.0f, m_createInfo.height, 0.0f);
-    //    createInfoTop.points.push_back(trimPoint);
-    //    createInfoTop.type = TrimSetType::CEILING;
-    //}
-    //m_trimSetCeilingId = World::AddTrimSet(createInfoTop, SpawnOffset());
-}
-
 void Wall::UpdateSegmentsTrimsAndVertexData() {
     CleanUp();
 
@@ -94,9 +65,6 @@ void Wall::UpdateSegmentsTrimsAndVertexData() {
         CreateCSGVertexData();
         CreateTrims();
     }
-
-
-    CreateTrimSets();
 }
 
 void Wall::FlipFaces() {
@@ -189,25 +157,17 @@ void Wall::SetCeilingTrimType(TrimType trimType) {
     UpdateSegmentsTrimsAndVertexData();
 }
 
-void Wall::SetMiddleTrimHeight(float value) {
-    m_createInfo.middleTrimHeight = value;
-    UpdateSegmentsTrimsAndVertexData(); // Necessary???????? check me
-    CreateTrimSets();
-}
+const glm::vec3& Wall::GetPointByIndex(int pointIndex) {
+    static glm::vec3 invalid = glm::vec3(0.0f);
 
-glm::vec3 Wall::GetPointByIndex(int pointIndex) {
     if (pointIndex < 0 || pointIndex >= m_createInfo.points.size()) {
         std::cout << "Wall::GetPointByIndex() failed: point index " << pointIndex << " out of range of size " << m_createInfo.points.size() << "\n";
-        return glm::vec3(0.0f);
+        return invalid;
     }
     return m_createInfo.points[pointIndex];
 }
 
 void Wall::CleanUp() {
-    World::RemoveObject(m_trimSetFloorId);
-    World::RemoveObject(m_trimSetMiddleId);
-    World::RemoveObject(m_trimSetCeilingId);
-
     for (WallSegment& wallSegment : m_wallSegments) {
         wallSegment.CleanUp();
     }
@@ -215,7 +175,8 @@ void Wall::CleanUp() {
 
 void Wall::CreateTrims() {
     m_trims.clear();
-    World::UpdateDoorAndWindowCubeTransforms();
+	World::UpdateDoorAndWindowCubeTransforms();
+	return;
 
     // Ceiling
     if (m_ceilingTrimType != TrimType::NONE) {

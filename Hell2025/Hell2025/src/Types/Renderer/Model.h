@@ -17,7 +17,7 @@ struct Model {
     void SetName(std::string modelName);
     void SetAABB(glm::vec3 aabbMin, glm::vec3 aabbMax);
     void SetLoadingState(LoadingState loadingState);
-    uint32_t GetGlobalMeshIndexByMeshName(const std::string& meshName);
+    int32_t GetGlobalMeshIndexByMeshName(const std::string& meshName);
 
     LoadingState GetLoadingState() const;
     const FileInfo& GetFileInfo() const                       { return m_fileInfo; }
