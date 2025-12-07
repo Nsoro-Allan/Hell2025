@@ -61,12 +61,10 @@ namespace OpenGLRenderer {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, waterFrameBuffer->GetColorAttachmentHandleByName("Color"));
 
-
         glBindImageTexture(0, gBuffer->GetColorAttachmentHandleByName("FinalLighting"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
         glDispatchCompute((gBuffer->GetWidth() + 7) / 8, (gBuffer->GetHeight() + 7) / 8, 1);
 
-
-       // Render hair into the main gbuffer depth texture so that doesn't fuck up 
+        // Render hair into the main gbuffer depth texture so that doesn't fuck up 
         gBuffer->Bind();
         gBuffer->DrawBuffer("FinalLighting");
 

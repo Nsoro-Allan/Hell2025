@@ -34,15 +34,19 @@ namespace AssetManager {
         std::vector<Texture>& textures = GetTextures();
 
         // Defaults
-        int defaultNormal = -1;
-        int defaultRma = -1;
+		int defaultNormal = -1;
+		int defaultRma = -1;
+		int defaultEmi = -1;
         for (int i = 0; i < textures.size(); i++) {
             if (textures[i].GetFileName() == "DefaultNRM") {
                 defaultNormal = i;
-            }
-            if (textures[i].GetFileName() == "DefaultRMA") {
-                defaultRma = i;
-            }
+			}
+			if (textures[i].GetFileName() == "DefaultRMA") {
+				defaultRma = i;
+			}
+			if (textures[i].GetFileName() == "Black") {
+                defaultEmi = i;
+			}
         }
 
         // Look for textures with _ALB suffix, create a material, and search for accompanying _NRM & _RMA textures
@@ -56,8 +60,9 @@ namespace AssetManager {
 
                 material.m_name = GetMaterialNameFromFileInfo(texture.GetFileInfo());
                 material.m_basecolor = i;
-                material.m_normal = defaultNormal;
-                material.m_rma = defaultRma;
+				material.m_normal = defaultNormal;
+				material.m_rma = defaultRma;
+				material.m_emissive = defaultEmi;
 
                 for (int j = 0; j < textures.size(); j++) {
                     if (textures[j].GetFileName() == material.m_name + "_ALB") {
@@ -73,12 +78,19 @@ namespace AssetManager {
                     }
                 }
 
-                for (int j = 0; j < textures.size(); j++) {
-                    if (textures[j].GetFileName() == material.m_name + "_RMA") {
-                        material.m_rma = j;
-                        break;
-                    }
-                }
+				for (int j = 0; j < textures.size(); j++) {
+					if (textures[j].GetFileName() == material.m_name + "_RMA") {
+						material.m_rma = j;
+						break;
+					}
+				}
+
+				for (int j = 0; j < textures.size(); j++) {
+					if (textures[j].GetFileName() == material.m_name + "_EMI") {
+						material.m_emissive = j;
+						break;
+					}
+				}
             }
         }
     }

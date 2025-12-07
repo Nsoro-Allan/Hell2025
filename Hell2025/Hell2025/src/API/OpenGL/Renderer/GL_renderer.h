@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/AABB.h"
+#include "Math/OBB.h"
 #include <string>
 #include "API/OpenGL/Types/GL_cubemapView.h"
 #include "API/OpenGL/Types/GL_mesh_buffer.h"
@@ -105,14 +106,15 @@ namespace OpenGLRenderer {
 
     // Debug
     void UpdateDebugMesh();
-    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool depthEnabled = false, int exclusiveViewportIndex = -1, int ignoredViewportIndex = -1);
-    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color);
-    void DrawPoint(glm::vec3 position, glm::vec3 color, bool depthEnabled = false, int exclusiveViewportIndex = -1);
-    void DrawPoint2D(const glm::ivec2& position, const glm::vec3& color);
-    void DrawAABB(const AABB& aabb, const glm::vec3& color);
-    void DrawAABB(const AABB& aabb, const glm::vec3& color, const glm::mat4& worldTransform);
-    void DrawFrustum(const Frustum& frustum, const glm::vec3& color);
-    void DrawSphere(glm::vec3 position, float radius, glm::vec3 color);
+    void DrawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color, bool depthEnabled = false, int exclusiveViewportIndex = -1, int ignoredViewportIndex = -1);
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec4& color);
+    void DrawPoint(const glm::vec3& position, const glm::vec4& color, bool depthEnabled = false, int exclusiveViewportIndex = -1);
+    void DrawPoint2D(const glm::ivec2& position, const glm::vec4& color);
+    void DrawAABB(const AABB& aabb, const glm::vec4& color);
+    void DrawAABB(const AABB& aabb, const glm::vec4& color, const glm::mat4& worldTransform);
+    void DrawOBB(const OBB& obb, const glm::vec4& color);
+    void DrawFrustum(const Frustum& frustum, const glm::vec4& color);
+    void DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color);
     void DebugBlitFrameBufferTexture(const std::string& frameBufferName, const std::string& attachmentName, GLint dstX, GLint dstY, GLint width, GLint height);
     void DebugBlitOpenGLTexture(GLuint textureHandle, float scale);
     void BlitDebugTextures();

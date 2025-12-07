@@ -255,8 +255,9 @@ struct Material {
     Material() {}
     std::string m_name = UNDEFINED_STRING;
     int m_basecolor = 0;
-    int m_normal = 0;
-    int m_rma = 0;
+	int m_normal = 0;
+	int m_rma = 0;
+	int m_emissive = 0;
 };
 
 struct QueuedTextureBake {
@@ -625,8 +626,9 @@ struct PrimitiveInstance {
     uint64_t meshBvhId;
     glm::vec3 worldAabbBoundsMin;
     glm::vec3 worldAabbBoundsMax;
-    glm::vec3 worldAabbCenter;
-    glm::mat4 worldTransform;
+	glm::vec3 worldAabbCenter;
+	glm::mat4 worldTransform;
+	glm::mat4 inverseWorldTransform;
     uint32_t openableId;
     uint32_t customId;
     uint32_t globalMeshIndex;
@@ -649,8 +651,9 @@ struct GpuPrimitiveInstance {
 };
 
 struct SceneBvh {
-    std::vector<BvhNode> m_nodes;
-    std::vector<GpuPrimitiveInstance> m_instances;
+	std::vector<BvhNode> m_nodes;
+	std::vector<PrimitiveInstance> m_instances;
+	std::vector<GpuPrimitiveInstance> m_gpuInstances;
 };
 
 struct MeshBvh {
@@ -701,7 +704,6 @@ struct InventoryItemInfo {
     bool m_combineable = false;
     bool m_discardable = true;
     bool m_equipable = true;
-    bool m_isGold = false;
     std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
     std::vector<std::string> m_supportedAttachments;
 };

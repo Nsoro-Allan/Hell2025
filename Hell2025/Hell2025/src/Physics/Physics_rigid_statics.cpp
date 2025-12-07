@@ -413,23 +413,21 @@ namespace Physics {
        }
    }
 
-   void SetRigidStaticGlobalPose(uint64_t rigidStaticId, glm::mat4 globalPoseMatrix) {
-       if (!RigidStaticExists(rigidStaticId)) return;
-           
-       RigidStatic& rigidStatic = g_rigidStatics[rigidStaticId];
-       PxRigidStatic* pxRigidStatic = rigidStatic.GetPxRigidStatic();
-       PxMat44 pxMatrix = GlmMat4ToPxMat44(globalPoseMatrix);
-       PxTransform pxTransform = PxTransform(pxMatrix);
-       pxRigidStatic->setGlobalPose(pxTransform);
+   glm::mat4 GetRigidStaticGlobalPose(uint64_t rigidStaticId) {
+	   if (!RigidStaticExists(rigidStaticId)) return glm::mat4(1.0f);
+
+	   RigidStatic& rigidStatic = g_rigidStatics[rigidStaticId];
+	   PxRigidStatic* pxRigidStatic = rigidStatic.GetPxRigidStatic();
+	   PxTransform pxTransform = pxRigidStatic->getGlobalPose();
+	   return PxMat44ToGlmMat4(pxTransform);
    }
 
-   glm::mat4 GetRigidStaticGlobalPose(uint64_t rigidStaticId) {
-       if (!RigidStaticExists(rigidStaticId)) return glm::mat4(1.0f);
-
-       RigidStatic& rigidStatic = g_rigidStatics[rigidStaticId];
-       PxRigidStatic* pxRigidStatic = rigidStatic.GetPxRigidStatic();
-       PxTransform pxTransform = pxRigidStatic->getGlobalPose();
-       return PxMat44ToGlmMat4(pxTransform);       
+   void SetRigidStaticWorldTransform(uint64_t rigidStaticId, glm::mat4 worldMatrix) {
+	   if (RigidStatic* rigidStatic = GetRigidStaitcById(rigidStaticId)) {
+		   PxRigidStatic* pxRigidStatic = rigidStatic->GetPxRigidStatic();
+		   PxMat44 pxWorldMatrix = Physics::GlmMat4ToPxMat44(worldMatrix);
+		   pxRigidStatic->setGlobalPose(PxTransform(pxWorldMatrix));
+	   }
    }
 
    void SetRigidStaticUserData(uint64_t m_physicsId, PhysicsUserData physicsUserData) {

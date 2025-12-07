@@ -45,10 +45,10 @@ public:
     uint64_t& GetMirrorId()     { return m_mirrorId; }
     Frustum& GetFrustum()       { return m_frustum; }
     uint32_t GetViewportIndex() { return m_viewportIndex; }
-    int GetLeftPixel()          { return m_leftPixel; }
-    int GetRightPixel()         { return m_rightPixel; }
-    int GetTopPixel()           { return m_topPixel; }
-    int GetBottomPixel()        { return m_bottomPixel; }
+    int GetLeftPixel()          { return (int)m_leftPixel; }
+    int GetRightPixel()         { return (int)m_rightPixel; }
+    int GetTopPixel()           { return (int)m_topPixel; }
+    int GetBottomPixel()        { return (int)m_bottomPixel; }
     float GetNearPlane()        { return m_nearPlane; }
     float GetFarPlane()         { return m_farPlane; }
 

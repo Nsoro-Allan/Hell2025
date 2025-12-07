@@ -141,6 +141,11 @@ void TrimSet::CreateRenderItems() {
         // This "cursor" is the amount walked so far on this wall
         float cursor = 0.0f;
 
+        // If on the first corner and it is internal, push the cursor forward the width of the corner piece
+        if (m_corners[i].m_internal) {
+            cursor += internalCornerPieceSize;
+        }
+
         // Internal corner
         if (m_corners[i].m_internal && internalCornerMeshIndex != -1) {
             RenderItem& renderItem = m_renderItems.emplace_back();
@@ -152,8 +157,6 @@ void TrimSet::CreateRenderItems() {
             renderItem.normalMapTextureIndex = material->m_normal;
             Util::UpdateRenderItemAABB(renderItem);
             Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-
-            cursor += internalCornerPieceSize;
         }
         // External corner
         else if (!m_corners[i].m_internal && externalCornerMeshIndex != -1) {

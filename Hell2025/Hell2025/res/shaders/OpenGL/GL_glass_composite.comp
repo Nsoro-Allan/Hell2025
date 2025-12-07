@@ -12,6 +12,11 @@ void main() {
     vec3 glassColor = imageLoad(glassTexure, texCoord).rgb;
 	finalLighting += glassColor;
 
+	
+	//if (glassColor != vec3(0,0,0)) {
+	//	finalLighting.rgb *= vec3(1, 0, 0);
+	//}
+
    //if (glassColor != vec3(0,0,0)) {
    //    finalLighting -= vec3(0.00125);
    //    finalLighting.r = clamp(finalLighting.r, 0, 1);

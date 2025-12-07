@@ -51,8 +51,7 @@ void Mermaid::Update(float deltaTime) {
 }
 
 void Mermaid::UpdateRenderItems() {
-    m_meshNodes.UpdateHierarchy();
-    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+    m_meshNodes.Update(m_transform.to_mat4());
 }
 
 void Mermaid::CleanUp() {

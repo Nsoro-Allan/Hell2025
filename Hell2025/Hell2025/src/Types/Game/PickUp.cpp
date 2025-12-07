@@ -136,7 +136,7 @@ void PickUp::Update(float deltaTime) {
         m_modelMatrix = Physics::GetRigidDynamicWorldMatrix(m_physicsId);
     }
 
-    m_meshNodes.UpdateRenderItems(GetModelMatrix());
+    m_meshNodes.Update(GetModelMatrix());
 }
 
 void PickUp::CleanUp() {

@@ -1,6 +1,7 @@
 #pragma once
 #include "HellTypes.h"
 #include "CreateInfo.h"
+#include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 
 struct Door {
@@ -14,12 +15,10 @@ struct Door {
 
     void SetPosition(glm::vec3 position);
     void Update(float deltaTime);
-    void CleanUp();
-    void UpdateRenderItems(); 
-    void SubmitRenderItems();
-    void Interact();
+	void CleanUp();
     void UpdateFloor();
 
+	MeshNodes& GetMeshNodes() { return m_meshNodes; }
     const bool MovedThisFrame() const                       { return m_movedThisFrame; }
     const uint64_t GetObjectId() const                      { return m_objectId; }
     const uint64_t GetPhysicsId() const                     { return m_physicsId; }
@@ -33,10 +32,13 @@ struct Door {
     const Model* GetDoorFrameModel() const                  { return m_frameModel; }
     const OpeningState& GetOpeningState() const             { return m_openingState; }
     const DoorCreateInfo& GetCreateInfo() const             { return m_createInfo; }
-    const std::vector<RenderItem>& GetRenderItems() const   { return m_renderItems; }
+    const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
 
 private:
-    DoorCreateInfo m_createInfo;
+	DoorCreateInfo m_createInfo;
+	MeshNodes m_meshNodes;
+    SpawnOffset m_spawnOffset;
+
     bool m_movedThisFrame = true;
     uint64_t m_lifeTime = 0;
     uint64_t m_objectId = 0;

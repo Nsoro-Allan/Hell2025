@@ -18,7 +18,6 @@ namespace World {
 
     void ProcessBullets() {
 
-
         std::vector<Bullet>& bullets = GetBullets();
         std::vector<Bullet> newBullets;
         bool glassWasHit = false;
@@ -41,11 +40,8 @@ namespace World {
             PhysXRayResult rayResult;// = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
 
 
-
-
             // Testing out bvh ray casts for bullets. Maybe it's worthwhile over physx raycasts
-            uint64_t sceneBvhId = GetSceneBvhIdByViewportIndex(player->GetViewportIndex());
-            BvhRayResult bvhRayResult = Bvh::Cpu::ClosestHit(sceneBvhId, rayOrigin, bullet.GetDirection(), rayLength);
+            BvhRayResult bvhRayResult = World::ClosestHit(rayOrigin, bullet.GetDirection(), rayLength);
 
             if (bvhRayResult.hitFound) {
                 Decal2CreateInfo decalCreateInfo;

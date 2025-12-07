@@ -18,7 +18,7 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
 }
 
 void GenericObject::Update(float deltaTime) {
-   m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+   m_meshNodes.Update(m_transform.to_mat4());
 }
 
 void GenericObject::CleanUp() {

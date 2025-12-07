@@ -108,17 +108,17 @@ namespace Physics {
     void MarkRigidStaticForRemoval(uint64_t rigidStaticId);
     void RemoveRigidStatic(uint64_t rigidStaticId);
     void RemoveAnyRigidStaticMarkedForRemoval();
-    void SetRigidStaticGlobalPose(uint64_t rigidStaticId, glm::mat4 globalPoseMatrix);
     glm::mat4 GetRigidStaticGlobalPose(uint64_t rigidStaticId);
-    bool RigidStaticExists(uint64_t rigidStaticId);
+	bool RigidStaticExists(uint64_t rigidStaticId);
+	void SetRigidStaticWorldTransform(uint64_t rigidStaticId, glm::mat4 worldMatrix);
     void SetRigidStaticUserData(uint64_t rigidStaticId, PhysicsUserData physicsUserData);
     uint64_t CreateRigidStaticFromCapsule(Transform transform, float radius, float halfHeight, PhysicsFilterData filterData, Transform localOffset);
     uint64_t CreateRigidStaticBoxFromExtents(Transform transform, glm::vec3 boxExtents, PhysicsFilterData filterData, Transform localOffset = Transform());
     uint64_t CreateRigidStaticConvexMeshFromModel(Transform transform, const std::string& modelName, PhysicsFilterData filterData);
     uint64_t CreateRigidStaticConvexMeshFromVertices(Transform transform, const std::span<Vertex>& vertices, PhysicsFilterData filterData);
     uint64_t CreateRigidStaticTriangleMeshFromVertexData(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, PhysicsFilterData filterData);
-    uint64_t CreateRigidStaticTriangleMeshFromModel(Transform transform, const std::string& modelName, PhysicsFilterData filterData);
-    RigidStatic* GetRigidStaitcById(uint64_t rigidStaticId);
+	uint64_t CreateRigidStaticTriangleMeshFromModel(Transform transform, const std::string& modelName, PhysicsFilterData filterData);
+	RigidStatic* GetRigidStaitcById(uint64_t rigidStaticId);
 
     // D6Joints
     uint64_t CreateD6Joint(uint64_t parentRigidDynamicId, uint64_t childRigidDynamicId, glm::mat4 parentFrame, glm::mat4 childFrame);

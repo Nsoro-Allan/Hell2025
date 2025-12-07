@@ -34,7 +34,7 @@ void Player::UpdateCursorRays() {
     // Bvh Ray result
     glm::vec3 rayOrigin = GetCameraPosition();
     glm::vec3 rayDir = GetCameraForward();
-    m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
+    m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance);
 
     // Find openable mesh if one exists
     if (m_bvhRayResult.hitFound) {
@@ -186,13 +186,6 @@ void Player::UpdateInteract() {
                 Audio::PlayAudio("ItemPickUp.wav", 1.0f);
             }
         }
-        // Doors
-        if (interactObjectType == ObjectType::DOOR) {
-            Door* door = World::GetDoorByObjectId(m_interactObjectId);
-            if (door) {
-                door->Interact();
-            }
-        }
     }
 
     // PRESSING interact key
@@ -212,7 +205,7 @@ void Player::UpdateInteract() {
         glm::vec3 rayDir = GetCameraForward();
         float maxRayDistance = 100.0f;
 
-        BvhRayResult result = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, m_viewportIndex);
+        BvhRayResult result = World::ClosestHit(rayOrigin, rayDir, maxRayDistance);
         if (result.hitFound) {
             // Sit at 
             //if (result.objectType == ObjectType::PIANO) {

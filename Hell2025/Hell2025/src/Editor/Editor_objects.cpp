@@ -37,7 +37,7 @@ namespace Editor {
         }
 
         // BVH ray
-        BvhRayResult bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance, GetHoveredViewportIndex());
+        BvhRayResult bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance);
         if (bvhRayResult.hitFound) {
             float physXDistance = glm::distance(physxRayResult.hitPosition, rayOrigin);
             float bvhDistance = glm::distance(bvhRayResult.hitPosition, rayOrigin);

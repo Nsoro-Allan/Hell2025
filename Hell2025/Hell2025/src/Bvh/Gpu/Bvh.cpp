@@ -238,7 +238,7 @@ namespace Bvh::Gpu {
         SceneBvh& sceneBvh = g_sceneBvhs[bvhId];
 
         // Clear last frames data
-        sceneBvh.m_instances.clear();
+        sceneBvh.m_gpuInstances.clear();
         sceneBvh.m_nodes.clear();
 
         if (instances.empty()) return;
@@ -271,7 +271,7 @@ namespace Bvh::Gpu {
             node.firstChildOrPrimitive = mmNode.index.value >> MadmannBvhNode::prim_count_bits;
         }
 
-        sceneBvh.m_instances.reserve(instances.size());
+        sceneBvh.m_gpuInstances.reserve(instances.size());
 
         // Walk the scene BVH and create the entity instance array, specifically ordering them such that leaf node instances are adjacent
         uint32_t stack[MAX_BVH_STACK_SIZE];
@@ -285,7 +285,7 @@ namespace Bvh::Gpu {
 
             // If this node is a leaf...
             if (node.primitiveCount > 0) {
-                int newPrimitiveIndex = static_cast<int>(sceneBvh.m_instances.size());
+                int newPrimitiveIndex = static_cast<int>(sceneBvh.m_gpuInstances.size());
 
                 // Loop over each primitive instance in the leaf
                 for (uint32_t i = 0; i < node.primitiveCount; i++) {
@@ -295,7 +295,7 @@ namespace Bvh::Gpu {
                     const PrimitiveInstance& instance = instances[instanceIndex];
 
                     // Create the GPU primitive instance
-                    GpuPrimitiveInstance& gpuInstance = sceneBvh.m_instances.emplace_back();
+                    GpuPrimitiveInstance& gpuInstance = sceneBvh.m_gpuInstances.emplace_back();
                     gpuInstance.rootNodeIndex = g_meshBvhRootNodeOffsetMapping[instance.meshBvhId];
                     gpuInstance.worldTransform = instance.worldTransform;
                     gpuInstance.inverseWorldTransform = glm::inverse(gpuInstance.worldTransform);
@@ -422,6 +422,6 @@ namespace Bvh::Gpu {
         static std::vector<GpuPrimitiveInstance> empty;
 
         if (!SceneBvhExists(sceneBvhId)) return empty;
-        return g_sceneBvhs[sceneBvhId].m_instances;
+        return g_sceneBvhs[sceneBvhId].m_gpuInstances;
     }
 }

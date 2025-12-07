@@ -119,7 +119,7 @@ void GameObject::UpdateRenderItems() {
     transform.rotation.x = rot;
     m_meshNodes.SetTransformByMeshName("Yamaha_Keyboard.Cover", transform);
 
-    m_meshNodes.UpdateRenderItems(GetModelMatrix());
+    m_meshNodes.Update(GetModelMatrix());
 }
 
 void GameObject::SetConvexHullsFromModel(const std::string modelName) {

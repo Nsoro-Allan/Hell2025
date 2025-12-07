@@ -9,25 +9,7 @@
 
 Light::Light(LightCreateInfo createInfo) {   
     m_createInfo = createInfo;
-
-    m_position = createInfo.position + glm::vec3(0, -0.1, 0);
-    m_color = createInfo.color;
-    m_radius = createInfo.radius;
-    m_strength = createInfo.strength;
-    m_type = createInfo.type;
-
-    if (m_type == LightType::LAMP_POST) {
-        m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("LampPost"));
-        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LampPost"));
-        m_transformMain.position = m_position;
-    }
-    if (m_type == LightType::HANGING_LIGHT) {
-        m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("Light"));
-        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHanging"));
-        m_transformMain.position = m_position;
-    }
-
-    m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
+	m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
 }
 
 void Light::Update(float deltaTime) {
@@ -36,24 +18,56 @@ void Light::Update(float deltaTime) {
     UpdateDirtyState();
 }
 
+// RENAME ME TO SOMETHING MORE DESCRIPTIVE
+// RENAME ME TO SOMETHING MORE DESCRIPTIVE
+// RENAME ME TO SOMETHING MORE DESCRIPTIVE
+
 void Light::BuildCord() {
-    if (m_type == LightType::HANGING_LIGHT) {
-        m_material = AssetManager::GetMaterialByIndex(AssetManager::GetMaterialIndexByName("Light"));
-        m_modelMain = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHanging"));
-        m_transformMain.position = m_position;
-        PhysXRayResult rayResult = Physics::CastPhysXRay(m_position, glm::vec3(0.0f, 1.0f, 0.0f), 100.0f, RaycastGroup::RAYCAST_ENABLED);
-        if (rayResult.hitFound) {
-            m_modelCord = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingCord"));
-            m_modelCordMount = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("LightHangingMount"));
-            m_transformCord.position = m_position;
-            m_transformCord.scale.y = glm::distance(rayResult.hitPosition, m_position);
-            m_transformCordMount.position = rayResult.hitPosition;
-            //std::cout << "hit found: " << Util::Vec3ToString(rayResult.hitPosition) << "\n";
-        }
-        else {
-            m_modelCord = nullptr;
-            m_modelCordMount = nullptr;
-        }
+    // Mount position
+    glm::vec3 mountPosition = m_createInfo.position;
+	PhysXRayResult rayResult = Physics::CastPhysXRay(m_createInfo.position, glm::vec3(0.0f, 1.0f, 0.0f), 100.0f, RaycastGroup::RAYCAST_ENABLED);
+	if (rayResult.hitFound) {
+        mountPosition = rayResult.hitPosition;
+	}
+
+    // Distance to roof
+	float distanceToRoof = glm::distance(mountPosition, m_createInfo.position);
+
+    // Transforms
+	Transform worldTransform;
+    worldTransform.position = m_createInfo.position;
+
+	Transform localMountTransform;
+    localMountTransform.position = glm::vec3(0.0f, distanceToRoof, 0.0f);
+
+	Transform localCordTransform;
+    localCordTransform.scale = glm::vec3(1.0f, distanceToRoof, 1.0f);
+
+	glm::mat4 worldMatrix = worldTransform.to_mat4();
+
+	if (m_createInfo.type == LightType::HANGING_LIGHT) {
+		std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+		MeshNodeCreateInfo& light = meshNodeCreateInfoSet.emplace_back();
+		light.meshName = "Light";
+		light.materialName = "Light";
+		light.castShadows = false;
+        light.emissiveColor = m_createInfo.color;
+
+		MeshNodeCreateInfo& mount = meshNodeCreateInfoSet.emplace_back();
+		mount.meshName = "Mount";
+		mount.materialName = "Light";
+		mount.castShadows = false;
+
+		MeshNodeCreateInfo& cord = meshNodeCreateInfoSet.emplace_back();
+		cord.meshName = "Cord";
+		cord.materialName = "Light";
+		cord.castShadows = false;
+
+        m_meshNodes.Init(m_objectId, "LightHanging", meshNodeCreateInfoSet);
+		m_meshNodes.SetTransformByMeshName("Mount", localMountTransform);
+		m_meshNodes.SetTransformByMeshName("Cord", localCordTransform);
+		m_meshNodes.Update(worldMatrix);
     }
 }
 
@@ -109,82 +123,11 @@ void Light::UpdateDirtyState() {
 }
 
 void Light::UpdateRenderItems() {
-    m_renderItems.clear();
-
-    if (m_modelMain) {
-        for (uint32_t meshIndex : m_modelMain->GetMeshIndices()) {
-            RenderItem& renderItem = m_renderItems.emplace_back();
-            renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transformMain.to_mat4();
-            renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-            renderItem.meshIndex = meshIndex;
-            renderItem.castShadows = false;
-            if (m_material) {
-                renderItem.baseColorTextureIndex = m_material->m_basecolor;
-                renderItem.normalMapTextureIndex = m_material->m_normal;
-                renderItem.rmaTextureIndex = m_material->m_rma;
-                renderItem.emissiveTextureIndex = AssetManager::GetTextureIndexByName("Light_EMI");
-            }
-            Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-            if (mesh->GetName() == "Lamp") {
-                renderItem.emissiveR = m_color.r;
-                renderItem.emissiveG = m_color.g;
-                renderItem.emissiveB = m_color.b;
-            }
-        }
-    }
-   
-    if (m_modelCord) {
-        for (uint32_t meshIndex : m_modelCord->GetMeshIndices()) {
-            RenderItem& renderItem = m_renderItems.emplace_back();
-            renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transformCord.to_mat4();
-            renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-            renderItem.meshIndex = meshIndex;
-            renderItem.castShadows = false;
-            if (m_material) {
-                renderItem.baseColorTextureIndex = m_material->m_basecolor;
-                renderItem.normalMapTextureIndex = m_material->m_normal;
-                renderItem.rmaTextureIndex = m_material->m_rma;
-            }
-            Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-            if (mesh->GetName() == "Lamp") {
-                renderItem.emissiveR = m_color.r;
-                renderItem.emissiveG = m_color.g;
-                renderItem.emissiveB = m_color.b;
-            }
-        }
-    }
-    if (m_modelCordMount) {
-        for (uint32_t meshIndex : m_modelCordMount->GetMeshIndices()) {
-            RenderItem& renderItem = m_renderItems.emplace_back();
-            renderItem.objectType = (int)ObjectType::LIGHT;
-            renderItem.modelMatrix = m_transformCordMount.to_mat4();
-            renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-            renderItem.meshIndex = meshIndex;
-            if (m_material) {
-                renderItem.baseColorTextureIndex = m_material->m_basecolor;
-                renderItem.normalMapTextureIndex = m_material->m_normal;
-                renderItem.rmaTextureIndex = m_material->m_rma;
-            }
-            Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-            if (mesh->GetName() == "Lamp") {
-                renderItem.emissiveR = m_color.r;
-                renderItem.emissiveG = m_color.g;
-                renderItem.emissiveB = m_color.b;
-            }
-        }
-    }
-
-    for (RenderItem& renderItem : m_renderItems) {
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-    }
+    // Replaced by MeshNodes
 }
 
 void Light::SetPosition(glm::vec3 position) {
-    m_position = position;
-    m_createInfo.position = m_position;
+    m_createInfo.position = position;
 }
 
 Frustum* Light::GetFrustumByFaceIndex(uint32_t faceIndex) {
@@ -198,21 +141,21 @@ void Light::ForceDirty() {
 }
 
 void Light::UpdateMatricesAndFrustum() {
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), (float)SHADOW_MAP_HI_RES_SIZE / (float)SHADOW_MAP_HI_RES_SIZE, SHADOW_NEAR_PLANE, m_radius);
+    glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.0f), (float)SHADOW_MAP_HI_RES_SIZE / (float)SHADOW_MAP_HI_RES_SIZE, SHADOW_NEAR_PLANE, m_createInfo.radius);
 
-    m_viewMatrix[0] = glm::lookAt(m_position, m_position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_viewMatrix[1] = glm::lookAt(m_position, m_position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_viewMatrix[2] = glm::lookAt(m_position, m_position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    m_viewMatrix[3] = glm::lookAt(m_position, m_position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-    m_viewMatrix[4] = glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_viewMatrix[5] = glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_viewMatrix[0] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_viewMatrix[1] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_viewMatrix[2] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    m_viewMatrix[3] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    m_viewMatrix[4] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_viewMatrix[5] = glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
-    m_projectionTransforms[0] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_projectionTransforms[1] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_projectionTransforms[2] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    m_projectionTransforms[3] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-    m_projectionTransforms[4] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-    m_projectionTransforms[5] = projectionMatrix * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_projectionTransforms[0] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_projectionTransforms[1] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_projectionTransforms[2] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    m_projectionTransforms[3] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+    m_projectionTransforms[4] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+    m_projectionTransforms[5] = projectionMatrix * glm::lookAt(m_createInfo.position, m_createInfo.position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
     for (int i = 0; i < 6; i++) {
         m_frustum[i].Update(m_projectionTransforms[i]);

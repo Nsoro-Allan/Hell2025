@@ -256,6 +256,25 @@
         1.0
       ],
       "Type": "TEST_MODEL2"
+    },
+    {
+      "EditorName": "Generic Object",
+      "Position": [
+        3.039365530014038,
+        1.7439422607421875,
+        -0.2413475513458252
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "TEST_MODEL"
     }
   ],
   "Fireplaces": [
@@ -399,33 +418,33 @@
   ],
   "Planes": [
     {
-      "EditorName": "UNDEFINED_STRING 8",
-      "Material": "FloorBoards",
+      "EditorName": "Floor 9",
+      "Material": "BathroomFloor",
       "P0": [
-        -5.049999713897705,
+        4.5,
         0.0,
-        -2.9499998092651367
+        1.5499999523162842
       ],
       "P1": [
-        -5.049999713897705,
+        4.5,
         0.0,
-        6.150000095367432
+        6.0
       ],
       "P2": [
+        8.899999618530273,
         0.0,
-        0.0,
-        6.150000095367432
+        6.0
       ],
       "P3": [
+        8.899999618530273,
         0.0,
-        0.0,
-        -2.950000047683716
+        1.5499999523162842
       ],
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.4000000059604645,
-      "Type": "UNDEFINED"
+      "TextureScale": 0.8999999761581421,
+      "Type": "FLOOR"
     },
     {
       "EditorName": "UNDEFINED_STRING 2",
@@ -631,32 +650,32 @@
       "Type": "FLOOR"
     },
     {
-      "EditorName": "Floor 9",
-      "Material": "BathroomFloor",
+      "EditorName": "Floor 10",
+      "Material": "FloorBoards",
       "P0": [
-        4.5,
+        -4.25,
         0.0,
-        1.5499999523162842
+        -2.8499999046325684
       ],
       "P1": [
-        4.5,
+        -4.25,
         0.0,
         6.0
       ],
       "P2": [
-        8.899999618530273,
+        0.05000000074505806,
         0.0,
         6.0
       ],
       "P3": [
-        8.899999618530273,
+        0.05000000074505806,
         0.0,
-        1.5499999523162842
+        -2.8499999046325684
       ],
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.8999999761581421,
+      "TextureScale": 0.4000000059604645,
       "Type": "FLOOR"
     }
   ],
@@ -905,87 +924,6 @@
       "TextureScale": 0.4166666567325592,
       "TrimTypeCeiling": "TIMBER",
       "TrimTypeFloor": "NONE",
-      "UseReversePointOrder": false,
-      "WallType": "INTERIOR"
-    },
-    {
-      "EditorName": "Wall 7",
-      "Height": 2.4000000953674316,
-      "Material": "Ceiling2",
-      "MiddleTrimHeight": 2.4000000953674316,
-      "Points": [
-        [
-          7.400000095367432,
-          0.0,
-          10.300000190734863
-        ],
-        [
-          7.400000095367432,
-          0.0,
-          13.5
-        ],
-        [
-          4.0,
-          0.0,
-          13.5
-        ],
-        [
-          4.0,
-          0.0,
-          16.0
-        ],
-        [
-          1.5,
-          0.0,
-          16.0
-        ],
-        [
-          1.5,
-          0.0,
-          12.0
-        ],
-        [
-          4.0,
-          0.0,
-          12.0
-        ],
-        [
-          4.0,
-          0.0,
-          8.5
-        ],
-        [
-          5.5,
-          0.0,
-          8.5
-        ],
-        [
-          5.5,
-          0.0,
-          10.0
-        ],
-        [
-          6.0,
-          0.0,
-          10.0
-        ],
-        [
-          6.0,
-          0.0,
-          9.5
-        ],
-        [
-          7.400000095367432,
-          0.0,
-          10.300000190734863
-        ]
-      ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": -1.399999976158142,
-      "TextureRotation": 0.0,
-      "TextureScale": 0.4166666567325592,
-      "TrimTypeCeiling": "TIMBER",
-      "TrimTypeFloor": "TIMBER",
       "UseReversePointOrder": false,
       "WallType": "INTERIOR"
     }

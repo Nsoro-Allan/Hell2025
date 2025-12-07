@@ -50,14 +50,14 @@ struct Piano {
     void PlayKey(int note, int velocity = 127, float duration = 0.05f);
 
     bool PianoKeyExists(uint64_t pianoKeyId);
-    PianoKey* GetPianoKey(uint64_t pianoKeyId);
+	PianoKey* GetPianoKey(uint64_t pianoKeyId);
 
+	MeshNodes& GetMeshNodes()                               { return m_meshNodes; }
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
     const uint64_t& GetObjectId() const                     { return m_pianoObjectId; };
     const glm::vec3 GetPosition() const                     { return m_createInfo.position; }
     const glm::vec3& GetSeatPosition() const                { return m_seatPosition; }
     const PianoCreateInfo GetCreateInfo() const             { return m_createInfo; }
-    const MeshNodes& GetMeshNodes() const                   { return m_meshNodes;  }
 
     static uint32_t MeshNameToNote(const std::string& meshName);
         

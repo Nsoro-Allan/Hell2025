@@ -761,7 +761,7 @@ namespace World {
     void ResetWorld() {
         std::cout << "Reset world()\n";
 
-        // Clear heightmap data
+        // Clear height map data
         g_heightMapChunks.clear();
         g_validChunks.clear();
         g_mapInstances.clear();
@@ -776,13 +776,6 @@ namespace World {
         //mermaidCreateInfo.position = glm::vec3(500.0f, 29.5f, 500.0f);
         mermaidCreateInfo.rotation.y = 0.05f;
         AddMermaid(mermaidCreateInfo);
-
-        // remove meeeeeeeeeeeeeeeee
-        // remove meeeeeeeeeeeeeeeee
-
-
-        // remove meeeeeeeeeeeeeeeee
-        // remove meeeeeeeeeeeeeeeee
 
         //AnimatedGameObject* animatedGameObject = nullptr;
         //uint64_t id = World::CreateAnimatedGameObject();

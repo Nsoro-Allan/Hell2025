@@ -161,7 +161,7 @@ namespace Bvh::Cpu {
         SceneBvh* sceneBvh = GetSceneBvhById(sceneBvhId);
 
         const std::vector<BvhNode>& sceneNodes = sceneBvh->m_nodes;
-        const std::vector<GpuPrimitiveInstance>& instances = sceneBvh->m_instances;
+        const std::vector<GpuPrimitiveInstance>& instances = sceneBvh->m_gpuInstances;
         const std::vector<BvhNode>& meshBvhNodes = GetMeshGpuBvhNodes();
         
         RayData rayData = ComputeRayData(rayOrigin, rayDir, 0.0001f, maxDistance);
@@ -313,7 +313,7 @@ namespace Bvh::Cpu {
         SceneBvh* sceneBvh = GetSceneBvhById(sceneBvhId);
 
         const std::vector<BvhNode>& sceneNodes = sceneBvh->m_nodes;
-        const std::vector<GpuPrimitiveInstance>& instances = sceneBvh->m_instances;
+        const std::vector<GpuPrimitiveInstance>& instances = sceneBvh->m_gpuInstances;
 
         // Bail if scene is empty
         if (sceneNodes.empty()) return rayResult;

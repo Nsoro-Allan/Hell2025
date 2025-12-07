@@ -92,7 +92,7 @@ namespace Game {
             g_totalTime -= TIME_WRAP; // Keep it continuous
         }
 
-        World::UpdatePlayerBvhs();
+        World::UpdateBvhs();
 
         // Editor select menu open?
         if (Editor::IsOpen() || ImGuiBackEnd::OwnsMouse()) {

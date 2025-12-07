@@ -38,6 +38,8 @@
 #include "Integration/GLFW.h"
 #include "Integration/SDL.h"
 
+#include "Pathfinding/NavMesh.h"
+
 #define NOMINMAX
 #ifdef _WIN32
 #include <windows.h>
@@ -120,6 +122,7 @@ namespace BackEnd {
         ImGuiBackEnd::Init();
         Logging::Init() << "ImGuiBackEnd::Init()";
 
+        NavMeshManager::Init();
 
         //Modelling::Init();
 

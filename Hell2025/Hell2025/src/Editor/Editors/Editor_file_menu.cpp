@@ -40,7 +40,8 @@ namespace Editor {
             interior.AddChild("Drawers Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
 
 
-            interior.AddChild("Fireplace", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::DEFAULT);
+			interior.AddChild("Fireplace (Open)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::DEFAULT);
+			interior.AddChild("Fireplace (WoodStove)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::WOOD_STOVE);
 
             interior.AddChild("Window", Shortcut::NONE, Callbacks::BeginAddingWindow);
 

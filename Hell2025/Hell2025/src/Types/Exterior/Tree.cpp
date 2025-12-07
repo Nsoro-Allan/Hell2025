@@ -103,7 +103,7 @@ void Tree::SetRotation(glm::vec3 rotation) {
 }
 
 void Tree::UpdateRenderItems() {
-    m_meshNodes.UpdateRenderItems(GetModelMatrix());
+    m_meshNodes.Update(GetModelMatrix());
 }
 
 void Tree::UpdateTransformAndModelMatrix() {

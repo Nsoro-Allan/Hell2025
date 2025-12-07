@@ -80,7 +80,7 @@ namespace Renderer {
         }
     }
 
-    void DrawPoint(glm::vec3 position, glm::vec3 color, bool obeyDepth, int exclusiveViewportIndex) {
+    void DrawPoint(const glm::vec3& position, const glm::vec4& color, bool obeyDepth, int exclusiveViewportIndex) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawPoint(position, color, obeyDepth, exclusiveViewportIndex);
         }
@@ -89,7 +89,7 @@ namespace Renderer {
         }
     }
 
-    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool obeyDepth, int exclusiveViewportIndex, int ignoredViewportIndex) {
+    void DrawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color, bool obeyDepth, int exclusiveViewportIndex, int ignoredViewportIndex) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawLine(begin, end, color, obeyDepth, exclusiveViewportIndex, ignoredViewportIndex);
         }
@@ -98,7 +98,7 @@ namespace Renderer {
         }
     }
 
-    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color) {
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec4& color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawLine2D(begin, end, color);
         }
@@ -107,7 +107,7 @@ namespace Renderer {
         }
     }
 
-    void DrawAABB(const AABB& aabb, const glm::vec3& color) {
+    void DrawAABB(const AABB& aabb, const glm::vec4& color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawAABB(aabb, color);
         }
@@ -116,7 +116,7 @@ namespace Renderer {
         }
     }
 
-    void DrawAABB(const AABB& aabb, const glm::vec3& color, const glm::mat4& worldTransform) {
+    void DrawAABB(const AABB& aabb, const glm::vec4& color, const glm::mat4& worldTransform) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawAABB(aabb, color, worldTransform);
         }
@@ -125,7 +125,16 @@ namespace Renderer {
         }
     }
 
-    void DrawFrustum(const Frustum& frustum, const glm::vec3& color) {
+    void DrawOBB(const OBB& obb, const glm::vec4& color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawOBB(obb, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: DrawOBB()";
+        }
+    }
+
+    void DrawFrustum(const Frustum& frustum, const glm::vec4& color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawFrustum(frustum, color);
         }
@@ -134,7 +143,7 @@ namespace Renderer {
         }
     }
 
-    void DrawSphere(glm::vec3 position, float radius, glm::vec3 color) {
+    void DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawSphere(position, radius, color);
         }

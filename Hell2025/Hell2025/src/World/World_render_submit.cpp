@@ -59,8 +59,11 @@ namespace World {
         }
 
         // Doors
-        for (Door& door : GetDoors()) {
-            door.SubmitRenderItems();
+		for (Door& door : GetDoors()) {
+			RenderDataManager::SubmitRenderItems(door.GetRenderItems());
+			if (Editor::GetSelectedObjectId() == door.GetObjectId()) {
+				RenderDataManager::SubmitOutlineRenderItems(door.GetRenderItems());
+			}
         }
         
         for (Piano& piano : GetPianos()) {
@@ -122,8 +125,9 @@ namespace World {
             RenderDataManager::SubmitRenderItems(trimSet.GetRenderItems());
         }
 
-        for (Fireplace& fireplace: GetFireplaces()) {
-            RenderDataManager::SubmitRenderItems(fireplace.GetRenderItems());             
+		for (Fireplace& fireplace : GetFireplaces()) {
+			RenderDataManager::SubmitRenderItems(fireplace.GetRenderItems());
+			RenderDataManager::SubmitRenderItemsGlass(fireplace.GetRenderItemsGlass());
             if (Editor::GetSelectedObjectId() == fireplace.GetObjectId()) {
                 RenderDataManager::SubmitOutlineRenderItems(fireplace.GetRenderItems());
             }

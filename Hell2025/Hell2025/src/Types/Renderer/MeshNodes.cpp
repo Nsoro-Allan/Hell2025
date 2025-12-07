@@ -40,18 +40,27 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         MeshNode& meshNode = m_meshNodes[i];
         meshNode.blendingMode = BlendingMode::DEFAULT;
         meshNode.materialIndex = AssetManager::GetMaterialIndexByName(DEFAULT_MATERIAL_NAME);
-        meshNode.transform = Transform();
-        meshNode.transformPreviousFrame = Transform(glm::vec3(666.0f)); // Forces dirty
+		meshNode.transform = Transform();
+		meshNode.worldMatrix = glm::mat4(1.0f);
+		meshNode.worldModelMatrixPreviousFrame = glm::mat4(0.0f); // Forces dirty
+        meshNode.inverseWorldMatrix = glm::mat4(1.0f);
         meshNode.localParentIndex = mesh->parentIndex;
         meshNode.localTransform = mesh->localTransform;
         meshNode.inverseBindTransform = mesh->inverseBindTransform;
-        meshNode.localModelMatrix = glm::mat4(1.0f);
+        meshNode.localMatrix = glm::mat4(1.0f);
         meshNode.worldspaceAabb = AABB();
         meshNode.parentObjectId = parentId;
         meshNode.type = MeshNodeType::DEFAULT;
         meshNode.globalMeshIndex = globalMeshIndex;
         meshNode.customId = 0;
         meshNode.nodeIndex = i;
+        meshNode.meshBvhId = mesh->meshBvhId;
+        meshNode.forceDynamic = false;
+		meshNode.castShadows = true;
+        meshNode.aabbCollision = false;
+		meshNode.emissiveColor = glm::vec3(1.0f);
+        meshNode.rigidStaticId = 0;
+        meshNode.worldSpaceObb.SetLocalBounds(AABB(mesh->aabbMin, mesh->aabbMax));
     }
 
     // If the model contains armatures, store the first one (TODO: allow more maybe)
@@ -61,18 +70,24 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 
     // Apply any mesh node create info
     for (const MeshNodeCreateInfo& createInfo : meshNodeCreateInfoSet) {
+		Mesh* mesh = AssetManager::GetMeshByName(createInfo.meshName);
+		MeshNode* meshNode = GetMeshNodeByMeshName(createInfo.meshName);
 
-        MeshNode* meshNode = GetMeshNodeByMeshName(createInfo.meshName);
-        if (!meshNode) {
-            Logging::Error() << "MeshNodes::Init(...) failed to process meshNodeCreateInfoSet, mesh name '" << createInfo.meshName << "' not found in model '" << modelName << "'";
-            continue;
-        }
+        // Validate
+        if (!mesh || !meshNode) {
+			Logging::Error() << "MeshNodes::Init(...) failed to process meshNodeCreateInfoSet, mesh name '" << createInfo.meshName << "' not found in model '" << modelName << "'";
+			continue;
+		}
+
         meshNode->materialIndex = AssetManager::GetMaterialIndexByName(createInfo.materialName);
         meshNode->blendingMode = createInfo.blendingMode;
-        meshNode->isGold = createInfo.isGold;
         meshNode->type = createInfo.type;
         meshNode->customId = createInfo.customId;
         meshNode->decalType = createInfo.decalType;
+        meshNode->forceDynamic = createInfo.forceDynamic;
+        meshNode->castShadows = createInfo.castShadows;
+        meshNode->emissiveColor = createInfo.emissiveColor;
+        meshNode->aabbCollision = createInfo.aabbCollision;
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 
@@ -89,6 +104,27 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                         default:                            triggerMeshNode->openableId = openableId; break;
                     }
                 }
+            }
+        }
+
+        // Rigid static
+        if (meshNode->aabbCollision) {
+            
+			PhysicsFilterData filterData;
+			filterData.raycastGroup = RAYCAST_ENABLED;
+			filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+			filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+
+            // Create RigidStatic if it doesn't exist
+			if (meshNode->rigidStaticId == 0) {
+				glm::vec3 extents = mesh->aabbMax - mesh->aabbMin;
+				glm::vec3 localCenter = 0.5f * (mesh->aabbMin + mesh->aabbMax);
+
+				Transform spawnTransform;
+				Transform offsetTransform;
+                offsetTransform.position = localCenter;
+
+                meshNode->rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(spawnTransform, extents, filterData, offsetTransform);
             }
         }
 
@@ -132,10 +168,6 @@ void MeshNodes::PrintMeshNames() {
     
         std::cout << "-" << i << ": " << mesh->GetName() << "\n";
     }
-}
-
-void MeshNodes::SetGoldFlag(bool flag) {
-    m_isGold = flag;
 }
 
 bool MeshNodes::NodeExists(const std::string& meshName) {
@@ -184,12 +216,33 @@ bool MeshNodes::MeshNodeIsClosed(const std::string& meshName) {
     return true;
 }
 
+bool MeshNodes::MeshNodeIsStatic(int localNodeIndex) {
+    MeshNode* currentNode = GetMeshNodeByLocalIndex(localNodeIndex);
+
+	while (currentNode) {
+		if (currentNode->forceDynamic) return false;
+		if (currentNode->openableId != 0) return false;
+		if (currentNode->physicsId != 0) return false;
+
+        // Walk up the tree via parent index
+        currentNode = GetMeshNodeByLocalIndex(currentNode->localParentIndex);
+    }
+
+    return true;
+}
+
 void MeshNodes::CleanUp() {
+    // First remove physics shapes
+	for (MeshNode& meshNode : m_meshNodes) {
+		Physics::RemoveRigidStatic(meshNode.rigidStaticId);
+	}
+
     m_modelName = "";
     m_nodeCount = 0;
     m_meshNodes.clear();
     m_localIndexMap.clear();
     m_renderItems.clear();
+    m_firstFrame = true;
 }
 
 void MeshNodes::SetTransformByMeshName(const std::string& meshName, Transform transform) {
@@ -300,15 +353,21 @@ void MeshNodes::UpdateHierarchy() {
     for (MeshNode& meshNode : m_meshNodes) {
         MeshNode* parentMeshNode = GetMeshNodeByLocalIndex(meshNode.localParentIndex);
         if (parentMeshNode) {
-            meshNode.localModelMatrix = parentMeshNode->localModelMatrix * meshNode.localTransform * meshNode.transform.to_mat4();
+            meshNode.localMatrix = parentMeshNode->localMatrix * meshNode.localTransform * meshNode.transform.to_mat4();
         }
         else {
-            meshNode.localModelMatrix = meshNode.localTransform * meshNode.transform.to_mat4();
+            meshNode.localMatrix = meshNode.localTransform * meshNode.transform.to_mat4();
         }
     }
 }
 
-void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
+void MeshNodes::Update(const glm::mat4& worldMatrix) {
+
+
+    //for (MeshNode& meshNode : m_meshNodes) {
+    //    Renderer::DrawOBB(meshNode.worldSpaceObb, GREEN);
+    //}
+
     // Check if the world matrix changed this frame
     const bool worldMatrixDirty = (!Util::Mat4NearlyEqual(worldMatrix, m_worldMatrixPreviousFrame));
 
@@ -367,27 +426,26 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
         Material* material = GetMaterial(i);
         if (!material) continue;
 
-        meshNode.worldModelMatrix = worldMatrix * meshNode.localModelMatrix;
+        meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
+        meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
 
         meshNode.renderItem.objectType = (int)UniqueID::GetType(meshNode.parentObjectId);
         meshNode.renderItem.openableId = meshNode.openableId;
         meshNode.renderItem.customId = meshNode.customId;
-        meshNode.renderItem.modelMatrix = meshNode.worldModelMatrix;
-        meshNode.renderItem.inverseModelMatrix = glm::inverse(meshNode.renderItem.modelMatrix);
+        meshNode.renderItem.modelMatrix = meshNode.worldMatrix;
+        meshNode.renderItem.inverseModelMatrix = meshNode.inverseWorldMatrix;
         meshNode.renderItem.meshIndex = GetGlobalMeshIndex(i);
         meshNode.renderItem.baseColorTextureIndex = material->m_basecolor;
-        meshNode.renderItem.normalMapTextureIndex = material->m_normal;
-        meshNode.renderItem.rmaTextureIndex = material->m_rma;
+		meshNode.renderItem.normalMapTextureIndex = material->m_normal;
+		meshNode.renderItem.rmaTextureIndex = material->m_rma;
+		meshNode.renderItem.emissiveTextureIndex = material->m_emissive;
         meshNode.renderItem.aabbMin = glm::vec4(meshNode.worldspaceAabb.GetBoundsMin(), 0.0f);
         meshNode.renderItem.aabbMax = glm::vec4(meshNode.worldspaceAabb.GetBoundsMax(), 0.0f);
         meshNode.renderItem.localMeshNodeIndex = i;
-
-        // If this object is gold, replace basecolor and rma textures with that of gold material, normal map does not change
-        if (m_isGold) {
-            static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
-            meshNode.renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
-            meshNode.renderItem.rmaTextureIndex = goldMaterial->m_rma;
-        }
+		meshNode.renderItem.castShadows = meshNode.castShadows;
+		meshNode.renderItem.emissiveR = meshNode.emissiveColor.r;
+		meshNode.renderItem.emissiveG = meshNode.emissiveColor.g;
+		meshNode.renderItem.emissiveB = meshNode.emissiveColor.b;
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
 
@@ -416,15 +474,49 @@ void MeshNodes::UpdateRenderItems(const glm::mat4& worldMatrix) {
             case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);      break;
             default: break;
         }
+
+        // If this is a static node and its transform is different than the previous frame, mark the World's static scene as dirty
+        if (MeshNodeIsStatic(i) && !Util::Mat4NearlyEqual(meshNode.worldMatrix, meshNode.worldModelMatrixPreviousFrame)) {
+            World::MarkStaticSceneBvhDirty();
+        }
     }
 
     // Store previous frame data
     for (MeshNode& meshNode : m_meshNodes) {
-        meshNode.transformPreviousFrame = meshNode.transform;
+        meshNode.worldModelMatrixPreviousFrame = meshNode.worldMatrix;
     }
+
     m_worldMatrixPreviousFrame = worldMatrix;
     m_forceDirty = false;
+
+
+	if (m_firstFrame) {
+        InitPhysicsTransforms();
+	}
+
+    UpdatePhysicsTransforms();
+
+    m_firstFrame = false;
 }
+
+
+void MeshNodes::InitPhysicsTransforms() {
+	for (MeshNode& meshNode : m_meshNodes) {
+		if (meshNode.rigidStaticId != 0) {
+			Physics::SetRigidStaticWorldTransform(meshNode.rigidStaticId, meshNode.worldMatrix);
+		}
+	}
+}
+
+
+void MeshNodes::UpdatePhysicsTransforms() {
+	for (MeshNode& meshNode : m_meshNodes) {
+		if (meshNode.rigidStaticId != 0 && meshNode.openableId != 0) {
+			Physics::SetRigidStaticWorldTransform(meshNode.rigidStaticId, meshNode.worldMatrix);
+		}
+	}
+}
+
 
 void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
     glm::vec3 min(std::numeric_limits<float>::max());
@@ -440,7 +532,7 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
         glm::vec3 c = 0.5f * (localMin + localMax);
         glm::vec3 e = 0.5f * (localMax - localMin);
 
-        glm::mat4 M = worldMatrix * meshNode.localModelMatrix;
+        glm::mat4 M = worldMatrix * meshNode.localMatrix;
 
         glm::vec3 worldCenter = glm::vec3(M * glm::vec4(c, 1.0f));
 
@@ -457,6 +549,7 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
         glm::vec3 worldMax = worldCenter + worldExtents;
 
         meshNode.worldspaceAabb = AABB(worldMin, worldMax);
+        meshNode.worldSpaceObb.SetTransform(M);
 
         min = glm::min(min, worldMin);
         max = glm::max(max, worldMax);
@@ -486,24 +579,24 @@ const void MeshNodes::SubmitOutlineRenderItems() const {
     RenderDataManager::SubmitOutlineRenderItems(m_renderItemsMirror);
 }
 
-const glm::mat4& MeshNodes::GetLocalModelMatrix(int nodeIndex) const {
+const glm::mat4& MeshNodes::GetLocalModelMatrix(int32_t nodeIndex) const {
     static const glm::mat4 identity = glm::mat4(1.0f);
     if (nodeIndex < 0) return identity;
 
     size_t i = static_cast<size_t>(nodeIndex);
     if (i >= m_meshNodes.size()) return identity;
 
-    return m_meshNodes[i].localModelMatrix;
+    return m_meshNodes[i].localMatrix;
 }
 
-const glm::mat4& MeshNodes::GetWorldModelMatrix(int nodeIndex) const {
+const glm::mat4& MeshNodes::GetWorldModelMatrix(int32_t nodeIndex) const {
     static const glm::mat4 identity = glm::mat4(1.0f);
     if (nodeIndex < 0) return identity;
 
     size_t i = static_cast<size_t>(nodeIndex);
     if (i >= m_meshNodes.size()) return identity;
 
-    return m_meshNodes[i].worldModelMatrix;
+    return m_meshNodes[i].worldMatrix;
 }
 
 const glm::mat4& MeshNodes::GetBoneLocalMatrix(const std::string& boneName) const {
@@ -517,7 +610,7 @@ const glm::mat4& MeshNodes::GetBoneLocalMatrix(const std::string& boneName) cons
     return identity;
 }
 
-const glm::mat4& MeshNodes::GetLocalTransform(int nodeIndex) const {
+const glm::mat4& MeshNodes::GetLocalTransform(int32_t nodeIndex) const {
     static const glm::mat4 identity = glm::mat4(1.0f);
     if (nodeIndex < 0) return identity;
 
@@ -527,7 +620,7 @@ const glm::mat4& MeshNodes::GetLocalTransform(int nodeIndex) const {
     return m_meshNodes[i].localTransform;
 }
 
-const glm::mat4& MeshNodes::GetInverseBindTransform(int nodeIndex) const {
+const glm::mat4& MeshNodes::GetInverseBindTransform(int32_t nodeIndex) const {
     static const glm::mat4 identity = glm::mat4(1.0f);
     if (nodeIndex < 0) return identity;
 
@@ -537,7 +630,7 @@ const glm::mat4& MeshNodes::GetInverseBindTransform(int nodeIndex) const {
     return m_meshNodes[i].inverseBindTransform; 
 }
 
-const std::string& MeshNodes::GetMeshNameByNodeIndex(int nodeIndex) const {
+const std::string& MeshNodes::GetMeshNameByNodeIndex(int32_t nodeIndex) const {
     static std::string notFound = "NOT_FOUND";
 
     for (const auto& [name, idx] : m_localIndexMap) {

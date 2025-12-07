@@ -257,6 +257,8 @@ namespace GlobalIllumination {
     }
     
     void UpdateSceneBVh() {
+        return;
+
         std::vector<PrimitiveInstance> instances;
 
         // Add the house

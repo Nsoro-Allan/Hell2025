@@ -18,16 +18,18 @@ struct Fireplace {
     void SetPosition(const glm::vec3& position);
     void SetYEulerRotation(float rotation);
 
-    uint64_t GetObjectId()                                { return m_id; }
-    AABB GetWallsAABB()                                   { return m_wallsAabb; }
-    const std::vector<RenderItem>& GetRenderItems() const { return m_meshNodes.GetRenderItems(); }
-    const glm::vec3& GetPosition()                        { return m_createInfo.position; }
-    const FireplaceCreateInfo& GetCreateInfo()      const { return m_createInfo; }
-    const glm::mat4& GetWorldMatrix() const               { return m_worldMatrix; }
-    float GetWallDepth() const                            { return m_wallDepth; }
-    float GetWallWidth() const                            { return m_wallWidth; }
-    const glm::vec3 GetWorldForward() const               { return m_worldForward; }
-    const glm::vec3 GetWorldRight() const                 { return m_worldRight; }
+    uint64_t GetObjectId()                                      { return m_id; }
+    AABB GetWallsAABB()                                         { return m_wallsAabb; }
+	MeshNodes& GetMeshNodes()                                   { return m_meshNodes; }
+	const std::vector<RenderItem>& GetRenderItems() const       { return m_meshNodes.GetRenderItems(); }
+	const std::vector<RenderItem>& GetRenderItemsGlass() const  { return m_meshNodes.GetRenderItemsGlass(); }
+    const glm::vec3& GetPosition()                              { return m_createInfo.position; }
+    const FireplaceCreateInfo& GetCreateInfo() const            { return m_createInfo; }
+    const glm::mat4& GetWorldMatrix() const                     { return m_worldMatrix; }
+    float GetWallDepth() const                                  { return m_wallDepth; }
+    float GetWallWidth() const                                  { return m_wallWidth; }
+    const glm::vec3 GetWorldForward() const                     { return m_worldForward; }
+    const glm::vec3 GetWorldRight() const                       { return m_worldRight; }
 
 private:
     void UpdateWorldMatrix();

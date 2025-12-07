@@ -64,7 +64,7 @@ Window::Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffse
     lock.materialName = "Window";
 
     m_meshNodes.Init(m_objectId, "Window", meshNodeCreateInfoSet);
-    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+    m_meshNodes.Update(m_transform.to_mat4());
 
     // Glass PhysX shapes
     PhysicsFilterData filterData;
@@ -93,8 +93,8 @@ void Window::CleanUp() {
 void Window::SetPosition(const glm::vec3& position) {
     m_createInfo.position = position;
     m_transform.position = position;
-    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
-    Physics::SetRigidStaticGlobalPose(m_physicsId, m_transform.to_mat4());
+    m_meshNodes.Update(m_transform.to_mat4());
+    Physics::SetRigidStaticWorldTransform(m_physicsId, m_transform.to_mat4());
 }
 
 void Window::Update(float deltaTime) {

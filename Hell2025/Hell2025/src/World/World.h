@@ -45,12 +45,6 @@
 
 #include "Types/Renderer/MeshBuffer.h"
 
-struct ViewportBvhData {
-    std::vector<PrimitiveInstance> instances;
-    uint64_t sceneBvhId;
-    BvhRayResult closestHit;
-};
-
 struct MapInstanceCreateInfo {
     std::string mapName;
     uint32_t spawnOffsetChunkX;
@@ -135,10 +129,9 @@ namespace World {
     glm::vec3 GetGizmoOffest(uint64_t objectId);
     
     // BVH
-    //void RemoveAllHouseBvhs();
-    void UpdatePlayerBvhs();
-    BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance, int viewportIndex);
-    uint64_t GetSceneBvhIdByViewportIndex(int viewportIndex);
+	void UpdateBvhs();
+    void MarkStaticSceneBvhDirty();
+	BvhRayResult ClosestHit(glm::vec3 rayOrigin, glm::vec3 rayDir, float maxRayDistance);
 
     const float GetWorldSpaceWidth();
     const float GetWorldSpaceDepth();

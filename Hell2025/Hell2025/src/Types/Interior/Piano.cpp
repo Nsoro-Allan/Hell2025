@@ -123,19 +123,17 @@ void Piano::Init(PianoCreateInfo& createInfo) {
                     pianoKey.m_note = MeshNameToNote(mesh->GetName());
                     pianoKey.m_isSharp = (mesh->GetName().find("#") != std::string::npos);
 
-                    MeshNodeCreateInfo& key = meshNodeCreateInfoSet.emplace_back();
-                    key.meshName = mesh->name;
-                    key.materialName = "Piano1";
-                    key.customId = keyId;
+                    MeshNodeCreateInfo& meshNodeCreateInfo = meshNodeCreateInfoSet.emplace_back();
+                    meshNodeCreateInfo.meshName = mesh->name;
+                    meshNodeCreateInfo.materialName = "Piano1";
+                    meshNodeCreateInfo.customId = keyId;
+                    meshNodeCreateInfo.forceDynamic = true;
                 }
             }
         }
     }
 
     m_meshNodes.Init(m_pianoObjectId, "Piano", meshNodeCreateInfoSet);
-
-    //uint32_t materialIndex0 = AssetManager::GetMaterialIndexByName("Piano0");
-    //uint32_t materialIndex1 = AssetManager::GetMaterialIndexByName("Piano1");
 
     m_seatPosition = m_transform.to_mat4() * glm::vec4(0.75f, 0.0f, 0.75f, 1.0f);
 
@@ -165,7 +163,7 @@ void Piano::PressKey(uint32_t customId) {
 }
 
 void Piano::CalculatePianoKeyWorldspaceCenters() {
-    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+    m_meshNodes.Update(m_transform.to_mat4());
 
     for (auto& pair : m_keys) {
         PianoKey& key = pair.second;
@@ -181,13 +179,14 @@ void Piano::SetPosition(glm::vec3 position) {
     m_transform.position = position;
 
     // Update collision mesh position
-    Physics::SetRigidStaticGlobalPose(m_rigidStaticId, m_transform.to_mat4());
+    Physics::SetRigidStaticWorldTransform(m_rigidStaticId, m_transform.to_mat4());
 
     CalculatePianoKeyWorldspaceCenters();
 }
 
 void Piano::CleanUp() {
     Physics::MarkRigidStaticForRemoval(m_rigidStaticId);
+	m_meshNodes.CleanUp();
 }
 
 void Piano::Update(float deltaTime) {
@@ -210,7 +209,7 @@ void Piano::Update(float deltaTime) {
         }
     }
 
-    m_meshNodes.UpdateRenderItems(m_transform.to_mat4());
+    m_meshNodes.Update(m_transform.to_mat4());
 }
 
 void Piano::TriggerInternalNoteFromExternalBulletHit(glm::vec3 bulletHitPositon) {

@@ -41,7 +41,6 @@ of shit.)";
         goldenGlock.m_meshMaterialNames["GlockRedDotGlassNew"] = "TX_LeupoldGlass_01a";
         goldenGlock.m_meshMaterialNames["GlockRedDotNew"] = "TX_LeupoldRedDot_01a";
         goldenGlock.m_meshMaterialNames["GlockSuppressorNew"] = "TX_Supressor_01a";
-        goldenGlock.m_isGold = false;
         goldenGlock.m_cellSize = 1;
         goldenGlock.m_combineable = true;
         goldenGlock.m_discardable = true;

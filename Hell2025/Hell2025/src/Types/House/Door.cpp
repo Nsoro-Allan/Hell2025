@@ -5,47 +5,70 @@
 #include "Physics/Physics.h"
 #include "Physics/Physics.h"
 #include "Renderer/RenderDataManager.h"
+#include "Renderer/Renderer.h"
 #include "UniqueID.h"
 #include "Util.h"
 #include "World/World.h"
 
 Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_objectId = id;
-    //m_frameObjectId = UniqueID::GetNext(ObjectType::DOOR_FRAME);
-
-    m_createInfo = createInfo;
+	m_createInfo = createInfo;
+	m_spawnOffset = spawnOffset;
 
     m_position = createInfo.position + spawnOffset.translation;
     m_rotation = createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-    m_material = AssetManager::GetMaterialByName("Door");
-    m_doorModel = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("Door"));
-    m_frameModel = AssetManager::GetModelByIndex(AssetManager::GetModelIndexByName("DoorFrame"));
+	std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-    PhysicsFilterData filterData;
-    filterData.raycastGroup = RAYCAST_ENABLED;
-    filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+	MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
+	door.meshName = "Door";
+	door.materialName = "Door";
+	door.openable.additionalTriggerMeshNames = { "Door_Handle", "Door_Hinges", "Door_Lock" };
+    door.type = MeshNodeType::OPENABLE;
+	door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
+	door.openable.initialOpenState = OpenState::CLOSED;
+	door.openable.minOpenValue = 0.0f;
+	door.openable.maxOpenValue = m_createInfo.maxOpenValue;
+	door.openable.openSpeed = 5.208f;
+	door.openable.closeSpeed = 5.208f;
+	door.openable.openingAudio = "Door_Open.wav";
+	door.openable.closingAudio = "Door_Open.wav";
+	door.aabbCollision = true;
 
-    Transform doorFrameTransform;
-    doorFrameTransform.position = m_position;
-    doorFrameTransform.rotation = m_rotation;
+	MeshNodeCreateInfo& doorHandle = meshNodeCreateInfoSet.emplace_back();
+    doorHandle.meshName = "Door_Handle";
+    doorHandle.materialName = "Door";
 
-    Transform shapeOffset;
-    shapeOffset.position.x = -0.005f;
+	MeshNodeCreateInfo& doorHinges = meshNodeCreateInfoSet.emplace_back();
+    doorHinges.meshName = "Door_Hinges";
+    doorHinges.materialName = "Door";
 
-    glm::vec3 boxExtents = glm::vec3(DOOR_DEPTH, DOOR_HEIGHT, DOOR_WIDTH);
-    m_physicsId = Physics::CreateRigidStaticBoxFromExtents(doorFrameTransform, boxExtents, filterData, shapeOffset);
+	MeshNodeCreateInfo& doorLock = meshNodeCreateInfoSet.emplace_back();
+    doorLock.meshName = "Door_Lock";
+    doorLock.materialName = "Door";
 
-    // Set PhysX user data
-    PhysicsUserData userData;
-    userData.physicsId = m_physicsId;
-    userData.objectId = m_objectId;
-    userData.physicsType = PhysicsType::RIGID_STATIC;
-    userData.objectType = ObjectType::DOOR;
-    Physics::SetRigidStaticUserData(m_physicsId, userData);
+	MeshNodeCreateInfo& doorFrame = meshNodeCreateInfoSet.emplace_back();
+	doorFrame.meshName = "Door_Frame";
+    doorFrame.materialName = "Door";
 
-    m_lifeTime = 0;
+	MeshNodeCreateInfo& doorFrameHinges = meshNodeCreateInfoSet.emplace_back();
+	doorFrameHinges.meshName = "Door_Frame_Hinges";
+	doorFrameHinges.materialName = "Door";
+
+	MeshNodeCreateInfo& doorFrameInner = meshNodeCreateInfoSet.emplace_back();
+    doorFrameInner.meshName = "Door_Frame_Inner";
+    doorFrameInner.materialName = "Door";
+	
+    MeshNodeCreateInfo& doorFrameLock = meshNodeCreateInfoSet.emplace_back();
+    doorFrameLock.meshName = "Door_Frame_Lock";
+    doorFrameLock.materialName = "Door";
+
+	m_meshNodes.Init(id, "Door", meshNodeCreateInfoSet);
+
+    //PhysicsFilterData filterData;
+    //filterData.raycastGroup = RAYCAST_ENABLED;
+    //filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    //filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
     UpdateFloor();
 }
@@ -53,6 +76,10 @@ Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spa
 void Door::UpdateFloor() {
     float half_w = 0.05f;
     float half_d = 0.4f;
+
+    //half_w = 0.1f;
+	//half_d = 0.3f;
+
 
     Transform transform;
     transform.position = m_position;
@@ -73,113 +100,52 @@ void Door::UpdateFloor() {
 }
 
 void Door::CleanUp() {
-    Physics::MarkRigidStaticForRemoval(m_physicsId);
+	m_meshNodes.CleanUp();
 }
 
 void Door::Update(float deltaTime) {
-    m_movedThisFrame = (m_lifeTime == 0 || m_openingState == OpeningState::OPENING || m_openingState == OpeningState::CLOSING);
-    m_lifeTime++;
+    Transform transform;
+    transform.position = m_position;
+    transform.rotation = m_rotation;
 
-    float openSpeed = 5.208f;
-    if (m_openingState == OpeningState::OPENING) {
-        m_currentOpenRotation -= openSpeed * deltaTime;
-        if (m_currentOpenRotation < -m_maxOpenRotation) {
-            m_currentOpenRotation = -m_maxOpenRotation;
-            m_openingState = OpeningState::OPEN;
-        }
-    }
-    if (m_openingState == OpeningState::CLOSING) {
-        m_currentOpenRotation += openSpeed * deltaTime;
-        if (m_currentOpenRotation > 0) {
-            m_currentOpenRotation = 0;
-            m_openingState = OpeningState::CLOSED;
-        }
-    }
+    m_meshNodes.Update(transform.to_mat4());
 
-    Transform doorFrameTransform;
-    doorFrameTransform.position = m_position;
-    doorFrameTransform.rotation = m_rotation;
-    m_frameModelMatrix = doorFrameTransform.to_mat4();
 
-    Transform doorTransform;
-    doorTransform.position = glm::vec3(0.058520f, 0.0f, 0.39550f);
-    doorTransform.rotation.y = m_currentOpenRotation;
-    m_doorModelMatrix = m_frameModelMatrix * doorTransform.to_mat4();
+    //Mesh* mesh = AssetManager::GetMeshByModelNameMeshName("Door", "Door");
+    //if (mesh) {
+    //    AABB aabb = AABB(mesh->aabbMin, mesh->aabbMax);
+    //
+    //
+	//	Transform transform;
+	//	transform.position = m_position;
+	//	transform.rotation = m_rotation;
+    //
+	//	Transform openTransform;
+	//	openTransform.rotation.y = -m_createInfo.maxOpenValue;
+    //
+	//	glm::vec3 origin = transform.to_mat4() * mesh->localTransform * glm::vec4(mesh->aabbMax.x, mesh->aabbMin.y, mesh->aabbMax.z, 1.0f);
+	//	glm::vec3 oppositePointClosed = transform.to_mat4() * mesh->localTransform * glm::vec4(mesh->aabbMax.x, mesh->aabbMin.y, mesh->aabbMin.z, 1.0f);
+	//	glm::vec3 oppositePointOpen = transform.to_mat4() * mesh->localTransform * openTransform.to_mat4() * glm::vec4(mesh->aabbMax.x, mesh->aabbMin.y, mesh->aabbMin.z, 1.0f);
+    //
+	//	Renderer::DrawPoint(origin, YELLOW);
+	//	Renderer::DrawPoint(oppositePointClosed, RED);
+	//	Renderer::DrawPoint(oppositePointOpen, GREEN);
+    //
+    //    int segmentCount = 10;
+    //    float openIncrement = m_createInfo.maxOpenValue / (float)segmentCount;
+    //    for (int i = 0; i < segmentCount; i++) {
+    //
+	//		Transform openTransform;
+	//		openTransform.rotation.y = i * -openIncrement;
+	//		glm::vec3 oppositePoint = transform.to_mat4() * mesh->localTransform * openTransform.to_mat4() * glm::vec4(mesh->aabbMax.x, mesh->aabbMin.y, mesh->aabbMin.z, 1.0f);
+	//		Renderer::DrawPoint(oppositePoint, BLUE);
+    //    }
+    //}
 
-    // Update PhysX transform
-    Transform physxOffsetTransform;
-    physxOffsetTransform.position.z = DOOR_WIDTH * -0.5f;
-    physxOffsetTransform.position.y = DOOR_HEIGHT * 0.5f;
-    physxOffsetTransform.position.x = DOOR_DEPTH * -0.5f;
-    glm::mat4 globalPoseMatrix = m_doorModelMatrix * physxOffsetTransform.to_mat4();
-    Physics::SetRigidStaticGlobalPose(m_physicsId, globalPoseMatrix);
-
-    // Calculate interact position
-    glm::mat4 interactOffset = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, DOOR_HEIGHT / 2, -DOOR_WIDTH / 2));
-    m_interactPosition = (m_doorModelMatrix * interactOffset)[3];
-
-    UpdateRenderItems();
+    //Renderer::DrawLine()
 }
 
 void Door::SetPosition(glm::vec3 position) {
     m_createInfo.position = position;
     m_position = position;
-}
-
-void Door::UpdateRenderItems() {
-    m_renderItems.clear();
-
-    // Handle missing material
-    if (!m_material) {
-        m_material = AssetManager::GetDefaultMaterial();
-    }
-    
-    // Bail if models are invalid
-    if (!m_doorModel || !m_frameModel) return;
-
-    for (const uint32_t& meshIndex : m_doorModel->GetMeshIndices()) {
-        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-        RenderItem& renderItem = m_renderItems.emplace_back();
-        renderItem.modelMatrix = m_doorModelMatrix;
-        renderItem.inverseModelMatrix = inverse(renderItem.modelMatrix);
-        renderItem.meshIndex = meshIndex;
-        renderItem.baseColorTextureIndex = m_material->m_basecolor;
-        renderItem.rmaTextureIndex = m_material->m_rma;
-        renderItem.normalMapTextureIndex = m_material->m_normal;
-        renderItem.objectType = Util::EnumToInt(ObjectType::DOOR);
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
-    }
-
-    for (const uint32_t& meshIndex : m_frameModel->GetMeshIndices()) {
-        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-        RenderItem& renderItem = m_renderItems.emplace_back();
-        renderItem.modelMatrix = m_frameModelMatrix;
-        renderItem.inverseModelMatrix = inverse(renderItem.modelMatrix);
-        renderItem.meshIndex = meshIndex;
-        renderItem.baseColorTextureIndex = m_material->m_basecolor;
-        renderItem.rmaTextureIndex = m_material->m_rma;
-        renderItem.normalMapTextureIndex = m_material->m_normal;
-        renderItem.objectType = Util::EnumToInt(ObjectType::DOOR_FRAME);
-        Util::UpdateRenderItemAABB(renderItem);
-        Util::PackUint64(0, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit); // ZERO ID!
-    }
-}
-
-void Door::SubmitRenderItems() {
-    RenderDataManager::SubmitRenderItems(m_renderItems);
-    if (Editor::GetSelectedObjectId() == m_objectId) {
-        RenderDataManager::SubmitOutlineRenderItems(m_renderItems);
-    }
-}
-
-void Door::Interact() {
-    if (m_openingState == OpeningState::CLOSED) {
-        m_openingState = OpeningState::OPENING;
-        Audio::PlayAudio("Door_Open.wav", 1.0f);
-    }
-    else if (m_openingState == OpeningState::OPEN) {
-        m_openingState = OpeningState::CLOSING;
-        Audio::PlayAudio("Door_Open.wav", 1.0f);
-    }
 }

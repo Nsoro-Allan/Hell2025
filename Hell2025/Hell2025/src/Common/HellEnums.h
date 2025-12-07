@@ -105,6 +105,7 @@ enum class ObjectType : uint16_t {
     DOBERMANN,
     GENERIC_OBJECT,
     MESH_NODE,
+    NAV_MESH,
     PLAYER,
     RAGDOLL_V1,
     TRIM,
@@ -478,7 +479,8 @@ enum struct HouseType {
 };
 
 enum struct FireplaceType {
-    DEFAULT,
+	WOOD_STOVE,
+	DEFAULT,
     UNDEFINED
 };
 

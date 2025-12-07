@@ -54,9 +54,12 @@ struct MeshNodeCreateInfo {
     OpenableCreateInfo openable;
     RigidDynamicCreateInfo rigidDynamic;
     RigidStaticCreateInfo rigidStatic;
-    bool isGold = false;
     int32_t customId;
     DecalType decalType = DecalType::PLASTER;
+    bool forceDynamic = false;
+	bool castShadows = true;
+	bool aabbCollision = false;
+	glm::vec3 emissiveColor = glm::vec3(1.0f);
 };
 
 struct GenericObjectCreateInfo {
@@ -132,6 +135,7 @@ struct KangarooCreateInfo {
 struct DoorCreateInfo {
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
+    float maxOpenValue = 2.1f;
 };
 
 struct WindowCreateInfo {

@@ -62,11 +62,11 @@ namespace OpenGLRenderer {
             //}
         }
 
-        if (Input::KeyPressed(HELL_KEY_U)) {
-            if (Util::RenameFile("res/shit.txt", "res/fuck.txt")) {
-                std::cout << "rename successful\n";
-            }
-        }
+        //if (Input::KeyPressed(HELL_KEY_U)) {
+        //    if (Util::RenameFile("res/shit.txt", "res/fuck.txt")) {
+        //        std::cout << "rename successful\n";
+        //    }
+        //}
     }
 
     void BlitWorldMap() {

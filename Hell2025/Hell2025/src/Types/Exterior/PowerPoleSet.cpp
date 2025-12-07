@@ -9,8 +9,7 @@ void PowerPoleSet::Init() {
 
     m_meshNodes.Init(NO_ID, "PowerPole", emptyMeshNodeCreateInfoSet);
     m_meshNodes.SetMeshMaterials("PowerPole");
-    m_meshNodes.UpdateHierarchy();
-    m_meshNodes.UpdateRenderItems(glm::mat4(1.0f));
+    m_meshNodes.Update(glm::mat4(1.0f));
 
     std::vector<glm::vec2> controlPoints2D;
     controlPoints2D.push_back(glm::vec2(24.172f, 7.79272f));

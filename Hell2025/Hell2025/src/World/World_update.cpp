@@ -26,7 +26,7 @@ namespace World {
 
         //std::cout << "Fireplace Count: " << GetFireplaces().size() << "\n";
 
-        NavMesh::RenderDebug();
+        NavMeshManager::Update();
 
         if (Input::KeyPressed(HELL_KEY_LEFT)) {
             static MermaidCreateInfo createInfo = GetMermaids()[0].GetCreateInfo();

@@ -133,8 +133,7 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
         }
 
         // Actually create the render items for each mesh
-        m_examineItemMeshNodes.SetGoldFlag(itemInfo->m_isGold);
-        m_examineItemMeshNodes.UpdateRenderItems(finalScaledAndCenteredModelMatrix);
+        m_examineItemMeshNodes.Update(finalScaledAndCenteredModelMatrix);
     }
 }
 

@@ -231,27 +231,27 @@ namespace OpenGLRenderer {
         }
     }
 
-    void DrawLine(glm::vec3 begin, glm::vec3 end, glm::vec3 color, bool depthEnabled, int exclusiveViewportIndex, int ignoredViewportIndex) {
+    void DrawLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color, bool depthEnabled, int exclusiveViewportIndex, int ignoredViewportIndex) {
         DebugVertex3D v0 = DebugVertex3D(begin, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
         DebugVertex3D v1 = DebugVertex3D(end, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
         g_lines3D.push_back(v0);
         g_lines3D.push_back(v1);
     }
 
-    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec3& color) {
+    void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec4& color) {
         g_lines2D.emplace_back(DebugVertex2D(begin, color));
         g_lines2D.emplace_back(DebugVertex2D(end, color));
     }
 
-    void DrawPoint(glm::vec3 position, glm::vec3 color, bool depthEnabled, int exclusiveViewportIndex) {
+    void DrawPoint(const glm::vec3& position, const glm::vec4& color, bool depthEnabled, int exclusiveViewportIndex) {
         g_points3D.push_back(DebugVertex3D(position, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex));
     }
 
-    void DrawPoint2D(const glm::ivec2& position, const glm::vec3& color) {
+    void DrawPoint2D(const glm::ivec2& position, const glm::vec4& color) {
         g_points2D.emplace_back(DebugVertex2D(position, color));
     }
 
-    void DrawAABB(const AABB& aabb, const glm::vec3& color) {
+    void DrawAABB(const AABB& aabb, const glm::vec4& color) {
         glm::vec3 FrontTopLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z);
         glm::vec3 FrontTopRight = glm::vec3(aabb.GetBoundsMax().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z);
         glm::vec3 FrontBottomLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMin().y, aabb.GetBoundsMax().z);
@@ -274,7 +274,7 @@ namespace OpenGLRenderer {
         DrawLine(FrontBottomRight, BackBottomRight, color);
     }
 
-    void DrawAABB(const AABB& aabb, const glm::vec3& color, const glm::mat4& worldTransform) {
+    void DrawAABB(const AABB& aabb, const glm::vec4& color, const glm::mat4& worldTransform) {
         glm::vec3 FrontTopLeft = worldTransform * glm::vec4(aabb.GetBoundsMin().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z, 1.0f);
         glm::vec3 FrontTopRight = worldTransform * glm::vec4(aabb.GetBoundsMax().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z, 1.0f);
         glm::vec3 FrontBottomLeft = worldTransform * glm::vec4(aabb.GetBoundsMin().x, aabb.GetBoundsMin().y, aabb.GetBoundsMax().z, 1.0f);
@@ -297,7 +297,29 @@ namespace OpenGLRenderer {
         DrawLine(FrontBottomRight, BackBottomRight, color);
     }
 
-    void DrawFrustum(const Frustum& frustum, const glm::vec3& color) {
+    void DrawOBB(const OBB& obb, const glm::vec4& color) {
+        const std::vector<glm::vec3>& corners = obb.GetCorners();
+        if (corners.size() < 8) return;
+
+        // Bottom Face
+        DrawLine(corners[0], corners[1], color);
+        DrawLine(corners[1], corners[5], color);
+        DrawLine(corners[5], corners[4], color);
+        DrawLine(corners[4], corners[0], color);
+
+        // Top Face
+        DrawLine(corners[2], corners[3], color);
+        DrawLine(corners[3], corners[7], color);
+        DrawLine(corners[7], corners[6], color);
+        DrawLine(corners[6], corners[2], color);
+
+        DrawLine(corners[0], corners[2], color); // Front Left
+        DrawLine(corners[1], corners[3], color); // Front Right
+        DrawLine(corners[4], corners[6], color); // Back Left
+        DrawLine(corners[5], corners[7], color); // Back Right
+    }
+
+    void DrawFrustum(const Frustum& frustum, const glm::vec4& color) {
         glm::vec3 ntl = frustum.GetCorner(0);
         glm::vec3 ntr = frustum.GetCorner(1);
         glm::vec3 nbl = frustum.GetCorner(2);
@@ -327,7 +349,7 @@ namespace OpenGLRenderer {
         DrawLine(nbr, fbr, color);
     }
 
-    void DrawCircle(const glm::vec3 center, float radius, const glm::vec3 axisU, const glm::vec3 axisV, int segments, const glm::vec3 color) {
+    void DrawCircle(const glm::vec3& center, float radius, const glm::vec3 axisU, const glm::vec3 axisV, int segments, const glm::vec4& color) {
         const float step = glm::two_pi<float>() / float(segments);
         glm::vec3 prev = center + radius * axisU;
         for (int i = 1; i <= segments; ++i) {
@@ -338,7 +360,7 @@ namespace OpenGLRenderer {
         }
     }
 
-    void DrawSphere(glm::vec3 position, float radius, glm::vec3 color) {
+    void DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color) {
         const int numLongitudes = 12;
         const int numLatitudes = 8;
         const int segsPerCircle = 96;

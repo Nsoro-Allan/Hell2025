@@ -183,6 +183,8 @@ void main() {
     uint viewportIndex = texture(ViewportIndexTexture, uv_screenspace).r;
     float sssRadius = texture(EmissiveTexture, uv_screenspace).a;
 
+    //rma.b = 1.0;
+
     
     vec3 emssiveColor = texture(EmissiveTexture, uv_screenspace).rgb;
     baseColor.rgb += emssiveColor.rgb;
@@ -354,14 +356,18 @@ void main() {
 
     // Moon light
     vec3 moonColor = vec3(1.0, 0.9, 0.9);
-    moonColor = vec3(1, 0.7799999713897705, 0.5289999842643738);    
+    vec3 moonColor2 = vec3(1, 0.7799999713897705, 0.5289999842643738);
+    moonColor = mix(moonColor, moonColor2, 0.5);
 
     vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
-    float moonLightStrength = 0.0125;
+    float moonLightStrength = 0.125;//0.0125;
        
     //float shadow = ShadowCalculation(lightIndex, lightPosition, lightRadius, worldSpacePosition.xyz, viewPos, normal.xyz, shadowMapArray);
     vec3 moonLighting = GetDirectionalLighting(moonLightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
     vec3 csmShadow = ShadowCalculationCSM(worldSpacePosition.xyz, normal.xyz, moonLightDir, viewMatrix);
+    
+    //csmShadow = vec3(1,1,1);
+    
     moonLighting *= csmShadow;
 
     // Moonlight subsurface scattering
@@ -371,7 +377,8 @@ void main() {
     float NdotL = max(dot(normal.xyz, L), 0.0);
     vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
     vec3 sssColor = subColor * radius * sss * sssStrength;
-    moonLighting += sssColor * csmShadow * 0.05;
+    moonLighting += sssColor * csmShadow * 0.05; // OG
+    //moonLighting += sssColor * 0.5;
 
     // Self light hack (RE7 style) 
     //if (viewportData[viewportIndex].flashlightModifer > 0.1) { 

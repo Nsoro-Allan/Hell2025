@@ -87,9 +87,9 @@ const glm::mat4& Decal2::GetParentWorldMatrix() {
 		MeshNodes& meshNodes = genericObject->GetMeshNodes();
 		return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
 	}
-
-	else if (Door* door = World::GetDoorByObjectId(m_createInfo.parentObjectId)) {
-        return door->GetDoorModelMatrix();
+	if (Door* door = World::GetDoorByObjectId(m_createInfo.parentObjectId)) {
+		MeshNodes& meshNodes = door->GetMeshNodes();
+		return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
 	}
     
     return identity;

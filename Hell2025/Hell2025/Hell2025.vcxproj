@@ -330,6 +330,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Editor\Editor_objects.cpp" />
     <ClCompile Include="src\Editor\Objects\Editor_object_placement.cpp" />
     <ClCompile Include="src\Editor\Objects\Editor_window_placement.cpp" />
+    <ClCompile Include="src\Math\OBB.cpp" />
     <ClCompile Include="src\Types\Characters\Enemies\Dobermann\Dobermann.cpp" />
     <ClCompile Include="src\Types\Characters\Enemies\Kangaroo\Kanagaroo_attack_logic.cpp" />
     <ClCompile Include="src\Types\Characters\Enemies\Kangaroo\Kangaroo_animation_state_machine.cpp" />
@@ -718,6 +719,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Common\HellLogging.h" />
     <ClInclude Include="src\Managers\MirrorManager.h" />
     <ClInclude Include="src\Managers\OpenableManager.h" />
+    <ClInclude Include="src\Hell\Math.h" />
+    <ClInclude Include="src\Math\OBB.h" />
     <ClInclude Include="src\Ragdoll\Ragdoll_util.h" />
     <ClInclude Include="src\Types\Characters\Enemies\Dobermann\Dobermann.h" />
     <ClInclude Include="src\Inventory\Inventory.h" />
