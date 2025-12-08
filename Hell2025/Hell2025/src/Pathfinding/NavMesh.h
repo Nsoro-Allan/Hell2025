@@ -39,8 +39,6 @@ namespace NavMeshManager {
         }
 	};
 
-    void CreateNavMesh();
     void Init();
     void Update();
-    void RenderDebug();
 }

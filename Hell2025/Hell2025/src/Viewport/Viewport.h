@@ -42,7 +42,7 @@ public:
     SpaceCoords GetGBufferSpaceCoords() const;
     SpaceCoords GetUISpaceCoords() const;
 
-    uint64_t& GetMirrorId()     { return m_mirrorId; }
+    uint64_t GetMirrorId()      { return m_mirrorId; }
     Frustum& GetFrustum()       { return m_frustum; }
     uint32_t GetViewportIndex() { return m_viewportIndex; }
     int GetLeftPixel()          { return (int)m_leftPixel; }

@@ -86,6 +86,7 @@ void Mirror::Update(const glm::mat4& worldMatrix) {
         m_clipPlanes[i] = glm::vec4(0.0f);
         m_reflectVectors[i] = glm::vec3(0.0f);
         m_viewMatrices[i] = glm::mat4(1.0f);
+        m_facingViewportCamera[i] = false;
 
         if (Viewport* viewport = ViewportManager::GetViewportByIndex(i)) {
             if (!viewport->IsVisible()) continue;
@@ -137,7 +138,10 @@ void Mirror::Update(const glm::mat4& worldMatrix) {
 
             // Is this mirror facing away from this viewport's camera?
             glm::vec3 toCamera = cameraPosition - m_worldCenter;
-            m_facingViewportCamera[i] = glm::dot(m_worldNormal, toCamera) > 0.0f;
+            glm::vec3 toMirror = m_worldCenter - cameraPosition;
+            bool cameraOnFrontSide = glm::dot(m_worldNormal, toCamera) > 0.0f;      // Is camera in front of the mirror plane?
+            bool mirrorInFrontOfCamera = glm::dot(cameraForward, toMirror) > 0.0f;  // Is the mirror in front of the camera in camera-forward space?
+            m_facingViewportCamera[i] = cameraOnFrontSide && mirrorInFrontOfCamera;
         }
     }
 }

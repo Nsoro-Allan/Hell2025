@@ -31,6 +31,7 @@ struct HousePlane {
     Material* GetMaterial()                         { return m_material; };
     std::vector<Vertex>& GetVertices()              { return m_vertices; }
     std::vector<uint32_t>& GetIndices()             { return m_indices; }
+    std::vector<glm::vec2>& GetNavMeshPoly()        { return m_navMeshPoly; }
     HousePlaneCreateInfo& GetCreateInfo()           { return m_createInfo; }
     HousePlaneType GetType() const                  { return m_createInfo.type; }
 
@@ -47,6 +48,7 @@ private:
     glm::vec3 m_worldSpaceCenter = glm::vec3(0.0f);
     std::vector<Vertex> m_vertices;
     std::vector<uint32_t> m_indices;
+    std::vector<glm::vec2> m_navMeshPoly;
     HousePlaneCreateInfo m_createInfo;
     
     void CreatePhysicsObject();

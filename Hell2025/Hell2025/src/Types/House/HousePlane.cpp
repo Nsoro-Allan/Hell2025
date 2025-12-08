@@ -63,6 +63,14 @@ void HousePlane::UpdateVertexDataFromCreateInfo() {
 
     // Calculate worldspace center
     m_worldSpaceCenter = (m_p0 + m_p1 + m_p2 + m_p3) / 4.0f;
+
+    // Nav mesh poly
+    m_navMeshPoly.clear();
+    m_navMeshPoly.reserve(4);
+    m_navMeshPoly.emplace_back(m_p0.x, m_p0.z);
+    m_navMeshPoly.emplace_back(m_p1.x, m_p1.z);
+    m_navMeshPoly.emplace_back(m_p2.x, m_p2.z);
+    m_navMeshPoly.emplace_back(m_p3.x, m_p3.z);
 }
 
 void HousePlane::CleanUp() {
