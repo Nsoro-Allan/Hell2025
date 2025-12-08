@@ -10,6 +10,7 @@
 #include "CreateInfo.h"
 
 struct MeshNode {
+    uint64_t id; // unused. you need to think if it would be worthwhile storing all mesh nodes elsewhere
     uint64_t parentObjectId;
     uint32_t openableId;
     uint32_t customId;

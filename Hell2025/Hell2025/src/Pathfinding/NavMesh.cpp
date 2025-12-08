@@ -54,36 +54,16 @@ namespace NavMeshManager {
         glm::vec3 right;
     };
 
-    struct EdgeKey {
-        glm::vec3 v0;
-        glm::vec3 v1;
-
-        bool operator==(const EdgeKey& other) const {
-            return v0 == other.v0 && v1 == other.v1;
-        }
-    };
-
-    struct EdgeKeyHasher {
-        std::size_t operator()(const EdgeKey& k) const {
-            // Combine hashes of all coordinates
-            // Using a prime multiplier to reduce collisions
-            size_t h = 0;
-            auto hashFloat = std::hash<float>{};
-
-            h ^= hashFloat(k.v0.x) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            h ^= hashFloat(k.v0.y) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            h ^= hashFloat(k.v0.z) + 0x9e3779b9 + (h << 6) + (h >> 2);
-
-            h ^= hashFloat(k.v1.x) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            h ^= hashFloat(k.v1.y) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            h ^= hashFloat(k.v1.z) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            return h;
-        }
-    };
-
     struct EdgeValue {
         int triIndex;
         int edgeIndex; // 0, 1, or 2
+    };
+
+    struct EdgeRef {
+        glm::vec3 v0;
+        glm::vec3 v1;
+        int triIndex;
+        int edgeIndex;
     };
 
     struct EarcutPolygon {
@@ -95,6 +75,8 @@ namespace NavMeshManager {
         NavMesh(uint64_t id, float agentRadius);
         void Update();
         void Reset();
+        std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest);
+        std::vector<glm::vec3> PullPath(const std::vector<glm::vec3>& path);
 
     private:
         uint64_t m_id = 0;
@@ -102,21 +84,23 @@ namespace NavMeshManager {
         bool m_dynamicPathsDirty = true;
         float m_agentRadius = 0.0f;
         std::unordered_map<int, LevelInfo> m_levelInfo; // mapped to y height (multiplied by 1000 as integer)
-        std::vector<NavTri> m_tris;
+        std::vector<EdgeRef> m_edgeList;                // Used for triangle neighbor building
+        std::vector<NavTri> m_tris;                     // The actual nav mesh
         glm::vec2 m_boundsMin = glm::vec2(0);
         glm::vec2 m_boundsMax = glm::vec2(0);
 
-        float m_gridCellSize = 2.0f;            // Size of one square in the grid
-        int m_gridWidth = 0;                    // How many cells wide (X axis)
-        int m_gridHeight = 0;                   // How many cells tall (Z axis)
-        glm::vec2 m_gridOrigin = glm::vec2(0);  // The World Space coordinate of the grid's bottom left corner
-        std::vector<std::vector<int>> m_grid;   // Flat vector representing a 2D array
+        float m_gridCellSize = 2.0f;                    // Size of one square in the grid
+        float m_invCellSize = 1.0f / m_gridCellSize;
+        int m_gridWidth = 0;                            // How many cells wide (X axis)
+        int m_gridHeight = 0;                           // How many cells tall (Z axis)
+        glm::vec2 m_gridOrigin = glm::vec2(0);          // The World Space coordinate of the grid's bottom left corner
+        std::vector<std::vector<int>> m_grid;           // Flat vector representing a 2D array
 
         // Permanent scratch memory
         std::vector<EarcutPolygon> m_tempPolys;
         std::vector<std::vector<glm::vec2>> m_tempEarcutInput;
-        std::vector<uint32_t> m_tempIndices;
         std::vector<glm::vec2> m_tempVerts2D;
+        std::vector<uint32_t> m_tempIndices;
 
         void AddMeshNodeToPath(const MeshNode& meshNode, Clipper2Lib::PathsD LevelInfo::* member);
         void AddTri(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c);
@@ -124,25 +108,26 @@ namespace NavMeshManager {
         void UpdateDynamicPaths();
         void UpdateNavMesh();
 
+        void RemoveTJunctions();
         void BuildNeighbors();
         void BuildSpatialGrid();
         
         void DebugDrawAdjacentTris();
         int FindContainingTriIndex(const glm::vec3& p);
         int GetGridIndex(const glm::vec3& p);
-        std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest);
-        std::vector<glm::vec3> PullPath(const std::vector<glm::vec3>& path);
         std::vector<glm::vec3> Funnel(const std::vector<Portal>& portals);
         std::vector<Portal> BuildPortalsFromCenters(const std::vector<glm::vec3>& path, const std::vector<int>& triIndices);
     };
 
     Hell::SlotMap<NavMesh> g_navMeshes;
+    uint64_t g_testNaveMeshID = 0;
 
     glm::vec3 g_destination = glm::vec3(666.0f);
 
     // Util
     int CreatePathKeyFromHeightY(float y);
     void BuildEarcutPolygons(const Clipper2Lib::PathsD& paths, std::vector<EarcutPolygon>& outPolys);
+    NavMesh* GetNavMeshById(int64_t id);
     std::vector<glm::vec2> ComputeConvexHull2D(std::vector<glm::vec2>& points);
     Clipper2Lib::PathD ConvertToClipperPath(const std::vector<glm::vec2>& points);
     Clipper2Lib::PathsD DeflatePaths(const Clipper2Lib::PathsD& paths, float agentRadius);
@@ -161,7 +146,7 @@ namespace NavMeshManager {
     void DrawPath(std::vector<glm::vec3>& path, const glm::vec4& color);
     void DrawNavTri(const NavTri& navTri, const glm::vec4& color);
 
-    void CreateNavMesh(float agentRadius);
+    uint64_t CreateNavMesh(float agentRadius);
 
 
 
@@ -189,13 +174,6 @@ namespace NavMeshManager {
         for (NavTri& navTri : m_tris) {
             DrawNavTri(navTri, GREEN);
         }
-
-        // Find path
-        glm::vec3 viewPos = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
-        std::vector<glm::vec3> rawPath = FindPath(viewPos, g_destination);
-        std::vector<glm::vec3> pulledPath = PullPath(rawPath);
-
-        DrawPath(pulledPath, WHITE);
     }
 
     void NavMesh::UpdateStaticPaths() {
@@ -277,31 +255,59 @@ namespace NavMeshManager {
     
     void NavMesh::UpdateNavMesh() {
         NAV_MESH_TIMER("UpdateNavMesh");
-
-        m_tris.clear();
+        
+        constexpr auto fillRule = Clipper2Lib::FillRule::NonZero;
         m_boundsMin = glm::vec2(std::numeric_limits<float>::max());
-        m_boundsMax = glm::vec2(std::numeric_limits<float>::lowest());
+        m_boundsMax = glm::vec2(std::numeric_limits<float>::lowest()); 
+        std::size_t estimatedTris = 0;
 
         // Iterate each path level and add the tris to the nav mesh
         for (auto& it : m_levelInfo) {
             LevelInfo& levelInfo = it.second;
 
-            // Subtract dynamic solution from static
-            Clipper2Lib::PathsD solution;
-            if (!levelInfo.dynamicObstaclePaths.empty()) {
-                solution = Clipper2Lib::Difference(levelInfo.solutionStatic, levelInfo.solutionDynamic, Clipper2Lib::FillRule::NonZero);
+            // Skip levels with no static geometry at all
+            if (levelInfo.solutionStatic.empty()) {
+                levelInfo.solutionFinal.clear();
+                continue;
             }
+
+            // Pointer for the base shape. This will be static only or static minus dynamic
+            const Clipper2Lib::PathsD* basePaths = nullptr;
+
+            // Static minus dynamic
+            if (!levelInfo.solutionDynamic.empty()) {
+                levelInfo.solutionFinal = Clipper2Lib::Difference(levelInfo.solutionStatic, levelInfo.solutionDynamic, fillRule);
+                basePaths = &levelInfo.solutionFinal;
+            }
+            // If there are no dynamics then use static directly
             else {
-                solution = levelInfo.solutionStatic;
+                basePaths = &levelInfo.solutionStatic;
             }
 
-            solution = DeflatePaths(solution, m_agentRadius);
+            if (basePaths->empty()) {
+                levelInfo.solutionFinal.clear();
+                continue;
+            }
 
-            //double epsilon = 0.05; // 5cm tolerance
-            //solution = Clipper2Lib::SimplifyPaths(solution, epsilon);
+            // Deflate into final
+            levelInfo.solutionFinal = DeflatePaths(*basePaths, m_agentRadius);
+
+            // Accumulate estimate tris
+            for (const auto& path : levelInfo.solutionFinal) {
+                const std::size_t n = path.size();
+                if (n >= 3) estimatedTris += n;
+            }
+        }
+
+        // Build nav mesh tris with earcut
+        m_tris.clear();
+        m_tris.reserve(estimatedTris);
+
+        for (auto& it : m_levelInfo) {
+            LevelInfo& levelInfo = it.second;
 
             // Build outer hole polygons from Clipper output
-            BuildEarcutPolygons(solution, m_tempPolys);
+            BuildEarcutPolygons(levelInfo.solutionFinal, m_tempPolys);
 
             for (const EarcutPolygon& poly : m_tempPolys) {
                 if (poly.rings.empty()) continue;
@@ -309,10 +315,19 @@ namespace NavMeshManager {
                 m_tempEarcutInput.clear();
                 m_tempEarcutInput.reserve(poly.rings.size());
 
+                // Precompute vertex count
+                std::size_t totalVerts = 0;
+                for (const auto& ring : poly.rings) {
+                    totalVerts += ring.size();
+                }
                 m_tempVerts2D.clear();
+                m_tempVerts2D.reserve(totalVerts);
+
+                // Fill earcut input + flat vertices
                 for (const auto& ring : poly.rings) {
                     auto& dstRing = m_tempEarcutInput.emplace_back();
                     dstRing.reserve(ring.size());
+
                     for (const auto& v : ring) {
                         dstRing.emplace_back(v.x, v.y);
                         m_tempVerts2D.push_back(v);
@@ -320,7 +335,6 @@ namespace NavMeshManager {
                 }
 
                 m_tempIndices = mapbox::earcut<uint32_t>(m_tempEarcutInput);
-
                 for (size_t i = 0; i + 2 < m_tempIndices.size(); i += 3) {
                     const glm::vec2& v0 = m_tempVerts2D[m_tempIndices[i + 0]];
                     const glm::vec2& v1 = m_tempVerts2D[m_tempIndices[i + 1]];
@@ -330,6 +344,12 @@ namespace NavMeshManager {
             }
         }
 
+        // RemoveTJunctions();
+        BuildNeighbors();
+        BuildSpatialGrid();
+    }
+
+    void NavMesh::RemoveTJunctions() {
         // Post process the triangulated mesh: Split triangles when a vertex encroaches an edge.
         bool postProcess = false;
         if (postProcess) {
@@ -390,44 +410,61 @@ namespace NavMeshManager {
             restart_loops:; // Goto label
             }
         }
-
-        BuildNeighbors();
-        BuildSpatialGrid();
     }
 
     void NavMesh::BuildNeighbors() {
-        std::unordered_map<EdgeKey, EdgeValue, EdgeKeyHasher> edgeMap;
-        edgeMap.reserve(m_tris.size() * 3);
+        const int triCount = (int)m_tris.size();
+        if (triCount == 0) return;
 
-        for (int i = 0; i < (int)m_tris.size(); ++i) {
+        m_edgeList.clear();
+        m_edgeList.reserve(triCount * 3);
+
+        // Build edge list
+        for (int i = 0; i < triCount; ++i) {
+            const NavTri& tri = m_tris[i];
+
             for (int e = 0; e < 3; ++e) {
-                // Get the two vertices of this edge
-                glm::vec3 v0 = m_tris[i].v[e];
-                glm::vec3 v1 = m_tris[i].v[(e + 1) % 3];
+                glm::vec3 v0 = tri.v[e];
+                glm::vec3 v1 = tri.v[(e + 1) % 3];
 
-                // Create a canonical key and sort so the "smaller" vertex is always first, ensuring both edges have the same key
-                EdgeKey key;
-                if (v0.x < v1.x || (v0.x == v1.x && v0.z < v1.z)) {
-                    key = { v0, v1 };
-                }
-                else {
-                    key = { v1, v0 };
+                // Canonical order in full 3D, this way edge keys match regardless of the vertex order
+                if (v0.x > v1.x ||
+                    (v0.x == v1.x && (v0.z > v1.z ||
+                        (v0.z == v1.z && v0.y > v1.y)))) {
+                    std::swap(v0, v1);
                 }
 
-                // Check if this edge was already added by a previous triangle
-                auto it = edgeMap.find(key);
+                m_edgeList.push_back({ v0, v1, i, e });
+            }
+        }
 
-                if (it != edgeMap.end()) {
-                    // Found a neighbor
-                    int neighborTriIndex = it->second.triIndex;
-                    int neighborEdgeIndex = it->second.edgeIndex;
-                    m_tris[i].neighbor[e] = neighborTriIndex;                 // Link me to them
-                    m_tris[neighborTriIndex].neighbor[neighborEdgeIndex] = i; // Link them to me
-                }
-                else {
-                    // No neighbor found yet, add myself to the map and wait for a partner
-                    edgeMap[key] = { i, e };
-                }
+        auto cmp = [](const EdgeRef& a, const EdgeRef& b) {
+            if (a.v0.x != b.v0.x) return a.v0.x < b.v0.x;
+            if (a.v0.z != b.v0.z) return a.v0.z < b.v0.z;
+            if (a.v0.y != b.v0.y) return a.v0.y < b.v0.y;
+            if (a.v1.x != b.v1.x) return a.v1.x < b.v1.x;
+            if (a.v1.z != b.v1.z) return a.v1.z < b.v1.z;
+            return a.v1.y < b.v1.y;
+            };
+        std::sort(m_edgeList.begin(), m_edgeList.end(), cmp);
+
+        const size_t edgeCount = m_edgeList.size();
+        size_t i = 0;
+        while (i + 1 < edgeCount) {
+            const EdgeRef& e0 = m_edgeList[i];
+            const EdgeRef& e1 = m_edgeList[i + 1];
+
+            bool equal =
+                e0.v0.x == e1.v0.x && e0.v0.y == e1.v0.y && e0.v0.z == e1.v0.z &&
+                e0.v1.x == e1.v1.x && e0.v1.y == e1.v1.y && e0.v1.z == e1.v1.z;
+
+            if (equal) {
+                m_tris[e0.triIndex].neighbor[e0.edgeIndex] = e1.triIndex;
+                m_tris[e1.triIndex].neighbor[e1.edgeIndex] = e0.triIndex;
+                i += 2;
+            }
+            else {
+                ++i;
             }
         }
     }
@@ -491,23 +528,27 @@ namespace NavMeshManager {
     }
 
     void NavMesh::AddTri(const glm::vec3 a, const glm::vec3 b, const glm::vec3 c) {
-        if (Math::IsDegenerateXZ(a, b, c)) return;
-
         NavTri tri;
         tri.v[0] = RoundVertex(a);
         tri.v[1] = RoundVertex(b);
         tri.v[2] = RoundVertex(c);
-        tri.neighbor[0] = tri.neighbor[1] = tri.neighbor[2] = -1;
 
-        // Enforce consistent winding order in XZ
-        glm::vec2 A(a.x, a.z), B(b.x, b.z), C(c.x, c.z);
-        float area2 = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+        const glm::vec3& A = tri.v[0];
+        const glm::vec3& B = tri.v[1];
+        const glm::vec3& C = tri.v[2];
+
+        float area2 = (B.x - A.x) * (C.z - A.z) - (B.z - A.z) * (C.x - A.x);
+
+        // Reject degenerate tris (in XZ)
+        if (std::fabs(area2) < 0.00001f) return;
+
+        // Enforce winding order
         if (area2 < 0.0f) std::swap(tri.v[1], tri.v[2]);
 
         // Center
         tri.center = (tri.v[0] + tri.v[1] + tri.v[2]) * (1.0f / 3.0f);
 
-        // Compute AABB
+        // Compute tri AABB
         tri.boundsMin = tri.v[0];
         tri.boundsMax = tri.v[0];
         for (int i = 1; i < 3; ++i) {
@@ -525,7 +566,7 @@ namespace NavMeshManager {
         tri.neighbor[1] = -1;
         tri.neighbor[2] = -1;
 
-        // Update navMesh bounds (note Z is Y in 2D)
+        // Update nav mesh AABB
         m_boundsMin.x = std::min(m_boundsMin.x, tri.boundsMin.x);
         m_boundsMin.y = std::min(m_boundsMin.y, tri.boundsMin.z);
         m_boundsMax.x = std::max(m_boundsMax.x, tri.boundsMax.x);
@@ -544,8 +585,8 @@ namespace NavMeshManager {
         float widthWorld = endPos.x - m_gridOrigin.x;
         float heightWorld = endPos.y - m_gridOrigin.y;
 
-        m_gridWidth = (int)std::ceil(widthWorld / m_gridCellSize);
-        m_gridHeight = (int)std::ceil(heightWorld / m_gridCellSize);
+        m_gridWidth = (int)std::ceil(widthWorld * m_invCellSize);
+        m_gridHeight = (int)std::ceil(heightWorld * m_invCellSize);
 
         // Resize Grid
         int numCells = m_gridWidth * m_gridHeight;
@@ -562,10 +603,10 @@ namespace NavMeshManager {
         for (int i = 0; i < (int)m_tris.size(); ++i) {
             const NavTri& tri = m_tris[i];
 
-            int minX = (int)((tri.boundsMin.x - m_gridOrigin.x) / m_gridCellSize);
-            int minZ = (int)((tri.boundsMin.z - m_gridOrigin.y) / m_gridCellSize);
-            int maxX = (int)((tri.boundsMax.x - m_gridOrigin.x) / m_gridCellSize);
-            int maxZ = (int)((tri.boundsMax.z - m_gridOrigin.y) / m_gridCellSize);
+            int minX = (int)((tri.boundsMin.x - m_gridOrigin.x) * m_invCellSize);
+            int minZ = (int)((tri.boundsMin.z - m_gridOrigin.y) * m_invCellSize);
+            int maxX = (int)((tri.boundsMax.x - m_gridOrigin.x) * m_invCellSize);
+            int maxZ = (int)((tri.boundsMax.z - m_gridOrigin.y) * m_invCellSize);
 
             minX = std::max(0, minX);
             minZ = std::max(0, minZ);
@@ -958,7 +999,7 @@ namespace NavMeshManager {
 
 
     void Init() {
-        CreateNavMesh(0.1f);
+        g_testNaveMeshID = CreateNavMesh(0.1f);
     }
 
     void Update() {
@@ -988,15 +1029,36 @@ namespace NavMeshManager {
         if (Input::KeyPressed(HELL_KEY_P)) {
             g_destination = viewPos;
         }
+
+        FindPath(viewPos, g_destination);
     }
 
-    void CreateNavMesh(float agentRadius) {
+    uint64_t CreateNavMesh(float agentRadius) {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::NAV_MESH);
         g_navMeshes.emplace_with_id(id, id, agentRadius);
+        return id;
+    }
+
+    std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest) {
+        static std::vector<glm::vec3> emptyPath;
+
+        if (NavMesh* navMesh = GetNavMeshById(g_testNaveMeshID)) {
+            std::vector<glm::vec3> rawPath = navMesh->FindPath(start, dest);
+            std::vector<glm::vec3> pulledPath = navMesh->PullPath(rawPath);
+            DrawPath(pulledPath, WHITE);
+            return pulledPath;
+        }
+        else {
+            return emptyPath;
+        }
     }
 
     int CreatePathKeyFromHeightY(float y) {
         return (int)std::round(y * 1000.0f);
+    }
+
+    NavMesh* GetNavMeshById(int64_t id) {
+        return g_navMeshes.get(id);
     }
 
     Clipper2Lib::PathsD DeflatePaths(const Clipper2Lib::PathsD& paths, float agentRadius) {
@@ -1045,17 +1107,31 @@ namespace NavMeshManager {
         return inside;
     }
 
-    // Build outer+hole groups from Clipper PathsD
+    // Build outer + hole groups from Clipper PathsD
     void BuildEarcutPolygons(const Clipper2Lib::PathsD& paths, std::vector<EarcutPolygon>& outPolys) {
         outPolys.clear();
+        if (paths.empty()) return;
 
         struct RingInfo {
             std::vector<glm::vec2> pts;
             double area;
+            glm::vec2 boundsMin;
+            glm::vec2 boundsMax;
         };
 
-        std::vector<RingInfo> rings;
+        struct OuterInfo {
+            int polyIndex;
+            glm::vec2 boundsMin;
+            glm::vec2 boundsMax;
+        };
+
+        static std::vector<RingInfo> rings;   // NOT THREAD SAFE!!!
+        static std::vector<OuterInfo> outers; // NOT THREAD SAFE!!!
+
+        rings.clear();
+        outers.clear();
         rings.reserve(paths.size());
+        outers.reserve(paths.size());
 
         double sumPos = 0.0;
         double sumNeg = 0.0;
@@ -1066,48 +1142,71 @@ namespace NavMeshManager {
             RingInfo r;
             r.pts.reserve(path.size());
 
-            for (const auto& p : path) {
-                r.pts.emplace_back((float)p.x, (float)p.y);
-            }
-            r.area = Clipper2Lib::Area(path);
+            glm::vec2 bmin(std::numeric_limits<float>::max());
+            glm::vec2 bmax(std::numeric_limits<float>::lowest());
 
-            if (r.area > 0.0) {
-                sumPos += r.area;
+            for (const auto& p : path) {
+                glm::vec2 v((float)p.x, (float)p.y);
+                r.pts.push_back(v);
+
+                bmin.x = std::min(bmin.x, v.x);
+                bmin.y = std::min(bmin.y, v.y);
+                bmax.x = std::max(bmax.x, v.x);
+                bmax.y = std::max(bmax.y, v.y);
             }
-            else {
-                sumNeg -= r.area;
-            }
+
+            r.boundsMin = bmin;
+            r.boundsMax = bmax;
+
+            r.area = Clipper2Lib::Area(path);
+            if (r.area > 0.0) sumPos += r.area;
+            else             sumNeg -= r.area;
+
             rings.push_back(std::move(r));
         }
 
         if (rings.empty()) return;
 
-        // Decide which sign is "outer"
         bool outerPositive = (sumPos >= sumNeg);
 
-        // First create one EarcutPolygon per outer ring
-        for (const RingInfo& r : rings) {
+        // Create one EarcutPolygon per outer ring
+        for (size_t i = 0; i < rings.size(); ++i) {
+            const RingInfo& r = rings[i];
             bool isOuter = outerPositive ? (r.area > 0.0) : (r.area < 0.0);
             if (!isOuter) continue;
 
             EarcutPolygon poly;
             poly.rings.push_back(r.pts);
             outPolys.push_back(std::move(poly));
+
+            OuterInfo oi;
+            oi.polyIndex = (int)outPolys.size() - 1;
+            oi.boundsMin = r.boundsMin;
+            oi.boundsMax = r.boundsMax;
+            outers.push_back(oi);
         }
 
-        // Assign holes to their containing outer
+        if (outPolys.empty()) return;
+
+        // Assign holes to containing outer
         for (const RingInfo& r : rings) {
             bool isOuter = outerPositive ? (r.area > 0.0) : (r.area < 0.0);
-            if (isOuter) continue; // skip outers here, you already handled them
-
+            if (isOuter) continue;
             if (r.pts.empty()) continue;
+
             glm::vec2 testPoint = r.pts[0];
 
-            for (EarcutPolygon& poly : outPolys) {
-                if (poly.rings.empty()) continue;
+            for (const OuterInfo& oi : outers) {
+                const glm::vec2& omin = oi.boundsMin;
+                const glm::vec2& omax = oi.boundsMax;
 
-                if (PointInPolygon2D(testPoint, poly.rings[0])) {
-                    poly.rings.push_back(r.pts); // add as hole
+                if (testPoint.x < omin.x || testPoint.x > omax.x ||
+                    testPoint.y < omin.y || testPoint.y > omax.y) {
+                    continue;
+                }
+
+                if (PointInPolygon2D(testPoint, outPolys[oi.polyIndex].rings[0])) {
+                    outPolys[oi.polyIndex].rings.push_back(r.pts);
                     break;
                 }
             }

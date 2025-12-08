@@ -29,6 +29,7 @@ namespace Game {
     float g_totalTime = 0;
     double g_deltaTimeAccumulator = 0.0;
     double g_fixedDeltaTime = 1.0 / 60.0;
+    bool g_glassHitAudioPlayedThisFrame = false;
     glm::vec3 g_moonlightDirection = glm::normalize(glm::vec3(0.0, 0.2, 0.5));
     std::vector<Player> g_localPlayers;
     std::vector<Player> g_onlinePlayers;
@@ -77,6 +78,8 @@ namespace Game {
         for (Player& player : g_localPlayers) {
             player.BeginFrame();
         }
+
+        g_glassHitAudioPlayedThisFrame = false;
     }
 
     void Update() {
@@ -222,6 +225,12 @@ namespace Game {
         }
     }
 
+    void PlayGlassHitAudio() {
+        if (!g_glassHitAudioPlayedThisFrame) {
+            Audio::PlayAudio("GlassImpact.wav", 2.0f);
+        }
+        g_glassHitAudioPlayedThisFrame = true;
+    }
 
     void PlayFootstepIndoorAudio() {
         const std::vector<const char*> indoorFootstepFilenames = {
@@ -282,7 +291,7 @@ namespace Game {
         }
     }
 
-    glm::vec3 GetMoonlightDirection() {
+    const glm::vec3& GetMoonlightDirection() {
         return g_moonlightDirection;
     }
 }

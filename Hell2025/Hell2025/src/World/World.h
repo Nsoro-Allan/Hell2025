@@ -166,6 +166,9 @@ namespace World {
 
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectId);
 
+    // Wild util
+    BlendingMode GetBlendingModeByObjectIdAndMeshNodeLocalIndex(uint64_t id, int32_t meshNodeLocalIndex);
+
     Door* GetDoorByObjectId(uint64_t objectId);
     Fireplace* GetFireplaceById(uint64_t objectId);
     GenericObject* GetGenericObjectById(uint64_t objectId);

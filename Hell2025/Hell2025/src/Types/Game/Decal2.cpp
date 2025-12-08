@@ -20,23 +20,30 @@ Decal2::Decal2(const Decal2CreateInfo& createInfo) {
 
     // Determine type
     m_type = DecalType::PLASTER;
+    MeshNodes* meshNodes = nullptr;
     if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
-        MeshNodes& meshNodes = genericObject->GetMeshNodes();
-
-        if (MeshNode* meshNode = meshNodes.GetMeshNodeByLocalIndex(m_createInfo.localMeshNodeIndex)) {
+        meshNodes = &genericObject->GetMeshNodes();
+    }
+    if (Window* window = World::GetWindowByObjectId(m_createInfo.parentObjectId)) {
+        meshNodes = &window->GetMeshNodes();
+    }
+    if (meshNodes) {
+        if (MeshNode* meshNode = meshNodes->GetMeshNodeByLocalIndex(m_createInfo.localMeshNodeIndex)) {
             m_type = meshNode->decalType;
         }
     }
+    // UGLYYYYYYY ^^^
+
 
     float scale = 0.1f;
 
     if (m_type == DecalType::GLASS) {
         m_material = AssetManager::GetMaterialByName("BulletHole_Glass");
-        scale = 0.035f;
+        scale = 0.035f * 0.825f;
     }
     else if (m_type == DecalType::PLASTER) {
         m_material = AssetManager::GetMaterialByName("BulletHole_Plaster");
-        scale = 0.02f;
+        scale = 0.02f * 0.5f;
     }
 
     // Compute the local matrix once because it never changes
@@ -45,7 +52,6 @@ Decal2::Decal2(const Decal2CreateInfo& createInfo) {
     m_localMatrix *= Util::RotationMatrixFromForwardVector(m_localNormal, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
     m_localMatrix *= glm::rotate(glm::mat4(1.0f), randomRotation, glm::vec3(0, 0, 1));
     m_localMatrix *= glm::scale(glm::mat4(1.0f), glm::vec3(scale));
-
 }
 
 void Decal2::Update() {

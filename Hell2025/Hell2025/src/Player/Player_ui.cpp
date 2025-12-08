@@ -236,6 +236,7 @@ void Player::UpdateUI() {
                     text += "- Openable Id: " + std::to_string(m_bvhRayResult.openableId) + "\n";
                     text += "- Custom Id: " + std::to_string(m_bvhRayResult.customId) + "\n";
                     text += "- Mesh node index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
+                    text += "- BlendingMode: " + Util::BlendingModeToString(World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(m_bvhRayResult.objectId, m_bvhRayResult.localMeshNodeIndex)) + "\n";
 
                     if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.openableId)) {
                         text += "\n";

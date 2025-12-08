@@ -41,4 +41,5 @@ namespace NavMeshManager {
 
     void Init();
     void Update();
+    std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest);
 }

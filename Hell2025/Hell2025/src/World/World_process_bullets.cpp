@@ -51,6 +51,29 @@ namespace World {
                 decalCreateInfo.surfaceHitNormal = bvhRayResult.hitNormal;
 
                 AddDecal2(decalCreateInfo);
+
+                // Bullet hit glass?
+                BlendingMode blendingMode = World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(bvhRayResult.objectId, bvhRayResult.localMeshNodeIndex);
+                if (blendingMode == BlendingMode::GLASS ||
+                    blendingMode == BlendingMode::MIRROR) {
+                    Game::PlayGlassHitAudio();
+
+                    decalCreateInfo.surfaceHitNormal *= glm::vec3(-1.0f);
+                    AddDecal2(decalCreateInfo);;
+
+                    // Create new bullet
+                    BulletCreateInfo bulletCreateInfo;
+                    bulletCreateInfo.origin = rayResult.hitPosition + bullet.GetDirection() * glm::vec3(0.05f);
+                    bulletCreateInfo.direction = bullet.GetDirection();
+                    bulletCreateInfo.damage = bullet.GetDamage();
+                    bulletCreateInfo.weaponIndex = bullet.GetWeaponIndex();
+                    bulletCreateInfo.ownerObjectId = bullet.GetOwnerObjectId();
+                    newBullets.emplace_back(Bullet(bulletCreateInfo));
+                }
+
+
+
+                std::cout << "Bullet hit: " << Util::ObjectTypeToString(UniqueID::GetType(bvhRayResult.objectId)) << "\n";
             }
 
 
@@ -202,10 +225,6 @@ namespace World {
                     }
                 }
             }
-        }
-
-        if (glassWasHit) {
-            Audio::PlayAudio("GlassImpact.wav", 2.0f);
         }
 
         // Wipe old bullets, and replace with any new ones that got spawned from glass hits

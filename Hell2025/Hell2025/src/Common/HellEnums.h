@@ -46,7 +46,8 @@ enum class BlendingMode {
     TOILET_WATER,
     MIRROR,
     GLASS,
-    DO_NOT_RENDER
+    DO_NOT_RENDER,
+    UNDEFINED
 };
 
 enum class ImageDataType {

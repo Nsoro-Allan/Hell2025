@@ -43,21 +43,25 @@ Window::Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffse
     glassInteriorTop.meshName = "GlassInteriorTop";
     glassInteriorTop.materialName = "WindowExterior";
     glassInteriorTop.blendingMode = BlendingMode::GLASS;
+    glassInteriorTop.decalType = DecalType::GLASS;
 
     MeshNodeCreateInfo& glassInteriorBottom = meshNodeCreateInfoSet.emplace_back();
     glassInteriorBottom.meshName = "GlassInteriorBottom";
     glassInteriorBottom.materialName = "WindowExterior";
     glassInteriorBottom.blendingMode = BlendingMode::GLASS;
+    glassInteriorBottom.decalType = DecalType::GLASS;
 
     MeshNodeCreateInfo& glassExteriorTop = meshNodeCreateInfoSet.emplace_back();
     glassExteriorTop.meshName = "GlassExteriorTop";
     glassExteriorTop.materialName = "WindowExterior";
     glassExteriorTop.blendingMode = BlendingMode::GLASS;
+    glassExteriorTop.decalType = DecalType::GLASS;
 
     MeshNodeCreateInfo& glassExteriorBottom = meshNodeCreateInfoSet.emplace_back();
     glassExteriorBottom.meshName = "GlassExteriorBottom";
     glassExteriorBottom.materialName = "WindowExterior";
     glassExteriorBottom.blendingMode = BlendingMode::GLASS;
+    glassExteriorBottom.decalType = DecalType::GLASS;
 
     MeshNodeCreateInfo& lock = meshNodeCreateInfoSet.emplace_back();
     lock.meshName = "Lock";
@@ -67,23 +71,23 @@ Window::Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffse
     m_meshNodes.Update(m_transform.to_mat4());
 
     // Glass PhysX shapes
-    PhysicsFilterData filterData;
-    filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
-    filterData.collisionGroup = CollisionGroup::NO_COLLISION;
-    filterData.collidesWith = CollisionGroup::NO_COLLISION;
-
-    filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
-
-    m_physicsId = Physics::CreateRigidStaticTriangleMeshFromModel(m_transform, "WindowGlassPhysX", filterData);
-    
-    // Set PhysX user data
-    PhysicsUserData userData;
-    userData.physicsId = m_physicsId;
-    userData.objectId = m_objectId;
-    userData.physicsType = PhysicsType::RIGID_STATIC;
-    userData.objectType = ObjectType::WINDOW;
-    Physics::SetRigidStaticUserData(m_physicsId, userData);
+    //PhysicsFilterData filterData;
+    //filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
+    //filterData.collisionGroup = CollisionGroup::NO_COLLISION;
+    //filterData.collidesWith = CollisionGroup::NO_COLLISION;
+    //
+    //filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    //filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+    //
+    //m_physicsId = Physics::CreateRigidStaticTriangleMeshFromModel(m_transform, "WindowGlassPhysX", filterData);
+    //
+    //// Set PhysX user data
+    //PhysicsUserData userData;
+    //userData.physicsId = m_physicsId;
+    //userData.objectId = m_objectId;
+    //userData.physicsType = PhysicsType::RIGID_STATIC;
+    //userData.objectType = ObjectType::WINDOW;
+    //Physics::SetRigidStaticUserData(m_physicsId, userData);
 }
 
 void Window::CleanUp() {

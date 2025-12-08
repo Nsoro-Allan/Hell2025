@@ -113,13 +113,10 @@ namespace World {
 		}
 		for (GenericObject& genericObject : GetGenericObjects()) {
 			CreateDynamicPrimtiveInstances(genericObject.GetMeshNodes());
-		}
-		for (Piano& piano : GetPianos()) {
-			CreateDynamicPrimtiveInstances(piano.GetMeshNodes());
-		}
-
-
-
+        }
+        for (Piano& piano : GetPianos()) {
+            CreateDynamicPrimtiveInstances(piano.GetMeshNodes());
+        }
 
         // TODO: Remove me
 		//for (Door& door : GetDoors()) {
@@ -150,13 +147,6 @@ namespace World {
 				}
 			}
 		}
-		for (Window& window : GetWindows()) {
-			const std::vector<RenderItem>& renderItems = window.GetRenderItems();
-			for (const RenderItem& renderItem : renderItems) {
-				CreateObjectInstanceDataFromRenderItem(renderItem, g_dynamicSceneInstances);
-			}
-		}
-
 
 
 
@@ -192,6 +182,9 @@ namespace World {
 		for (Piano& piano : GetPianos()) {
             CreateStaticPrimtiveInstances(piano.GetMeshNodes());
 		}
+		for (Window& window : GetWindows()) {
+			CreateStaticPrimtiveInstances(window.GetMeshNodes());
+        }
 
         // Recreate the TLAS
 		Bvh::Cpu::UpdateSceneBvh(g_staticSceneBvhId, g_staticSceneInstances);

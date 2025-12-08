@@ -24,9 +24,10 @@ namespace Game {
     Camera* GetLocalPlayerCameraByIndex(uint32_t index);
     float GetLocalPlayerFovByIndex(uint32_t index);
 
-    glm::vec3 GetMoonlightDirection();
+    const glm::vec3& GetMoonlightDirection();
     
     // Audio
+    void PlayGlassHitAudio();
     void PlayFootstepIndoorAudio();
     void PlayFootstepOutdoorAudio();
 }

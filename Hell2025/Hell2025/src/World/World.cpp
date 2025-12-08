@@ -959,7 +959,6 @@ namespace World {
         g_newDecals.push_back(Decal2(createInfo));
     }
 
-
     void AddDobermann(DobermannCreateInfo& createInfo) {
         Dobermann& dobermann = g_dobermanns.emplace_back();
         dobermann.Init(createInfo);
@@ -1164,27 +1163,38 @@ namespace World {
 
     }
 
-    ///// const std::string& GetSectorNameAtLocation(int x, int z) {
-    /////     if (x < 0 || x >= 1 || z < 0 || z >= 1) {
-    /////         std::cout << "World::GetSectorNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
-    /////         static const std::string emptyStr = "";
-    /////         return emptyStr;
-    /////     }
-    /////     return g_sectorNames[x][z];
-    ///// }
-    ///// 
-    ///// const std::string& GetHeightMapNameAtLocation(int x, int z) {
-    /////     if (x < 0 || x >= 1 || z < 0 || z >= 1) {
-    /////         std::cout << "World::GetHeightMapNameAtLocation() failed: [" << x << "][" << z << "] out of range of size [" << 1 << "][" << 1 << "]\n";
-    /////         static const std::string emptyStr = "";
-    /////         return emptyStr;
-    /////     }
-    /////     return g_heightMapNames[x][z];
-    ///// }
+    BlendingMode GetBlendingModeByObjectIdAndMeshNodeLocalIndex(uint64_t id, int32_t meshNodeLocalIndex) {
+        if (meshNodeLocalIndex < 0) {
+            return BlendingMode::UNDEFINED;
+        }
 
-    ///// bool IsMapCellInRange(int x, int z) {
-    /////     return (x >= 0 && x < 1 && z >= 0 && z < 1);
-    ///// }
+        MeshNodes* meshNodes = nullptr;
+
+        if (Door* door = GetDoorByObjectId(id)) {
+            meshNodes = &door->GetMeshNodes();
+        }
+        else if (Fireplace* fireplace = GetFireplaceById(id)) {
+            meshNodes = &fireplace->GetMeshNodes();
+        }
+        else if (GenericObject* genericObject = GetGenericObjectById(id)) {
+            meshNodes = &genericObject->GetMeshNodes();
+        }
+        else if (Piano* piano = GetPianoByObjectId(id)) {
+            meshNodes = &piano->GetMeshNodes();
+        }
+        else if (Window* window = GetWindowByObjectId(id)) {
+            meshNodes = &window->GetMeshNodes();
+        }
+        else {
+            Logging::Warning() << "World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(...) failed: unknown object type\n";
+            return BlendingMode::UNDEFINED;
+        }
+
+        // Safe to retrieve the blending mode now
+        if (MeshNode* meshNode = meshNodes->GetMeshNodeByLocalIndex(meshNodeLocalIndex)) {
+            return meshNode->blendingMode;
+        }
+    }
 
     Piano* GetPianoByObjectId(uint64_t objectId) {
         for (Piano& piano : g_pianos) {
