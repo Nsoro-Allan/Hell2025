@@ -15,9 +15,8 @@ struct MeshNode {
     uint32_t openableId;
     uint32_t customId;
     uint64_t physicsId;
-    uint64_t rigidStaticId;
+    uint64_t rigidDynamicId;
     uint64_t mirrorId;
-    MeshNodeType type;
     BlendingMode blendingMode;
     int32_t localParentIndex;
     uint64_t meshBvhId;
@@ -37,7 +36,7 @@ struct MeshNode {
     DecalType decalType = DecalType::PLASTER;
     bool forceDynamic;
     bool castShadows;
-    bool aabbCollision;
+    bool ownsOpenableId = false;      // Only nodes with this flag set to true receive the transform from the openable ID
     glm::vec3 emissiveColor = glm::vec3(1.0f);
 };
 

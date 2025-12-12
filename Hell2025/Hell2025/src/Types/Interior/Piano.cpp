@@ -23,7 +23,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
     MeshNodeCreateInfo& topCover = meshNodeCreateInfoSet.emplace_back();
-    topCover.type = MeshNodeType::OPENABLE;
+    topCover.openable.isOpenable = true;
     topCover.materialName = "Piano0";
     topCover.meshName = "Yamaha_Case.Top.Cover";
     topCover.openable.openAxis = OpenAxis::ROTATE_X_NEG;
@@ -34,7 +34,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     topCover.openable.closeSpeed = 8.5f;
 
     MeshNodeCreateInfo& keyboardCover = meshNodeCreateInfoSet.emplace_back();
-    keyboardCover.type = MeshNodeType::OPENABLE;
+    keyboardCover.openable.isOpenable = true;
     keyboardCover.materialName = "Piano0";
     keyboardCover.meshName = "Yamaha_Keyboard.Cover";
     keyboardCover.openable.additionalTriggerMeshNames = { "Yamaha_Keyboard.Cover.Lock" };
@@ -46,7 +46,7 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     keyboardCover.openable.closeSpeed = 8.5f;
 
     MeshNodeCreateInfo& sheetMusicRest = meshNodeCreateInfoSet.emplace_back();
-    sheetMusicRest.type = MeshNodeType::OPENABLE;
+    sheetMusicRest.openable.isOpenable = true;
     sheetMusicRest.materialName = "Piano0";
     sheetMusicRest.meshName = "Yamaha_Lyrics.Stand";
     sheetMusicRest.openable.additionalTriggerMeshNames = { "Yamaha_Lyrics.Hinges.Plate.A",  "Yamaha_Lyrics.Hinges.Plate.B" };
@@ -138,18 +138,18 @@ void Piano::Init(PianoCreateInfo& createInfo) {
     m_seatPosition = m_transform.to_mat4() * glm::vec4(0.75f, 0.0f, 0.75f, 1.0f);
 
     // Create physics objects
-    PhysicsFilterData filterData;
-    filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
-    filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    filterData.collidesWith = (CollisionGroup)(CHARACTER_CONTROLLER | BULLET_CASING | ITEM_PICK_UP | RAGDOLL_ENEMY);
-    m_rigidStaticId = Physics::CreateRigidStaticConvexMeshFromModel(m_transform, "PianoConvexMesh", filterData);
-
-    PhysicsUserData userData;
-    userData.physicsId = m_rigidStaticId;
-    userData.objectId = m_pianoObjectId;
-    userData.physicsType = PhysicsType::RIGID_STATIC;
-    userData.objectType = ObjectType::PIANO;
-    Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
+    //PhysicsFilterData filterData;
+    //filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
+    //filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    //filterData.collidesWith = (CollisionGroup)(CHARACTER_CONTROLLER | BULLET_CASING | ITEM_PICK_UP | RAGDOLL_ENEMY);
+    //m_rigidStaticId = Physics::CreateRigidStaticConvexMeshFromModel(m_transform, "PianoConvexMesh", filterData);
+    //
+    //PhysicsUserData userData;
+    //userData.physicsId = m_rigidStaticId;
+    //userData.objectId = m_pianoObjectId;
+    //userData.physicsType = PhysicsType::RIGID_STATIC;
+    //userData.objectType = ObjectType::PIANO;
+    //Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
 
     CalculatePianoKeyWorldspaceCenters();
 }

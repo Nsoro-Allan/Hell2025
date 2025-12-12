@@ -168,9 +168,8 @@ void Player::UpdateInteract() {
 
     // Convenience bool for setting crosshair
     m_interactFound = false;
-    if (m_interactObjectId != 0)                                            m_interactFound = true;
-    if (m_interactOpenableId != 0)                                          m_interactFound = true;
-    if (interactObjectType == ObjectType::PIANO && m_interactCustomId != 0) m_interactFound = true;
+    if (OpenableManager::IsInteractable(m_interactOpenableId, GetCameraPosition())) m_interactFound = true;
+    if (interactObjectType == ObjectType::PIANO && m_interactCustomId != 0)         m_interactFound = true;
 
     // PRESSED interact key
     if (PressedInteract()) {

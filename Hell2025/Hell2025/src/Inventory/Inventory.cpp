@@ -4,9 +4,31 @@
 #include "Input/Input.h"
 #include "UI/TextBlitter.h"
 #include "UI/UiBackend.h"
+#include "Weapon/WeaponManager.h"
 
-Inventory::Inventory() {
-    //UpdateOccupiedSlotsArray();
+void Inventory::Init() {
+    CloseInventory();
+    ClearInventory();
+    InitWeaponAndAmmoStates();
+}
+
+void Inventory::InitWeaponAndAmmoStates() {
+    m_weaponStates.clear();
+    m_ammoStates.clear();
+
+    for (int i = 0; i < WeaponManager::GetWeaponCount(); i++) {
+        WeaponState& state = m_weaponStates.emplace_back();
+        state.name = WeaponManager::GetWeaponInfoByIndex(i)->name;
+        state.has = false;
+        state.ammoInMag = 0;
+    }
+
+    m_ammoStates.clear();
+    for (int i = 0; i < WeaponManager::GetAmmoTypeCount(); i++) {
+        AmmoState& state = m_ammoStates.emplace_back();
+        state.name = WeaponManager::GetAmmoInfoByIndex(i)->name;
+        state.ammoOnHand = 0;
+    }
 }
 
 void Inventory::OpenInventory() {

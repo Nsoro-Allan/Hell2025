@@ -155,6 +155,51 @@ namespace Physics {
         return physicsID;
     }
 
+    uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, bool kinematic, PhysicsFilterData filterData, Transform localOffset) {
+        PxPhysics* pxPhysics = Physics::GetPxPhysics();
+        PxScene* pxScene = Physics::GetPxScene();
+        PxMaterial* material = Physics::GetDefaultMaterial();
+
+        float halfWidth = boxExtents.x * 0.5f;
+        float halfHeight = boxExtents.y * 0.5f;
+        float halfDepth = boxExtents.z * 0.5f;
+
+        PxFilterData pxFilterData;
+        pxFilterData.word0 = (PxU32)filterData.raycastGroup;
+        pxFilterData.word1 = (PxU32)filterData.collisionGroup;
+        pxFilterData.word2 = (PxU32)filterData.collidesWith;
+
+        // Create shape
+        PxShape* pxShape = pxPhysics->createShape(PxBoxGeometry(halfWidth, halfHeight, halfDepth), *material, true);
+        pxShape->setQueryFilterData(pxFilterData);       // ray casts
+        pxShape->setSimulationFilterData(pxFilterData);  // collisions
+        pxShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
+        pxShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
+
+        PxTransform localOffsetTransform = PxTransform(GlmMat4ToPxMat44(localOffset.to_mat4()));
+        pxShape->setLocalPose(localOffsetTransform);
+
+        // Create rigid dynamic
+        PxQuat quat = Physics::GlmQuatToPxQuat(glm::quat(transform.rotation));
+        PxTransform pxTransform = PxTransform(PxVec3(transform.position.x, transform.position.y, transform.position.z), quat);
+        PxRigidDynamic* pxRigidDynamic = pxPhysics->createRigidDynamic(pxTransform);
+        pxRigidDynamic->attachShape(*pxShape);
+        pxScene->addActor(*pxRigidDynamic);
+
+        // Kinematic flag
+        pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
+        
+        // Create DynamicBox
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
+        RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
+
+        // Update its pointers
+        rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
+        rigidDynamic.SetPxShape(pxShape);
+
+        return physicsID;
+    }
+
     uint64_t CreateRigidDynamicFromPxShape(PxShape* pxShape, glm::mat4 initialPose, glm::mat4 shapeOffsetMatrix) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
         PxScene* pxScene = Physics::GetPxScene();

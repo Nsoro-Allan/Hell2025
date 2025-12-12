@@ -227,6 +227,8 @@ void Player::UpdateUI() {
                 text = "BVH ray hit: " + Util::BoolToString(m_bvhRayResult.hitFound) + "\n";
 
                 if (m_bvhRayResult.hitFound) {
+                    MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_bvhRayResult.objectId, m_bvhRayResult.localMeshNodeIndex);
+
                     uint64_t hitId = m_bvhRayResult.objectId;
                     ObjectType hitType = UniqueID::GetType(hitId);
                     text += "- Hit pos: " + Util::Vec3ToString(m_bvhRayResult.hitPosition) + "\n";
@@ -236,7 +238,10 @@ void Player::UpdateUI() {
                     text += "- Openable Id: " + std::to_string(m_bvhRayResult.openableId) + "\n";
                     text += "- Custom Id: " + std::to_string(m_bvhRayResult.customId) + "\n";
                     text += "- Mesh node index: " + std::to_string(m_bvhRayResult.localMeshNodeIndex) + "\n";
-                    text += "- BlendingMode: " + Util::BlendingModeToString(World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(m_bvhRayResult.objectId, m_bvhRayResult.localMeshNodeIndex)) + "\n";
+
+                    if (meshNode) {
+                        text += "- BlendingMode: " + Util::BlendingModeToString(meshNode->blendingMode) + "\n";
+                    }
 
                     if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.openableId)) {
                         text += "\n";
@@ -269,4 +274,19 @@ void Player::UpdateUI() {
             UIBackEnd::BlitTexture("PressStart", location, Alignment::CENTERED, WHITE, size, TextureFilter::LINEAR);
         }
     }
+
+    //std::string name = "FontTest_LockedFromTheOtherSide";
+    //name = "FontTest_LockedWithAKey";
+    ////name = "FontTest_YouUnlockedIt";
+    //
+    //if (Texture* texture = AssetManager::GetTextureByName(name)) {
+    //    int width = texture->GetWidth() * 2;
+    //    int height = texture->GetHeight() * 2;
+    //    int marginX = 100;
+    //    int marginY = 120;
+    //    glm::ivec2 location = glm::ivec2(marginX, yBottom - marginY);
+    //    std::cout << yBottom << "\n";
+    //    glm::ivec2 size = glm::ivec2(width, height);
+    //    UIBackEnd::BlitTexture(name, location, Alignment::BOTTOM_LEFT, WHITE, size, TextureFilter::NEAREST);
+    //}
 }

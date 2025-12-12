@@ -37,6 +37,13 @@ namespace OpenableManager {
         return (g_openables.find(openableId) != g_openables.end());
     }
 
+    bool IsInteractable(uint32_t openableId, const glm::vec3& viewPos) {
+        if (Openable* openable = GetOpenableByOpenableId(openableId)) {
+            return openable->IsInteractable(viewPos);
+        }
+        return false;
+    }
+
     Openable* GetOpenableByOpenableId(uint32_t openableId) {
         if (OpenableExists(openableId)) {
             return &g_openables[openableId];

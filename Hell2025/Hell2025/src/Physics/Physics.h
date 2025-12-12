@@ -93,6 +93,9 @@ namespace Physics {
     bool RigidDynamicExists(uint64_t rigidDynamicId);
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
     uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
+    
+    uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, bool kinematic, PhysicsFilterData filterData, Transform localOffset = Transform());
+
     uint64_t CreateRigidDynamicFromPxShape(PxShape* pxShape, glm::mat4 initialPose, glm::mat4 shapeOffsetMatrix);
     glm::mat4 GetRigidDynamicWorldMatrix(uint64_t rigidDynamicId);
     void RemoveAnyRigidDynamicMarkedForRemoval();

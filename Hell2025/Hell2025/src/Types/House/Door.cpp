@@ -23,8 +23,8 @@ Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spa
 	MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
 	door.meshName = "Door";
 	door.materialName = "Door";
-	door.openable.additionalTriggerMeshNames = { "Door_Handle", "Door_Hinges", "Door_Lock" };
-    door.type = MeshNodeType::OPENABLE;
+    door.openable.additionalTriggerMeshNames = { "Door_Handle", "Door_Hinges", "Door_Lock" };
+    door.openable.isOpenable = true;
 	door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
 	door.openable.initialOpenState = OpenState::CLOSED;
 	door.openable.minOpenValue = 0.0f;
@@ -33,7 +33,11 @@ Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spa
 	door.openable.closeSpeed = 5.208f;
 	door.openable.openingAudio = "Door_Open.wav";
 	door.openable.closingAudio = "Door_Open.wav";
-	door.aabbCollision = true;
+    door.rigidDynamicAABB.createObject = true;
+    door.rigidDynamicAABB.kinematic = true;
+    door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+    door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
 	MeshNodeCreateInfo& doorHandle = meshNodeCreateInfoSet.emplace_back();
     doorHandle.meshName = "Door_Handle";

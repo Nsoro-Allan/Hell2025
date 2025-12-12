@@ -37,82 +37,135 @@ namespace World {
                 ignoredActors.insert(ignoredActors.end(), ragdollActors.begin(), ragdollActors.end());
             }
 
-            PhysXRayResult rayResult;// = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
-
-
-            // Testing out bvh ray casts for bullets. Maybe it's worthwhile over physx raycasts
+            PhysXRayResult physXRayResult = Physics::CastPhysXRay(rayOrigin, rayDirection, rayLength, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS, ignoredActors);
             BvhRayResult bvhRayResult = World::ClosestHit(rayOrigin, bullet.GetDirection(), rayLength);
 
+            // Defaults
+            bool hitFound = false;
+            uint64_t objectId = 0;
+            uint64_t physicsId = 0;
+            int32_t localMeshNodeIndex = -1;
+            glm::vec3 hitPosition = glm::vec3(0.0f);
+            glm::vec3 hitNormal = glm::vec3(0.0f);
+
+            // BVH hit
             if (bvhRayResult.hitFound) {
-                Decal2CreateInfo decalCreateInfo;
-                decalCreateInfo.surfaceHitPosition = bvhRayResult.hitPosition;
-                decalCreateInfo.parentObjectId = bvhRayResult.objectId;
-                decalCreateInfo.localMeshNodeIndex = bvhRayResult.localMeshNodeIndex;
-                decalCreateInfo.surfaceHitNormal = bvhRayResult.hitNormal;
-
-                AddDecal2(decalCreateInfo);
-
-                // Bullet hit glass?
-                BlendingMode blendingMode = World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(bvhRayResult.objectId, bvhRayResult.localMeshNodeIndex);
-                if (blendingMode == BlendingMode::GLASS ||
-                    blendingMode == BlendingMode::MIRROR) {
-                    Game::PlayGlassHitAudio();
-
-                    decalCreateInfo.surfaceHitNormal *= glm::vec3(-1.0f);
-                    AddDecal2(decalCreateInfo);;
-
-                    // Create new bullet
-                    BulletCreateInfo bulletCreateInfo;
-                    bulletCreateInfo.origin = rayResult.hitPosition + bullet.GetDirection() * glm::vec3(0.05f);
-                    bulletCreateInfo.direction = bullet.GetDirection();
-                    bulletCreateInfo.damage = bullet.GetDamage();
-                    bulletCreateInfo.weaponIndex = bullet.GetWeaponIndex();
-                    bulletCreateInfo.ownerObjectId = bullet.GetOwnerObjectId();
-                    newBullets.emplace_back(Bullet(bulletCreateInfo));
-                }
-
-
-
-                std::cout << "Bullet hit: " << Util::ObjectTypeToString(UniqueID::GetType(bvhRayResult.objectId)) << "\n";
+                hitFound = true;
+                objectId = bvhRayResult.objectId;
+                physicsId = 0;
+                localMeshNodeIndex = bvhRayResult.localMeshNodeIndex;
+                hitPosition = bvhRayResult.hitPosition;
+                hitNormal = bvhRayResult.hitNormal;
             }
 
+            // PhysX hit
+            if (physXRayResult.hitFound) {
+                float distToPhysXHit = glm::distance(physXRayResult.hitPosition, bullet.GetOrigin());
 
+                // Overwrite only if PhysX hit is closer
+                if (!bvhRayResult.hitFound || bvhRayResult.hitFound && distToPhysXHit < bvhRayResult.distanceToHit) {
+                    hitFound = true;
+                    objectId = physXRayResult.userData.objectId;
+                    physicsId = physXRayResult.userData.physicsId;
+                    localMeshNodeIndex = -1;
+                    hitPosition = physXRayResult.hitPosition;
+                    hitNormal = physXRayResult.hitNormal;
 
+                    std::cout << "physx hit\n";
+                }
+            }
 
+            // Hit found?
+            if (hitFound) {
 
-            // On hit
-            if (rayResult.hitFound) {
-                PhysicsType& physicsType = rayResult.userData.physicsType;
-                ObjectType& objectType = rayResult.userData.objectType;
-                uint64_t physicsId = rayResult.userData.physicsId;
-                uint64_t objectId = rayResult.userData.objectId;
+                // Retrieve the hit MeshNode, this could be nullptr if the hit was a physics object
+                MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(objectId, localMeshNodeIndex);
 
-                // Did you hit a dobermann?
+                bool glassHit = meshNode && (meshNode->blendingMode == BlendingMode::GLASS ||
+                                             meshNode->blendingMode == BlendingMode::MIRROR);
+
+                bool createDecal = (meshNode && meshNode->decalType != DecalType::UNDEFINED) ||
+                                   (Physics::GetRigidStaitcById(physicsId) != nullptr);
+
+                //bool createBlood = (Physics::GetRagdollById(physicsId) != nullptr) ||
+                //                   (RagdollManager::GetRagdollV2ById(physicsId) != nullptr);
+                //
+                //if (Physics::GetRigidDynamicById(physicsId) != nullptr) {
+                //    createBlood = true;
+                //    std::cout << "Shot rigid dynamic\n";
+                //}
+
+                // Create the decal
+                if (createDecal) {
+                    Decal2CreateInfo decalCreateInfo;
+                    decalCreateInfo.surfaceHitPosition = hitPosition;
+                    decalCreateInfo.parentObjectId = objectId;
+                    decalCreateInfo.localMeshNodeIndex = localMeshNodeIndex;
+                    decalCreateInfo.surfaceHitNormal = hitNormal;
+                    AddDecal2(decalCreateInfo);
+
+                    // Create second decal on opposite side if glass was hit + spawn a new bullet
+                    if (glassHit) {
+                        decalCreateInfo.surfaceHitNormal *= glm::vec3(-1.0f);
+                        AddDecal2(decalCreateInfo);
+
+                        if (bullet.CreatesFolloWThroughBulletOnGlassHit() && meshNode->blendingMode != BlendingMode::MIRROR) {
+                            BulletCreateInfo bulletCreateInfo;
+                            bulletCreateInfo.origin = hitPosition + bullet.GetDirection() * glm::vec3(0.05f);
+                            bulletCreateInfo.direction = bullet.GetDirection();
+                            bulletCreateInfo.damage = bullet.GetDamage();
+                            bulletCreateInfo.weaponIndex = bullet.GetWeaponIndex();
+                            bulletCreateInfo.ownerObjectId = bullet.GetOwnerObjectId();
+                            newBullets.emplace_back(Bullet(bulletCreateInfo));
+                        }
+
+                        Game::PlayGlassHitAudio();
+                    }
+                }
+
+                // Trigger the closest piano note on piano hit
+                if (Piano* piano = World::GetPianoByObjectId(objectId)) {
+                    piano->TriggerInternalNoteFromExternalBulletHit(hitPosition);
+                }
+
+                // Dobermann hit
                 for (Dobermann& dobermann : GetDobermanns()) {
                     if (objectId == dobermann.GetRagdollV2Id()) {
                         dobermann.TakeDamage(bullet.GetDamage());
+                        SpawnBlood(hitPosition, -bullet.GetDirection());
                     }
 
-                    // Find a way to abstract this a bit nicer
-                    if (bullet.CreatesDecalTexturePaintedWounds()) {
-                        DecalPaintingInfo decalPaintingInfo;
-                        decalPaintingInfo.rayOrigin = bullet.GetOrigin();
-                        decalPaintingInfo.rayDirection = bullet.GetDirection();
-                        RenderDataManager::SubmitDecalPaintingInfo(decalPaintingInfo);
+                    //if (objectType == ObjectType::RAGDOLL_V2) {
+                        float strength = 100000.0f;
+                        glm::vec3 force = bullet.GetDirection() * strength;
+                        RagdollManager::AddForce(physicsId, force);
+                    //}
+                }
+
+                // Kangaroo hit
+                for (AnimatedGameObject& animatedGameObject : GetAnimatedGameObjects()) {
+                    if (animatedGameObject.GetRagdollId() == objectId) {
+
+                        for (Kangaroo& kangaroo : GetKangaroos()) {
+                            if (kangaroo.GetAnimatedGameObject() == &animatedGameObject) {
+                                SpawnBlood(hitPosition, -bullet.GetDirection());
+                                //kangaroo.GiveDamage(bullet.GetDamage());
+                            }
+                        }
                     }
-
                 }
 
-                // Blood
-                if (objectType == ObjectType::RAGDOLL_PLAYER ||
-                    objectType == ObjectType::RAGDOLL_ENEMY ||
-                    objectType == ObjectType::RAGDOLL_V2 ||
-                    objectType == ObjectType::SHARK) {
-                    SpawnBlood(rayResult.hitPosition, -bullet.GetDirection());
+                // Shark Kit
+                if (Shark* shark = World::GetSharkByObjectId(objectId)) {
+                    shark->GiveDamage(bullet.GetOwnerObjectId(), bullet.GetDamage());
+                    SpawnBlood(hitPosition, -bullet.GetDirection());
                 }
 
-                // Shot a player ragdoll?
-                if (objectType == ObjectType::RAGDOLL_PLAYER) {
+                // Player ragdoll?
+                // REWRITE ME TO NOT BE SO SHIT!!! Don't rely on object type
+                // REWRITE ME TO NOT BE SO SHIT!!! Don't rely on object type
+                // REWRITE ME TO NOT BE SO SHIT!!! Don't rely on object type
+                if (physXRayResult.userData.objectType == ObjectType::RAGDOLL_PLAYER) {
                     Player* player = Game::GetPlayerByPlayerId(objectId);
                     if (player) {
                         player->Kill();
@@ -121,108 +174,41 @@ namespace World {
                         float strength = 1000.0f;
                         glm::vec3 force = bullet.GetDirection() * strength;
                         Physics::AddFoceToRigidDynamic(physicsId, force);
+                        SpawnBlood(hitPosition, -bullet.GetDirection());
                     }
                 }
 
-                if (objectType == ObjectType::SHARK) {
-                    Shark* shark = World::GetSharkByObjectId(objectId);
-                    if (shark) {
-                        shark->GiveDamage(bullet.GetOwnerObjectId(), bullet.GetDamage());
-                    }
+                // Decal texture painting
+                if (bullet.CreatesDecalTexturePaintedWounds()) {
+                    DecalPaintingInfo decalPaintingInfo;
+                    decalPaintingInfo.rayOrigin = bullet.GetOrigin();
+                    decalPaintingInfo.rayDirection = bullet.GetDirection();
+                    RenderDataManager::SubmitDecalPaintingInfo(decalPaintingInfo);
                 }
+            }
 
-
-                if (objectType == ObjectType::RAGDOLL_V2) {
-                    float strength = 100000.0f;
-                    glm::vec3 force = bullet.GetDirection() * strength;
-                    RagdollManager::AddForce(rayResult.userData.physicsId, force);
+            // On hit
+            PhysXRayResult rayResult;
+            if (rayResult.hitFound) {
+                PhysicsType& physicsType = rayResult.userData.physicsType;
+                ObjectType& objectType = rayResult.userData.objectType;
+                uint64_t physicsId = rayResult.userData.physicsId;
+                uint64_t objectId = rayResult.userData.objectId;
+            
+                // Blood
+                if (objectType == ObjectType::RAGDOLL_PLAYER ||
+                    objectType == ObjectType::RAGDOLL_ENEMY ||
+                    objectType == ObjectType::RAGDOLL_V2 ||
+                    objectType == ObjectType::SHARK) {
+                    SpawnBlood(rayResult.hitPosition, -bullet.GetDirection());
                 }
-
-                // Shot enemy ragdoll?
-                if (objectType == ObjectType::RAGDOLL_ENEMY && !rooDeath) {
-
-                    // Give damage to enemy
-                    for (AnimatedGameObject& animatedGameObject : GetAnimatedGameObjects()) {
-                        if (animatedGameObject.GetRagdollId() == objectId) {
-
-                            if (bullet.CreatesDecalTexturePaintedWounds()) {
-                                DecalPaintingInfo decalPaintingInfo;
-                                decalPaintingInfo.rayOrigin = bullet.GetOrigin();
-                                decalPaintingInfo.rayDirection = bullet.GetDirection();
-                                RenderDataManager::SubmitDecalPaintingInfo(decalPaintingInfo);
-                            }
-
-                            for (Kangaroo& kangaroo : GetKangaroos()) {
-                                if (kangaroo.GetAnimatedGameObject() == &animatedGameObject) {
-                                    //kangaroo.GiveDamage(bullet.GetDamage());
-                                }
-                            }
-                        }
-                    }
-
-                    // Spawn volumetric blood
-                    //glm::vec3 position = rayResult.hitPosition;
-                    //glm::vec3 front = bullet.GetDirection() * glm::vec3(-1);
-                    //World::AddVATBlood(position, -bullet.GetDirection());
-                }
-
-
+            
                 // Apply force if object is dynamic
                 if (physicsType == PhysicsType::RIGID_DYNAMIC) {
                     float strength = 200.0f;
                     glm::vec3 force = bullet.GetDirection() * strength;
                     Physics::AddFoceToRigidDynamic(physicsId, force);
                     //std::cout << "Shot a rigid dynamic\n";
-                }
-
-                // Add decals for rigid static
-                if (physicsType == PhysicsType::RIGID_STATIC) {
-                    DecalCreateInfo decalCreateInfo;
-                    decalCreateInfo.parentPhysicsId = physicsId;
-                    decalCreateInfo.parentPhysicsType = physicsType;
-                    decalCreateInfo.parentObjectId = objectId;
-                    decalCreateInfo.parentObjectType = objectType;
-                    decalCreateInfo.surfaceHitPosition = rayResult.hitPosition;
-                    decalCreateInfo.surfaceHitNormal = rayResult.hitNormal;
-
-                    // Plaster decal
-                    if (objectType == ObjectType::WALL_SEGMENT ||
-                        objectType == ObjectType::HOUSE_PLANE ||
-                        objectType == ObjectType::DOOR ||
-                        objectType == ObjectType::PIANO) {
-                        decalCreateInfo.decalType = DecalType::PLASTER;
-                        if (bullet.CreatesDecals()) {
-                            AddDecal(decalCreateInfo);
-                        }
-                    }
-
-                    // Did the bullet hit the piano itself, and thus trigger the closest key? This simulates shooting the strings inside the piano
-                    if (objectType == ObjectType::PIANO && bullet.PlaysPiano()) {
-                        Piano* piano = World::GetPianoByObjectId(objectId);
-                        if (piano) {
-                            piano->TriggerInternalNoteFromExternalBulletHit(rayResult.hitPosition);
-                        }
-                    }
-
-                    // Glass decal
-                    if (objectType == ObjectType::WINDOW && bullet.CreatesFolloWThroughBulletOnGlassHit()) {
-                        decalCreateInfo.decalType = DecalType::GLASS;
-                        AddDecal(decalCreateInfo);
-
-                        decalCreateInfo.surfaceHitNormal *= glm::vec3(-1.0f);
-                        AddDecal(decalCreateInfo);
-
-                        // Create new bullet
-                        BulletCreateInfo bulletCreateInfo;
-                        bulletCreateInfo.origin = rayResult.hitPosition + bullet.GetDirection() * glm::vec3(0.05f);
-                        bulletCreateInfo.direction = bullet.GetDirection();
-                        bulletCreateInfo.damage = bullet.GetDamage();
-                        bulletCreateInfo.weaponIndex = bullet.GetWeaponIndex();
-                        bulletCreateInfo.ownerObjectId = bullet.GetOwnerObjectId();
-                        newBullets.emplace_back(Bullet(bulletCreateInfo));
-
-                        glassWasHit = true;
-                    }
                 }
             }
         }

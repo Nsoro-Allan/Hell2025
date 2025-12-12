@@ -6,6 +6,7 @@
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
 #include "Renderer/Renderer.h"
+#include "Util.h"
 
 void Inventory::Update(float deltaTime) {
 
@@ -40,9 +41,30 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
 
     // Buttons
     if (player->PressedInventoryExamine() && GetSelectedItemIndex() != -1) {
-        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+        InitMeshNodesFromSelectedItem();
         SetState(InventoryState::EXAMINE_ITEM);
+        Audio::PlayAudio(AUDIO_SELECT, 1.00f);
     }
+}
+
+void Inventory::InitMeshNodesFromSelectedItem() {
+    InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(GetSelectedItemName());
+    if (!itemInfo) return;
+
+    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
+    m_examineItemMeshNodes.Init(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
+
+    // Iterate through the mesh materials as defined in the bible and update the meshNodes them with them
+    for (const auto& pair : itemInfo->m_meshMaterialNames) {
+        const std::string& meshName = pair.first;
+        const std::string& materialName = pair.second;
+        m_examineItemMeshNodes.SetMaterialByMeshName(meshName, materialName);
+    }
+
+    // TODO: Use the bible properly for this!!!!!!!
+    // TODO: Use the bible properly for this!!!!!!!
+    // TODO: Use the bible properly for this!!!!!!!
+    // TODO: Use the bible properly for this!!!!!!!
 }
 
 void Inventory::UpdateExamineScreen(float deltaTime) {
@@ -100,11 +122,6 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
 
         m_examineModelMatrix = rotX.to_mat4() * rotY.to_mat4() * initialTransform.to_mat4() * scale.to_mat4();
 
-        // Update the mesh nodes from the model. WARNNG: YOu dont wanna do this every frame like you are currently!
-
-        std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-        m_examineItemMeshNodes.Init(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
-
         // Calculate matrix to scale the model to fit on screen nicely
         float maxXZ = 2.0f; // Desired max footprint on XZ in meters
         float maxY = 1.0f;  // Desired max height in meters
@@ -125,14 +142,6 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
         // Mash all the matrices together
         glm::mat4 finalScaledAndCenteredModelMatrix = m_examineModelMatrix * scalingMatrix * centeringMatrix;
 
-        // Iterate through the mesh materials as defined in the bible and update the meshNodes them with them
-        for (const auto& pair : itemInfo->m_meshMaterialNames) {
-            const std::string& meshName = pair.first;
-            const std::string& materialName = pair.second;
-            m_examineItemMeshNodes.SetMaterialByMeshName(meshName, materialName);
-        }
-
-        // Actually create the render items for each mesh
         m_examineItemMeshNodes.Update(finalScaledAndCenteredModelMatrix);
     }
 }

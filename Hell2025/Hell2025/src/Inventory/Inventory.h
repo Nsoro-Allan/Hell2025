@@ -3,6 +3,8 @@
 #include "HellEnums.h"
 #include "HellTypes.h"
 #include "Types/Renderer/MeshNodes.h"
+#include "Weapon/WeaponCommon.h"
+
 #include <string>
 #include <vector>
 
@@ -37,7 +39,8 @@ struct InventoryLocations {
 };
 
 struct Inventory {
-    Inventory();
+    Inventory() = default;
+    void Init();
     void Update(float deltaTime);
     void AddItem(const std::string& name);
     void ClearInventory();
@@ -60,6 +63,7 @@ struct Inventory {
     const bool IsOpen()                             { return m_state != InventoryState::CLOSED; }
 
 private:
+    void InitWeaponAndAmmoStates();
     glm::ivec2 GetNextFreeLocation(int itemCellSize);
     void UpdateOccupiedSlotsArray(); // rename this to reflect the actual name of the array: m_itemIndex2DArray
     void RenderButton(glm::ivec2 location, const std::string& letter, const std::string& description);
@@ -78,6 +82,8 @@ private:
     // Util
     void StepDirection(int dx, int dy);
     void BlitInventoryBackground(glm::ivec2 origin, int width, int height);
+
+    void InitMeshNodesFromSelectedItem();
     
     // Updates
     void UpdateItemViewScreen(float deltaTime);
@@ -115,4 +121,7 @@ private:
     MeshNodes m_examineItemMeshNodes;
     InventoryStyle m_style;
     InventoryLocations m_locations;
+
+    std::vector<WeaponState> m_weaponStates;
+    std::vector<AmmoState> m_ammoStates;
 };

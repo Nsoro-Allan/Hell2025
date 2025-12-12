@@ -1163,38 +1163,50 @@ namespace World {
 
     }
 
-    BlendingMode GetBlendingModeByObjectIdAndMeshNodeLocalIndex(uint64_t id, int32_t meshNodeLocalIndex) {
-        if (meshNodeLocalIndex < 0) {
-            return BlendingMode::UNDEFINED;
-        }
+    MeshNode* GetMeshNodeByObjectIdAndLocalNodeIndex(uint64_t id, int32_t meshNodeLocalIndex) {
+        if (meshNodeLocalIndex < 0) return nullptr;
 
-        MeshNodes* meshNodes = nullptr;
-
-        if (Door* door = GetDoorByObjectId(id)) {
-            meshNodes = &door->GetMeshNodes();
-        }
-        else if (Fireplace* fireplace = GetFireplaceById(id)) {
-            meshNodes = &fireplace->GetMeshNodes();
-        }
-        else if (GenericObject* genericObject = GetGenericObjectById(id)) {
-            meshNodes = &genericObject->GetMeshNodes();
-        }
-        else if (Piano* piano = GetPianoByObjectId(id)) {
-            meshNodes = &piano->GetMeshNodes();
-        }
-        else if (Window* window = GetWindowByObjectId(id)) {
-            meshNodes = &window->GetMeshNodes();
-        }
-        else {
-            Logging::Warning() << "World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(...) failed: unknown object type\n";
-            return BlendingMode::UNDEFINED;
-        }
-
-        // Safe to retrieve the blending mode now
-        if (MeshNode* meshNode = meshNodes->GetMeshNodeByLocalIndex(meshNodeLocalIndex)) {
-            return meshNode->blendingMode;
-        }
+        if (Door* object = GetDoorByObjectId(id))               return object->GetMeshNodes().GetMeshNodeByLocalIndex(meshNodeLocalIndex);
+        if (Fireplace* object = GetFireplaceById(id))           return object->GetMeshNodes().GetMeshNodeByLocalIndex(meshNodeLocalIndex);
+        if (GenericObject* object = GetGenericObjectById(id))   return object->GetMeshNodes().GetMeshNodeByLocalIndex(meshNodeLocalIndex);
+        if (Piano* object = GetPianoByObjectId(id))             return object->GetMeshNodes().GetMeshNodeByLocalIndex(meshNodeLocalIndex);
+        if (Window* object = GetWindowByObjectId(id))           return object->GetMeshNodes().GetMeshNodeByLocalIndex(meshNodeLocalIndex);
+         
+        return nullptr;
     }
+
+    //BlendingMode GetBlendingModeByObjectIdAndMeshNodeLocalIndex(uint64_t id, int32_t meshNodeLocalIndex) {
+    //    if (meshNodeLocalIndex < 0) {
+    //        return BlendingMode::UNDEFINED;
+    //    }
+    //
+    //    MeshNodes* meshNodes = nullptr;
+    //
+    //    if (Door* door = GetDoorByObjectId(id)) {
+    //        meshNodes = &door->GetMeshNodes();
+    //    }
+    //    else if (Fireplace* fireplace = GetFireplaceById(id)) {
+    //        meshNodes = &fireplace->GetMeshNodes();
+    //    }
+    //    else if (GenericObject* genericObject = GetGenericObjectById(id)) {
+    //        meshNodes = &genericObject->GetMeshNodes();
+    //    }
+    //    else if (Piano* piano = GetPianoByObjectId(id)) {
+    //        meshNodes = &piano->GetMeshNodes();
+    //    }
+    //    else if (Window* window = GetWindowByObjectId(id)) {
+    //        meshNodes = &window->GetMeshNodes();
+    //    }
+    //    else {
+    //        Logging::Warning() << "World::GetBlendingModeByObjectIdAndMeshNodeLocalIndex(...) failed: unknown object type\n";
+    //        return BlendingMode::UNDEFINED;
+    //    }
+    //
+    //    // Safe to retrieve the blending mode now
+    //    if (MeshNode* meshNode = meshNodes->GetMeshNodeByLocalIndex(meshNodeLocalIndex)) {
+    //        return meshNode->blendingMode;
+    //    }
+    //}
 
     Piano* GetPianoByObjectId(uint64_t objectId) {
         for (Piano& piano : g_pianos) {

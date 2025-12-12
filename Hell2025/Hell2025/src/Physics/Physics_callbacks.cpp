@@ -2,14 +2,19 @@
 
 PxQueryHitType::Enum RaycastFilterCallback::preFilter(const PxFilterData& filterData, const PxShape* shape, const PxRigidActor* actor, PxHitFlags& queryFlags) {
     const PxFilterData sf = shape->getQueryFilterData();
-    //if (!((filterData.word0 & sf.word1) && (filterData.word1 & sf.word0))) {
-    //    return PxQueryHitType::eNONE;
-    //}
+
+    // Ignore explicit actors
     for (const PxRigidActor* pxRigidActor : m_ignoredActors) {
         if (actor == pxRigidActor) {
             return PxQueryHitType::eNONE;
         }
     }
+
+    // Ignore raycast-disabled shapes (no overlapping bits with the query)
+    if ((sf.word0 & filterData.word0) == 0) {
+        return PxQueryHitType::eNONE;
+    }
+
     return PxQueryHitType::eBLOCK;
 }
 

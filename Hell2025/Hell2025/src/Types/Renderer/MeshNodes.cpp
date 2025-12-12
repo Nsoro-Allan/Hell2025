@@ -50,16 +50,14 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode.localMatrix = glm::mat4(1.0f);
         meshNode.worldspaceAabb = AABB();
         meshNode.parentObjectId = parentId;
-        meshNode.type = MeshNodeType::DEFAULT;
         meshNode.globalMeshIndex = globalMeshIndex;
         meshNode.customId = 0;
         meshNode.nodeIndex = i;
         meshNode.meshBvhId = mesh->meshBvhId;
         meshNode.forceDynamic = false;
 		meshNode.castShadows = true;
-        meshNode.aabbCollision = false;
 		meshNode.emissiveColor = glm::vec3(1.0f);
-        meshNode.rigidStaticId = 0;
+        meshNode.rigidDynamicId = 0;
         meshNode.worldSpaceObb.SetLocalBounds(AABB(mesh->aabbMin, mesh->aabbMax));
     }
 
@@ -81,42 +79,31 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 
         meshNode->materialIndex = AssetManager::GetMaterialIndexByName(createInfo.materialName);
         meshNode->blendingMode = createInfo.blendingMode;
-        meshNode->type = createInfo.type;
         meshNode->customId = createInfo.customId;
         meshNode->decalType = createInfo.decalType;
         meshNode->forceDynamic = createInfo.forceDynamic;
         meshNode->castShadows = createInfo.castShadows;
         meshNode->emissiveColor = createInfo.emissiveColor;
-        meshNode->aabbCollision = createInfo.aabbCollision;
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 
-        if (meshNode->type == MeshNodeType::OPENABLE) {
+        if (createInfo.openable.isOpenable) {
             uint32_t openableId = OpenableManager::CreateOpenable(createInfo.openable, parentId);
             meshNode->openableId = openableId;
+            meshNode->ownsOpenableId = true;
 
             for (const std::string& triggerMeshName : createInfo.openable.additionalTriggerMeshNames) {
                 if (MeshNode* triggerMeshNode = GetMeshNodeByMeshName(triggerMeshName)) {
-                    switch (triggerMeshNode->type) {
-                        case MeshNodeType::OPENABLE:        Logging::Error() << "MeshNodes::Init(...) failed to set '" << createInfo.meshName << "' as a Openable trigger node because it already has an Openable"; break;
-                        case MeshNodeType::RIGID_DYNAMIC:   Logging::Error() << "MeshNodes::Init(...) failed to set '" << createInfo.meshName << "' as a trigger node because it of type RIGID_DYNAMIC"; break;
-                        case MeshNodeType::RIGID_STATIC:    Logging::Error() << "MeshNodes::Init(...) failed to set '" << createInfo.meshName << "' as a trigger node because it of type RIGID_STATIC"; break;
-                        default:                            triggerMeshNode->openableId = openableId; break;
-                    }
+                    triggerMeshNode->openableId = openableId;
                 }
             }
         }
 
         // Rigid static
-        if (meshNode->aabbCollision) {
+        if (createInfo.rigidDynamicAABB.createObject) {
             
-			PhysicsFilterData filterData;
-			filterData.raycastGroup = RAYCAST_ENABLED;
-			filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-			filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
-
-            // Create RigidStatic if it doesn't exist
-			if (meshNode->rigidStaticId == 0) {
+            // Create RigidDynamic if it doesn't exist
+			if (meshNode->rigidDynamicId == 0) {
 				glm::vec3 extents = mesh->aabbMax - mesh->aabbMin;
 				glm::vec3 localCenter = 0.5f * (mesh->aabbMin + mesh->aabbMax);
 
@@ -124,7 +111,18 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 				Transform offsetTransform;
                 offsetTransform.position = localCenter;
 
-                meshNode->rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(spawnTransform, extents, filterData, offsetTransform);
+                PhysicsFilterData filterData = createInfo.rigidDynamicAABB.filterData;
+                bool kinematic = createInfo.rigidDynamicAABB.kinematic;
+                //float mass = 1.0f;
+
+                Logging::Init() << "Creating rigid box for " << mesh->GetName() << "\n";
+
+                meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, kinematic, filterData, offsetTransform);
+
+                //meshNode->rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(spawnTransform, extents, filterData, offsetTransform);
+            }
+            else {
+                Logging::Warning() << "You tried to create an rigidDynamicAABB for mesh node " << mesh->GetName() << " but it already had a rigidDynamicId\n";
             }
         }
 
@@ -133,28 +131,28 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
             MirrorManager::AddMirror(parentId, meshNode->nodeIndex, meshNode->globalMeshIndex);
         }
 
-        if (meshNode->type == MeshNodeType::RIGID_DYNAMIC) {
-            // Break connection with parent
-            meshNode->localParentIndex = -1;
-
-            // If you wanna add physics to MeshNodes that don't belong to a GenericObject then you are gonna need a bit of a different plan here or a giant lists of ifs, ugly...
-            Transform initalTransform; 
-            if (GenericObject* parent = World::GetGenericObjectById(parentId)) {
-                initalTransform.position = parent->GetPosition();
-                initalTransform.rotation = parent->GetRotation();
-                Logging::ToDo() << "FOUND PARENT !!!!!!!!!!!!!!!!!!!!!!!!!!!" << initalTransform.position << " " << initalTransform.rotation;
-            }
-            else {
-                Logging::Error() << "Did not find parent!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-            }
-
-            PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
-            float mass = createInfo.rigidDynamic.mass;
-
-            // Test box
-            glm::vec3 boxExtents = glm::vec3(0.5f);
-            meshNode->physicsId = Physics::CreateRigidDynamicFromBoxExtents(initalTransform, boxExtents, mass, filterData);
-        }
+        //if (meshNode->type == MeshNodeType::RIGID_DYNAMIC) {
+        //    // Break connection with parent
+        //    meshNode->localParentIndex = -1;
+        //
+        //    // If you wanna add physics to MeshNodes that don't belong to a GenericObject then you are gonna need a bit of a different plan here or a giant lists of ifs, ugly...
+        //    Transform initalTransform; 
+        //    if (GenericObject* parent = World::GetGenericObjectById(parentId)) {
+        //        initalTransform.position = parent->GetPosition();
+        //        initalTransform.rotation = parent->GetRotation();
+        //        Logging::ToDo() << "FOUND PARENT !!!!!!!!!!!!!!!!!!!!!!!!!!!" << initalTransform.position << " " << initalTransform.rotation;
+        //    }
+        //    else {
+        //        Logging::Error() << "Did not find parent!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+        //    }
+        //
+        //    PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
+        //    float mass = createInfo.rigidDynamic.mass;
+        //
+        //    // Test box
+        //    glm::vec3 boxExtents = glm::vec3(0.5f);
+        //    meshNode->physicsId = Physics::CreateRigidDynamicFromBoxExtents(initalTransform, boxExtents, mass, filterData);
+        //}
     }
 }
 
@@ -234,7 +232,7 @@ bool MeshNodes::MeshNodeIsStatic(int localNodeIndex) {
 void MeshNodes::CleanUp() {
     // First remove physics shapes
 	for (MeshNode& meshNode : m_meshNodes) {
-		Physics::RemoveRigidStatic(meshNode.rigidStaticId);
+		Physics::RemoveRigidDynamic(meshNode.rigidDynamicId);
 	}
 
     m_modelName = "";
@@ -362,8 +360,6 @@ void MeshNodes::UpdateHierarchy() {
 }
 
 void MeshNodes::Update(const glm::mat4& worldMatrix) {
-
-
     //for (MeshNode& meshNode : m_meshNodes) {
     //    Renderer::DrawOBB(meshNode.worldSpaceObb, GREEN);
     //}
@@ -380,7 +376,7 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
 
     // Openables
     for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.type == MeshNodeType::OPENABLE) {
+        if (meshNode.ownsOpenableId) {
             if (Openable* openable = OpenableManager::GetOpenableByOpenableId(meshNode.openableId)) {
                 if (openable->IsDirty()) {
                     meshNode.transform = openable->m_transform;
@@ -390,13 +386,13 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         }
     }
 
-    for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.type == MeshNodeType::RIGID_DYNAMIC) {
-            if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.physicsId)) {
-                Renderer::DrawPoint(rigidDynamic->GetCurrentPosition(), YELLOW);
-            }
-        }
-    }
+    //for (MeshNode& meshNode : m_meshNodes) {
+    //    if (meshNode.type == MeshNodeType::RIGID_DYNAMIC) {
+    //        if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.physicsId)) {
+    //            Renderer::DrawPoint(rigidDynamic->GetCurrentPosition(), YELLOW);
+    //        }
+    //    }
+    //}
 
     if (hierarchyDirty) {
         UpdateHierarchy();
@@ -478,6 +474,11 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         // If this is a static node and its transform is different than the previous frame, mark the World's static scene as dirty
         if (MeshNodeIsStatic(i) && !Util::Mat4NearlyEqual(meshNode.worldMatrix, meshNode.worldModelMatrixPreviousFrame)) {
             World::MarkStaticSceneBvhDirty();
+
+
+            if (Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex)) {
+                //std::cout << mesh->GetName() << " triggered shit\n";
+            }
         }
     }
 
@@ -502,8 +503,8 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
 
 void MeshNodes::InitPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-		if (meshNode.rigidStaticId != 0) {
-			Physics::SetRigidStaticWorldTransform(meshNode.rigidStaticId, meshNode.worldMatrix);
+		if (meshNode.rigidDynamicId != 0) {
+			Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
 		}
 	}
 }
@@ -511,8 +512,8 @@ void MeshNodes::InitPhysicsTransforms() {
 
 void MeshNodes::UpdatePhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-		if (meshNode.rigidStaticId != 0 && meshNode.openableId != 0) {
-			Physics::SetRigidStaticWorldTransform(meshNode.rigidStaticId, meshNode.worldMatrix);
+		if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0) {
+			Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
 		}
 	}
 }

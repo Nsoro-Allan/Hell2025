@@ -197,8 +197,7 @@ void Player::Update(float deltaTime) {
 
 void Player::Respawn() {
     WeaponManager::Init();
-    m_inventory.CloseInventory();
-    m_inventory.ClearInventory();
+    m_inventory.Init();
 
     //World::GetKangaroos()[0].Respawn();
 

@@ -19,6 +19,7 @@ struct FireplaceCreateInfo {
 };
 
 struct OpenableCreateInfo {
+    bool isOpenable = false;
     OpenState initialOpenState = OpenState::CLOSED;
     OpenAxis openAxis = OpenAxis::TRANSLATE_Z;
     std::string lockedAudio = "Locked.wav";
@@ -37,6 +38,8 @@ struct OpenableCreateInfo {
 };
 
 struct RigidDynamicCreateInfo {
+    bool createObject = false;
+    bool kinematic = true;
     Transform offsetTransform;
     PhysicsFilterData filterData;
     float mass = 1.0f;
@@ -49,16 +52,16 @@ struct RigidStaticCreateInfo {
 struct MeshNodeCreateInfo {
     std::string meshName;
     std::string materialName = UNDEFINED_STRING;
-    MeshNodeType type = MeshNodeType::DEFAULT;
     BlendingMode blendingMode = BlendingMode::DEFAULT;
     OpenableCreateInfo openable;
-    RigidDynamicCreateInfo rigidDynamic;
+    RigidDynamicCreateInfo rigidDynamicAABB;
+    RigidDynamicCreateInfo rigidDynamicConvexHull; // needs implementing
     RigidStaticCreateInfo rigidStatic;
+
     int32_t customId;
     DecalType decalType = DecalType::PLASTER;
     bool forceDynamic = false;
 	bool castShadows = true;
-	bool aabbCollision = false;
 	glm::vec3 emissiveColor = glm::vec3(1.0f);
 };
 

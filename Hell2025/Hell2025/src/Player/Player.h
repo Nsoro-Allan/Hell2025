@@ -290,6 +290,7 @@ private:
     PlayerControls m_controls;
     ShellEjectionState m_shellEjectionState;
     WeaponAction m_weaponAction = DRAW_BEGIN;
+    
     std::vector<WeaponState> m_weaponStates;
     std::vector<AmmoState> m_ammoStates;
 

@@ -28,17 +28,13 @@ namespace Editor {
             bathroom.AddChild("Basin", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_BASIN);
             bathroom.AddChild("Cabinet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CABINET);
             bathroom.AddChild("Toilet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
-            bathroom.AddChild("Test Model", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL);
-            bathroom.AddChild("Test Model 2", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL2);
             bathroom.AddChild("Towel", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
-
 
             EditorUI::FileMenuNode& interior = insert.AddChild("Interior", Shortcut::NONE);
             interior.AddChild("Door",          Shortcut::NONE, Callbacks::BeginAddingDoor);
             interior.AddChild("Couch",         Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::COUCH);
             interior.AddChild("Drawers Small", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_SMALL);
             interior.AddChild("Drawers Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
-
 
 			interior.AddChild("Fireplace (Open)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::DEFAULT);
 			interior.AddChild("Fireplace (WoodStove)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::WOOD_STOVE);
@@ -50,6 +46,12 @@ namespace Editor {
             nature.AddChild("Tree",         Shortcut::NONE,     Callbacks::BeginAddingTree);
             
             EditorUI::FileMenuNode& pickups = insert.AddChild("Pick Ups", Shortcut::NONE);
+
+            EditorUI::FileMenuNode& testModels = insert.AddChild("Test Models", Shortcut::NONE);
+            testModels.AddChild("Test Model", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL);
+            testModels.AddChild("Test Model 2", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL2);
+            testModels.AddChild("Test Model 3", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL3);
+            testModels.AddChild("Test Model 4", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL4);
             
             EditorUI::FileMenuNode& weapons = pickups.AddChild("Weapons", Shortcut::NONE);
             weapons.AddChild("AKS74U",          Shortcut::NONE,     nullptr);

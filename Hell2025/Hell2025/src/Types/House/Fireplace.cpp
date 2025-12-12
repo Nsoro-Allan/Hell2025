@@ -54,8 +54,8 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
 		MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
 		door.meshName = "FireplaceBrick_StoveDoor";
-		door.materialName = "T_Stove";
-		door.type = MeshNodeType::OPENABLE;
+        door.materialName = "T_Stove";
+        door.openable.isOpenable = true;
 		door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
 		door.openable.initialOpenState = OpenState::CLOSED;
 		door.openable.minOpenValue = 0.0f;

@@ -495,15 +495,17 @@ enum struct GenericObjectType {
     BATHROOM_TOWEL_RACK,
     TEST_MODEL,
     TEST_MODEL2,
+    TEST_MODEL3,
+    TEST_MODEL4,
     UNDEFINED
 };
 
-enum struct MeshNodeType {
-    DEFAULT,
-    OPENABLE,
-    RIGID_STATIC,
-    RIGID_DYNAMIC
-};
+//enum struct MeshNodeType {
+//    DEFAULT,
+//    OPENABLE,
+//    RIGID_STATIC,
+//    RIGID_DYNAMIC
+//};
 
 inline RaycastIgnoreFlags operator|(RaycastIgnoreFlags a, RaycastIgnoreFlags b) {
     return static_cast<RaycastIgnoreFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
