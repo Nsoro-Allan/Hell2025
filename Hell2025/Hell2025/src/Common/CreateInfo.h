@@ -210,11 +210,12 @@ struct BasicDoorCreateInfo {
 };
 
 struct PickUpCreateInfo {
+    PickUpType type = PickUpType::UNDEFINED;
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
     glm::vec3 intitialForce = glm::vec3(0.0f);
-    std::string pickUpType = "";
-    bool isGold = false;
+    bool saveToFile = false;
+    bool respawn = false;
 };
 
 struct PictureFrameCreateInfo {

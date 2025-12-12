@@ -384,8 +384,7 @@ void Player::DropWeapons() {
                 createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
-                createInfo.pickUpType = weaponInfo->pickupName;
-                createInfo.isGold = weaponInfo->isGold;
+                createInfo.type = Util::StringToPickUpType(weaponInfo->pickupName);
 
                 createInfo.intitialForce.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
                 createInfo.intitialForce.y = 1.0f;

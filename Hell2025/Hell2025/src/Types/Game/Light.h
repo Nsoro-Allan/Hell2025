@@ -10,10 +10,13 @@ struct Light {
     Light(LightCreateInfo createInfo);
 
     void Update(float deltaTime);
-    void SetPosition(glm::vec3 position);
+    void SetColor(const glm::vec3& color);
+    void SetRadius(float radius);
+    void SetPosition(const glm::vec3& position);
+    void SetStrength(float strengtht);
     void UpdateMatricesAndFrustum();
     void ForceDirty();
-    void BuildCord();
+    void ConfigureMeshNodes();
 
     Frustum* GetFrustumByFaceIndex(uint32_t faceIndex);
 
@@ -29,7 +32,6 @@ struct Light {
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
 
 private:
-    void UpdateRenderItems();
     void UpdateDirtyState();
 
 	MeshNodes m_meshNodes;

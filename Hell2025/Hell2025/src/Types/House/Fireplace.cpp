@@ -116,7 +116,6 @@ void Fireplace::SetYEulerRotation(float rotation) {
     UpdateWorldMatrix();
 }
 
-
 void Fireplace::Update(float deltaTime) {
     m_meshNodes.Update(m_worldMatrix);
 

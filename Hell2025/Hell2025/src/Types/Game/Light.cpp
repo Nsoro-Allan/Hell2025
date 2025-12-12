@@ -13,16 +13,11 @@ Light::Light(LightCreateInfo createInfo) {
 }
 
 void Light::Update(float deltaTime) {
-    UpdateRenderItems();
     UpdateMatricesAndFrustum();
     UpdateDirtyState();
 }
 
-// RENAME ME TO SOMETHING MORE DESCRIPTIVE
-// RENAME ME TO SOMETHING MORE DESCRIPTIVE
-// RENAME ME TO SOMETHING MORE DESCRIPTIVE
-
-void Light::BuildCord() {
+void Light::ConfigureMeshNodes() {
     // Mount position
     glm::vec3 mountPosition = m_createInfo.position;
 	PhysXRayResult rayResult = Physics::CastPhysXRay(m_createInfo.position, glm::vec3(0.0f, 1.0f, 0.0f), 100.0f, RaycastGroup::RAYCAST_ENABLED);
@@ -122,12 +117,22 @@ void Light::UpdateDirtyState() {
     }
 }
 
-void Light::UpdateRenderItems() {
-    // Replaced by MeshNodes
+void Light::SetPosition(const glm::vec3& position) {
+    m_createInfo.position = position;
+    ConfigureMeshNodes();
 }
 
-void Light::SetPosition(glm::vec3 position) {
-    m_createInfo.position = position;
+void Light::SetColor(const glm::vec3& color) {
+    m_createInfo.color = color;
+    ConfigureMeshNodes();
+}
+
+void Light::SetRadius(float radius) {
+    m_createInfo.radius = radius;
+}
+
+void Light::SetStrength(float strength) {
+    m_createInfo.strength = strength;
 }
 
 Frustum* Light::GetFrustumByFaceIndex(uint32_t faceIndex) {

@@ -55,7 +55,8 @@ struct Piano {
 	MeshNodes& GetMeshNodes()                               { return m_meshNodes; }
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
     const uint64_t& GetObjectId() const                     { return m_pianoObjectId; };
-    const glm::vec3 GetPosition() const                     { return m_createInfo.position; }
+    const glm::vec3 GetPosition() const                     { return m_transform.position; }
+    const glm::vec3 GetRotation() const                     { return m_transform.rotation; }
     const glm::vec3& GetSeatPosition() const                { return m_seatPosition; }
     const PianoCreateInfo GetCreateInfo() const             { return m_createInfo; }
 

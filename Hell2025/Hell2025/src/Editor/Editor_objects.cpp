@@ -175,40 +175,27 @@ namespace Editor {
             SetSelectedObjectType(GetHoveredObjectType());
             SetSelectedObjectId(GetHoveredObjectId());
 
-            //std::cout << "Selected: " << Util::ObjectTypeToString(GetSelectedObjectType()) << " " << GetSelectedObjectId() << "\n";
             Gizmo::SetSourceObjectOffeset(World::GetGizmoOffest(GetSelectedObjectId()));
 
-            GenericObject* drawers = World::GetGenericObjectById(GetSelectedObjectId());
-            if (drawers) {
-                Gizmo::SetPosition(drawers->GetPosition());
-                Gizmo::SetRotation(drawers->GetRotation());
+            if (GenericObject* genericObject = World::GetGenericObjectById(GetSelectedObjectId())) {
+                Gizmo::SetPosition(genericObject->GetPosition());
+                Gizmo::SetRotation(genericObject->GetRotation());
             }
 
-            if (GetSelectedObjectType() == ObjectType::DOOR) {
-                Door* door = World::GetDoorByObjectId(GetSelectedObjectId());
-                if (door) {
-                    Gizmo::SetPosition(door->GetPosition());
-                }
+            if (Door* door = World::GetDoorByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(door->GetPosition());
+                Gizmo::SetRotation(door->GetRotation());
             }
 
-            if (GetSelectedObjectType() == ObjectType::PIANO) {
-                Piano* piano = World::GetPianoByObjectId(GetSelectedObjectId());
-                if (piano) {
-                    Gizmo::SetPosition(piano->GetPosition());
-                }
+            if (Piano* piano = World::GetPianoByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(piano->GetPosition());
+                Gizmo::SetRotation(piano->GetPosition());
             }
 
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
             if (Fireplace* fireplace = World::GetFireplaceById(GetSelectedObjectId())) {
                 Gizmo::SetPosition(fireplace->GetPosition());
+                Gizmo::SetRotation(fireplace->GetRotation());
             }
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
-            // HELLO! make all your objects use this style for setting the gizmo position on mouse click
 
             if (GetSelectedObjectType() == ObjectType::HOUSE_PLANE) {
                 HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId());

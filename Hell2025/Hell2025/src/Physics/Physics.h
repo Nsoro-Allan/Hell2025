@@ -172,12 +172,12 @@ namespace Physics {
     glm::quat PxQuatToGlmQuat(PxQuat quat);
     glm::mat4 PxMat44ToGlmMat4(physx::PxMat44 pxMatrix);
     glm::vec3 GetHeightMapPositionAtXZ(float x, float z);
-    PxVec3 GlmVec3toPxVec3(glm::vec3 vec);
-    PxQuat GlmQuatToPxQuat(glm::quat quat);
-    PxMat44 GlmMat4ToPxMat44(glm::mat4 glmMatrix);
-    PhysXRayResult CastPhysXRayStaticEnvironment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
-    PhysXRayResult CastPhysXRayHeightMap(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength);
-    PhysXRayResult CastPhysXRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, bool cullBackFacing = false, RaycastIgnoreFlags ignoreFlags = RaycastIgnoreFlags(), std::vector<PxRigidActor*> ignoredActors = std::vector<PxRigidActor*>());
+    PxVec3 GlmVec3toPxVec3(const glm::vec3& vec);
+    PxQuat GlmQuatToPxQuat(const glm::quat& quat);
+    PxMat44 GlmMat4ToPxMat44(const glm::mat4& glmMatrix);
+    PhysXRayResult CastPhysXRayStaticEnvironment(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength);
+    PhysXRayResult CastPhysXRayHeightMap(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength);
+    PhysXRayResult CastPhysXRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength, bool cullBackFacing = false, RaycastIgnoreFlags ignoreFlags = RaycastIgnoreFlags(), std::vector<PxRigidActor*> ignoredActors = std::vector<PxRigidActor*>());
     PhysXOverlapReport OverlapTest(const PxGeometry& overlapShape, const PxTransform& shapePose, PxU32 collisionGroup);
 }
 

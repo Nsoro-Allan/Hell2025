@@ -88,7 +88,7 @@ namespace World {
 
     void UpdateAllHangingLightCords() {
         for (Light& light : GetLights()) {
-            light.BuildCord();
+            light.ConfigureMeshNodes();
         }
     }
 

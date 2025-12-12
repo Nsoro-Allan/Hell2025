@@ -162,12 +162,8 @@ namespace World {
     MeshBuffer& GetWeatherBoardMeshBuffer();
     Mesh* GetHouseMeshByIndex(uint32_t meshIndex);
 
-    CreateInfoCollection GetCreateInfoCollection();
-
     AnimatedGameObject* GetAnimatedGameObjectByObjectId(uint64_t objectId);
-
-    // Wild util
-    //BlendingMode GetBlendingModeByObjectIdAndMeshNodeLocalIndex(uint64_t id, int32_t meshNodeLocalIndex);
+    CreateInfoCollection GetCreateInfoCollection();
     MeshNode* GetMeshNodeByObjectIdAndLocalNodeIndex(uint64_t id, int32_t meshNodeLocalIndex);
 
     Door* GetDoorByObjectId(uint64_t objectId);
@@ -188,10 +184,18 @@ namespace World {
     GameObject* GetGameObjectByIndex(int32_t index);
     GameObject* GetGameObjectByName(const std::string& name);
     Light* GetLightByIndex(int32_t index);
-    PickUp* GetPickUpByIndex(int32_t index);
     Tree* GetTreeByIndex(int32_t index);
 
     size_t GetLightCount();
+
+    Hell::SlotMap<Door>& GetDoors();
+    Hell::SlotMap<GenericObject>& GetGenericObjects();
+    Hell::SlotMap<Fireplace>& GetFireplaces();
+    Hell::SlotMap<HousePlane>& GetHousePlanes();
+    Hell::SlotMap<PickUp>& GetPickUps();
+    Hell::SlotMap<TrimSet>& GetTrimSets();
+    Hell::SlotMap<Wall>& GetWalls();
+    Hell::SlotMap<Window>& GetWindows();
 
     std::vector<AnimatedGameObject>& GetAnimatedGameObjects();
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals();
@@ -203,20 +207,15 @@ namespace World {
     std::vector<ClippingCube>& GetClippingCubes();
     std::vector<Decal>& GetDecals();
     std::vector<Decal2>& GetNewDecals();
-    Hell::SlotMap<Door>& GetDoors();
     std::vector<Dobermann>& GetDobermanns();
-    Hell::SlotMap<GenericObject>& GetGenericObjects();
     std::vector<Fence>& GetFences();
-    Hell::SlotMap<Fireplace>& GetFireplaces();
     std::vector<GameObject>& GetGameObjects();
     std::vector<HeightMapChunk>& GetHeightMapChunks();
-    Hell::SlotMap<HousePlane>& GetHousePlanes();
     std::vector<Light>& GetLights();
     std::vector<Kangaroo>& GetKangaroos();
     std::vector<MapInstance>& GetMapInstances();
     std::vector<Mermaid>& GetMermaids();
     std::vector<Piano>& GetPianos();
-    std::vector<PickUp>& GetPickUps();
     std::vector<PictureFrame>& GetPictureFrames();
     std::vector<PowerPoleSet>& GetPowerPoleSets();
     std::vector<SpawnPoint>& GetCampaignSpawnPoints();
@@ -225,10 +224,7 @@ namespace World {
     std::vector<Road>& GetRoads();
     std::vector<Shark>& GetSharks();
     std::vector<Tree>& GetTrees();
-    Hell::SlotMap<TrimSet>& GetTrimSets();
-    Hell::SlotMap<Wall>& GetWalls();
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters();
-    Hell::SlotMap<Window>& GetWindows();
 
     std::vector<RenderItem>& GetSkinnedRenderItems();
 }

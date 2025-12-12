@@ -580,6 +580,7 @@ struct PhysXRayResult {
     glm::vec3 hitNormal = glm::vec3(0.0f);
     glm::vec3 rayDirection = glm::vec3(0.0f);
     bool hitFound = false;
+    float distanceToHit = std::numeric_limits<float>::max();
 };
 
 struct PhysXOverlapResult {

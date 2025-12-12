@@ -70,8 +70,6 @@ namespace World {
                     localMeshNodeIndex = -1;
                     hitPosition = physXRayResult.hitPosition;
                     hitNormal = physXRayResult.hitNormal;
-
-                    std::cout << "physx hit\n";
                 }
             }
 
@@ -94,6 +92,7 @@ namespace World {
                 //    createBlood = true;
                 //    std::cout << "Shot rigid dynamic\n";
                 //}
+
 
                 // Create the decal
                 if (createDecal) {
@@ -136,9 +135,9 @@ namespace World {
                     }
 
                     //if (objectType == ObjectType::RAGDOLL_V2) {
-                        float strength = 100000.0f;
-                        glm::vec3 force = bullet.GetDirection() * strength;
-                        RagdollManager::AddForce(physicsId, force);
+                        //float strength = 100000.0f;
+                        //glm::vec3 force = bullet.GetDirection() * strength;
+                        //RagdollManager::AddForce(physicsId, force);
                     //}
                 }
 
@@ -159,6 +158,14 @@ namespace World {
                 if (Shark* shark = World::GetSharkByObjectId(objectId)) {
                     shark->GiveDamage(bullet.GetOwnerObjectId(), bullet.GetDamage());
                     SpawnBlood(hitPosition, -bullet.GetDirection());
+                }
+
+                // Apply physics force
+                if (physicsId != 0) {
+                    float strength = 25000.0f;
+                    glm::vec3 force = bullet.GetDirection() * strength;
+                    RagdollManager::AddForce(physicsId, force);
+                    Physics::AddFoceToRigidDynamic(physicsId, force);
                 }
 
                 // Player ragdoll?
@@ -196,19 +203,20 @@ namespace World {
                 uint64_t objectId = rayResult.userData.objectId;
             
                 // Blood
-                if (objectType == ObjectType::RAGDOLL_PLAYER ||
-                    objectType == ObjectType::RAGDOLL_ENEMY ||
-                    objectType == ObjectType::RAGDOLL_V2 ||
-                    objectType == ObjectType::SHARK) {
-                    SpawnBlood(rayResult.hitPosition, -bullet.GetDirection());
-                }
+                //if (objectType == ObjectType::RAGDOLL_PLAYER ||
+                //    objectType == ObjectType::RAGDOLL_ENEMY ||
+                //    objectType == ObjectType::RAGDOLL_V2 ||
+                //    objectType == ObjectType::SHARK) {
+                //    SpawnBlood(rayResult.hitPosition, -bullet.GetDirection());
+                //}
             
                 // Apply force if object is dynamic
                 if (physicsType == PhysicsType::RIGID_DYNAMIC) {
-                    float strength = 200.0f;
+                    //float strength = 200.0f;
+                    float strength = 1000.0f;
                     glm::vec3 force = bullet.GetDirection() * strength;
                     Physics::AddFoceToRigidDynamic(physicsId, force);
-                    //std::cout << "Shot a rigid dynamic\n";
+                    std::cout << "Shot a rigid dynamic\n";
                 }
             }
         }

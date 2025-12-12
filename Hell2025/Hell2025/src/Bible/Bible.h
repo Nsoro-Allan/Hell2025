@@ -9,15 +9,23 @@ namespace Bible {
     void Init();
     void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes);
 
-    AmmoInfo& CreateAmmoItemInfo(const std::string& name);
+    AmmoInfo& CreateAmmoInfo(const std::string& name);
     InventoryItemInfo& CreateInventoryItemInfo(const std::string& name);
     WeaponAttachmentInfo& CreateWeaponAttachmentInfo(const std::string& name);
     WeaponInfo& CreateWeaponInfo(const std::string& name);
 
+    bool AmmoInfoExists(const std::string& name);
+    bool InventoryItemInfoExists(const std::string& name);
+    bool WeaponAttachmentInfoExists(const std::string& name);
+    bool WeaponInfoExists(const std::string& name);
+
+    // Misc
+    void CreateSortedWeaponNameList();
+    void PrintDebugInfo();
+
     // Inventory Item Info
     InventoryItemInfo* GetInventoryItemInfoByName(const std::string& name);
     int GetInventoryItemSizeByName(const std::string& name);
-    bool InventoryItemExists(const std::string& name);
 
     void ConfigureTestModel(uint64_t, MeshNodes& meshNodes);
     void ConfigureTestModel2(uint64_t, MeshNodes& meshNodes);

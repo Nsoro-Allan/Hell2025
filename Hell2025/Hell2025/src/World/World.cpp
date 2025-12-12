@@ -44,7 +44,7 @@ namespace World {
     std::vector<Light> g_lights;
     std::vector<MapInstance> g_mapInstances;
     std::vector<Mermaid> g_mermaids;
-    std::vector<PickUp> g_pickUps;
+    Hell::SlotMap<PickUp> g_pickUps;
     std::vector<PictureFrame> g_pictureFrames;
     std::vector<PowerPoleSet> g_powerPoleSets;
     std::vector<Piano> g_pianos;
@@ -493,6 +493,10 @@ namespace World {
         return g_housePlanes.get(objectId);
     }
 
+    PickUp* GetPickUpByObjectId(uint64_t objectId) {
+        return g_pickUps.get(objectId);
+    }
+
     Wall* GetWallByObjectId(uint64_t objectId) {
         return g_walls.get(objectId);
     }
@@ -536,15 +540,6 @@ namespace World {
         }
     }
 
-    PickUp* GetPickUpByIndex(int32_t index) {
-        if (index >= 0 && index < g_pickUps.size()) {
-            return &g_pickUps[index];
-        }
-        else {
-            return nullptr;
-        }
-    }
-
     Tree* GetTreeByIndex(int32_t index) {
         if (index >= 0 && index < g_trees.size()) {
             return &g_trees[index];
@@ -558,16 +553,6 @@ namespace World {
         for (AnimatedGameObject& animatedGameObject : g_animatedGameObjects) {
             if (animatedGameObject.GetObjectId() == objectID) {
                 return &animatedGameObject;
-            }
-        }
-        return nullptr;
-    }
-
-    PickUp* GetPickUpByObjectId(uint64_t objectID) {
-        for (int i = 0; i < g_pickUps.size(); i++) {
-            PickUp& pickUp = g_pickUps[i];
-            if (pickUp.GetObjectId() == objectID) {
-                return &g_pickUps[i];
             }
         }
         return nullptr;
@@ -712,9 +697,9 @@ namespace World {
             g_trimSets.erase(objectId);
             return true;
         }
-        if (g_windows.contains(objectId)) {
-            g_windows.get(objectId)->CleanUp();
-            g_windows.erase(objectId);
+        if (g_pickUps.contains(objectId)) {
+            g_pickUps.get(objectId)->CleanUp();
+            g_pickUps.erase(objectId);
             return true;
         }
         if (g_walls.contains(objectId)) {
@@ -722,18 +707,16 @@ namespace World {
             g_walls.erase(objectId);
             return true;
         }
+        if (g_windows.contains(objectId)) {
+            g_windows.get(objectId)->CleanUp();
+            g_windows.erase(objectId);
+            return true;
+        }
 
         for (int i = 0; i < g_pianos.size(); i++) {
             if (g_pianos[i].GetObjectId() == objectId) {
                 g_pianos[i].CleanUp();
                 g_pianos.erase(g_pianos.begin() + i);
-                return true;
-            }
-        }
-        for (int i = 0; i < g_pickUps.size(); i++) {
-            if (g_pickUps[i].GetObjectId() == objectId) {
-                g_pickUps[i].CleanUp();
-                g_pickUps.erase(g_pickUps.begin() + i);
                 return true;
             }
         }
@@ -1008,10 +991,8 @@ namespace World {
     }
 
     void AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
-        createInfo.position += spawnOffset.translation;
-
-        PickUp& pickUp = g_pickUps.emplace_back();
-        pickUp.Init(createInfo);
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
+        g_pickUps.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1268,7 +1249,7 @@ namespace World {
     std::vector<MapInstance>& GetMapInstances()                         { return g_mapInstances; }
     std::vector<Mermaid>& GetMermaids()                                 { return g_mermaids; }
     std::vector<Piano>& GetPianos()                                     { return g_pianos; }
-    std::vector<PickUp>& GetPickUps()                                   { return g_pickUps; }
+    Hell::SlotMap<PickUp>& GetPickUps()                                 { return g_pickUps; }
     std::vector<PictureFrame>& GetPictureFrames()                       { return g_pictureFrames; }
     std::vector<PowerPoleSet>& GetPowerPoleSets()                       { return g_powerPoleSets; }
     std::vector<SpawnPoint>& GetCampaignSpawnPoints()                   { return g_spawnCampaignPoints; }

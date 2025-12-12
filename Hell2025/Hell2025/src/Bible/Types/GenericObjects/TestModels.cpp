@@ -74,7 +74,7 @@ namespace Bible {
         hinges.openable.openingAudio = "Door_Open.wav";
         hinges.openable.closingAudio = "Door_Open.wav";
 
-        meshNodes.Init(id, "DoorV5", meshNodeCreateInfoSet);
+        meshNodes.Init(id, "DoorV6", meshNodeCreateInfoSet);
 
         meshNodes.SetMaterialByMeshName("Door_Back", "T_Door_RE");
         meshNodes.SetMaterialByMeshName("Door_Front", "T_Door_RE");
@@ -99,6 +99,7 @@ namespace Bible {
         meshNodes.SetMaterialByMeshName("Door_Knob", "T_DoorOldKnob");
         meshNodes.SetMaterialByMeshName("Door_Hinges", "T_DoorMetals");
         meshNodes.SetMaterialByMeshName("Door_Deadlock", "T_DoorMetals");
+        meshNodes.SetMaterialByMeshName("Door_DeadLockSwitch", "T_DoorMetals");
 
         meshNodes.SetMaterialByMeshName("DoorFrame_Front", "T_DoorFrame_RE");
         meshNodes.SetMaterialByMeshName("DoorFrame_Back", "T_DoorFrame_RE");
@@ -163,7 +164,7 @@ namespace Bible {
         hinges.openable.openingAudio = "Door_Open.wav";
         hinges.openable.closingAudio = "Door_Open.wav";
 
-        meshNodes.Init(id, "DoorV4", meshNodeCreateInfoSet);
+        meshNodes.Init(id, "DoorV6", meshNodeCreateInfoSet);
 
         meshNodes.SetMaterialByMeshName("Door_Back", "T_Door_WP");
         meshNodes.SetMaterialByMeshName("Door_Front", "T_Door_WP");
@@ -188,6 +189,7 @@ namespace Bible {
         meshNodes.SetMaterialByMeshName("Door_Knob", "T_DoorOldKnob");
         meshNodes.SetMaterialByMeshName("Door_Hinges", "T_DoorMetals");
         meshNodes.SetMaterialByMeshName("Door_Deadlock", "T_DoorMetals");
+        meshNodes.SetMaterialByMeshName("Door_DeadLockSwitch", "T_DoorMetals");
 
         meshNodes.SetMaterialByMeshName("DoorFrame_Front", "T_DoorFrame_WP");
         meshNodes.SetMaterialByMeshName("DoorFrame_Back", "T_DoorFrame_WP");

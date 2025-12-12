@@ -29,25 +29,11 @@ void Player::UpdateCursorRays() {
     glm::vec3 cameraRayOrigin = GetCameraPosition();
     glm::vec3 cameraRayDirection = GetCameraForward();
     m_physXRayResult = Physics::CastPhysXRay(cameraRayOrigin, cameraRayDirection, maxRayDistance, false, RaycastIgnoreFlags::PLAYER_CHARACTER_CONTROLLERS | RaycastIgnoreFlags::PLAYER_RAGDOLLS);
-    m_physXRayResult = PhysXRayResult();
-
+    
     // Bvh Ray result
     glm::vec3 rayOrigin = GetCameraPosition();
     glm::vec3 rayDir = GetCameraForward();
     m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance);
-
-    // Find openable mesh if one exists
-    if (m_bvhRayResult.hitFound) {
-        // BUGS SURELY
-        if (GenericObject* hitObject = World::GetGenericObjects().get(m_bvhRayResult.objectId)) {
-            //uint64_t openableParentId = hitObject->GetMeshNodes().GetObjectIdOfFirstOpenableParentNode(m_bvhRayResult.openableId);
-            //
-            //if (openableParentId != 0) {
-            //    m_bvhRayResult.objectId = openableParentId;
-            //    m_bvhRayResult.objectType = UniqueID::GetType(openableParentId);
-            //}
-        }
-    }
 
 
     //m_rayHitObjectType = UniqueID::GetType(m_bvhRayResult.objectId);
@@ -157,19 +143,68 @@ void Player::UpdateInteract() {
     //     }
     // //}
 
+    glm::vec3 hitPosition = glm::vec3(0.0f);
+    bool hitFound = false;
+
     // Replace me with some distance check with closest point from hit object AABB
     if (m_bvhRayResult.hitFound) {
         m_interactObjectId = m_bvhRayResult.objectId;
         m_interactOpenableId = m_bvhRayResult.openableId;
         m_interactCustomId = m_bvhRayResult.customId;
+
+        hitPosition = m_bvhRayResult.hitPosition;
+        hitFound = true;
+    } 
+
+    // Now try see if the PhysX hit is closer, you need this position for the PhysX sweep tests
+    if (m_physXRayResult.hitFound && m_physXRayResult.distanceToHit < m_bvhRayResult.distanceToHit) {
+        m_interactObjectId = m_physXRayResult.userData.objectId;
+        m_interactOpenableId = 0;
+        m_interactCustomId = 0;
+
+        hitPosition = m_physXRayResult.hitPosition;
+        hitFound = true;
     }
 
+    // Sweep test
+    if (hitFound) {
+        glm::vec3 spherePosition = hitPosition;
+        float sphereRadius = 0.15f;
+        PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
+        const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));
+        PhysXOverlapReport overlapReport = Physics::OverlapTest(overlapSphereShape, overlapSphereTranform, CollisionGroup(GENERIC_BOUNCEABLE | GENERTIC_INTERACTBLE | ITEM_PICK_UP | ENVIROMENT_OBSTACLE));
+
+        // Sort by distance to player
+        sort(overlapReport.hits.begin(), overlapReport.hits.end(), [this, spherePosition](PhysXOverlapResult& lhs, PhysXOverlapResult& rhs) {
+            float distanceA = glm::distance(spherePosition, lhs.objectPosition);
+            float distanceB = glm::distance(spherePosition, rhs.objectPosition);
+            return distanceA < distanceB;
+            });
+
+        if (overlapReport.hits.size()) {
+            PhysicsUserData userData = overlapReport.hits[0].userData;
+
+            if (World::GetPickUpByObjectId(userData.objectId)) {
+                m_interactObjectId = userData.objectId;
+                m_interactOpenableId = 0;
+                m_interactCustomId = 0;
+            }
+        }
+    }
+
+    //Renderer::DrawPoint(hitPosition, GREEN);
+    
     ObjectType interactObjectType = UniqueID::GetType(m_interactObjectId);
 
     // Convenience bool for setting crosshair
     m_interactFound = false;
+
     if (OpenableManager::IsInteractable(m_interactOpenableId, GetCameraPosition())) m_interactFound = true;
     if (interactObjectType == ObjectType::PIANO && m_interactCustomId != 0)         m_interactFound = true;
+    if (interactObjectType == ObjectType::PICK_UP)                                  m_interactFound = true;
+
+    // Bail if nothing to interact with
+    if (!InteractFound()) return;
 
     // PRESSED interact key
     if (PressedInteract()) {
@@ -178,12 +213,9 @@ void Player::UpdateInteract() {
         }
 
         // Pickups
-        if (interactObjectType == ObjectType::PICK_UP) {
-            PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId);
-            if (pickUp) {
-                World::RemoveObject(m_interactObjectId);
-                Audio::PlayAudio("ItemPickUp.wav", 1.0f);
-            }
+        if (PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId)) {
+            World::RemoveObject(m_interactObjectId);
+            Audio::PlayAudio("ItemPickUp.wav", 1.0f);
         }
     }
 

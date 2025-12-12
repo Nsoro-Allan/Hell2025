@@ -108,9 +108,9 @@
     {
       "EditorName": "Drawers Small",
       "Position": [
-        7.75,
+        8.649999618530273,
         0.0,
-        2.4251389503479004
+        1.9500000476837158
       ],
       "Rotation": [
         0.0,
@@ -287,6 +287,16 @@
       ],
       "Type": "DEFAULT",
       "YEulerRotation": 3.1415927410125732
+    },
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        8.149999618530273,
+        0.0,
+        6.0
+      ],
+      "Type": "WOOD_STOVE",
+      "YEulerRotation": 1.3962639570236206
     }
   ],
   "Lights": [
@@ -323,16 +333,16 @@
     {
       "Color": [
         1.0,
-        0.0,
-        0.0
+        0.7799999713897705,
+        0.5289999842643738
       ],
       "Position": [
         6.699999809265137,
         2.174999952316284,
         4.099999904632568
       ],
-      "Radius": 4.0,
-      "Strength": 15.25,
+      "Radius": 3.5,
+      "Strength": 2.0,
       "Type": "HANGING_LIGHT"
     },
     {
@@ -419,7 +429,7 @@
   "Planes": [
     {
       "EditorName": "Floor 9",
-      "Material": "BathroomFloor",
+      "Material": "FloorBoards",
       "P0": [
         4.5,
         0.0,
@@ -443,7 +453,7 @@
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.8999999761581421,
+      "TextureScale": 0.4000000059604645,
       "Type": "FLOOR"
     },
     {
@@ -455,9 +465,9 @@
         -2.999999761581421
       ],
       "P1": [
-        9.0,
-        2.6772918701171875,
-        6.0
+        7.313388824462891,
+        2.700000047683716,
+        6.050000190734863
       ],
       "P2": [
         0.0,
@@ -506,7 +516,7 @@
     },
     {
       "EditorName": "UNDEFINED_STRING 4",
-      "Material": "BathroomFloor",
+      "Material": "Ceiling2",
       "P0": [
         8.899999618530273,
         2.4000000953674316,
@@ -530,7 +540,7 @@
       "TextureOffsetU": 0.0,
       "TextureOffsetV": 0.0,
       "TextureRotation": 0.0,
-      "TextureScale": 0.8999999761581421,
+      "TextureScale": 2.0,
       "Type": "UNDEFINED"
     },
     {
@@ -766,7 +776,7 @@
     {
       "EditorName": "Wall 3",
       "Height": 2.4000000953674316,
-      "Material": "BathroomFloor",
+      "Material": "PlasterGeen",
       "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
@@ -847,7 +857,7 @@
     },
     {
       "EditorName": "Wall 5",
-      "Height": 2.4000000953674316,
+      "Height": 2.700000047683716,
       "Material": "Ceiling2",
       "MiddleTrimHeight": 2.4000000953674316,
       "Points": [

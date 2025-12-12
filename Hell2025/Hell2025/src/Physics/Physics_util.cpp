@@ -11,11 +11,11 @@ namespace Physics {
         return { vec.x, vec.y, vec.z };
     }
     
-    PxVec3 GlmVec3toPxVec3(glm::vec3 vec) {
+    PxVec3 GlmVec3toPxVec3(const glm::vec3& vec) {
         return { vec.x, vec.y, vec.z };
     }
     
-    PxQuat GlmQuatToPxQuat(glm::quat quat) {
+    PxQuat GlmQuatToPxQuat(const glm::quat& quat) {
         return { quat.x, quat.y, quat.z, quat.w };
     }
     
@@ -31,7 +31,7 @@ namespace Physics {
         return matrix;
     }
 
-    physx::PxMat44 GlmMat4ToPxMat44(glm::mat4 glmMatrix) {
+    physx::PxMat44 GlmMat4ToPxMat44(const glm::mat4& glmMatrix) {
         physx::PxMat44 matrix;
         std::copy(glm::value_ptr(glmMatrix),
                   glm::value_ptr(glmMatrix) + 16,
@@ -51,7 +51,7 @@ namespace Physics {
         }
     }
 
-    PhysXRayResult CastPhysXRayStaticEnvironment(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength) {
+    PhysXRayResult CastPhysXRayStaticEnvironment(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength) {
         PxScene* scene = Physics::GetPxScene();
         PxVec3 origin = PxVec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
         PxVec3 unitDir = PxVec3(rayDirection.x, rayDirection.y, rayDirection.z);
@@ -69,6 +69,7 @@ namespace Physics {
         result.hitNormal = glm::vec3(0, 0, 0);
         result.rayDirection = rayDirection;
         result.userData = PhysicsUserData();
+        result.distanceToHit = rayLength;
 
         RaycastStaticEnviromentFilterCallback callback;
         result.hitFound = scene->raycast(origin, unitDir, maxDistance, hit, outputFlags, filterData, &callback);
@@ -88,7 +89,7 @@ namespace Physics {
         return result;
     }
 
-    PhysXRayResult CastPhysXRayHeightMap(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength) {
+    PhysXRayResult CastPhysXRayHeightMap(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength) {
         PxScene* scene = Physics::GetPxScene();
         PxVec3 origin = PxVec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
         PxVec3 unitDir = PxVec3(rayDirection.x, rayDirection.y, rayDirection.z);
@@ -115,6 +116,7 @@ namespace Physics {
             result.hitPosition = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
             result.hitNormal = glm::vec3(hit.block.normal.x, hit.block.normal.y, hit.block.normal.z);
             result.hitFound = true;
+            result.distanceToHit = glm::distance(rayOrigin, result.hitPosition);
             PhysicsUserData* userData = (PhysicsUserData*)hit.block.actor->userData;
             if (userData) {
                 result.userData = *userData;
@@ -125,7 +127,7 @@ namespace Physics {
         return result;
     }
 
-    PhysXRayResult CastPhysXRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float rayLength, bool cullBackFacing, RaycastIgnoreFlags ignoreFlags, std::vector<PxRigidActor*> ignoredActors) {
+    PhysXRayResult CastPhysXRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, float rayLength, bool cullBackFacing, RaycastIgnoreFlags ignoreFlags, std::vector<PxRigidActor*> ignoredActors) {
         PxScene* scene = Physics::GetPxScene();
         PxVec3 origin = PxVec3(rayOrigin.x, rayOrigin.y, rayOrigin.z);
         PxVec3 unitDir = PxVec3(rayDirection.x, rayDirection.y, rayDirection.z);
@@ -162,6 +164,7 @@ namespace Physics {
         if (result.hitFound) {
             result.hitPosition = glm::vec3(hit.block.position.x, hit.block.position.y, hit.block.position.z);
             result.hitNormal = glm::vec3(hit.block.normal.x, hit.block.normal.y, hit.block.normal.z);
+            result.distanceToHit = glm::distance(rayOrigin, result.hitPosition);
             result.hitFound = true;
             PhysicsUserData* userData = (PhysicsUserData*)hit.block.actor->userData;
             if (userData) {

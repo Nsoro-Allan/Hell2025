@@ -22,8 +22,9 @@ struct Fireplace {
     AABB GetWallsAABB()                                         { return m_wallsAabb; }
 	MeshNodes& GetMeshNodes()                                   { return m_meshNodes; }
 	const std::vector<RenderItem>& GetRenderItems() const       { return m_meshNodes.GetRenderItems(); }
-	const std::vector<RenderItem>& GetRenderItemsGlass() const  { return m_meshNodes.GetRenderItemsGlass(); }
-    const glm::vec3& GetPosition()                              { return m_createInfo.position; }
+    const std::vector<RenderItem>& GetRenderItemsGlass() const  { return m_meshNodes.GetRenderItemsGlass(); }
+    const glm::vec3& GetPosition()                              { return m_transform.position; }
+    const glm::vec3& GetRotation()                              { return m_transform.rotation; }
     const FireplaceCreateInfo& GetCreateInfo() const            { return m_createInfo; }
     const glm::mat4& GetWorldMatrix() const                     { return m_worldMatrix; }
     float GetWallDepth() const                                  { return m_wallDepth; }

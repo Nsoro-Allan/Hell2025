@@ -8,14 +8,15 @@
 #include "World/World.h"
 #include "Renderer/Renderer.h"
 
-void PickUp::Init(PickUpCreateInfo createInfo) {
+PickUp::PickUp(uint64_t id, const PickUpCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
+    m_createInfo = createInfo;
+    m_objectId = id;
+
     m_initialTransform.position = createInfo.position;
     m_initialTransform.rotation = createInfo.rotation;
-    m_pickUpType = Util::StringToPickUpType(createInfo.pickUpType);
-    m_isGold = createInfo.isGold;
 
     PhysicsFilterData filterData;
-    filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
+    filterData.raycastGroup = RaycastGroup::RAYCAST_DISABLED;
     filterData.collisionGroup = CollisionGroup::ITEM_PICK_UP;
     filterData.collidesWith = CollisionGroup::ENVIROMENT_OBSTACLE;
 
@@ -25,24 +26,24 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
 
     // Shotty buckshot
-    if (m_pickUpType == PickUpType::SHOTGUN_AMMO_BUCKSHOT) {
-        m_meshNodes.Init(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
+    if (GetType() == PickUpType::SHOTGUN_AMMO_BUCKSHOT) {
+        m_meshNodes.Init(id, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun_AmmoBox");
         glm::vec3 modelExtents = AssetManager::GetModelByName("Shotgun_AmmoBox")->GetExtents();
         mass = 0.45f;
         m_physicsId = Physics::CreateRigidDynamicFromBoxExtents(m_initialTransform, modelExtents, mass, filterData);
     }
     // Shotty slug
-    else if (m_pickUpType == PickUpType::SHOTGUN_AMMO_SLUG) {
-        m_meshNodes.Init(NO_ID, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::SHOTGUN_AMMO_SLUG) {
+        m_meshNodes.Init(id, "Shotgun_AmmoBox", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun_AmmoBoxSlug");
         glm::vec3 modelExtents = AssetManager::GetModelByName("Shotgun_AmmoBox")->GetExtents();
         mass = 0.45f;
         m_physicsId = Physics::CreateRigidDynamicFromBoxExtents(m_initialTransform, modelExtents, mass, filterData);
     }
     // AKS74U
-    else if (m_pickUpType == PickUpType::AKS74U) {
-        m_meshNodes.Init(NO_ID, "AKS74U_PickUp", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::AKS74U) {
+        m_meshNodes.Init(id, "AKS74U_PickUp", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("Mesh0", "AKS74U_0");
         m_meshNodes.SetMaterialByMeshName("Mesh1", "AKS74U_1");
         m_meshNodes.SetMaterialByMeshName("Mesh2", "AKS74U_2");
@@ -53,16 +54,16 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     }
 
     // Remington 870
-    else if (m_pickUpType == PickUpType::REMINGTON_870) {
-        m_meshNodes.Init(NO_ID, "World_Remington870", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::REMINGTON_870) {
+        m_meshNodes.Init(id, "World_Remington870", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Shotgun");
         mass = 3.2f;
         physicsModel = AssetManager::GetModelByName("World_Remington870_Collision_Mesh");
     }
 
     // SPAS
-    else if (m_pickUpType == PickUpType::SPAS) {
-        m_meshNodes.Init(NO_ID, "World_SPAS", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::SPAS) {
+        m_meshNodes.Init(id, "World_SPAS", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("SPAS12_Main", "SPAS_Main");
         m_meshNodes.SetMaterialByMeshName("SPAS12_Moving", "SPAS_Moving");
         m_meshNodes.SetMaterialByMeshName("SPAS12_Stamped", "SPAS_Stamped");
@@ -70,25 +71,23 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
         physicsModel = AssetManager::GetModelByName("World_SPAS_Collision_Mesh");
     }
 
-    else if (m_pickUpType == PickUpType::GLOCK || m_pickUpType == PickUpType::GOLDEN_GLOCK) {
-        m_meshNodes.Init(NO_ID, "World_Glock", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::GLOCK || GetType() == PickUpType::GOLDEN_GLOCK) {
+        m_meshNodes.Init(id, "World_Glock", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMeshMaterials("Glock");
         mass = 0.7f;
         physicsModel = AssetManager::GetModelByName("World_Glock_Collision_Mesh");
     }
 
-
-    else if (m_pickUpType == PickUpType::TOKAREV) {
-        m_meshNodes.Init(NO_ID, "World_Tokarev", emptyMeshNodeCreateInfoSet);
+    else if (GetType() == PickUpType::TOKAREV) {
+        m_meshNodes.Init(id, "World_Tokarev", emptyMeshNodeCreateInfoSet);
         m_meshNodes.SetMaterialByMeshName("TokarevBody", "Tokarev");
         m_meshNodes.SetMaterialByMeshName("TokarevGripPolymer", "TokarevGrip");
         mass = 0.7f;
         physicsModel = AssetManager::GetModelByName("World_Glock_Collision_Mesh");
     }
 
-
     else {
-        std::cout << "Warning!: You created a pickup with an invalid type!: " << createInfo.pickUpType << "\n";
+        std::cout << "Warning!: You created a pickup with an invalid type!: " << Util::PickUpTypeToString(GetType()) << "\n";
         return;
     }
 
@@ -102,9 +101,6 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
             m_physicsId = Physics::CreateRigidDynamicFromConvexMeshVertices(m_initialTransform, vertices, indices, mass, filterData);
         }
     }
-
-    // Get next unique ID
-    m_objectId = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
 
     // Set PhysX user data
     PhysicsUserData userData;
@@ -120,14 +116,6 @@ void PickUp::Init(PickUpCreateInfo createInfo) {
     Physics::AddFoceToRigidDynamic(m_physicsId, force);
 }
 
-PickUpCreateInfo PickUp::GetCreateInfo() {
-    PickUpCreateInfo createInfo;
-    createInfo.position = m_initialTransform.position;
-    createInfo.rotation = m_initialTransform.rotation;
-    createInfo.pickUpType = Util::PickUpTypeToString(m_pickUpType);
-    return createInfo;
-}
-
 void PickUp::Update(float deltaTime) {
     m_modelMatrix = m_initialTransform.to_mat4();
 
@@ -140,9 +128,10 @@ void PickUp::Update(float deltaTime) {
 }
 
 void PickUp::CleanUp() {
+    m_meshNodes.CleanUp();
     Physics::MarkRigidDynamicForRemoval(m_physicsId);
 }
 
-void PickUp::SetPosition(glm::vec3 position) {
+void PickUp::SetPosition(const glm::vec3& position) {
     m_initialTransform.position = position;
 }

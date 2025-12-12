@@ -8,7 +8,8 @@
 
 void Dobermann::Init(DobermannCreateInfo createInfo) {
     m_objectId = UniqueID::GetNextObjectId(ObjectType::DOBERMANN);
-    m_ragdollV2Id = RagdollManager::SpawnRagdoll(createInfo.position, createInfo.eulerDirection, "manikin2");
+    //m_ragdollV2Id = RagdollManager::SpawnRagdoll(createInfo.position, createInfo.eulerDirection, "manikin2");
+    m_ragdollV2Id = RagdollManager::SpawnRagdoll(createInfo.position, createInfo.eulerDirection, "dobermann_new"); 
 
     g_animatedGameObjectObjectId = World::CreateAnimatedGameObject();
 
@@ -59,6 +60,12 @@ void Dobermann::Update(float deltaTime) {
         else {
             EnableRagdollRender();
         }
+    }
+
+    if (Input::KeyPressed(HELL_KEY_Y)) {
+        ragdoll->SetToInitialPose();
+        animatedGameObject->SetAnimationModeToAnimated();
+        animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Lay", 1.0f);
     }
 
     static bool gettingUp = false;

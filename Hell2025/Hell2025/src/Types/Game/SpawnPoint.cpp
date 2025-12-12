@@ -3,7 +3,7 @@
 #include "Renderer/Renderer.h"
 #include "UniqueID.h"
 
-SpawnPoint::SpawnPoint(glm::vec3 position, glm::vec3 camEuler) {
+SpawnPoint::SpawnPoint(const glm::vec3& position, const glm::vec3& camEuler) {
     m_position = position;
     m_camEuler = camEuler;
 }
@@ -23,19 +23,19 @@ void SpawnPoint::Init() {
     filterData.collisionGroup = CollisionGroup::NO_COLLISION;
     filterData.collidesWith = CollisionGroup::NO_COLLISION;
 
-    m_rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(transform, cubeExtents, filterData);
-
-    // Set PhysX user data
-    PhysicsUserData userData;
-    userData.physicsId = m_rigidStaticId;
-    userData.objectId = m_objectId;
-    userData.physicsType = PhysicsType::RIGID_STATIC;
-    userData.objectType = ObjectType::SPAWN_POINT;
-    Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
+    //m_rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(transform, cubeExtents, filterData);
+    //
+    //// Set PhysX user data
+    //PhysicsUserData userData;
+    //userData.physicsId = m_rigidStaticId;
+    //userData.objectId = m_objectId;
+    //userData.physicsType = PhysicsType::RIGID_STATIC;
+    //userData.objectType = ObjectType::SPAWN_POINT;
+    //Physics::SetRigidStaticUserData(m_rigidStaticId, userData);
 }
 
 void SpawnPoint::CleanUp() {
-    Physics::MarkRigidStaticForRemoval(m_rigidStaticId);
+    //Physics::MarkRigidStaticForRemoval(m_rigidStaticId);
 }
 
 void SpawnPoint::DrawDebugCube() {

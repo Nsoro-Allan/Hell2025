@@ -172,16 +172,16 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
-        for (Door& door : GetDoors()) door.Update(deltaTime);
-        for (GenericObject& drawers : GetGenericObjects()) drawers.Update(deltaTime); 
-
+        for (Door& door : GetDoors())                       door.Update(deltaTime);
+        for (GenericObject& drawers : GetGenericObjects())  drawers.Update(deltaTime); 
+        for (PickUp& pickUp : GetPickUps())                 pickUp.Update(deltaTime);
+        
         std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
         std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
         std::vector<Bullet>& bullets = GetBullets();
         std::vector<GameObject>& gameObjects = GetGameObjects();
         std::vector<Light>& lights = GetLights();
         std::vector<Piano>& pianos = GetPianos();
-        std::vector<PickUp>& pickUps = GetPickUps();
         std::vector<Tree>& trees = GetTrees();
 
         for (AnimatedGameObject& animatedGameObject : animatedGameObjects) {
@@ -231,9 +231,6 @@ namespace World {
             mermaid.Update(deltaTime);
         }
 
-        for (PickUp& pickUp : pickUps) {
-            pickUp.Update(deltaTime);
-        }
 
         for (Piano& piano : pianos) {
             piano.Update(deltaTime);
@@ -283,8 +280,9 @@ namespace World {
             light.Update(deltaTime);
         }
 
-
-
+        lights[2].SetColor(DEFAULT_LIGHT_COLOR);
+        lights[2].SetStrength(2.0f);
+        lights[2].SetRadius(3.5f);
 
 
         // And finally decals
