@@ -19,5 +19,6 @@ private:
 	uint64_t g_animatedGameObjectObjectId = 0;
 	uint64_t m_objectId = 0;
 	uint64_t m_ragdollV2Id = 0;
+	float m_health = 0.0f;
 	bool m_renderRagdoll = false;
 };

@@ -276,7 +276,7 @@ void Player::UpdateUI() {
     }
 
     //std::string name = "FontTest_LockedFromTheOtherSide";
-    //name = "FontTest_LockedWithAKey";
+    ////name = "FontTest_LockedWithAKey";
     ////name = "FontTest_YouUnlockedIt";
     //
     //if (Texture* texture = AssetManager::GetTextureByName(name)) {
@@ -285,7 +285,6 @@ void Player::UpdateUI() {
     //    int marginX = 100;
     //    int marginY = 120;
     //    glm::ivec2 location = glm::ivec2(marginX, yBottom - marginY);
-    //    std::cout << yBottom << "\n";
     //    glm::ivec2 size = glm::ivec2(width, height);
     //    UIBackEnd::BlitTexture(name, location, Alignment::BOTTOM_LEFT, WHITE, size, TextureFilter::NEAREST);
     //}

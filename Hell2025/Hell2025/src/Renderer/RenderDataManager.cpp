@@ -54,7 +54,6 @@ namespace RenderDataManager {
     std::vector<glm::mat4> g_oceanPatchTransforms;
 
     void UpdateOceanPatchTransforms();
-    void UpdateViewportFrustums();
     void UpdateViewportData();
     void UpdateRendererData();
     void UpdateDrawCommandsSet();
@@ -88,7 +87,6 @@ namespace RenderDataManager {
 
     void Update() {
         UpdateViewportData();
-        UpdateViewportFrustums();
         UpdateRendererData();
         UpdateDrawCommandsSet();
     }
@@ -130,19 +128,11 @@ namespace RenderDataManager {
             }
             glm::mat4 inverseView = glm::inverse(viewMatrix);
             glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
-            //glm::vec3 cameraForward = glm::vec3(g_viewportData[i].inverseView[2]);
-            //glm::vec3 cameraRight = glm::normalize(glm::cross(worldUp, cameraForward));;
-            //glm::vec3 cameraUp = glm::normalize(glm::cross(cameraForward, cameraRight));
-
             glm::vec3 cameraRight = glm::vec3(inverseView[0]);
             glm::vec3 cameraUp = glm::vec3(inverseView[1]);
             glm::vec3 cameraForward = -glm::vec3(inverseView[2]);
 
             // Store them (no need to normalize, they should already be unit vectors)
-            g_viewportData[i].cameraRight = glm::vec4(cameraRight, 0.0f);
-            g_viewportData[i].cameraUp = glm::vec4(cameraUp, 0.0f);
-            g_viewportData[i].cameraForward = glm::vec4(cameraForward, 0.0f);
-
             g_viewportData[i].cameraForward = glm::vec4(cameraForward, 0.0f);
             g_viewportData[i].cameraRight = glm::vec4(cameraRight, 0.0f);
             g_viewportData[i].cameraUp = glm::vec4(cameraUp, 0.0f);
@@ -153,10 +143,10 @@ namespace RenderDataManager {
             g_viewportData[i].projectionView = g_viewportData[i].projection * g_viewportData[i].view;
             g_viewportData[i].inverseProjectionView = glm::inverse(g_viewportData[i].projectionView);
             g_viewportData[i].skyboxProjectionView = viewport->GetPerpsectiveMatrix() * g_viewportData[i].view;
-            g_viewportData[i].width = resolutions.gBuffer.x * (int)viewport->GetSize().x;
-            g_viewportData[i].height = resolutions.gBuffer.y * (int)viewport->GetSize().y;
-            g_viewportData[i].xOffset = resolutions.gBuffer.x * (int)viewport->GetPosition().x;
-            g_viewportData[i].yOffset = resolutions.gBuffer.y * (int)viewport->GetPosition().y;
+            g_viewportData[i].width = (int)(resolutions.gBuffer.x * viewport->GetSize().x);
+            g_viewportData[i].height = (int)(resolutions.gBuffer.y * viewport->GetSize().y);
+            g_viewportData[i].xOffset = (int)(resolutions.gBuffer.x * viewport->GetPosition().x);
+            g_viewportData[i].yOffset = (int)(resolutions.gBuffer.y * viewport->GetPosition().y);
             g_viewportData[i].posX = viewport->GetPosition().x;
             g_viewportData[i].posY = viewport->GetPosition().y;
             g_viewportData[i].sizeX = viewport->GetSize().x;
@@ -187,15 +177,6 @@ namespace RenderDataManager {
                     g_viewportData[i].flashlightPosition = glm::vec4(player->GetFlashlightPosition(), 0.0f);
                     g_viewportData[i].flashlightModifer = player->GetFlashLightModifer();
                 }
-            }
-        }
-    }
-
-    void UpdateViewportFrustums() {
-        for (int i = 0; i < 4; i++) {
-            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
-            if (viewport->IsVisible()) {
-                viewport->GetFrustum().Update(g_viewportData[i].projectionView);
             }
         }
     }
@@ -249,7 +230,8 @@ namespace RenderDataManager {
 
         // Lil hack to include bullet decals in mirrors
         int count = g_renderItems.size() + g_renderItemsAlphaDiscarded.size();
-        std::vector<RenderItem> potentialMirrorItems(count);
+        std::vector<RenderItem> potentialMirrorItems;
+        potentialMirrorItems.reserve(count);
         potentialMirrorItems.insert(potentialMirrorItems.end(), g_renderItems.begin(), g_renderItems.end());
         potentialMirrorItems.insert(potentialMirrorItems.end(), g_renderItemsAlphaDiscarded.begin(), g_renderItemsAlphaDiscarded.end());
 
@@ -279,21 +261,21 @@ namespace RenderDataManager {
         }
 
         // Flashlight stuff
-        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
-            Player* player = Game::GetLocalPlayerByIndex(i);
+        for (int playerIndex = 0; playerIndex < Game::GetLocalPlayerCount(); playerIndex++) {
+            Player* player = Game::GetLocalPlayerByIndex(playerIndex);
             if (!player) continue;
 
             Frustum flashLightFrustum = player->GetFlashlightFrustum();
 
             // Build multi draw commands for regular geometry
-            CreateDrawCommands(g_flashLightShadowMapDrawInfo.flashlightShadowMapGeometry[i], g_renderItems, &flashLightFrustum, i, true);
+            CreateDrawCommands(g_flashLightShadowMapDrawInfo.flashlightShadowMapGeometry[playerIndex], g_renderItems, &flashLightFrustum, playerIndex, true);
 
             // Frustum cull the heightmap chunks
             std::vector<HeightMapChunk>& chunks = World::GetHeightMapChunks();
             for (int i = 0; i < chunks.size(); i++) {
                 HeightMapChunk& chunk = chunks[i];
                 if (flashLightFrustum.IntersectsAABBFast(AABB(chunk.aabbMin, chunk.aabbMax))) {
-                    g_flashLightShadowMapDrawInfo.heightMapChunkIndices->push_back(i);
+                    g_flashLightShadowMapDrawInfo.heightMapChunkIndices[playerIndex].push_back(i);
                 }
             }
 
@@ -302,7 +284,7 @@ namespace RenderDataManager {
             for (int i = 0; i < g_houseRenderItems.size(); i++) {
                 HouseRenderItem& renderItem = g_houseRenderItems[i];
                 if (flashLightFrustum.IntersectsAABBFast(renderItem)) {
-                    g_flashLightShadowMapDrawInfo.houseMeshRenderItems->push_back(renderItem);
+                    g_flashLightShadowMapDrawInfo.houseMeshRenderItems[playerIndex].push_back(renderItem);
                 }
             }
         }

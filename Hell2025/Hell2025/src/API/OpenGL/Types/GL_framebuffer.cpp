@@ -48,14 +48,14 @@ void OpenGLFrameBuffer::CreateAttachment(const char* name, GLenum internalFormat
     }
 
     glTextureStorage2D(colorAttachment.handle, levels, internalFormat, m_width, m_height);
-    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MIN_FILTER, minFilter);
+    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_WRAP_S, wrap);
+    glTextureParameteri(colorAttachment.handle, GL_TEXTURE_WRAP_T, wrap);
 
     if (allocateMips) {
         glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(colorAttachment.handle, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTextureParameteri(colorAttachment.handle, GL_TEXTURE_WRAP_S, wrap);
-        glTextureParameteri(colorAttachment.handle, GL_TEXTURE_WRAP_T, wrap);
     }
 
     glNamedFramebufferTexture(m_handle, GL_COLOR_ATTACHMENT0 + m_colorAttachments.size() - 1, colorAttachment.handle, 0);

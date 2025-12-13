@@ -280,7 +280,7 @@ namespace World {
             light.Update(deltaTime);
         }
 
-        lights[2].SetColor(DEFAULT_LIGHT_COLOR);
+        //lights[2].SetColor(DEFAULT_LIGHT_COLOR);
         lights[2].SetStrength(2.0f);
         lights[2].SetRadius(3.5f);
 

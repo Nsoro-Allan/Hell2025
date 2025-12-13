@@ -19,9 +19,9 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const FireplaceCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
+            {"Rotation", createInfo.rotation},
             {"Type", Util::FireplaceTypeToString(createInfo.type)},
-            {"EditorName", createInfo.editorName},
-            {"YEulerRotation", createInfo.yEulerRotation}
+            {"EditorName", createInfo.editorName}
         };
     }
 
@@ -176,7 +176,7 @@ namespace nlohmann {
 
     void from_json(const nlohmann::json& j, FireplaceCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
-        info.yEulerRotation = j.value("YEulerRotation", 0.0f);
+        info.rotation = j.value("Rotation", glm::vec3(0.0f));
         info.editorName = j.value("EditorName", UNDEFINED_STRING);
         info.type = Util::StringToFireplaceType(j.value("Type", UNDEFINED_STRING));
     }

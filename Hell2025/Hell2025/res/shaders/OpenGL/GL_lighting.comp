@@ -263,9 +263,12 @@ void main() {
     }
 
     for (int i = 0; i < 2; i++) {    
-        if (fragDistance < 0.1) {
-            continue;
-        }
+
+        // Dont apply flashlight too close
+        //if (fragDistance < 0.01) {
+        //    continue;
+        //}
+
         float flashlightModifer = viewportData[i].flashlightModifer;
         if (flashlightModifer > 0.05) { 
             mat4 flashlightProjectionView = viewportData[i].flashlightProjectionView;
@@ -279,6 +282,11 @@ void main() {
 		    vec3 spotLightDir = flashlightDir.xyz;
             vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
 
+            // Prevent flashlight being drawn on the back of your head when viewed by another player
+            if (i != viewportIndex) {
+                spotLightPos += spotLightDir * 0.2;
+            }
+
             float fresnelReflect = 0.9;
             float spotLightRadius = 20.0;
             float spotLightStregth = 4.5;
@@ -289,9 +297,9 @@ void main() {
             spotLightRadius = 20.0;
             spotLightStregth = 5.0;
             
-            if (worldSpacePosition.y < 10) {
-                spotLightStregth = 25;
-            }
+            //if (worldSpacePosition.y < 10) {
+            //    spotLightStregth = 25;
+            //}
 
             float innerAngle = cos(radians(5.0 * flashlightModifer));
             float outerAngle = cos(radians(25.0));         
@@ -314,7 +322,6 @@ void main() {
 
             
             // Subsurface scattering
-
             vec3 radius = vec3(sssRadius);
             vec3 subColor = Saturate(baseColor.rgb, 1.5);
             vec3 L = spotLightDir;
@@ -348,6 +355,8 @@ void main() {
 
             spotLighting *= vec3(1 - shadow);
             spotLighting *= cookie;
+
+
             directLighting += vec3(spotLighting) * flashlightModifer;
 
 

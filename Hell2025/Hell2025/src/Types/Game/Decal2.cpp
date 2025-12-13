@@ -19,21 +19,12 @@ Decal2::Decal2(const Decal2CreateInfo& createInfo) {
     m_localPosition += m_localNormal * 0.0025f;
 
     // Determine type
-    m_type = DecalType::PLASTER;
-    MeshNodes* meshNodes = nullptr;
-    if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
-        meshNodes = &genericObject->GetMeshNodes();
+    if (MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_createInfo.parentObjectId, m_createInfo.localMeshNodeIndex)) {
+        m_type = meshNode->decalType;
     }
-    if (Window* window = World::GetWindowByObjectId(m_createInfo.parentObjectId)) {
-        meshNodes = &window->GetMeshNodes();
+    else {
+        m_type = DecalType::PLASTER;
     }
-    if (meshNodes) {
-        if (MeshNode* meshNode = meshNodes->GetMeshNodeByLocalIndex(m_createInfo.localMeshNodeIndex)) {
-            m_type = meshNode->decalType;
-        }
-    }
-    // UGLYYYYYYY ^^^
-
 
     float scale = 0.1f;
 
@@ -89,18 +80,23 @@ void Decal2::Update() {
 const glm::mat4& Decal2::GetParentWorldMatrix() {
     static glm::mat4 identity = glm::mat4(1.0f);
 
-	if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
-		MeshNodes& meshNodes = genericObject->GetMeshNodes();
-		return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
+    if (MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_createInfo.parentObjectId, m_createInfo.localMeshNodeIndex)) {
+        return meshNode->worldMatrix;
     }
-    if (Door* door = World::GetDoorByObjectId(m_createInfo.parentObjectId)) {
-        MeshNodes& meshNodes = door->GetMeshNodes();
-        return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
-    }
-    if (Piano* piano= World::GetPianoByObjectId(m_createInfo.parentObjectId)) {
-        MeshNodes& meshNodes = piano->GetMeshNodes();
-        return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
-    }
+    
+
+    //if (GenericObject* genericObject = World::GetGenericObjectById(m_createInfo.parentObjectId)) {
+    //	MeshNodes& meshNodes = genericObject->GetMeshNodes();
+    //	return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
+    //}
+    //if (Door* door = World::GetDoorByObjectId(m_createInfo.parentObjectId)) {
+    //    MeshNodes& meshNodes = door->GetMeshNodes();
+    //    return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
+    //}
+    //if (Piano* piano= World::GetPianoByObjectId(m_createInfo.parentObjectId)) {
+    //    MeshNodes& meshNodes = piano->GetMeshNodes();
+    //    return meshNodes.GetWorldModelMatrix(m_createInfo.localMeshNodeIndex);
+    //}
     
     return identity;
 }

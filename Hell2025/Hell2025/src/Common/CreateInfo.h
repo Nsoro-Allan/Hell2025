@@ -14,7 +14,7 @@ struct TrimSetCreateInfo {
 struct FireplaceCreateInfo {
     FireplaceType type = FireplaceType::DEFAULT;
     glm::vec3 position = glm::vec3(0.0f);
-    float yEulerRotation = 0.0f;
+    glm::vec3 rotation = glm::vec3(0.0f);
     std::string editorName = UNDEFINED_STRING;
 };
 

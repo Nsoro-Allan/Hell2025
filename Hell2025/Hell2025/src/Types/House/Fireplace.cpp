@@ -8,7 +8,7 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
     m_id = id;
     m_createInfo = createInfo;
     m_transform.position = m_createInfo.position + spawnOffset.translation;
-    m_transform.rotation.y = m_createInfo.yEulerRotation + spawnOffset.yRotation;
+    m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
     //m_transform.rotation.y = HELL_PI;
 
@@ -50,37 +50,41 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
         m_meshNodes.SetBlendingModeByMeshName("Fireplace_Walls_Chipped", BlendingMode::ALPHA_DISCARD);
     }
 
-	if (m_createInfo.type == FireplaceType::WOOD_STOVE) {
+    if (m_createInfo.type == FireplaceType::WOOD_STOVE) {
 
-		MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
-		door.meshName = "FireplaceBrick_StoveDoor";
-        door.materialName = "T_Stove";
+        MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
+        door.meshName = "FireplaceBrick_StoveDoor";
+        door.materialName = "FireplaceB_Stove";
         door.openable.isOpenable = true;
-		door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
-		door.openable.initialOpenState = OpenState::CLOSED;
-		door.openable.minOpenValue = 0.0f;
-		door.openable.maxOpenValue = 1.7;
-		door.openable.openSpeed = 7.25f;
-		door.openable.closeSpeed = 7.25f;
-		//door.openable.openingAudio = "BathroomCabinetOpen.wav";
-		//door.openable.closingAudio = "BathroomCabinetClose.wav";
-		door.openable.additionalTriggerMeshNames = { "FireplaceBrick_StoveHandle", "FireplaceBrick_StoveGlass"};
+        door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
+        door.openable.initialOpenState = OpenState::CLOSED;
+        door.openable.minOpenValue = 0.0f;
+        door.openable.maxOpenValue = 1.7;
+        door.openable.openSpeed = 7.25f;
+        door.openable.closeSpeed = 7.25f;
+        //door.openable.openingAudio = "BathroomCabinetOpen.wav";
+        //door.openable.closingAudio = "BathroomCabinetClose.wav";
+        door.openable.additionalTriggerMeshNames = { "FireplaceBrick_StoveHandle", "FireplaceBrick_StoveGlass" };
+
+        MeshNodeCreateInfo& glass = meshNodeCreateInfoSet.emplace_back();
+        glass.meshName = "FireplaceBrick_StoveGlass";
+        glass.materialName = "FireplaceB_GlassStove";
+        glass.decalType = DecalType::GLASS;
 
 		m_meshNodes.Init(id, "FireplaceBrick", meshNodeCreateInfoSet);
 
-
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Floor", "T_Floor");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Stove", "T_Stove");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveDoor", "T_Stove");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveHandle", "T_Stove");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveWindSlide", "T_Stove");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveGlass", "T_GlassStove");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool0", "T_Tools");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool1", "T_Tools");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool2", "T_Tools");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallFront", "T_BrickWall2");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallMain", "T_BrickWall1");
-		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallExtended", "T_BrickWall1");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Floor", "FireplaceB_Floor");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Stove", "FireplaceB_Stove");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveDoor", "FireplaceB_Stove");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveHandle", "FireplaceB_Stove");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveWindSlide", "FireplaceB_Stove");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_StoveGlass", "FireplaceB_GlassStove");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool0", "FireplaceB_Tools");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool1", "FireplaceB_Tools");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_Tool2", "FireplaceB_Tools");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallFront", "FireplaceB_BrickWall2");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallMain", "FireplaceB_BrickWall1");
+		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallExtended", "FireplaceB_BrickWall1");
 
 		m_meshNodes.SetBlendingModeByMeshName("FireplaceBrick_StoveGlass", BlendingMode::GLASS);
 	}
@@ -110,9 +114,9 @@ void Fireplace::SetPosition(const glm::vec3& position) {
     UpdateWorldMatrix();
 }
 
-void Fireplace::SetYEulerRotation(float rotation) {
-    m_createInfo.yEulerRotation = rotation;
-    m_transform.rotation.y = rotation;
+void Fireplace::SetRotation(const glm::vec3& rotation) {
+    m_createInfo.rotation = rotation;
+    m_transform.rotation = rotation;
     UpdateWorldMatrix();
 }
 

@@ -11,9 +11,9 @@ namespace Editor {
     EditorState g_lastPlacementState = EditorState::IDLE;
 
     //void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
-    void PlaceFireplace(FireplaceType fireplaceType, glm::vec3 hitPosition);
-    void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal);
-    void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal);
+    void PlaceFireplace(FireplaceType fireplaceType, const glm::vec3& hitPosition);
+    void PlaceHousePlane(HousePlaneType housePlaneType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
+    void PlaceGenericObject(GenericObjectType genericObjectType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
 
     void UpdateObjectPlacement() {
         if (GetEditorState() == EditorState::PLACE_OBJECT) {
@@ -102,7 +102,7 @@ namespace Editor {
     //    }
     //}
 
-    void PlaceFireplace(FireplaceType fireplaceType, glm::vec3 hitPosition) {
+    void PlaceFireplace(FireplaceType fireplaceType, const glm::vec3& hitPosition) {
         FireplaceCreateInfo createInfo;
         createInfo.position = hitPosition;
         createInfo.type = fireplaceType;
@@ -110,19 +110,31 @@ namespace Editor {
         ExitObjectPlacement();
     }
 
-    void PlaceHousePlane(HousePlaneType housePlaneType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+    void PlaceHousePlane(HousePlaneType housePlaneType, const glm::vec3& hitPosition, const glm::vec3& hitNormal) {
         HousePlaneCreateInfo createInfo; 
-        createInfo.p0 = hitPosition + glm::vec3(-1.0f, 0.0f, -1.0f);
-        createInfo.p1 = hitPosition + glm::vec3(-1.0f, 0.0f, 1.0f);
-        createInfo.p2 = hitPosition + glm::vec3(1.0f, 0.0f, 1.0f);
-        createInfo.p3 = hitPosition + glm::vec3(1.0f, 0.0f, -1.0f);
+
+        if (housePlaneType == HousePlaneType::FLOOR) {
+            createInfo.p0 = hitPosition + glm::vec3(-1.0f, 0.0f, -1.0f);
+            createInfo.p1 = hitPosition + glm::vec3(-1.0f, 0.0f, 1.0f);
+            createInfo.p2 = hitPosition + glm::vec3(1.0f, 0.0f, 1.0f);
+            createInfo.p3 = hitPosition + glm::vec3(1.0f, 0.0f, -1.0f);
+        }
+        if (housePlaneType == HousePlaneType::CEILING) {
+            float h = 2.4f;
+            createInfo.p3 = hitPosition + glm::vec3(-1.0f, h, -1.0f);
+            createInfo.p2 = hitPosition + glm::vec3(-1.0f, h, 1.0f);
+            createInfo.p1 = hitPosition + glm::vec3(1.0f, h, 1.0f);
+            createInfo.p0 = hitPosition + glm::vec3(1.0f, h, -1.0f);
+        }
+
         createInfo.type = housePlaneType;
+
         World::AddHousePlane(createInfo, SpawnOffset()); 
         World::UpdateHouseMeshBuffer();
         ExitObjectPlacement();
     }
 
-    void PlaceGenericObject(GenericObjectType genericObjectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
+    void PlaceGenericObject(GenericObjectType genericObjectType, const glm::vec3& hitPosition, const glm::vec3& hitNormal) {
         GenericObjectCreateInfo createInfo;
         createInfo.position = hitPosition;
         createInfo.rotation.y = 0.0f;

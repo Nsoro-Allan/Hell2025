@@ -16,7 +16,7 @@ struct Fireplace {
     void CleanUp();
 
     void SetPosition(const glm::vec3& position);
-    void SetYEulerRotation(float rotation);
+    void SetRotation(const glm::vec3& rotation);
 
     uint64_t GetObjectId()                                      { return m_id; }
     AABB GetWallsAABB()                                         { return m_wallsAabb; }

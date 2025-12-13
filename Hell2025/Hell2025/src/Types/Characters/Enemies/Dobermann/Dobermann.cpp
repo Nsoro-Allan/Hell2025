@@ -30,12 +30,22 @@ void Dobermann::Init(DobermannCreateInfo createInfo) {
     animatedGameObject->SetMeshWoundMaskTextureIndex("Body", woundMaskIndex);
     animatedGameObject->SetMeshWoundMaterialByMeshName("Body", "DobermannFullBlood");
     Logging::Debug() << "Assigned a Dobermann a 'Body' mesh wound mask index of " << woundMaskIndex;
+
+    m_health = 1.0f;
 }
 
 void Dobermann::TakeDamage(uint32_t damage) {
     RagdollV2* ragdoll = RagdollManager::GetRagdollV2ById(m_ragdollV2Id);
     AnimatedGameObject* animatedGameObject = GetAnimatedGameObject();
     animatedGameObject->SetAnimationModeToRagdollV2();
+
+    // Would this kill it?
+    if (m_health > 0.0f && m_health - damage <= 0.0f) {
+        Audio::PlayAudio("Dobermann_Death.wav", 1.0f);
+    }
+
+    // Apply damage
+    m_health -= damage;
 }
 
 void Dobermann::EnableRagdollRender() {
@@ -66,6 +76,7 @@ void Dobermann::Update(float deltaTime) {
         ragdoll->SetToInitialPose();
         animatedGameObject->SetAnimationModeToAnimated();
         animatedGameObject->PlayAndLoopAnimation("MainLayer", "Dobermann_Lay", 1.0f);
+        m_health = 1.0f;
     }
 
     static bool gettingUp = false;

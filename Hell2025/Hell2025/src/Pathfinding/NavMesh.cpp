@@ -1004,8 +1004,9 @@ namespace NavMeshManager {
 
     void Update() {
         // Lazy toggle hack
-        static bool doThis = true;
+        static bool doThis = false;
         if (Input::KeyPressed(HELL_KEY_O)) {
+            Audio::PlayAudio(AUDIO_SELECT, 1.0f);
             doThis = !doThis;
         }
         if (!doThis) return;

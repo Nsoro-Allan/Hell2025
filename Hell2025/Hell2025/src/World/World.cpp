@@ -654,7 +654,7 @@ namespace World {
 
     void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
         if (Fireplace* fireplace = World::GetFireplaceById(objectId)) {
-            fireplace->SetYEulerRotation(rotation.y);
+            fireplace->SetRotation(rotation);
         }
         if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
             genericObject->SetRotation(rotation);
