@@ -57,12 +57,12 @@ struct MeshNodeCreateInfo {
     RigidDynamicCreateInfo rigidDynamicAABB;
     RigidDynamicCreateInfo rigidDynamicConvexHull; // needs implementing
     RigidStaticCreateInfo rigidStatic;
-
     int32_t customId;
     DecalType decalType = DecalType::PLASTER;
     bool forceDynamic = false;
 	bool castShadows = true;
-	glm::vec3 emissiveColor = glm::vec3(1.0f);
+    glm::vec3 emissiveColor = glm::vec3(1.0f);
+    glm::vec3 tintColor = glm::vec3(1.0f);
 };
 
 struct GenericObjectCreateInfo {
@@ -136,8 +136,14 @@ struct KangarooCreateInfo {
 };
 
 struct DoorCreateInfo {
+    DoorType type = DoorType::STANDARD_A;
+    DoorMaterialType materialTypeFront = DoorMaterialType::UNDEFINED;
+    DoorMaterialType materialTypeBack = DoorMaterialType::UNDEFINED;
+    DoorMaterialType materialTypeFrame = DoorMaterialType::UNDEFINED;
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
+    bool hasDeadLock = false;
+    bool deadLockedAtInit = false;
     float maxOpenValue = 2.1f;
 };
 

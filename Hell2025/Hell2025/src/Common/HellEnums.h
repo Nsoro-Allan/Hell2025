@@ -47,6 +47,7 @@ enum class BlendingMode {
     MIRROR,
     GLASS,
     DO_NOT_RENDER,
+    STAINED_GLASS,
     UNDEFINED
 };
 
@@ -497,6 +498,20 @@ enum struct GenericObjectType {
     TEST_MODEL2,
     TEST_MODEL3,
     TEST_MODEL4,
+    UNDEFINED
+};
+
+enum struct DoorType {
+    STANDARD_A,
+    STANDARD_B,
+    STAINED_GLASS,
+    UNDEFINED
+};
+
+enum struct DoorMaterialType {
+    WHITE_PAINT,
+    BACK_PAINT,
+    RESIDENT_EVIL,
     UNDEFINED
 };
 

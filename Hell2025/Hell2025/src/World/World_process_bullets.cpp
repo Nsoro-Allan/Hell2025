@@ -80,7 +80,8 @@ namespace World {
                 MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(objectId, localMeshNodeIndex);
 
                 bool glassHit = meshNode && (meshNode->blendingMode == BlendingMode::GLASS ||
-                                             meshNode->blendingMode == BlendingMode::MIRROR);
+                                             meshNode->blendingMode == BlendingMode::MIRROR ||
+                                             meshNode->blendingMode == BlendingMode::STAINED_GLASS);
 
                 bool createDecal = (meshNode && meshNode->decalType != DecalType::UNDEFINED) ||
                                    (Physics::GetRigidStaitcById(physicsId) != nullptr);

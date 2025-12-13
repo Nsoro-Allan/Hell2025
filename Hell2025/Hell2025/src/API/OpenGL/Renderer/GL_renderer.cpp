@@ -345,6 +345,7 @@ namespace OpenGLRenderer {
         g_shaders["ShadowMap"] = OpenGLShader({ "GL_shadow_map.vert", "GL_shadow_map.frag" });
         g_shaders["ShadowCubeMap"] = OpenGLShader({ "GL_shadow_cube_map.vert", "GL_shadow_cube_map.frag" });
         g_shaders["SolidColor"] = OpenGLShader({ "GL_solid_color.vert", "GL_solid_color.frag" });
+        g_shaders["StainedGlass"] = OpenGLShader({ "GL_stained_glass.vert", "GL_stained_glass.frag" });
         g_shaders["Skybox"] = OpenGLShader({ "GL_skybox.vert", "GL_skybox.frag" });
         g_shaders["SpriteSheet"] = OpenGLShader({ "GL_sprite_sheet.vert", "GL_sprite_sheet.frag" });
         g_shaders["UI"] = OpenGLShader({ "GL_ui.vert", "GL_ui.frag" });
@@ -441,6 +442,7 @@ namespace OpenGLRenderer {
         HairPass();
         RayMarchFog();
         OceanUnderwaterCompositePass();
+        StainedGlassPass();
         WinstonPass();
         SpriteSheetPass(); // Muzzle flash, etc
         InventoryGaussianPass();      

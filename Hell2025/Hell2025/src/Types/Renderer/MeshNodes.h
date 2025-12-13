@@ -38,6 +38,7 @@ struct MeshNode {
     bool castShadows;
     bool ownsOpenableId = false;      // Only nodes with this flag set to true receive the transform from the openable ID
     glm::vec3 emissiveColor = glm::vec3(1.0f);
+    glm::vec3 tintColor = glm::vec3(1.0f);
 };
 
 struct MeshNodes {
@@ -97,6 +98,7 @@ struct MeshNodes {
     const std::vector<RenderItem>& GetRenderItemsGlass() const              { return m_renderItemsGlass; }
     const std::vector<RenderItem>& GetRenderItemsToiletWater() const        { return m_renderItemsHairBottomLayer; }
     const std::vector<RenderItem>& GetRenderItemsMirror() const             { return m_renderItemsMirror; }
+    const std::vector<RenderItem>& GetRenderItemsStainedGlass() const       { return m_renderItemsStainedGlass; }
 
 private:
     void UpdateAABBs(const glm::mat4& worldMatrix);
@@ -116,6 +118,7 @@ private:
     std::vector<RenderItem> m_renderItemsHairBottomLayer;
     std::vector<RenderItem> m_renderItemsMirror;
     std::vector<RenderItem> m_renderItemsToiletWater;
+    std::vector<RenderItem> m_renderItemsStainedGlass;
     bool m_isDirty = true;
     bool m_forceDirty = true;
     bool m_firstFrame = true;

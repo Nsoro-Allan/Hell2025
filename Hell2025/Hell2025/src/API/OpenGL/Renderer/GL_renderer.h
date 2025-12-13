@@ -78,6 +78,7 @@ namespace OpenGLRenderer {
     void ScreenSpaceDecalsPass();
     void SkyBoxPass();
     void SpriteSheetPass();
+    void StainedGlassPass();
     void TextureReadBackPass();
     void UIPass();
     void VatBloodPass();

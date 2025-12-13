@@ -1,6 +1,7 @@
 #include "Door.h"
 #include "Audio/Audio.h"
 #include "AssetManagement/AssetManager.h"
+#include "Bible/Bible.h"
 #include "Editor/Editor.h"
 #include "Physics/Physics.h"
 #include "Physics/Physics.h"
@@ -10,7 +11,7 @@
 #include "Util.h"
 #include "World/World.h"
 
-Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
+Door::Door(uint64_t id, DoorCreateInfo& createInfo, SpawnOffset& spawnOffset) {
     m_objectId = id;
 	m_createInfo = createInfo;
 	m_spawnOffset = spawnOffset;
@@ -18,61 +19,12 @@ Door::Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spa
     m_position = createInfo.position + spawnOffset.translation;
     m_rotation = createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-	std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+    createInfo.type = DoorType::STAINED_GLASS;
+    createInfo.materialTypeFront = DoorMaterialType::RESIDENT_EVIL;
+    createInfo.materialTypeBack = DoorMaterialType::WHITE_PAINT;
+    createInfo.materialTypeFrame = DoorMaterialType::RESIDENT_EVIL;
 
-	MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
-	door.meshName = "Door";
-	door.materialName = "Door";
-    door.openable.additionalTriggerMeshNames = { "Door_Handle", "Door_Hinges", "Door_Lock" };
-    door.openable.isOpenable = true;
-	door.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
-	door.openable.initialOpenState = OpenState::CLOSED;
-	door.openable.minOpenValue = 0.0f;
-	door.openable.maxOpenValue = m_createInfo.maxOpenValue;
-	door.openable.openSpeed = 5.208f;
-	door.openable.closeSpeed = 5.208f;
-	door.openable.openingAudio = "Door_Open.wav";
-	door.openable.closingAudio = "Door_Open.wav";
-    door.rigidDynamicAABB.createObject = true;
-    door.rigidDynamicAABB.kinematic = true;
-    door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-    door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
-
-	MeshNodeCreateInfo& doorHandle = meshNodeCreateInfoSet.emplace_back();
-    doorHandle.meshName = "Door_Handle";
-    doorHandle.materialName = "Door";
-
-	MeshNodeCreateInfo& doorHinges = meshNodeCreateInfoSet.emplace_back();
-    doorHinges.meshName = "Door_Hinges";
-    doorHinges.materialName = "Door";
-
-	MeshNodeCreateInfo& doorLock = meshNodeCreateInfoSet.emplace_back();
-    doorLock.meshName = "Door_Lock";
-    doorLock.materialName = "Door";
-
-	MeshNodeCreateInfo& doorFrame = meshNodeCreateInfoSet.emplace_back();
-	doorFrame.meshName = "Door_Frame";
-    doorFrame.materialName = "Door";
-
-	MeshNodeCreateInfo& doorFrameHinges = meshNodeCreateInfoSet.emplace_back();
-	doorFrameHinges.meshName = "Door_Frame_Hinges";
-	doorFrameHinges.materialName = "Door";
-
-	MeshNodeCreateInfo& doorFrameInner = meshNodeCreateInfoSet.emplace_back();
-    doorFrameInner.meshName = "Door_Frame_Inner";
-    doorFrameInner.materialName = "Door";
-	
-    MeshNodeCreateInfo& doorFrameLock = meshNodeCreateInfoSet.emplace_back();
-    doorFrameLock.meshName = "Door_Frame_Lock";
-    doorFrameLock.materialName = "Door";
-
-	m_meshNodes.Init(id, "Door", meshNodeCreateInfoSet);
-
-    //PhysicsFilterData filterData;
-    //filterData.raycastGroup = RAYCAST_ENABLED;
-    //filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-    //filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+    Bible::ConfigureDoorMeshNodes(id, createInfo, m_meshNodes);
 
     UpdateFloor();
 }
@@ -83,7 +35,6 @@ void Door::UpdateFloor() {
 
     //half_w = 0.1f;
 	//half_d = 0.3f;
-
 
     Transform transform;
     transform.position = m_position;

@@ -12,7 +12,6 @@ void main() {
     vec3 glassColor = imageLoad(glassTexure, texCoord).rgb;
 	finalLighting += glassColor;
 
-	
 	//if (glassColor != vec3(0,0,0)) {
 	//	finalLighting.rgb *= vec3(1, 0, 0);
 	//}
@@ -24,6 +23,8 @@ void main() {
    //    finalLighting.b = clamp(finalLighting.b, 0, 1);
    //    // Guasian blur final lighting plz
    //}
+
+   //finalLighting = glassColor;
 
 	imageStore(finalLightingTexture, texCoord, vec4(finalLighting, 1));
 }

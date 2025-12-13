@@ -227,6 +227,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_glass_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_ocean_passes.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_post_processing.cpp" />
+    <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_stained_glass_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_vat_blood_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_weatherboards_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_winston_pass.cpp" />
@@ -296,6 +297,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\BackEnd\BackEnd.cpp" />
     <ClCompile Include="src\BackEnd\Integration\GLFW.cpp" />
     <ClCompile Include="src\BackEnd\Integration\SDL.cpp" />
+    <ClCompile Include="src\Bible\Types\Bible_Doors.cpp" />
     <ClCompile Include="src\Bible\Types\Bible_WeaponAttachmentInfo.cpp" />
     <ClCompile Include="src\Bible\Types\Bible_WeaponInfo.cpp" />
     <ClCompile Include="src\Bible\Types\GenericObjects\Bathroom.cpp" />
@@ -647,6 +649,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\GL_spirtesheet.vert" />
     <None Include="res\shaders\OpenGL\GL_sprite_sheet.frag" />
     <None Include="res\shaders\OpenGL\GL_sprite_sheet.vert" />
+    <None Include="res\shaders\OpenGL\GL_stained_glass.frag" />
+    <None Include="res\shaders\OpenGL\GL_stained_glass.vert" />
     <None Include="res\shaders\OpenGL\GL_ui.frag" />
     <None Include="res\shaders\OpenGL\GL_ui.vert" />
     <None Include="res\shaders\common\pbr_functions.glsl" />

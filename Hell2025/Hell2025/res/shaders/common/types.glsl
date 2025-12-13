@@ -102,6 +102,11 @@ struct RenderItem {
     int woundNormalMapTextureIndex;
     int woundRmaTextureIndex;
     int localMeshNodeIndex;
+    
+    float tintColorR;
+    float tintColorG;
+    float tintColorB;
+    float UNUSED;
 };
 
 struct Light {

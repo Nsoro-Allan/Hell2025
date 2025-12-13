@@ -194,5 +194,9 @@ void main() {
     vec3 finalColor = directLighting;
     FragOut.rgb = vec3(finalColor);
 	FragOut.a = 1.0;
+
+    
+
+    //finalColor.rgb = vec3(1,0,0);
     
 }

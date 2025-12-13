@@ -59,8 +59,11 @@ namespace World {
         }
 
         // Doors
-		for (Door& door : GetDoors()) {
-			RenderDataManager::SubmitRenderItems(door.GetRenderItems());
+        for (Door& door : GetDoors()) {
+            RenderDataManager::SubmitRenderItems(door.GetRenderItems());
+            RenderDataManager::SubmitRenderItemsGlass(door.GetRenderItemsGlass());
+            RenderDataManager::SubmitRenderItemsStainedGlass(door.GetRenderItemsStainedGlass());
+
 			if (Editor::GetSelectedObjectId() == door.GetObjectId()) {
 				RenderDataManager::SubmitOutlineRenderItems(door.GetRenderItems());
 			}

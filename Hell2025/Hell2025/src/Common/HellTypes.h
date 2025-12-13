@@ -42,7 +42,7 @@ struct RenderItem {
     uint32_t openableId = 0;
     uint32_t customId = 0;
 
-    int32_t padding1 = 0;               // Unused
+    int32_t padding1 = 0;               // UNUSED
     int32_t exclusiveViewportIndex = -1;
     int32_t skinned = 0;                // True or false
     int32_t castShadows = 1;            // True or false
@@ -61,6 +61,11 @@ struct RenderItem {
     int32_t woundNormalMapTextureIndex = 0;
     int32_t woundRmaTextureIndex = 0;
     int32_t localMeshNodeIndex = 0;
+
+    float tintColorR = 1.0f;
+    float tintColorG = 1.0f;
+    float tintColorB = 1.0f;
+    float UNUSED = 66.6f;               // UNUSED
 };
 
 struct AABBRayResult {

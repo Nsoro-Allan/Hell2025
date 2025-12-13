@@ -55,8 +55,9 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode.nodeIndex = i;
         meshNode.meshBvhId = mesh->meshBvhId;
         meshNode.forceDynamic = false;
-		meshNode.castShadows = true;
-		meshNode.emissiveColor = glm::vec3(1.0f);
+        meshNode.castShadows = true;
+        meshNode.emissiveColor = glm::vec3(1.0f);
+        meshNode.tintColor = glm::vec3(1.0f);
         meshNode.rigidDynamicId = 0;
         meshNode.worldSpaceObb.SetLocalBounds(AABB(mesh->aabbMin, mesh->aabbMax));
     }
@@ -84,6 +85,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode->forceDynamic = createInfo.forceDynamic;
         meshNode->castShadows = createInfo.castShadows;
         meshNode->emissiveColor = createInfo.emissiveColor;
+        meshNode->tintColor = createInfo.tintColor;
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 
@@ -416,6 +418,7 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     m_renderItemsHairBottomLayer.clear();
     m_renderItemsToiletWater.clear();
     m_renderItemsMirror.clear();
+    m_renderItemsStainedGlass.clear();
 
     for (size_t i = 0; i < m_meshNodes.size(); i++) {
         MeshNode& meshNode = m_meshNodes[i];
@@ -441,33 +444,47 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
 		meshNode.renderItem.castShadows = meshNode.castShadows;
 		meshNode.renderItem.emissiveR = meshNode.emissiveColor.r;
 		meshNode.renderItem.emissiveG = meshNode.emissiveColor.g;
-		meshNode.renderItem.emissiveB = meshNode.emissiveColor.b;
+        meshNode.renderItem.emissiveB = meshNode.emissiveColor.b;
+        meshNode.renderItem.tintColorR = meshNode.tintColor.r;
+        meshNode.renderItem.tintColorG = meshNode.tintColor.g;
+        meshNode.renderItem.tintColorB = meshNode.tintColor.b;
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
 
-        if (meshNode.blendingMode == BlendingMode::MIRROR) {
-            static bool test = true;
-            if (Input::KeyPressed(HELL_KEY_M)) {
-                test = !test;
-            }
+       if (meshNode.blendingMode == BlendingMode::STAINED_GLASS) {
+           if (Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex)) {
+               std::cout << mesh->GetName() << ": (";
+               std::cout << meshNode.renderItem.tintColorR << ", ";
+               std::cout << meshNode.renderItem.tintColorG << ", ";
+               std::cout << meshNode.renderItem.tintColorB << ") " << meshNode.globalMeshIndex << "\n";
+           }
+           std::cout << "\n";
+       }
 
-            if (test) {
-                m_renderItemsMirror.push_back(meshNode.renderItem);
-                m_renderItemsGlass.push_back(meshNode.renderItem);
-            }
-            else {
-                m_renderItems.push_back(meshNode.renderItem);
-            }
-        }
+        //if (meshNode.blendingMode == BlendingMode::MIRROR) {
+        //    static bool test = true;
+        //    if (Input::KeyPressed(HELL_KEY_M)) {
+        //        test = !test;
+        //    }
+        //
+        //    if (test) {
+        //        m_renderItemsMirror.push_back(meshNode.renderItem);
+        //        m_renderItemsGlass.push_back(meshNode.renderItem);
+        //    }
+        //    else {
+        //        m_renderItems.push_back(meshNode.renderItem);
+        //    }
+        //}
 
         switch (meshNode.blendingMode) {
-            case BlendingMode::DEFAULT:    m_renderItems.push_back(meshNode.renderItem);                 break;
-            case BlendingMode::ALPHA_DISCARD:   m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
+            case BlendingMode::DEFAULT:           m_renderItems.push_back(meshNode.renderItem);                 break;
+            case BlendingMode::ALPHA_DISCARD:     m_renderItemsAlphaDiscarded.push_back(meshNode.renderItem);   break;
             case BlendingMode::BLENDED:           m_renderItemsBlended.push_back(meshNode.renderItem);          break;
             case BlendingMode::GLASS:             m_renderItemsGlass.push_back(meshNode.renderItem);            break;
             case BlendingMode::HAIR_TOP_LAYER:    m_renderItemsHairTopLayer.push_back(meshNode.renderItem);     break;
             case BlendingMode::HAIR_UNDER_LAYER:  m_renderItemsHairBottomLayer.push_back(meshNode.renderItem);  break;
             case BlendingMode::TOILET_WATER:      m_renderItemsToiletWater.push_back(meshNode.renderItem);      break;
+            case BlendingMode::STAINED_GLASS:     m_renderItemsStainedGlass.push_back(meshNode.renderItem);     break;
             default: break;
         }
 
@@ -568,6 +585,7 @@ const void MeshNodes::SubmitRenderItems() const {
     RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(m_renderItemsHairTopLayer);
     RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(m_renderItemsHairBottomLayer);
     RenderDataManager::SubmitRenderItemsMirror(m_renderItemsMirror);
+    RenderDataManager::SubmitRenderItemsStainedGlass(m_renderItemsStainedGlass);
 }
 
 const void MeshNodes::SubmitOutlineRenderItems() const {

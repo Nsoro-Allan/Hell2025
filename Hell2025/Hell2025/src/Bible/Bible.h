@@ -27,10 +27,12 @@ namespace Bible {
     InventoryItemInfo* GetInventoryItemInfoByName(const std::string& name);
     int GetInventoryItemSizeByName(const std::string& name);
 
-    void ConfigureTestModel(uint64_t, MeshNodes& meshNodes);
-    void ConfigureTestModel2(uint64_t, MeshNodes& meshNodes);
-    void ConfigureTestModel3(uint64_t, MeshNodes& meshNodes);
-    void ConfigureTestModel4(uint64_t, MeshNodes& meshNodes);
+    void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes& meshNodes);
+
+    void ConfigureTestModel(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureTestModel2(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureTestModel3(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureTestModel4(uint64_t id, MeshNodes& meshNodes);
 
     void ConfigureMeshNodesCouch(uint64_t, MeshNodes& meshNodes);
     void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes);

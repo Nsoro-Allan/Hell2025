@@ -6,7 +6,7 @@
 
 struct Door {
     Door() = default;
-    Door(uint64_t id, const DoorCreateInfo& createInfo, const SpawnOffset& spawnOffset);    
+    Door(uint64_t id, DoorCreateInfo& createInfo, SpawnOffset& spawnOffset);    
     Door(const Door&) = delete;
     Door& operator=(const Door&) = delete;
     Door(Door&&) noexcept = default;
@@ -19,20 +19,22 @@ struct Door {
     void UpdateFloor();
 
 	MeshNodes& GetMeshNodes() { return m_meshNodes; }
-    const bool MovedThisFrame() const                       { return m_movedThisFrame; }
-    const uint64_t GetObjectId() const                      { return m_objectId; }
-    const uint64_t GetPhysicsId() const                     { return m_physicsId; }
-    //const uint64_t GetFrameObjectId() const                 { return m_frameObjectId; }
-    const glm::vec3& GetPosition() const                    { return m_position; }
-    const glm::vec3& GetRotation() const                    { return m_rotation; }
-    const glm::vec3& GetInteractPosition() const            { return m_interactPosition; }
-    const glm::mat4& GetDoorModelMatrix () const            { return m_doorModelMatrix; }
-    const glm::mat4& GetDoorFrameModelMatrix () const       { return m_frameModelMatrix; }
-    const Model* GetDoorModel() const                       { return m_doorModel; }
-    const Model* GetDoorFrameModel() const                  { return m_frameModel; }
-    const OpeningState& GetOpeningState() const             { return m_openingState; }
-    const DoorCreateInfo& GetCreateInfo() const             { return m_createInfo; }
-    const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
+    const bool MovedThisFrame() const                                   { return m_movedThisFrame; }
+    const uint64_t GetObjectId() const                                  { return m_objectId; }
+    const uint64_t GetPhysicsId() const                                 { return m_physicsId; }
+    //const uint64_t GetFrameObjectId() const                             { return m_frameObjectId; }
+    const glm::vec3& GetPosition() const                                { return m_position; }
+    const glm::vec3& GetRotation() const                                { return m_rotation; }
+    const glm::vec3& GetInteractPosition() const                        { return m_interactPosition; }
+    const glm::mat4& GetDoorModelMatrix () const                        { return m_doorModelMatrix; }
+    const glm::mat4& GetDoorFrameModelMatrix () const                   { return m_frameModelMatrix; }
+    const Model* GetDoorModel() const                                   { return m_doorModel; }
+    const Model* GetDoorFrameModel() const                              { return m_frameModel; }
+    const OpeningState& GetOpeningState() const                         { return m_openingState; }
+    const DoorCreateInfo& GetCreateInfo() const                         { return m_createInfo; }
+    const std::vector<RenderItem>& GetRenderItems() const               { return m_meshNodes.GetRenderItems(); }
+    const std::vector<RenderItem>& GetRenderItemsGlass() const          { return m_meshNodes.GetRenderItemsGlass(); }
+    const std::vector<RenderItem>& GetRenderItemsStainedGlass() const   { return m_meshNodes.GetRenderItemsStainedGlass(); }
 
 private:
 	DoorCreateInfo m_createInfo;

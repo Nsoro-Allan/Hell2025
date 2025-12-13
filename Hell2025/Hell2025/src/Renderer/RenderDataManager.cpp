@@ -38,6 +38,7 @@ namespace RenderDataManager {
     std::vector<RenderItem> g_renderItemsHairTopLayer;
     std::vector<RenderItem> g_renderItemsHairBottomLayer;
     std::vector<RenderItem> g_renderItemsMirror;
+    std::vector<RenderItem> g_stainedGlassRenderItems;
 
     std::vector<RenderItem> g_outlineRenderItems;
     std::vector<RenderItem> g_shadowMapRenderItems;
@@ -80,6 +81,7 @@ namespace RenderDataManager {
         g_renderItemsAlphaDiscarded.clear();
         g_renderItemsHairTopLayer.clear();
         g_renderItemsHairBottomLayer.clear();
+        g_stainedGlassRenderItems.clear();
         g_outlineRenderItems.clear();
         g_gpuLightsHighRes.clear();
         g_decalPaintingInfo.clear();
@@ -571,6 +573,10 @@ namespace RenderDataManager {
         return g_renderItemsMirror;
     }
 
+    const std::vector<RenderItem>& GetStainedGlassRenderItems() {
+        return g_stainedGlassRenderItems;
+    }
+
     const std::vector<RenderItem>& GetInstanceData() {
         return g_instanceData;
     }
@@ -637,6 +643,10 @@ namespace RenderDataManager {
 
     void SubmitRenderItemsGlass(const std::vector<RenderItem>& renderItems) {
         g_glassRenderItems.insert(g_glassRenderItems.begin(), renderItems.begin(), renderItems.end());
+    }
+
+    void SubmitRenderItemsStainedGlass(const std::vector<RenderItem>& renderItems) {
+        g_stainedGlassRenderItems.insert(g_stainedGlassRenderItems.begin(), renderItems.begin(), renderItems.end());
     }
 
     void SubmitRenderItem(const HouseRenderItem& renderItem) {

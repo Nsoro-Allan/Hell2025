@@ -838,7 +838,7 @@ namespace World {
             transform.position = door.GetPosition();
             transform.position.y += DOOR_HEIGHT * 0.5f;
             transform.rotation = door.GetRotation();
-            transform.scale = glm::vec3(0.2f, DOOR_HEIGHT * 1.01f, DOOR_WIDTH);
+            transform.scale = glm::vec3(0.2f, DOOR_HEIGHT * 1.01f, DOOR_WIDTH + 0.2f);
 
             ClippingCube& cube = g_clippingCubes.emplace_back();
             cube.Update(transform);
