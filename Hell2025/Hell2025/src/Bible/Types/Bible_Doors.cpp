@@ -6,6 +6,22 @@ namespace Bible {
     void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
+        // Deadlock stuff
+        MeshNodeCreateInfo& deadLock = meshNodeCreateInfoSet.emplace_back();
+        deadLock.meshName = "Door_Deadlock";
+        deadLock.materialName = "DoorMetals";
+        if (!createInfo.hasDeadLock) deadLock.blendingMode = BlendingMode::DO_NOT_RENDER;
+
+        MeshNodeCreateInfo& deadLockSwitch = meshNodeCreateInfoSet.emplace_back();
+        deadLockSwitch.meshName = "Door_DeadLockSwitch";
+        deadLockSwitch.materialName = "DoorMetals";
+        if (!createInfo.hasDeadLock) deadLockSwitch.blendingMode = BlendingMode::DO_NOT_RENDER;
+
+        MeshNodeCreateInfo& frameDeadLock = meshNodeCreateInfoSet.emplace_back();
+        frameDeadLock.meshName = "DoorFrame_Deadlock";
+        frameDeadLock.materialName = "DoorMetals";
+        if (!createInfo.hasDeadLock) frameDeadLock.blendingMode = BlendingMode::DO_NOT_RENDER;
+
         if (createInfo.type == DoorType::STANDARD_A) {
 
             // Collision mesh node
@@ -38,25 +54,26 @@ namespace Bible {
             hinges.openable.closeSpeed = 5.208f;
             hinges.openable.openingAudio = "Door_Open.wav";
             hinges.openable.closingAudio = "Door_Open.wav";
+            hinges.openable.isDeadLock = true;
 
             meshNodes.Init(id, "Door_StandardA", meshNodeCreateInfoSet);
 
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
                 meshNodes.SetMaterialByMeshName("DoorOld_Front", "Door_WP");
-                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("DoorOld_Front", "Door_RE");
-                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_RE");
             }
 
             // Back
             if (createInfo.materialTypeBack == DoorMaterialType::WHITE_PAINT) {
                 meshNodes.SetMaterialByMeshName("DoorOld_Back", "Door_WP");
+                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("DoorOld_Back", "Door_RE");
+                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_RE");
             }
         }
 
@@ -90,17 +107,17 @@ namespace Bible {
             hinges.openable.closeSpeed = 5.208f;
             hinges.openable.openingAudio = "Door_Open.wav";
             hinges.openable.closingAudio = "Door_Open.wav";
+            hinges.openable.isDeadLock = true;
 
             meshNodes.Init(id, "Door_StandardB", meshNodeCreateInfoSet);
 
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
                 meshNodes.SetMaterialByMeshName("Door_Front", "Door_WP");
-                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("Door_Front", "Door_RE");
-                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_RE");
+                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_WP");
             }
 
             // Back
@@ -109,6 +126,7 @@ namespace Bible {
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("Door_Back", "Door_RE");
+                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_RE");
             }
         }
 
@@ -156,6 +174,7 @@ namespace Bible {
             hinges.openable.closeSpeed = 5.208f;
             hinges.openable.openingAudio = "Door_Open.wav";
             hinges.openable.closingAudio = "Door_Open.wav";
+            hinges.openable.isDeadLock = true;
 
             // Glass pieces
             MeshNodeCreateInfo& glassClear = meshNodeCreateInfoSet.emplace_back();
@@ -212,19 +231,19 @@ namespace Bible {
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
                 meshNodes.SetMaterialByMeshName("DoorGlass_Front", "Door_WP");
-                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("DoorGlass_Front", "Door_RE");
-                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_RE");
             }
 
             // Back
             if (createInfo.materialTypeBack == DoorMaterialType::WHITE_PAINT) {
                 meshNodes.SetMaterialByMeshName("DoorGlass_Back", "Door_WP");
+                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
                 meshNodes.SetMaterialByMeshName("DoorGlass_Back", "Door_RE");
+                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_RE");
             }
 
             // Glass frame
@@ -232,13 +251,17 @@ namespace Bible {
         }
 
         // Frame material
-        if (createInfo.materialTypeFrame == DoorMaterialType::RESIDENT_EVIL) {
+        if (createInfo.materialTypeFrameFront == DoorMaterialType::RESIDENT_EVIL) {
             meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_RE");
+        }
+        if (createInfo.materialTypeFrameFront == DoorMaterialType::WHITE_PAINT) {
+            meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
+        }
+        if (createInfo.materialTypeFrameBack == DoorMaterialType::RESIDENT_EVIL) {
             meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_RE");
             meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_RE");
         }
-        if (createInfo.materialTypeFrame == DoorMaterialType::WHITE_PAINT) {
-            meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
+        if (createInfo.materialTypeFrameBack == DoorMaterialType::WHITE_PAINT) {
             meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
             meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
         }
@@ -246,9 +269,6 @@ namespace Bible {
         // Same for all combinations
         meshNodes.SetMaterialByMeshName("Door_Knob", "DoorOldKnob");
         meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals");
-        meshNodes.SetMaterialByMeshName("Door_Deadlock", "DoorMetals");
-        meshNodes.SetMaterialByMeshName("Door_DeadLockSwitch", "DoorMetals");
-        meshNodes.SetMaterialByMeshName("DoorFrame_Deadlock", "DoorMetals");
         meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals");
         meshNodes.SetMaterialByMeshName("DoorFrame_KnobLatch", "DoorOldKnob");
     }

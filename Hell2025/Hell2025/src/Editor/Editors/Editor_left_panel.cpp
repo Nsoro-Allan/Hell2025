@@ -48,6 +48,15 @@ namespace Editor {
     EditorUI::FloatInput g_housePlaneP3Y;
     EditorUI::FloatInput g_housePlaneP3Z;
 
+    // Door stuff
+    EditorUI::DropDown g_doorType;
+    EditorUI::DropDown g_doorFrontMaterial;
+    EditorUI::DropDown g_doorBackMaterial;    
+    EditorUI::DropDown g_doorFrameFrontMaterial;
+    EditorUI::DropDown g_doorFrameBackMaterial;
+    EditorUI::CheckBox g_doorHasDeadLock;
+    EditorUI::CheckBox g_doorDeadLockedAtStart;
+
     void InitLeftPanel() {
         g_mapPropertiesHeader.SetTitle("Map Editor");
         g_objectPropertiesHeader.SetTitle("Properties");
@@ -81,6 +90,14 @@ namespace Editor {
         g_housePlaneP3X.SetText("P3 X");
         g_housePlaneP3Y.SetText("P3 Y");
         g_housePlaneP3Z.SetText("P3 Z");
+
+        g_doorType.SetText("Type");
+        g_doorFrontMaterial.SetText("Front Material");
+        g_doorBackMaterial.SetText("Back Material");
+        g_doorFrameFrontMaterial.SetText("Frame Front Material");
+        g_doorFrameBackMaterial.SetText("Frame Back Material");
+        g_doorHasDeadLock.SetText("Has Deadlock");
+        g_doorDeadLockedAtStart.SetText("Deadlocked at start");
     }
 
     void UpdateOutliner() {
@@ -94,6 +111,7 @@ namespace Editor {
                 g_outlinerHeader.SetTitle("Outliner");
 
                 g_outliner.SetItems("Ceilings", GetCeilingNames());
+                g_outliner.SetItems("Doors", GetDoorNames());
                 g_outliner.SetItems("Floors", GetFloorNames());
                 g_outliner.SetItems("Generic Objects", GetGenericObjectNames());
                 g_outliner.SetItems("House Planes", GetUndefinedHousePlaneNames());
@@ -192,10 +210,56 @@ namespace Editor {
                     g_positionZ.SetValue(door->GetPosition().z);
                     g_rotationY.SetValue(door->GetRotation().y);
 
+                    std::vector<std::string> types;
+                    types.push_back(Util::DoorTypeToString(DoorType::STANDARD_A));
+                    types.push_back(Util::DoorTypeToString(DoorType::STANDARD_B));
+                    types.push_back(Util::DoorTypeToString(DoorType::STAINED_GLASS));
+                                          
+                    std::vector<std::string> materialTypes;
+                    materialTypes.push_back(Util::DoorMaterialTypeToString(DoorMaterialType::RESIDENT_EVIL));
+                    materialTypes.push_back(Util::DoorMaterialTypeToString(DoorMaterialType::WHITE_PAINT));
+
+                    g_doorType.SetOptions(types);
+                    g_doorFrontMaterial.SetOptions(materialTypes);
+                    g_doorBackMaterial.SetOptions(materialTypes);
+                    g_doorFrameFrontMaterial.SetOptions(materialTypes);
+                    g_doorFrameBackMaterial.SetOptions(materialTypes);
+
+                    g_doorType.SetCurrentOption(Util::DoorTypeToString(door->GetType()));
+                    g_doorFrontMaterial.SetCurrentOption(Util::DoorMaterialTypeToString(door->GetMaterialTypeFront()));
+                    g_doorBackMaterial.SetCurrentOption(Util::DoorMaterialTypeToString(door->GetMaterialTypeBack()));
+                    g_doorFrameFrontMaterial.SetCurrentOption(Util::DoorMaterialTypeToString(door->GetMaterialTypeFrameFront()));
+                    g_doorFrameBackMaterial.SetCurrentOption(Util::DoorMaterialTypeToString(door->GetMaterialTypeFrameBack()));
+
+                    g_doorHasDeadLock.SetState(door->GetDeadLockState());
+                    g_doorDeadLockedAtStart.SetState(door->GetDeadLockedAtInitState());
+
                     if (g_positionX.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
                     if (g_positionY.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
                     if (g_positionZ.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
                     if (g_rotationY.CreateImGuiElements()) {}; // TODO
+
+                    if (g_doorType.CreateImGuiElements()) {
+                        door->SetType(Util::StringToDoorType(g_doorType.GetSelectedOptionText()));
+                    }
+                    if (g_doorFrontMaterial.CreateImGuiElements()) {
+                        door->SetFrontMaterial(Util::StringToDoorMaterialType(g_doorFrontMaterial.GetSelectedOptionText()));
+                    }
+                    if (g_doorBackMaterial.CreateImGuiElements()) {
+                        door->SetBackMaterial(Util::StringToDoorMaterialType(g_doorBackMaterial.GetSelectedOptionText()));
+                    }
+                    if (g_doorFrameFrontMaterial.CreateImGuiElements()) {
+                        door->SetFrameFrontMaterial(Util::StringToDoorMaterialType(g_doorFrameFrontMaterial.GetSelectedOptionText()));
+                    }
+                    if (g_doorFrameBackMaterial.CreateImGuiElements()) {
+                        door->SetFrameBackMaterial(Util::StringToDoorMaterialType(g_doorFrameBackMaterial.GetSelectedOptionText()));
+                    }
+                    if (g_doorHasDeadLock.CreateImGuiElements()) {
+                        door->SetDeadLockState(g_doorHasDeadLock.GetState());
+                    }
+                    if (g_doorDeadLockedAtStart.CreateImGuiElements()) {
+                        door->SetDeadLockedAtInitState(g_doorDeadLockedAtStart.GetState());
+                    }
                 }
 
                 // House planes (aka floors and ceilings)

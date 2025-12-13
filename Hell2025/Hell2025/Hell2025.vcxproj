@@ -356,6 +356,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
     <ClCompile Include="src\Types\Core\Openable.cpp" />
     <ClCompile Include="src\Types\Game\Decal2.cpp" />
+    <ClCompile Include="src\Types\Game\TypeWriter.cpp" />
     <ClCompile Include="src\Types\House\Fireplace.cpp" />
     <ClCompile Include="src\Types\House\TrimSet.cpp" />
     <ClCompile Include="src\Types\Mirror.cpp" />
@@ -754,6 +755,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Christmas\ChristmasTree.h" />
     <ClInclude Include="src\Common\SlotMap.h" />
     <ClInclude Include="src\Types\Game\Decal2.h" />
+    <ClInclude Include="src\Types\Game\TypeWriter.h" />
     <ClInclude Include="src\Types\House\Fireplace.h" />
     <ClInclude Include="src\Types\House\TrimSet.h" />
     <ClInclude Include="src\Types\Mirror.h" />

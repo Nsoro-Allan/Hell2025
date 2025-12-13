@@ -6,6 +6,7 @@
 #include "Math/AABB.h"
 #include "Physics/Physics.h"
 #include "Types/Game/AnimatedGameObject.h"
+#include "Types/Game/TypeWriter.h"
 #include "Types/Renderer/SpriteSheetObject.h"
 #include "Weapon/WeaponManager.h"
 
@@ -52,7 +53,7 @@ struct Player {
     void UpdateCamera(float deltaTime);
     void UpdateViewWeapon(float deltaTime);
     void UpdateMovement(float deltaTime);
-    void UpdateUI();
+    void UpdateUI(float deltaTime);
     void UpdateSpriteSheets(float deltaTime);
     void UpdateHeadBob(float deltaTime);
     void UpdateBreatheBob(float deltaTime);
@@ -105,6 +106,8 @@ struct Player {
     glm::ivec2 GetViewportCenter();
     void CheckForMeleeHit();
     float GetTargetWalkingSpeed();
+    
+    TypeWriter m_typeWriter;
 
     // Water
     WaterState m_waterState;

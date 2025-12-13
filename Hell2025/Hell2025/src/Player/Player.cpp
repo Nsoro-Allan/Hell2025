@@ -120,7 +120,7 @@ void Player::Update(float deltaTime) {
     UpdateWeaponSlide();
     UpdateSpriteSheets(deltaTime);
     UpdateAudio();
-    UpdateUI();
+    UpdateUI(deltaTime);
     UpdateFlashlight(deltaTime);
     UpdateFlashlightFrustum();
     UpdatePlayingPiano(deltaTime);

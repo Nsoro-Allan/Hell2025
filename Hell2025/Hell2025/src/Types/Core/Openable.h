@@ -23,6 +23,7 @@ struct Openable {
     bool m_dirty = true;
     bool m_firstFrame = true;
     bool m_locked = false;
+    bool m_isDeadLock = false;
     float m_currentOpenValue = 1;
     float m_minOpenValue = 0;
     float m_maxOpenValue = HELL_PI * 0.5f;
@@ -32,8 +33,8 @@ struct Openable {
 
     void Init(const OpenableCreateInfo& createInfo, uint64_t parentObjectId);
     void SetParentObjectId(uint64_t parentObjectId);
-    bool IsInteractable(const glm::vec3& viewPos);
-    void Interact();
+    bool IsInteractable(const glm::vec3& cameraPosition);
+    std::string Interact(const glm::vec3& cameraPosition, const glm::vec3& cameraForward);
     void Update(float deltaTime);
     bool IsDirty();
     bool IsOpen();

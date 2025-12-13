@@ -5,6 +5,13 @@
 namespace Editor {
 
     bool NameAvailable(const std::string& desiredName, ObjectType objectType) {
+        if (objectType == ObjectType::DOOR) {
+            for (const Door& door : World::GetDoors()) {
+                if (door.GetEditorName() == desiredName) {
+                    return false;
+                }
+            }
+        }
         if (objectType == ObjectType::TREE) {
             for (const Tree& tree : World::GetTrees()) {
                 if (tree.GetEditorName() == desiredName) {
@@ -97,6 +104,16 @@ namespace Editor {
         return GetNextEditorName(desiredName, ObjectType::TREE);
     }
 
+    std::string GetNextAvailableDoorName(DoorType type) {
+        std::string desiredName = "SomethingFuckedUp";
+        switch (type) {
+            case DoorType::STANDARD_A:    desiredName = "Door Standard A"; break;
+            case DoorType::STANDARD_B:    desiredName = "Door Standard B"; break;
+            case DoorType::STAINED_GLASS: desiredName = "Door Stained Glass"; break;
+        }
+        return GetNextEditorName(desiredName, ObjectType::DOOR);
+    }
+
     std::string GetNextAvailableWallName() {
         return GetNextEditorName("Wall", ObjectType::WALL);
     }
@@ -110,6 +127,23 @@ namespace Editor {
             if (housePlane.GetType() == HousePlaneType::CEILING) {
                 names.push_back(housePlane.GetEditorName());
             }
+        }
+        return names;
+    }
+
+    const std::vector<std::string>& GetDoorNames() {
+        static std::vector<std::string> names;
+        names.clear();
+        names.reserve(World::GetDoors().size());
+
+        for (Door& door : World::GetDoors()) {
+            std::string name = door.GetEditorName();
+
+            if (name == UNDEFINED_STRING) {
+                name = GetNextAvailableDoorName(door.GetType());
+                door.SetEditorName(name);
+            }
+            names.push_back(name);
         }
         return names;
     }

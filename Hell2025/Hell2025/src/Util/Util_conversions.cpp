@@ -5,6 +5,8 @@ namespace Util {
     BlendingMode StringToBlendingMode(const std::string& str)                   { return magic_enum::enum_cast<BlendingMode>(str).value_or(BlendingMode::DEFAULT); }
     CameraView StringToCameraView(const std::string& str)                       { return magic_enum::enum_cast<CameraView>(str).value_or(CameraView::UNDEFINED); }
     DebugRenderMode StringToDebugRenderMode(const std::string& str)             { return magic_enum::enum_cast<DebugRenderMode>(str).value_or(DebugRenderMode::NONE); }
+    DoorType StringToDoorType(const std::string& str)                           { return magic_enum::enum_cast<DoorType>(str).value_or(DoorType::UNDEFINED); }
+    DoorMaterialType StringToDoorMaterialType(const std::string& str)           { return magic_enum::enum_cast<DoorMaterialType>(str).value_or(DoorMaterialType::UNDEFINED); }
     EditorMode StringToEditorMode(const std::string& str)                       { return magic_enum::enum_cast<EditorMode>(str).value_or(EditorMode::UNDEFINED); }
     EditorSelectionMode StringToEditorSelectionMode(const std::string& str)     { return magic_enum::enum_cast<EditorSelectionMode>(str).value_or(EditorSelectionMode::OBJECT); }
     EditorState StringToEditorState(const std::string& str)                     { return magic_enum::enum_cast<EditorState>(str).value_or(EditorState::IDLE); }
@@ -31,6 +33,8 @@ namespace Util {
     std::string BlendingModeToString(BlendingMode mode)                         { return std::string(magic_enum::enum_name(mode)); }
     std::string CameraViewToString(CameraView cameraView)                       { return std::string(magic_enum::enum_name(cameraView)); }
     std::string DebugRenderModeToString(DebugRenderMode mode)                   { return std::string(magic_enum::enum_name(mode)); }
+    std::string DoorTypeToString(DoorType type)                                 { return std::string(magic_enum::enum_name(type)); }
+    std::string DoorMaterialTypeToString(DoorMaterialType type)                 { return std::string(magic_enum::enum_name(type)); }
     std::string EditorModeToString(EditorMode editorMode)                       { return std::string(magic_enum::enum_name(editorMode)); }
     std::string EditorSelectionModeToString(EditorSelectionMode mode)           { return std::string(magic_enum::enum_name(mode)); }
     std::string EditorStateToString(EditorState state)                          { return std::string(magic_enum::enum_name(state)); }

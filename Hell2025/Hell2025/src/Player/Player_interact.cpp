@@ -209,7 +209,11 @@ void Player::UpdateInteract() {
     // PRESSED interact key
     if (PressedInteract()) {
         if (OpenableManager::GetOpenableByOpenableId(m_interactOpenableId)) {
-            OpenableManager::TriggerInteract(m_interactOpenableId);
+
+            std::string openableText = OpenableManager::TriggerInteract(m_interactOpenableId, GetCameraPosition(), GetCameraForward());
+            if (openableText != "") {
+                m_typeWriter.DisplayText(openableText);
+            }
         }
 
         // Pickups

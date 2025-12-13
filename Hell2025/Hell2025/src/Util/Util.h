@@ -157,6 +157,8 @@ namespace Util {
     std::string BlendingModeToString(BlendingMode mode);
     std::string CameraViewToString(CameraView cameraView);
     std::string DebugRenderModeToString(DebugRenderMode mode);
+    std::string DoorTypeToString(DoorType type);
+    std::string DoorMaterialTypeToString(DoorMaterialType type);
     std::string EditorModeToString(EditorMode editorMode);
     std::string EditorSelectionModeToString(EditorSelectionMode mode);
     std::string EditorStateToString(EditorState state);
@@ -182,6 +184,8 @@ namespace Util {
 
     // String to Enum conversions
     BlendingMode StringToBlendingMode(const std::string& str);
+    DoorType StringToDoorType(const std::string& str);
+    DoorMaterialType StringToDoorMaterialType(const std::string& str);
     GenericObjectType StringToGenericObjectType(const std::string& str);
     FireplaceType StringToFireplaceType(const std::string& str);
     HouseType StringToHouseType(const std::string& str);

@@ -19,7 +19,8 @@ struct FireplaceCreateInfo {
 };
 
 struct OpenableCreateInfo {
-    bool isOpenable = false;
+    bool isOpenable = false; 
+    bool isDeadLock = false;
     OpenState initialOpenState = OpenState::CLOSED;
     OpenAxis openAxis = OpenAxis::TRANSLATE_Z;
     std::string lockedAudio = "Locked.wav";
@@ -139,12 +140,14 @@ struct DoorCreateInfo {
     DoorType type = DoorType::STANDARD_A;
     DoorMaterialType materialTypeFront = DoorMaterialType::UNDEFINED;
     DoorMaterialType materialTypeBack = DoorMaterialType::UNDEFINED;
-    DoorMaterialType materialTypeFrame = DoorMaterialType::UNDEFINED;
+    DoorMaterialType materialTypeFrameFront = DoorMaterialType::UNDEFINED;
+    DoorMaterialType materialTypeFrameBack = DoorMaterialType::UNDEFINED;
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
     bool hasDeadLock = false;
     bool deadLockedAtInit = false;
     float maxOpenValue = 2.1f;
+    std::string editorName = UNDEFINED_STRING;
 };
 
 struct WindowCreateInfo {

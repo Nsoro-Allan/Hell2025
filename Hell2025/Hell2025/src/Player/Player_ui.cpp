@@ -16,15 +16,12 @@
 
 #include "Renderer/RenderDataManager.h"
 
-void Player::UpdateUI() {
+void Player::UpdateUI(float deltaTime) {
     if (Editor::IsOpen()) return;
 
-    const Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
+    Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
     if (!viewport->IsVisible()) return;
 
-   //if (Debug::IsDebugTextVisible()) {
-   //    return;
-   //}
 
     const Resolutions& resolutions = Config::GetResolutions();
     int width = resolutions.ui.x * viewport->GetSize().x;
@@ -37,6 +34,24 @@ void Player::UpdateUI() {
     int centerY = yTop + (height / 2);
     int ammoX = xRight - (width * 0.17f);
     int ammoY = yBottom - (height * 0.145f) - TextBlitter::GetFontSpriteSheet("AmmoFont")->m_charHeight - -TextBlitter::GetFontSpriteSheet("AmmoFont")->m_lineSpacing;
+
+    // Set type writer position based on viewport coords
+    int margin = 100;
+    glm::ivec2 typeWriteLocation;
+    typeWriteLocation.x = viewport->GetLeftPixel() + margin;
+    typeWriteLocation.y = ammoY + 40;
+    m_typeWriter.SetLocation(typeWriteLocation);
+
+   //if (Input::KeyPressed(HELL_KEY_Q)) {
+   //    std::string text = "SHIT PISS FUCK CUNT COCK SUCKER MOTHER FUCKER TITS FART TURD AND TWAT";
+   //    m_typeWriter.DisplayText(text, 3);
+   //}
+
+    m_typeWriter.Update(deltaTime);
+
+   //if (Debug::IsDebugTextVisible()) {
+   //    return;
+   //}
 
     // Info text
     int infoTextX = xLeft + (width * 0.1f);

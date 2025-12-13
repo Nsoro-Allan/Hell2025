@@ -451,15 +451,15 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
 
-       if (meshNode.blendingMode == BlendingMode::STAINED_GLASS) {
-           if (Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex)) {
-               std::cout << mesh->GetName() << ": (";
-               std::cout << meshNode.renderItem.tintColorR << ", ";
-               std::cout << meshNode.renderItem.tintColorG << ", ";
-               std::cout << meshNode.renderItem.tintColorB << ") " << meshNode.globalMeshIndex << "\n";
-           }
-           std::cout << "\n";
-       }
+        // if (meshNode.blendingMode == BlendingMode::STAINED_GLASS) {
+        //     if (Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex)) {
+        //         std::cout << mesh->GetName() << ": (";
+        //         std::cout << meshNode.renderItem.tintColorR << ", ";
+        //         std::cout << meshNode.renderItem.tintColorG << ", ";
+        //         std::cout << meshNode.renderItem.tintColorB << ") " << meshNode.globalMeshIndex << "\n";
+        //     }
+        //     std::cout << "\n";
+        // }
 
         //if (meshNode.blendingMode == BlendingMode::MIRROR) {
         //    static bool test = true;

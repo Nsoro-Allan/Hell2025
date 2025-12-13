@@ -132,9 +132,11 @@ namespace Editor {
     std::string GetNextAvailableGenericObjectName(GenericObjectType type);
     std::string GetNextAvailableHousePlaneName(HousePlaneType type);
     std::string GetNextAvailableTreeName(TreeType type);
+    std::string GetNextAvailableDoorName(DoorType type);
     std::string GetNextAvailableWallName();
 
     const std::vector<std::string>& GetCeilingNames();
+    const std::vector<std::string>& GetDoorNames();
     const std::vector<std::string>& GetGenericObjectNames();
     const std::vector<std::string>& GetFloorNames();
     const std::vector<std::string>& GetTreeNames();

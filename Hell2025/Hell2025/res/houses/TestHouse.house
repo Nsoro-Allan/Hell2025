@@ -1,6 +1,14 @@
 {
   "Doors": [
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A",
+      "HasDeadLock": true,
+      "MaterialTypeBack": "WHITE_PAINT",
+      "MaterialTypeFrameBack": "WHITE_PAINT",
+      "MaterialTypeFrameFront": "WHITE_PAINT",
+      "MaterialTypeFront": "WHITE_PAINT",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         0.05000000074505806,
         0.0,
@@ -10,9 +18,18 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "Type": "STAINED_GLASS"
     },
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 2",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         4.449999809265137,
         0.0,
@@ -22,9 +39,18 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "Type": "STAINED_GLASS"
     },
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 3",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         2.200000047683716,
         0.0,
@@ -34,9 +60,18 @@
         0.0,
         1.5707963705062866,
         0.0
-      ]
+      ],
+      "Type": "STANDARD_A"
     },
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 4",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         2.299999952316284,
         0.0,
@@ -46,9 +81,18 @@
         0.0,
         1.5707963705062866,
         0.0
-      ]
+      ],
+      "Type": "STAINED_GLASS"
     },
     {
+      "DeadLockedAtStart": true,
+      "EditorName": "Door Standard A 5",
+      "HasDeadLock": true,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         6.290388107299805,
         0.0,
@@ -58,9 +102,18 @@
         0.0,
         1.5707963705062866,
         0.0
-      ]
+      ],
+      "Type": "STAINED_GLASS"
     },
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 6",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         4.449999809265137,
         0.0,
@@ -70,9 +123,18 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "Type": "STAINED_GLASS"
     },
     {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 7",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "WHITE_PAINT",
+      "MaterialTypeFront": "WHITE_PAINT",
+      "MaxOpenValue": 2.0999999046325684,
       "Position": [
         8.149999618530273,
         0.0,
@@ -82,7 +144,8 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "Type": "STANDARD_A"
     }
   ],
   "Drawers": [

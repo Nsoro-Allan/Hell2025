@@ -17,6 +17,7 @@ void Openable::Init(const OpenableCreateInfo& createInfo, uint64_t parentObjectI
     m_audioVolume = createInfo.audioVolume;
     m_prerequisiteOpenMeshName = createInfo.prerequisiteOpenMeshName;
     m_prerequisiteClosedMeshName = createInfo.prerequisiteClosedMeshName;
+    m_isDeadLock = createInfo.isDeadLock;
     m_parentObjectId = parentObjectId;
 
     if (m_currentOpenState == OpenState::OPEN ||
@@ -75,15 +76,33 @@ bool Openable::IsInteractable(const glm::vec3& viewPos) {
     return true;
 }
 
-void Openable::Interact() {
+std::string Openable::Interact(const glm::vec3& cameraPosition, const glm::vec3& cameraForward) {
+    // Unlock deadlock from "the other side"
+    if (m_locked && m_isDeadLock) {
+        if (Door* door = World::GetDoorByObjectId(m_parentObjectId)) {
+            if (door->CameraFacingDoorWorldForward(cameraPosition, cameraForward)) {
+                m_locked = false;
+                m_isDeadLock = false;
+                Audio::PlayAudio("Unlocked.wav", 1.0f);
+                return "You unlocked it.";
+            }
+        }
+    }
+
     if (m_locked && m_lockedAudio != UNDEFINED_STRING) {
         Audio::PlayAudio(m_lockedAudio, m_audioVolume);
-        return;
+
+        if (Door* door = World::GetDoorByObjectId(m_parentObjectId)) {
+            if (door->GetDeadLockState()) {
+                return "It's locked from the other side.";
+            }
+        }
+        return "";
     }
 
     glm::vec3 dummyViewPos = glm::vec3(0.0f);
     if (!IsInteractable(dummyViewPos)) {
-        return;
+        return "";
     }
 
     if (m_currentOpenState == OpenState::OPEN) {
@@ -99,6 +118,8 @@ void Openable::Interact() {
             Audio::PlayAudio(m_openingAudio, m_audioVolume);
         }
     }
+
+    return "";
 }
 
 void Openable::Update(float deltaTime) {

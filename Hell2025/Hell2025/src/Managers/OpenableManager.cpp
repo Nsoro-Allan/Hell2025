@@ -26,11 +26,25 @@ namespace OpenableManager {
         }
     }
 
-    void TriggerInteract(uint32_t openableId) {
+    std::string TriggerInteract(uint32_t openableId, const glm::vec3& cameraPosition, const glm::vec3& cameraForward) {
+        if (!OpenableExists(openableId)) return "";
+
+        Openable* openable = GetOpenableByOpenableId(openableId);
+        return openable->Interact(cameraPosition, cameraForward);
+    }
+
+    void LockOpenablebyId(uint32_t openableId) {
         if (!OpenableExists(openableId)) return;
 
-        Openable* openStateHandler = GetOpenableByOpenableId(openableId);
-        openStateHandler->Interact();
+        Openable* openable = GetOpenableByOpenableId(openableId);
+        openable->m_locked = true;
+    }
+
+    void UnlockOpenablebyId(uint32_t openableId) {
+        if (!OpenableExists(openableId)) return;
+
+        Openable* openable = GetOpenableByOpenableId(openableId);
+        openable->m_locked = false;
     }
 
     bool OpenableExists(uint32_t openableId) {

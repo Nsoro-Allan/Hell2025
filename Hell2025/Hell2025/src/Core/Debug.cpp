@@ -48,7 +48,7 @@ namespace Debug {
         std::string text = "";
 
         // Mirrors
-        if (true) {
+        if (false) {
             text += "Mirror count: " + std::to_string(MirrorManager::GetMirrors().size()) + "\n";
             for (Mirror& mirror : MirrorManager::GetMirrors()) {
                 text += "- ";

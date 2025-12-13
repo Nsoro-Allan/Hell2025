@@ -12,7 +12,16 @@ namespace nlohmann {
     void to_json(nlohmann::json& j, const DoorCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
-            {"Rotation", createInfo.rotation}
+            {"Rotation", createInfo.rotation},
+            {"EditorName", createInfo.editorName},
+            {"Type", Util::DoorTypeToString(createInfo.type) },
+            {"MaterialTypeFront", Util::DoorMaterialTypeToString(createInfo.materialTypeFront) },
+            {"MaterialTypeBack", Util::DoorMaterialTypeToString(createInfo.materialTypeBack) },
+            {"MaterialTypeFrameFront", Util::DoorMaterialTypeToString(createInfo.materialTypeFrameFront) },
+            {"MaterialTypeFrameBack", Util::DoorMaterialTypeToString(createInfo.materialTypeFrameBack) },
+            {"MaxOpenValue", createInfo.maxOpenValue},
+            {"HasDeadLock", createInfo.hasDeadLock},
+            {"DeadLockedAtStart", createInfo.deadLockedAtInit}
         };
     }
 
@@ -164,6 +173,15 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, DoorCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
+        info.type = Util::StringToDoorType(j.value("Type", UNDEFINED_STRING));
+        info.materialTypeFront = Util::StringToDoorMaterialType(j.value("MaterialTypeFront", UNDEFINED_STRING));
+        info.materialTypeBack = Util::StringToDoorMaterialType(j.value("MaterialTypeBack", UNDEFINED_STRING));
+        info.materialTypeFrameFront = Util::StringToDoorMaterialType(j.value("MaterialTypeFrameFront", UNDEFINED_STRING));
+        info.materialTypeFrameBack = Util::StringToDoorMaterialType(j.value("MaterialTypeFrameBack", UNDEFINED_STRING));
+        info.hasDeadLock = j.value("HasDeadLock", false);
+        info.deadLockedAtInit = j.value("DeadLockedAtStart", false);
+        info.maxOpenValue = j.value("MaxOpenValue", 2.1f);
     }
 
     void from_json(const nlohmann::json& j, GenericObjectCreateInfo& info) {
