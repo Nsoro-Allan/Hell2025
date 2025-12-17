@@ -60,6 +60,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode.tintColor = glm::vec3(1.0f);
         meshNode.rigidDynamicId = 0;
         meshNode.worldSpaceObb.SetLocalBounds(AABB(mesh->aabbMin, mesh->aabbMax));
+        meshNode.addToNavMesh = false;
     }
 
     // If the model contains armatures, store the first one (TODO: allow more maybe)
@@ -86,6 +87,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode->castShadows = createInfo.castShadows;
         meshNode->emissiveColor = createInfo.emissiveColor;
         meshNode->tintColor = createInfo.tintColor;
+        meshNode->addToNavMesh = createInfo.addtoNavMesh;
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 

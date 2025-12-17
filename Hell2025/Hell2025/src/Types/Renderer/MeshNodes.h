@@ -39,6 +39,7 @@ struct MeshNode {
     bool ownsOpenableId = false;      // Only nodes with this flag set to true receive the transform from the openable ID
     glm::vec3 emissiveColor = glm::vec3(1.0f);
     glm::vec3 tintColor = glm::vec3(1.0f);
+    bool addToNavMesh = false;
 };
 
 struct MeshNodes {

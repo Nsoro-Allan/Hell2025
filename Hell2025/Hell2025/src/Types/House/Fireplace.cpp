@@ -18,7 +18,18 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
     std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
+
     if (m_createInfo.type == FireplaceType::DEFAULT) {
+
+        MeshNodeCreateInfo& walls = meshNodeCreateInfoSet.emplace_back();
+        walls.meshName = "Fireplace_Body_Lower.002";
+        walls.rigidDynamicAABB.createObject = true;
+        walls.rigidDynamicAABB.kinematic = true;
+        walls.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+        walls.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        walls.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        walls.addtoNavMesh = true;
+
         m_meshNodes.Init(id, "Fireplace", meshNodeCreateInfoSet);
 
         m_meshNodes.SetMeshMaterials("NumGrid");
@@ -51,6 +62,15 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
     }
 
     if (m_createInfo.type == FireplaceType::WOOD_STOVE) {
+
+        MeshNodeCreateInfo& walls = meshNodeCreateInfoSet.emplace_back();
+        walls.meshName = "FireplaceBrick_WallMain";
+        walls.rigidDynamicAABB.createObject = true;
+        walls.rigidDynamicAABB.kinematic = true;
+        walls.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+        walls.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        walls.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        walls.addtoNavMesh = true;
 
         MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
         door.meshName = "FireplaceBrick_StoveDoor";

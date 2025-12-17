@@ -203,10 +203,11 @@ struct Player {
     bool InventoryIsOpen();
     bool InventoryIsClosed();
 
-    bool InteractFound()                { return m_interactFound; }
-    uint64_t GetInteractObjectId()      { return m_interactObjectId; }
-    Frustum& GetFlashlightFrustum()     { return m_flashlightFrustum; }
-    const std::string& GetName() const  { return m_name; }
+    bool InteractFound()                        { return m_interactFound; }
+    uint64_t GetInteractObjectId()              { return m_interactObjectId; }
+    Frustum& GetFlashlightFrustum()             { return m_flashlightFrustum; }
+    const glm::vec3& GetInteractHitPosition()   { return m_interactHitPosition; }
+    const std::string& GetName() const          { return m_name; }
 
 private:
     std::string m_name = "PLAYER_NAME";
@@ -218,6 +219,7 @@ private:
     uint64_t m_interactObjectId = 0;
     uint32_t m_interactOpenableId = 0;
     uint32_t m_interactCustomId = 0;
+    glm::vec3 m_interactHitPosition = glm::vec3(0.0f);
     bool m_rayHitFound = false;
     bool m_interactFound = false;
     int32_t m_deathCount = 0;

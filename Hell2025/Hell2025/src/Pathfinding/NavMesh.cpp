@@ -75,6 +75,7 @@ namespace NavMeshManager {
         NavMesh(uint64_t id, float agentRadius);
         void Update();
         void Reset();
+        void DrawTris();
         std::vector<glm::vec3> FindPath(const glm::vec3& start, const glm::vec3& dest);
         std::vector<glm::vec3> PullPath(const std::vector<glm::vec3>& path);
 
@@ -143,7 +144,6 @@ namespace NavMeshManager {
     float TriArea2D(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c);
 
     // Debug
-    void DrawPath(std::vector<glm::vec3>& path, const glm::vec4& color);
     void DrawNavTri(const NavTri& navTri, const glm::vec4& color);
 
     uint64_t CreateNavMesh(float agentRadius);
@@ -170,10 +170,6 @@ namespace NavMeshManager {
 
         //m_staticPathsDirty = false;
         //m_dynamicPathsDirty = false;
-
-        for (NavTri& navTri : m_tris) {
-            DrawNavTri(navTri, GREEN);
-        }
     }
 
     void NavMesh::UpdateStaticPaths() {
@@ -208,6 +204,20 @@ namespace NavMeshManager {
                 AddMeshNodeToPath(meshNode, &LevelInfo::staticObstaclePaths);
             }
         }
+        for (Fireplace& fireplace : World::GetFireplaces()) {
+            for (const MeshNode& meshNode : fireplace.GetMeshNodes().GetNodes()) {
+                if (meshNode.addToNavMesh) {
+                    AddMeshNodeToPath(meshNode, &LevelInfo::staticObstaclePaths);
+                }
+            }
+        }
+        for (GenericObject& genericObject: World::GetGenericObjects()) {
+            for (const MeshNode& meshNode : genericObject.GetMeshNodes().GetNodes()) {
+                if (meshNode.addToNavMesh) {
+                    AddMeshNodeToPath(meshNode, &LevelInfo::staticObstaclePaths);
+                }
+            }
+        }
 
         // Boolean ops + Triangulation per level
         for (auto& it : m_levelInfo) {
@@ -238,10 +248,12 @@ namespace NavMeshManager {
             levelInfo.solutionDynamic.clear();
         }
 
-        // Cut doors
+        // Cut doors out of the nav mesh
         for (Door& door : World::GetDoors()) {
-            if (const MeshNode* meshNode = door.GetMeshNodes().GetMeshNodeByMeshName("Door")) {
-                AddMeshNodeToPath(*meshNode, &LevelInfo::dynamicObstaclePaths);
+            for (const MeshNode& meshNode : door.GetMeshNodes().GetNodes()) {
+                if (meshNode.addToNavMesh) {
+                    AddMeshNodeToPath(meshNode, &LevelInfo::dynamicObstaclePaths);
+                }
             }
         }
 
@@ -471,7 +483,7 @@ namespace NavMeshManager {
 
     void NavMesh::AddMeshNodeToPath(const MeshNode& meshNode, Clipper2Lib::PathsD LevelInfo::* member) {
         // Inflate slightly to ensure the OBB intersects the floor plane even if it's resting perfectly on top
-        float threshold = 0.02f;
+        float threshold = 0.05f;
 
         // Only process nodes marked for collision
         // if (!meshNode.aabbCollision) continue;
@@ -996,6 +1008,11 @@ namespace NavMeshManager {
         }
     }
 
+    void NavMesh::DrawTris() {
+        for (NavTri& navTri : m_tris) {
+            DrawNavTri(navTri, GREEN);
+        }
+    }
 
 
     void Init() {
@@ -1004,6 +1021,11 @@ namespace NavMeshManager {
 
     void Update() {
         // Lazy toggle hack
+        
+        for (NavMesh& navMesh : g_navMeshes) {
+            navMesh.Update();
+        }
+
         static bool doThis = false;
         if (Input::KeyPressed(HELL_KEY_O)) {
             Audio::PlayAudio(AUDIO_SELECT, 1.0f);
@@ -1011,27 +1033,28 @@ namespace NavMeshManager {
         }
         if (!doThis) return;
 
+
         for (NavMesh& navMesh : g_navMeshes) {
-            navMesh.Update();
+            navMesh.DrawTris();
         }
 
         // One once hack
-        static bool runOnce = true;
-        if (runOnce) {
-            runOnce = false;
-            if (World::GetDobermanns().size()) {
-                g_destination = World::GetDobermanns()[0].GetPosition();
-            }
-        }
-
-        glm::vec3 viewPos = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
-
-        // Place destination
-        if (Input::KeyPressed(HELL_KEY_P)) {
-            g_destination = viewPos;
-        }
-
-        FindPath(viewPos, g_destination);
+        //static bool runOnce = true;
+        //if (runOnce) {
+        //    runOnce = false;
+        //    if (World::GetDobermanns().size()) {
+        //        g_destination = World::GetDobermanns()[0].GetPosition();
+        //    }
+        //}
+        //
+        //glm::vec3 viewPos = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
+        //
+        //// Place destination
+        //if (Input::KeyPressed(HELL_KEY_P)) {
+        //    g_destination = viewPos;
+        //}
+        //
+        //FindPath(viewPos, g_destination);
     }
 
     uint64_t CreateNavMesh(float agentRadius) {
@@ -1046,7 +1069,6 @@ namespace NavMeshManager {
         if (NavMesh* navMesh = GetNavMeshById(g_testNaveMeshID)) {
             std::vector<glm::vec3> rawPath = navMesh->FindPath(start, dest);
             std::vector<glm::vec3> pulledPath = navMesh->PullPath(rawPath);
-            DrawPath(pulledPath, WHITE);
             return pulledPath;
         }
         else {

@@ -7,7 +7,13 @@ namespace Bible {
 
         MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
         body.meshName = "CouchBody";
-        body.materialName = "Couch";
+        body.materialName = "Couch"; 
+        body.rigidDynamicAABB.createObject = true;
+        body.rigidDynamicAABB.kinematic = true;
+        body.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+        body.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        body.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        body.addtoNavMesh = true;
 
         PhysicsFilterData filterData;
         filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;

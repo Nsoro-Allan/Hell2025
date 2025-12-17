@@ -4,9 +4,15 @@ namespace Bible {
     void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-        MeshNodeCreateInfo& largeFrame = meshNodeCreateInfoSet.emplace_back();
-        largeFrame.meshName = "DrawersSmallFrame";
-        largeFrame.materialName = "Drawers_Frame";
+        MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
+        frame.meshName = "DrawersSmallFrame";
+        frame.materialName = "Drawers_Frame";
+        frame.rigidDynamicAABB.createObject = true;
+        frame.rigidDynamicAABB.kinematic = true;
+        frame.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+        frame.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        frame.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawer1st = meshNodeCreateInfoSet.emplace_back();
         drawer1st.materialName = "Drawers_Drawers";
@@ -90,9 +96,15 @@ namespace Bible {
     void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-        MeshNodeCreateInfo& largeFrame = meshNodeCreateInfoSet.emplace_back();
-        largeFrame.meshName = "DrawersLargeFrame";
-        largeFrame.materialName = "Drawers_Frame";
+        MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
+        frame.meshName = "DrawersLargeFrame";
+        frame.materialName = "Drawers_Frame";
+        frame.rigidDynamicAABB.createObject = true;
+        frame.rigidDynamicAABB.kinematic = true;
+        frame.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
+        frame.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        frame.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawerTopL = meshNodeCreateInfoSet.emplace_back();
         drawerTopL.materialName = "Drawers_Drawers";

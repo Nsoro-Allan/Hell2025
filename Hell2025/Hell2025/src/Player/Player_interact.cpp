@@ -143,7 +143,7 @@ void Player::UpdateInteract() {
     //     }
     // //}
 
-    glm::vec3 hitPosition = glm::vec3(0.0f);
+    m_interactHitPosition = glm::vec3(-9999.0f);
     bool hitFound = false;
 
     // Replace me with some distance check with closest point from hit object AABB
@@ -151,8 +151,7 @@ void Player::UpdateInteract() {
         m_interactObjectId = m_bvhRayResult.objectId;
         m_interactOpenableId = m_bvhRayResult.openableId;
         m_interactCustomId = m_bvhRayResult.customId;
-
-        hitPosition = m_bvhRayResult.hitPosition;
+        m_interactHitPosition = m_bvhRayResult.hitPosition;
         hitFound = true;
     } 
 
@@ -161,14 +160,13 @@ void Player::UpdateInteract() {
         m_interactObjectId = m_physXRayResult.userData.objectId;
         m_interactOpenableId = 0;
         m_interactCustomId = 0;
-
-        hitPosition = m_physXRayResult.hitPosition;
+        m_interactHitPosition = m_physXRayResult.hitPosition;
         hitFound = true;
     }
 
     // Sweep test
     if (hitFound) {
-        glm::vec3 spherePosition = hitPosition;
+        glm::vec3 spherePosition = m_interactHitPosition;
         float sphereRadius = 0.15f;
         PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
         const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));

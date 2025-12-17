@@ -32,6 +32,7 @@ namespace Bible {
             door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
             door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.addtoNavMesh = true;
 
             // Openable mesh node
             MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
@@ -87,6 +88,7 @@ namespace Bible {
             door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
             door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.addtoNavMesh = true;
 
             // Openable mesh node
             MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
@@ -140,6 +142,7 @@ namespace Bible {
             door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
             door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.addtoNavMesh = true;
 
             // Openable mesh node
             MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
