@@ -356,7 +356,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Ragdoll\RagdollManager.cpp" />
     <ClCompile Include="src\Ragdoll\RagdollV2.cpp" />
     <ClCompile Include="src\Types\Core\Openable.cpp" />
-    <ClCompile Include="src\Types\Game\Decal2.cpp" />
+    <ClCompile Include="src\Types\Game\Decal.cpp" />
     <ClCompile Include="src\Types\Game\TypeWriter.cpp" />
     <ClCompile Include="src\Types\House\Fireplace.cpp" />
     <ClCompile Include="src\Types\House\TrimSet.cpp" />
@@ -440,7 +440,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Player\Player_interact.cpp" />
     <ClCompile Include="src\Player\Player_util.cpp" />
     <ClCompile Include="src\Types\Renderer\TextureArray.cpp" />
-    <ClCompile Include="src\Types\Game\Decal.cpp" />
     <ClCompile Include="src\Types\House\Door.cpp" />
     <ClCompile Include="src\Types\House\HousePlane.cpp" />
     <ClCompile Include="src\Types\Game\PickUp.cpp" />
@@ -756,7 +755,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Christmas\ChristmasPresent.h" />
     <ClInclude Include="src\Types\Christmas\ChristmasTree.h" />
     <ClInclude Include="src\Common\SlotMap.h" />
-    <ClInclude Include="src\Types\Game\Decal2.h" />
+    <ClInclude Include="src\Types\Game\Decal.h" />
     <ClInclude Include="src\Types\Game\TypeWriter.h" />
     <ClInclude Include="src\Types\House\Fireplace.h" />
     <ClInclude Include="src\Types\House\TrimSet.h" />
@@ -804,7 +803,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Physics\Types\RigidStatic.h" />
     <ClInclude Include="src\Types\Renderer\TextureArray.h" />
     <ClInclude Include="src\Types\Game\Bullet.h" />
-    <ClInclude Include="src\Types\Game\Decal.h" />
     <ClInclude Include="src\Types\House\Door.h" />
     <ClInclude Include="src\Types\House\HousePlane.h" />
     <ClInclude Include="src\Types\Game\PickUp.h" />

@@ -48,7 +48,7 @@ namespace MidiFileManager {
 
     void Update(float deltaTime) {
         // Play Goat
-        if (Input::KeyPressed(HELL_KEY_SCROLL_LOCK)) {
+        if (Input::KeyPressed(HELL_KEY_NUM_LOCK)) {
             PlayTrack(0);
         }
 

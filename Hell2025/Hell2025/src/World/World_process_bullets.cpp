@@ -10,9 +10,6 @@
 
 #include "BVH/Cpu/CpuBvh.h"
 
-
-#include "Types/Game/Decal2.h"
-
 namespace World {
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction);
 
@@ -167,6 +164,7 @@ namespace World {
                     glm::vec3 force = bullet.GetDirection() * strength;
                     RagdollManager::AddForce(physicsId, force);
                     Physics::AddFoceToRigidDynamic(physicsId, force);
+                    std::cout << "applied physx force\n";
                 }
 
                 // Player ragdoll?
@@ -193,6 +191,23 @@ namespace World {
                     decalPaintingInfo.rayDirection = bullet.GetDirection();
                     RenderDataManager::SubmitDecalPaintingInfo(decalPaintingInfo);
                 }
+
+                // TEST FOR CHAIN
+                //if (rayResult.hitFound) {
+                //    PhysicsType& physicsType = rayResult.userData.physicsType;
+                //    ObjectType& objectType = rayResult.userData.objectType;
+                //    uint64_t physicsId = rayResult.userData.physicsId;
+                //    uint64_t objectId = rayResult.userData.objectId;
+                //
+                //    // Apply force if object is dynamic
+                //    if (physicsType == PhysicsType::RIGID_DYNAMIC) {
+                //        //float strength = 200.0f;
+                //        float strength = 1000.0f;
+                //        glm::vec3 force = bullet.GetDirection() * strength;
+                //        Physics::AddFoceToRigidDynamic(physicsId, force);
+                //        std::cout << "Shot a rigid dynamic TEST\n";
+                //    }
+                //}
             }
 
             // On hit

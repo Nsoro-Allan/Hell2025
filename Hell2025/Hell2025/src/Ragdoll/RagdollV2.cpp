@@ -287,11 +287,11 @@ void RagdollV2::Init(glm::vec3 spawnPosition, glm::vec3 spawnEulerRotation, cons
 }
 
 void RagdollV2::Update() {
-    for (PxRigidDynamic* pxRigidDynamic : m_pxRigidDynamics) {
-        PxTransform pxTransform = pxRigidDynamic->getGlobalPose();
-        PxMat44 pxMatrix(pxTransform);
-        glm::mat4 matrix = Physics::PxMat44ToGlmMat4(pxMatrix);
-    }
+    //for (PxRigidDynamic* pxRigidDynamic : m_pxRigidDynamics) {
+    //    PxTransform pxTransform = pxRigidDynamic->getGlobalPose();
+    //    PxMat44 pxMatrix(pxTransform);
+    //    glm::mat4 matrix = Physics::PxMat44ToGlmMat4(pxMatrix);
+    //}
 }
 
 void RagdollV2::AddForce(uint64_t physicsId, glm::vec3 force) {

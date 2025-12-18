@@ -50,10 +50,6 @@ namespace World {
             RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(mermaid.GetRenderItemsHairBottomLayer());
         }
 
-        for (Decal& decal : GetDecals()) {
-            decal.SubmitRenderItem();
-        }
-
         for (HousePlane& housePlane : GetHousePlanes()) {
             housePlane.SubmitRenderItem();
         }

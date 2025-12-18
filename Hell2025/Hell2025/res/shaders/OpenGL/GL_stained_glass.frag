@@ -202,38 +202,40 @@ void main() {
 
     vec3 tintColorWIP = TintColor;
 
+    int offset = 1;
+
     // Clear
-    if (u_meshIndex == 145) {   
+    if (u_meshIndex == 145 + offset) {   
         tintColorWIP = vec3(1.0, 1.0, 1.0); 
     }
     
     // Red
-    if (u_meshIndex == 146) {   
+    if (u_meshIndex == 146 + offset) {   
         tintColorWIP = vec3(0.95, 0.00, 0);
     }
 
     // Yellow
-    if (u_meshIndex == 147) {   
+    if (u_meshIndex == 147 + offset) {   
         tintColorWIP = vec3(1.00, 0.8, 0.25); 
     }
 
     // Purple
-    if (u_meshIndex == 149) {   
+    if (u_meshIndex == 149 + offset) {   
         tintColorWIP = vec3(0.15, 0.00, 0.50); 
     }
 
     // Green
-    if (u_meshIndex == 154) {   
+    if (u_meshIndex == 154 + offset) {   
         tintColorWIP = vec3(0, 0.95, 0.5); 
     }
     
     // Orange
-    if (u_meshIndex == 155) {   
+    if (u_meshIndex == 155 + offset) {   
         tintColorWIP = vec3(0.6, 0.2, 0.0); 
     }
 
     // Center Circle
-    if (u_meshIndex == 156) {   
+    if (u_meshIndex == 156 + offset) {   
         tintColorWIP = vec3(0.5, 0.35, 0.);  
     }
     

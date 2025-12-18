@@ -35,7 +35,6 @@ namespace World {
     std::vector<ChristmasTree> g_christmasTrees;
     std::vector<ClippingCube> g_clippingCubes;
     std::vector<Dobermann> g_dobermanns;
-    std::vector<Decal> g_decals;
     std::vector<Fence> g_fences;
     Hell::SlotMap<Fireplace> g_fireplaces;
     std::vector<GameObject> g_gameObjects;
@@ -61,7 +60,7 @@ namespace World {
 
 
 
-    std::vector<Decal2> g_newDecals;
+    std::vector<Decal> g_newDecals;
 
 
 
@@ -808,7 +807,6 @@ namespace World {
         g_christmasLights.clear();
         g_christmasPresents.clear();
         g_christmasTrees.clear();
-        g_decals.clear();
         g_doors.clear();
         g_fireplaces.clear();
         g_genericObjects.clear();
@@ -933,13 +931,8 @@ namespace World {
         g_bulletCasings.push_back(BulletCasing(createInfo));
     }
 
-    void AddDecal(const DecalCreateInfo& createInfo) {
-        Decal& decal = g_decals.emplace_back();
-        decal.Init(createInfo);
-    }
-
     void AddDecal2(Decal2CreateInfo createInfo) {
-        g_newDecals.push_back(Decal2(createInfo));
+        g_newDecals.push_back(Decal(createInfo));
     }
 
     void AddDobermann(DobermannCreateInfo& createInfo) {
@@ -1235,8 +1228,7 @@ namespace World {
     std::vector<ChristmasLights>& GetChristmasLights()                  { return g_christmasLights; }
     std::vector<ChristmasTree>& GetChristmasTrees()                     { return g_christmasTrees; }
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
-    std::vector<Decal>& GetDecals()                                     { return g_decals; }
-    std::vector<Decal2>& GetNewDecals()                                 { return g_newDecals; }
+    std::vector<Decal>& GetDecals()                                 { return g_newDecals; }
     Hell::SlotMap<Door>& GetDoors()                                     { return g_doors; }
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
     Hell::SlotMap<GenericObject>& GetGenericObjects()                   { return g_genericObjects; }

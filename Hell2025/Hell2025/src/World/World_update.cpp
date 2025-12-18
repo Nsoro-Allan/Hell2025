@@ -11,6 +11,8 @@
 #include "Ragdoll/RagdollManager.h"
 #include "Pathfinding/NavMesh.h"
 
+#include "AssetManagement/AssetManager.h"
+
 namespace World {
 
     void LazyDebugSpawns();
@@ -22,29 +24,199 @@ namespace World {
         return GetAnimatedGameObjectByObjectId(g_testAnimatedGameObject);
     }
     
+    static float DegToRad(float degrees) { return degrees * (HELL_PI / 180.0f); }
+
     void Update(float deltaTime) {
+
+        static int chainLinkMeshIndex = AssetManager::GetModelByName("ChainLink")->GetMeshIndices()[0];
+        Mesh* chainLinkMesh = AssetManager::GetMeshByIndex(chainLinkMeshIndex);
+
+        glm::vec3 extents = chainLinkMesh->extents;// glm::vec3(0.18f, 0.08f, 0.6f) * 1.0f;
+        glm::vec3 chainOrigin = glm::vec3(36, 32.6, 36);
+
+        static uint64_t physicsIdOrigin = 0;
+        static uint64_t jointId = 0;
+
+        static std::vector<uint64_t> physicsIds;
+
+        //std::vector<uint64_t> linkPhysicsIds;
+
+        static Transform scaleTransform;
+        scaleTransform.scale = extents;
+        static glm::mat4 scaleMatrix = scaleTransform.to_mat4();
+        static glm::mat4 localOffsetTransform = chainLinkMesh->localTransform;
+
+        glm::vec3 extentsOrigin = glm::vec3(0.05f, 0.05f, 0.05f) * 1.0f;
+        static Transform scaleTransformOrigin;
+        scaleTransformOrigin.scale = extentsOrigin;
+        static glm::mat4 scaleMatrixOrigin = scaleTransformOrigin.to_mat4();
+
+        Transform originTransform;
+        originTransform.position = chainOrigin;
+        glm::mat4 originMatrix = originTransform.to_mat4();
+
+        static bool runOnce = true;
+        if (runOnce) {
+            runOnce = false;
+
+            Transform originTransform;
+            originTransform.position = chainOrigin;
+
+
+            PhysicsFilterData filterData;
+            filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
+            filterData.collisionGroup = CollisionGroup::BULLET_CASING;
+            filterData.collidesWith = CollisionGroup::ENVIROMENT_OBSTACLE;
+
+            // Origin kinematic body
+            {
+                physicsIdOrigin = Physics::CreateRigidDynamicFromBoxExtents(originTransform, extentsOrigin, true, filterData, glm::mat4(1.0f));
+                RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIdOrigin);
+            }
+
+            // Chain link
+            int linkCount = 2;
+
+            for (int i = 0; i < linkCount; i++) {
+
+                float magicOffsetPercentage = 0.795f;
+
+                Transform linkTransform;
+                linkTransform.position = chainOrigin;
+                linkTransform.position.z += (chainLinkMesh->extents.z * magicOffsetPercentage) * i;
+
+                glm::mat4 shapeLocalPose = glm::inverse(localOffsetTransform);
+                uint64_t physicsId = Physics::CreateRigidDynamicFromBoxExtents(linkTransform, extents, true, filterData, shapeLocalPose);
+                RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsId);
+                physicsIds.push_back(physicsId);
+
+                PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic();
+                pxRigidDynamic->setMass(10.0f);
+
+                pxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+                pxRigidDynamic->wakeUp();
+                float mass = 10.0f;
+                PxRigidBodyExt::setMassAndUpdateInertia(*pxRigidDynamic, mass);
+                pxRigidDynamic->setAngularDamping(2.0f); // start 1 to 5
+                pxRigidDynamic->setLinearDamping(0.1f);
+
+                PhysicsUserData physicsUserData;
+                physicsUserData.physicsId = physicsId;
+                Physics::SetRigidDynamicUserData(physicsId, physicsUserData);
+
+                //glm::mat4 parentFrame = glm::mat4(1.0f);
+                //glm::mat4 childFrame = glm::mat4(1.0f);
+
+                float linkSpacing = (chainLinkMesh->extents.z * magicOffsetPercentage);
+
+                // Joint between parent and child should be halfway between their centers
+                glm::mat4 parentFrame = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, +linkSpacing * 0.5f));
+                glm::mat4 childFrame = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -linkSpacing * 0.5f));
+
+                if (i == 0) {
+                    jointId = Physics::CreateD6Joint(physicsIdOrigin, physicsId, glm::mat4(1.0f), glm::mat4(1.0f)); // identity
+                }
+                else {
+                    uint64_t currentId = physicsIds[i];
+                    uint64_t parentId = physicsIds[i-1];
+                    jointId = Physics::CreateD6Joint(parentId, currentId, parentFrame, childFrame);
+                }
+
+                D6Joint* d6 = Physics::GetD6JointById(jointId);
+                auto pxD6 = d6->GetPxD6Joint();
+
+                // Start FREE on all axes
+                pxD6->setMotion(PxD6Axis::eX, PxD6Motion::eLOCKED);
+                pxD6->setMotion(PxD6Axis::eY, PxD6Motion::eLOCKED);
+                pxD6->setMotion(PxD6Axis::eZ, PxD6Motion::eLOCKED);
+
+                // Allow it to rotate
+                pxD6->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
+                pxD6->setMotion(PxD6Axis::eSWING2, PxD6Motion::eFREE); // eLIMITED this locks it weird like in maya
+                pxD6->setMotion(PxD6Axis::eTWIST, PxD6Motion::eFREE);  // eLIMITED this locks it weird like in maya 
+
+
+                physx::PxJointLimitCone swingLimit(
+                    DegToRad(55.0f),   // swing1
+                    DegToRad(25.0f)    // swing2
+                );
+                pxD6->setSwingLimit(swingLimit);
+
+                physx::PxJointAngularLimitPair twistLimit(
+                    DegToRad(-20.0f), // lower limit
+                    DegToRad(20.0f)   // upper limit
+                );
+                pxD6->setTwistLimit(twistLimit);
+            }
+        }
+
+        Renderer::DrawPoint(chainOrigin, GREEN);
+
+
+        // Origin
+        //if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIdOrigin)) {
+        //    glm::mat4 modelMatrix = rigidDynamic->GetWorldTransform() * scaleMatrixOrigin;
+        //
+        //    Material* material = AssetManager::GetMaterialByName("White");
+        //    RenderItem renderItem;
+        //    renderItem.modelMatrix = modelMatrix;
+        //    renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+        //    renderItem.baseColorTextureIndex = material->m_basecolor;
+        //    renderItem.rmaTextureIndex = material->m_rma;
+        //    renderItem.normalMapTextureIndex = material->m_normal;
+        //    renderItem.meshIndex = meshIndex;
+        //    Util::UpdateRenderItemAABB(renderItem);
+        //
+        //    RenderDataManager::SubmitRenderItem(renderItem);
+        //}
+
+        // Links
+        for (int i = 0; i < physicsIds.size(); i++) {
+            if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIds[i])) {
+                glm::mat4 modelMatrix = rigidDynamic->GetWorldTransform();
+
+                Material* material = AssetManager::GetMaterialByName("Tokarev");
+                RenderItem renderItem;
+                renderItem.modelMatrix = modelMatrix;
+                renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+                renderItem.baseColorTextureIndex = material->m_basecolor;
+                renderItem.rmaTextureIndex = material->m_rma;
+                renderItem.normalMapTextureIndex = material->m_normal;
+                renderItem.meshIndex = chainLinkMeshIndex;
+                Util::UpdateRenderItemAABB(renderItem);
+
+                RenderDataManager::SubmitRenderItem(renderItem);
+
+                Renderer::DrawPoint(rigidDynamic->GetWorldTransform()[3], BLUE);
+
+            }
+        }
+
+
+
+        //std::cout << GetGameObjects().size() << "\n";
 
         //std::cout << "Fireplace Count: " << GetFireplaces().size() << "\n";
 
         NavMeshManager::Update();
 
-        if (Input::KeyPressed(HELL_KEY_LEFT)) {
-            static MermaidCreateInfo createInfo = GetMermaids()[0].GetCreateInfo();
-            createInfo.rotation.y += 0.05f;
-            GetMermaids()[0].Init(createInfo, SpawnOffset());
-        }
-
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
-
-            GetGameObjects()[0].SetPosition(Game::GetLocalPlayerByIndex(0)->GetFootPosition());
-            for (Light& light : GetLights()) {
-                light.ForceDirty();
-            }
-        }
-
-        if (Input::KeyPressed(HELL_KEY_J)) {
-            PrintObjectCounts();
-        }
+        //if (Input::KeyPressed(HELL_KEY_LEFT)) {
+        //    static MermaidCreateInfo createInfo = GetMermaids()[0].GetCreateInfo();
+        //    createInfo.rotation.y += 0.05f;
+        //    GetMermaids()[0].Init(createInfo, SpawnOffset());
+        //}
+        //
+        //if (Input::KeyPressed(HELL_KEY_NUMPAD_3)) {
+        //
+        //    GetGameObjects()[0].SetPosition(Game::GetLocalPlayerByIndex(0)->GetFootPosition());
+        //    for (Light& light : GetLights()) {
+        //        light.ForceDirty();
+        //    }
+        //}
+        //
+        //if (Input::KeyPressed(HELL_KEY_J)) {
+        //    PrintObjectCounts();
+        //}
 
         //glm::vec3 rayOrigin = Game::GetLocalPlayerByIndex(0)->GetCameraPosition();
         //glm::vec3 rayDir = Game::GetLocalPlayerByIndex(0)->GetCameraForward();
@@ -110,7 +282,7 @@ namespace World {
         for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
             RagdollV2& ragdoll = it->second;
 
-            ragdoll.Update();
+            //ragdoll.Update();
 
             if (Input::KeyPressed(HELL_KEY_Y)) {
                 ragdoll.SetToInitialPose();
@@ -172,131 +344,39 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
-        for (Door& door : GetDoors())                       door.Update(deltaTime);
-        for (GenericObject& drawers : GetGenericObjects())  drawers.Update(deltaTime); 
-        for (PickUp& pickUp : GetPickUps())                 pickUp.Update(deltaTime);
-        
-        std::vector<AnimatedGameObject>& animatedGameObjects = GetAnimatedGameObjects();
-        std::vector<BulletCasing>& bulletCasings = GetBulletCasings();
-        std::vector<Bullet>& bullets = GetBullets();
-        std::vector<GameObject>& gameObjects = GetGameObjects();
-        std::vector<Light>& lights = GetLights();
-        std::vector<Piano>& pianos = GetPianos();
-        std::vector<Tree>& trees = GetTrees();
 
-        for (AnimatedGameObject& animatedGameObject : animatedGameObjects) {
-            animatedGameObject.Update(deltaTime);
-        }
-
-        for (BulletCasing& bulletCasing : bulletCasings) {
-            bulletCasing.Update(deltaTime);
-        }
-
-        for (ChristmasLights& christmasLights : GetChristmasLights()) {
-            christmasLights.Update(deltaTime);
-        }
-
-        for (ChristmasPresent& christmasPresent : GetChristmasPresents()) {
-            christmasPresent.Update(deltaTime);
-        }
-
-        for (ChristmasTree& christmasTree : GetChristmasTrees()) {
-            christmasTree.Update(deltaTime);
-        }
-
-
-        for (Dobermann& dobermann : GetDobermanns()) {
-            dobermann.Update(deltaTime);
-        }
-
-
-        for (Fence& fence : GetFences()) {
-            fence.Update();
-        }
-
-        for (GameObject& gameObject : gameObjects) {
-            gameObject.Update(deltaTime);
-        }
-
-        for (HousePlane& housePlane : GetHousePlanes()) {
-            //housePlane.DrawVertices(GREEN);
-            //housePlane.DrawEdges(GREEN);
-        }
-
-        for (Kangaroo& kangaroo : GetKangaroos()) {
-            kangaroo.Update(deltaTime);
-        }
-
-        for (Mermaid& mermaid : GetMermaids()) {
-            mermaid.Update(deltaTime);
-        }
-
-
-        for (Piano& piano : pianos) {
-            piano.Update(deltaTime);
-        }
-
-        for (PowerPoleSet& powerPoleSet : GetPowerPoleSets()) {
-            powerPoleSet.Update();
-        }
-
-        for (Road& road : GetRoads()) {
-            road.Update();
-        }
-        for (Shark& shark : GetSharks()) {
-            shark.Update(deltaTime);
-        }
-
-        for (Tree& tree : trees) {
-            tree.Update(deltaTime);
-        }
-
-        for (Fireplace& fireplace : GetFireplaces()) {
-            fireplace.Update(deltaTime);
-        }
-
-        for (TrimSet& trimSet : GetTrimSets()) {
-            if (trimSet.GetType() == TrimSetType::CEILING) {
-                trimSet.RenderDebug(RED);
-            }
-            if (trimSet.GetType() == TrimSetType::MIDDLE) {
-                trimSet.RenderDebug(GREEN);
-            }
-            trimSet.Update();
-        }
-
-        for (Window& window : GetWindows()) {
-            window.Update(deltaTime);
-        }
-
-        for (Wall& wall : GetWalls()) {
-            //  wall.CreateTrims();                         // REMOVE ME FOR THE LOVE OF JEBUS!!!
-            // Nothing as of yet. Probably ever.
-        }
-
-        // Update lights last. That way their dirty state reflects the state of all 
-        // objects whom may have potentially moved within their radius
-        for (Light& light : lights) {
-            light.Update(deltaTime);
-        }
+        for (AnimatedGameObject& object : GetAnimatedGameObjects()) object.Update(deltaTime);
+        for (BulletCasing& object : GetBulletCasings())             object.Update(deltaTime);
+        for (ChristmasLights& object : GetChristmasLights())        object.Update(deltaTime);
+        for (ChristmasPresent& object : GetChristmasPresents())     object.Update(deltaTime);
+        for (ChristmasTree& object : GetChristmasTrees())           object.Update(deltaTime);
+        for (Decal& object : GetDecals())                           object.Update();
+        for (Dobermann& object : GetDobermanns())                   object.Update(deltaTime);
+        for (Door& object : GetDoors())                             object.Update(deltaTime);
+        for (Fence& object : GetFences())                           object.Update();
+        for (Fireplace& object : GetFireplaces())                   object.Update(deltaTime);
+        for (GameObject& object : GetGameObjects())                 object.Update(deltaTime);
+        for (HousePlane& object : GetHousePlanes())                 //object.Update(deltaTime);
+        for (GenericObject& object : GetGenericObjects())           object.Update(deltaTime);
+        for (Kangaroo& object : GetKangaroos())                     object.Update(deltaTime);
+        for (Light& object : GetLights())                           object.Update(deltaTime);
+        for (Mermaid& object : GetMermaids())                       object.Update(deltaTime);
+        for (Piano& object : GetPianos())                           object.Update(deltaTime);
+        for (PickUp& object : GetPickUps())                         object.Update(deltaTime);
+        for (PowerPoleSet& object : GetPowerPoleSets())             object.Update();
+        for (Road& object : GetRoads())                             object.Update();
+        for (Shark& object : GetSharks())                           object.Update(deltaTime);
+        for (Tree& object : GetTrees())                             object.Update(deltaTime);
+        for (TrimSet& object : GetTrimSets())                       object.Update();
+        for (Window& object : GetWindows())                         object.Update(deltaTime);
 
         //lights[2].SetColor(DEFAULT_LIGHT_COLOR);
-        lights[2].SetStrength(2.0f);
-        lights[2].SetRadius(3.5f);
+        //GetLights()[2].SetStrength(2.0f);
+        //GetLights()[2].SetRadius(3.5f);
 
-
-        // And finally decals
-        for (Decal2& decal : GetNewDecals()) {
-            decal.Update();
-        }
         if (Input::KeyPressed(HELL_KEY_BACKSPACE)) {
-            GetNewDecals().clear();
+            GetDecals().clear();
         }
-
-
-
-
-
 
         CalculateGPULights();
 

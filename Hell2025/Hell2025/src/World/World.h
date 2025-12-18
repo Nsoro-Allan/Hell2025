@@ -21,7 +21,6 @@
 #include "Types/Game/Bullet.h"
 #include "Types/Game/BulletCasing.h"
 #include "Types/Game/Decal.h"
-#include "Types/Game/Decal2.h"
 #include "Types/Game/GameObject.h"
 #include "Types/Game/Light.h"
 #include "Types/Game/PickUp.h"
@@ -206,7 +205,6 @@ namespace World {
     std::vector<ChristmasTree>& GetChristmasTrees();
     std::vector<ClippingCube>& GetClippingCubes();
     std::vector<Decal>& GetDecals();
-    std::vector<Decal2>& GetNewDecals();
     std::vector<Dobermann>& GetDobermanns();
     std::vector<Fence>& GetFences();
     std::vector<GameObject>& GetGameObjects();

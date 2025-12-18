@@ -1,63 +1,88 @@
+#pragma once
 #include "Decal.h"
+#include "Renderer/Renderer.h"
+#include "World/World.h"
+
 #include "AssetManagement/AssetManager.h"
-#include "Physics/Physics.h"
 #include "Renderer/RenderDataManager.h"
-#include "UniqueID.h"
 
-void Decal::Init(const DecalCreateInfo& createInfo) {
-    m_parentPhysicsId = createInfo.parentPhysicsId;
-    m_parentObjectId = createInfo.parentObjectId;
-    m_parentPhysicsType = createInfo.parentPhysicsType;
-    m_parentObjectType = createInfo.parentObjectType;
+Decal::Decal(const Decal2CreateInfo& createInfo) {
+    m_createInfo = createInfo;
 
-    // Compute local position: aka position relative to the parent at time of hit
-    glm::mat4 parentMatrix = Physics::GetRigidStaticGlobalPose(m_parentPhysicsId);
-    glm::vec3 localPosition = glm::vec3(glm::inverse(parentMatrix) * glm::vec4(createInfo.surfaceHitPosition, 1.0f));
-   
-    // Compute local normal: aka normal relative to the parent orientation at time of hit
-    glm::mat3 parentRotation = glm::mat3(parentMatrix);
-    glm::mat3 rotationTranspose = glm::transpose(parentRotation);
-    m_localNormal = glm::normalize(rotationTranspose * createInfo.surfaceHitNormal);
+    m_localPosition = glm::vec3(glm::inverse(GetParentWorldMatrix()) * glm::vec4(createInfo.surfaceHitPosition, 1.0f));
+    m_localNormal = glm::vec3(glm::inverse(GetParentWorldMatrix()) * glm::vec4(createInfo.surfaceHitNormal, 0.0f));
+      
+    // Re-normalize because it got fucked up somewhere further up the chain
+    m_localNormal = glm::normalize(m_localNormal);
 
-    // Slightly offset the position to avoid z fighting
-    localPosition += m_localNormal * glm::vec3(0.003f);
+    // Offset along local normal to avoid z fighting
+    m_localPosition += m_localNormal * 0.0025f;
 
-    // Scale and material varies per decal type
-    float scale = 1.0f;
-    if (createInfo.decalType == DecalType::GLASS) {
+    // Determine type
+    if (MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_createInfo.parentObjectId, m_createInfo.localMeshNodeIndex)) {
+        m_type = meshNode->decalType;
+    }
+    else {
+        m_type = DecalType::PLASTER;
+    }
+
+    float scale = 0.1f;
+
+    if (m_type == DecalType::GLASS) {
         m_material = AssetManager::GetMaterialByName("BulletHole_Glass");
-        scale = 0.035f;
+        scale = 0.035f * 0.825f;
     }
-    else if (createInfo.decalType == DecalType::PLASTER) {
+    else if (m_type == DecalType::PLASTER) {
         m_material = AssetManager::GetMaterialByName("BulletHole_Plaster");
-        scale = 0.02f;
+        scale = 0.02f * 0.5f;
     }
-
-    float maxExtent = scale / glm::sqrt(2.0f);
-    m_localAABB = AABB(-glm::vec3(maxExtent), glm::vec3(maxExtent));
 
     // Compute the local matrix once because it never changes
     float randomRotation = Util::RandomFloat(0.0f, HELL_PI * 2.0f);
-    m_localMatrix = glm::translate(glm::mat4(1.0f), localPosition);
+    m_localMatrix = glm::translate(glm::mat4(1.0f), m_localPosition);
     m_localMatrix *= Util::RotationMatrixFromForwardVector(m_localNormal, glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
     m_localMatrix *= glm::rotate(glm::mat4(1.0f), randomRotation, glm::vec3(0, 0, 1));
     m_localMatrix *= glm::scale(glm::mat4(1.0f), glm::vec3(scale));
 }
 
-void Decal::SubmitRenderItem() {
+void Decal::Update() {
+    glm::vec3 position = GetParentWorldMatrix() * glm::vec4(m_localPosition, 1.0f);
+   // Renderer::DrawPoint(position, OUTLINE_COLOR);
+
+    m_worldNormal = GetParentWorldMatrix() * glm::vec4(m_localNormal, 0.0f);
+    m_worldMatrix = GetParentWorldMatrix() * m_localMatrix;
+
+    //Renderer::DrawLine(position, position + (m_worldNormal * 0.05f), WHITE);
+
+    glm::vec3 boundsMin = glm::vec3(-0.5f);
+    glm::vec3 boundsMax = glm::vec3(0.5f);
+    AABB m_localAABB(boundsMin, boundsMax);
+
     static int meshIndex = AssetManager::GetMeshIndexByModelNameMeshName("Primitives", "Quad");
 
-    glm::mat4 parentMatrix = Physics::GetRigidStaticGlobalPose(m_parentPhysicsId);
-    m_modelMatrix = parentMatrix * m_localMatrix;
 
-    RenderItem renderItem;
-    renderItem.meshIndex = meshIndex;
-    renderItem.modelMatrix = m_modelMatrix;
-    renderItem.aabbMin = glm::vec4(GetPosition() - m_localAABB.GetBoundsMin(), 1.0);
-    renderItem.aabbMax = glm::vec4(GetPosition() + m_localAABB.GetBoundsMax(), 1.0);
-    renderItem.baseColorTextureIndex = m_material->m_basecolor;
-    renderItem.normalMapTextureIndex = m_material->m_normal;
-    renderItem.rmaTextureIndex = m_material->m_rma;
+    m_renderItem.meshIndex = meshIndex;
+    m_renderItem.modelMatrix = m_worldMatrix;
+    m_renderItem.inverseModelMatrix = glm::inverse(m_renderItem.modelMatrix);
+    m_renderItem.aabbMin = glm::vec4(GetPosition() - m_localAABB.GetBoundsMin(), 1.0);
+    m_renderItem.aabbMax = glm::vec4(GetPosition() + m_localAABB.GetBoundsMax(), 1.0);
+    m_renderItem.baseColorTextureIndex = m_material->m_basecolor;
+    m_renderItem.normalMapTextureIndex = m_material->m_normal;
+    m_renderItem.rmaTextureIndex = m_material->m_rma; 
+    Util::UpdateRenderItemAABB(m_renderItem);
 
-    RenderDataManager::SubmitDecalRenderItem(renderItem);
+    //RenderDataManager::SubmitDecalRenderItem(m_renderItem);
+    RenderDataManager::SubmitRenderItemsAlphaDiscard({ m_renderItem });
+
+}
+
+
+const glm::mat4& Decal::GetParentWorldMatrix() {
+    static glm::mat4 identity = glm::mat4(1.0f);
+
+    if (MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_createInfo.parentObjectId, m_createInfo.localMeshNodeIndex)) {
+        return meshNode->worldMatrix;
+    }
+    
+    return identity;
 }

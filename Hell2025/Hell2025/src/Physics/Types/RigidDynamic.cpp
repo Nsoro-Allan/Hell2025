@@ -31,6 +31,8 @@ void RigidDynamic::Update(float deltaTime) {
             m_pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
         }
     }
+
+    m_worldTransform = Physics::PxMat44ToGlmMat4(m_pxRigidDynamic->getGlobalPose());
 }
 
 void RigidDynamic::ActivatePhsyics() {

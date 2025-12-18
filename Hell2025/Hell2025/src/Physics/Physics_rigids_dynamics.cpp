@@ -155,7 +155,11 @@ namespace Physics {
         return physicsID;
     }
 
-    uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, bool kinematic, PhysicsFilterData filterData, Transform localOffset) {
+    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, filterData, localOffset.to_mat4());
+    }
+
+    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
         PxScene* pxScene = Physics::GetPxScene();
         PxMaterial* material = Physics::GetDefaultMaterial();
@@ -176,7 +180,7 @@ namespace Physics {
         pxShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, true);
         pxShape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
 
-        PxTransform localOffsetTransform = PxTransform(GlmMat4ToPxMat44(localOffset.to_mat4()));
+        PxTransform localOffsetTransform = PxTransform(GlmMat4ToPxMat44(localOffset));
         pxShape->setLocalPose(localOffsetTransform);
 
         // Create rigid dynamic
