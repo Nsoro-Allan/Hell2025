@@ -424,6 +424,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\Core\GenericObject.cpp" />
     <ClCompile Include="src\Types\Interior\Piano.cpp" />
     <ClCompile Include="src\Types\Interior\PictureFrame.cpp" />
+    <ClCompile Include="src\Types\Misc\DoorChain.cpp" />
     <ClCompile Include="src\Types\Renderer\Mesh.cpp" />
     <ClCompile Include="src\Types\Renderer\MeshBuffer.cpp" />
     <ClCompile Include="src\Types\Renderer\MeshNodes.cpp" />
@@ -793,6 +794,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Types\Map\MapInstance.h" />
     <ClInclude Include="src\Types\Interior\Piano.h" />
     <ClInclude Include="src\Types\Interior\PictureFrame.h" />
+    <ClInclude Include="src\Types\Misc\DoorChain.h" />
     <ClInclude Include="src\Types\Renderer\Mesh.h" />
     <ClInclude Include="src\Types\Renderer\MeshNodes.h" />
     <ClInclude Include="src\Types\Renderer\Model.h" />

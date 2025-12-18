@@ -137,6 +137,12 @@ struct KangarooCreateInfo {
     glm::vec3 rotation = glm::vec3(0.0f);
 };
 
+struct DoorChainCreateInfo {
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    float scale = 1.0f;
+};
+
 struct DoorCreateInfo {
     DoorType type = DoorType::STANDARD_A;
     DoorMaterialType materialTypeFront = DoorMaterialType::UNDEFINED;

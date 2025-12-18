@@ -18,6 +18,7 @@ struct Model {
     void SetAABB(glm::vec3 aabbMin, glm::vec3 aabbMax);
     void SetLoadingState(LoadingState loadingState);
     int32_t GetGlobalMeshIndexByMeshName(const std::string& meshName);
+    const glm::mat4& GetBoneLocalMatrix(const std::string& boneName) const;
 
     LoadingState GetLoadingState() const;
     const FileInfo& GetFileInfo() const                       { return m_fileInfo; }

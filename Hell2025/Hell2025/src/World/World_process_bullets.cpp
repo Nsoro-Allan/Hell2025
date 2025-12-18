@@ -161,6 +161,7 @@ namespace World {
                 // Apply physics force
                 if (physicsId != 0) {
                     float strength = 25000.0f;
+                    strength = 15000.0f;
                     glm::vec3 force = bullet.GetDirection() * strength;
                     RagdollManager::AddForce(physicsId, force);
                     Physics::AddFoceToRigidDynamic(physicsId, force);

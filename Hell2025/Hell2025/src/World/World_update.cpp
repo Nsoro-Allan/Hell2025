@@ -13,6 +13,10 @@
 
 #include "AssetManagement/AssetManager.h"
 
+#include "Types/Misc/DoorChain.h"
+
+#include "Common/SlotMap.h"
+
 namespace World {
 
     void LazyDebugSpawns();
@@ -28,171 +32,238 @@ namespace World {
 
     void Update(float deltaTime) {
 
-        static int chainLinkMeshIndex = AssetManager::GetModelByName("ChainLink")->GetMeshIndices()[0];
-        Mesh* chainLinkMesh = AssetManager::GetMeshByIndex(chainLinkMeshIndex);
-
-        glm::vec3 extents = chainLinkMesh->extents;// glm::vec3(0.18f, 0.08f, 0.6f) * 1.0f;
-        glm::vec3 chainOrigin = glm::vec3(36, 32.6, 36);
-
-        static uint64_t physicsIdOrigin = 0;
-        static uint64_t jointId = 0;
-
-        static std::vector<uint64_t> physicsIds;
-
-        //std::vector<uint64_t> linkPhysicsIds;
-
-        static Transform scaleTransform;
-        scaleTransform.scale = extents;
-        static glm::mat4 scaleMatrix = scaleTransform.to_mat4();
-        static glm::mat4 localOffsetTransform = chainLinkMesh->localTransform;
-
-        glm::vec3 extentsOrigin = glm::vec3(0.05f, 0.05f, 0.05f) * 1.0f;
-        static Transform scaleTransformOrigin;
-        scaleTransformOrigin.scale = extentsOrigin;
-        static glm::mat4 scaleMatrixOrigin = scaleTransformOrigin.to_mat4();
-
-        Transform originTransform;
-        originTransform.position = chainOrigin;
-        glm::mat4 originMatrix = originTransform.to_mat4();
-
+        static Hell::SlotMap<DoorChain> doorchains;
         static bool runOnce = true;
+
         if (runOnce) {
             runOnce = false;
 
-            Transform originTransform;
-            originTransform.position = chainOrigin;
+            SpawnOffset spawnOffset;
+            
+            DoorChainCreateInfo createInfo;
 
+            // First chain
+            createInfo.position = glm::vec3(36, 32.6, 36);
+            const uint64_t id = UniqueID::GetNextObjectId(ObjectType::NO_TYPE);
+            doorchains.emplace_with_id(id, id, createInfo, spawnOffset);
 
-            PhysicsFilterData filterData;
-            filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
-            filterData.collisionGroup = CollisionGroup::BULLET_CASING;
-            filterData.collidesWith = CollisionGroup::ENVIROMENT_OBSTACLE;
-
-            // Origin kinematic body
-            {
-                physicsIdOrigin = Physics::CreateRigidDynamicFromBoxExtents(originTransform, extentsOrigin, true, filterData, glm::mat4(1.0f));
-                RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIdOrigin);
-            }
-
-            // Chain link
-            int linkCount = 2;
-
-            for (int i = 0; i < linkCount; i++) {
-
-                float magicOffsetPercentage = 0.795f;
-
-                Transform linkTransform;
-                linkTransform.position = chainOrigin;
-                linkTransform.position.z += (chainLinkMesh->extents.z * magicOffsetPercentage) * i;
-
-                glm::mat4 shapeLocalPose = glm::inverse(localOffsetTransform);
-                uint64_t physicsId = Physics::CreateRigidDynamicFromBoxExtents(linkTransform, extents, true, filterData, shapeLocalPose);
-                RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsId);
-                physicsIds.push_back(physicsId);
-
-                PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic();
-                pxRigidDynamic->setMass(10.0f);
-
-                pxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
-                pxRigidDynamic->wakeUp();
-                float mass = 10.0f;
-                PxRigidBodyExt::setMassAndUpdateInertia(*pxRigidDynamic, mass);
-                pxRigidDynamic->setAngularDamping(2.0f); // start 1 to 5
-                pxRigidDynamic->setLinearDamping(0.1f);
-
-                PhysicsUserData physicsUserData;
-                physicsUserData.physicsId = physicsId;
-                Physics::SetRigidDynamicUserData(physicsId, physicsUserData);
-
-                //glm::mat4 parentFrame = glm::mat4(1.0f);
-                //glm::mat4 childFrame = glm::mat4(1.0f);
-
-                float linkSpacing = (chainLinkMesh->extents.z * magicOffsetPercentage);
-
-                // Joint between parent and child should be halfway between their centers
-                glm::mat4 parentFrame = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, +linkSpacing * 0.5f));
-                glm::mat4 childFrame = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -linkSpacing * 0.5f));
-
-                if (i == 0) {
-                    jointId = Physics::CreateD6Joint(physicsIdOrigin, physicsId, glm::mat4(1.0f), glm::mat4(1.0f)); // identity
-                }
-                else {
-                    uint64_t currentId = physicsIds[i];
-                    uint64_t parentId = physicsIds[i-1];
-                    jointId = Physics::CreateD6Joint(parentId, currentId, parentFrame, childFrame);
-                }
-
-                D6Joint* d6 = Physics::GetD6JointById(jointId);
-                auto pxD6 = d6->GetPxD6Joint();
-
-                // Start FREE on all axes
-                pxD6->setMotion(PxD6Axis::eX, PxD6Motion::eLOCKED);
-                pxD6->setMotion(PxD6Axis::eY, PxD6Motion::eLOCKED);
-                pxD6->setMotion(PxD6Axis::eZ, PxD6Motion::eLOCKED);
-
-                // Allow it to rotate
-                pxD6->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
-                pxD6->setMotion(PxD6Axis::eSWING2, PxD6Motion::eFREE); // eLIMITED this locks it weird like in maya
-                pxD6->setMotion(PxD6Axis::eTWIST, PxD6Motion::eFREE);  // eLIMITED this locks it weird like in maya 
-
-
-                physx::PxJointLimitCone swingLimit(
-                    DegToRad(55.0f),   // swing1
-                    DegToRad(25.0f)    // swing2
-                );
-                pxD6->setSwingLimit(swingLimit);
-
-                physx::PxJointAngularLimitPair twistLimit(
-                    DegToRad(-20.0f), // lower limit
-                    DegToRad(20.0f)   // upper limit
-                );
-                pxD6->setTwistLimit(twistLimit);
-            }
+            // Second chain
+            createInfo.position = glm::vec3(37, 32.6, 37);
+            createInfo.rotation.y = HELL_PI * 0.5f;
+            const uint64_t id2 = UniqueID::GetNextObjectId(ObjectType::NO_TYPE);
+            doorchains.emplace_with_id(id2, id2, createInfo, spawnOffset);
         }
 
-        Renderer::DrawPoint(chainOrigin, GREEN);
+        for (DoorChain& doorChain : doorchains) {
+            doorChain.Update(deltaTime);
+            doorChain.SubmitRenderItems();
+        }
 
 
-        // Origin
-        //if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIdOrigin)) {
-        //    glm::mat4 modelMatrix = rigidDynamic->GetWorldTransform() * scaleMatrixOrigin;
+
+        //Model* model = AssetManager::GetModelByName("ChainLink");
         //
-        //    Material* material = AssetManager::GetMaterialByName("White");
-        //    RenderItem renderItem;
-        //    renderItem.modelMatrix = modelMatrix;
-        //    renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-        //    renderItem.baseColorTextureIndex = material->m_basecolor;
-        //    renderItem.rmaTextureIndex = material->m_rma;
-        //    renderItem.normalMapTextureIndex = material->m_normal;
-        //    renderItem.meshIndex = meshIndex;
-        //    Util::UpdateRenderItemAABB(renderItem);
+        //glm::mat4 linkBeginLocalBoneMatrix = model->GetBoneLocalMatrix("LinkBegin");
+        //glm::mat4 linkEndBoneLocalBoneMatrix = model->GetBoneLocalMatrix("LinkEnd");
         //
-        //    RenderDataManager::SubmitRenderItem(renderItem);
+        //glm::vec3 linkBeginOffset = linkBeginLocalBoneMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        //glm::vec3 linkEndOffset = linkEndBoneLocalBoneMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        //glm::vec3 linkAxisLocal = glm::normalize(linkEndOffset - linkBeginOffset);
+        //
+        //float magicSpacingPercentage = 0.795f; 
+        //float linkSpacing = (model->GetExtents().z * magicSpacingPercentage);
+        //
+        //int chainLinkMeshIndex = AssetManager::GetModelByName("ChainLink")->GetMeshIndices()[0];
+        //Mesh* chainLinkMesh = AssetManager::GetMeshByIndex(chainLinkMeshIndex);
+        //
+        //glm::vec3 extents = chainLinkMesh->extents;// glm::vec3(0.18f, 0.08f, 0.6f) * 1.0f;
+        //glm::vec3 chainOrigin = glm::vec3(36, 32.6, 36);
+        //
+        //static uint64_t physicsIdOrigin = 0;
+        //static std::vector<uint64_t> physicsIds;
+        //
+        //glm::vec3 extentsOrigin = glm::vec3(0.05f, 0.05f, 0.05f) * 1.0f;
+        //
+        //glm::mat4 localOffsetTransform = chainLinkMesh->localTransform;
+        //
+        //Transform scaleTransformOrigin;
+        //scaleTransformOrigin.scale = extentsOrigin;
+        //
+        //Transform originTransform;
+        //originTransform.position = chainOrigin;
+        //glm::mat4 originMatrix = originTransform.to_mat4();
+        //
+        //static bool runOnce = true;
+        //if (runOnce) {
+        //    runOnce = false;
+        //
+        //    PhysicsFilterData filterData;
+        //    filterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
+        //    filterData.collisionGroup = CollisionGroup::BULLET_CASING;
+        //    filterData.collidesWith = CollisionGroup::ENVIROMENT_OBSTACLE;
+        //                
+        //    Transform originTransform;
+        //    originTransform.position = chainOrigin;
+        //
+        //    // Origin kinematic body
+        //    {
+        //        physicsIdOrigin = Physics::CreateRigidDynamicFromBoxExtents(originTransform, extentsOrigin, true, filterData, glm::mat4(1.0f));
+        //        RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIdOrigin);
+        //    }
+        //
+        //    // Chain link
+        //    int linkCount = 4;
+        //
+        //    for (int i = 0; i < linkCount; i++) {
+        //
+        //        //std::cout << "\n" << Util::Mat4ToString(linkBeginLocalBoneMatrix) << "\n";
+        //        //std::cout << "\n" << Util::Mat4ToString(linkEndBoneLocalBoneMatrix) << "\n\n";
+        //        //
+        //        //std::cout << "linkBeginOffset: " << linkBeginOffset << "\n";
+        //        //std::cout << "linkEndOffset: " << linkEndOffset << "\n";
+        //
+        //        Transform linkTransform;
+        //        linkTransform.position = chainOrigin;
+        //        linkTransform.position -= linkBeginOffset;
+        //        linkTransform.position += (linkAxisLocal * linkSpacing * glm::vec3(i));
+        //
+        //        bool isEven = (i % 2) == 0;
+        //        if (!isEven) {
+        //            linkTransform.rotation.z = HELL_PI * 0.5f;
+        //        }
+        //
+        //
+        //        glm::mat4 shapeLocalPose = glm::inverse(localOffsetTransform);
+        //        uint64_t physicsId = Physics::CreateRigidDynamicFromBoxExtents(linkTransform, extents, false, filterData, shapeLocalPose);
+        //        RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsId);
+        //        physicsIds.push_back(physicsId);
+        //
+        //        PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic();
+        //
+        //        pxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
+        //        pxRigidDynamic->wakeUp();
+        //        float mass = 10.0f;
+        //        PxRigidBodyExt::setMassAndUpdateInertia(*pxRigidDynamic, mass);
+        //        pxRigidDynamic->setAngularDamping(2.0f); // start 1 to 5
+        //        pxRigidDynamic->setLinearDamping(0.1f);
+        //
+        //        pxRigidDynamic->setSolverIterationCounts(24, 8);
+        //
+        //        //sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+        //        pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true); // this might not doing anything without the scene having CCD enabled
+        //
+        //        PhysicsUserData physicsUserData;
+        //        physicsUserData.physicsId = physicsId;
+        //        Physics::SetRigidDynamicUserData(physicsId, physicsUserData);
+        //
+        //
+        //
+        //
+        //        auto PxTransformToGlmMat4 = [](const PxTransform& t) {
+        //            glm::quat q(t.q.w, t.q.x, t.q.y, t.q.z);
+        //            glm::mat4 m = glm::mat4_cast(q);
+        //            m[3] = glm::vec4(t.p.x, t.p.y, t.p.z, 1.0f);
+        //            return m;
+        //        };
+        //
+        //        uint64_t parentId = (i == 0) ? physicsIdOrigin : physicsIds[i - 1];
+        //        uint64_t childId = physicsIds[i];
+        //
+        //        PxRigidDynamic* pxParent = Physics::GetRigidDynamicById(parentId)->GetPxRigidDynamic();
+        //        PxRigidDynamic* pxChild = Physics::GetRigidDynamicById(childId)->GetPxRigidDynamic();
+        //
+        //        PxTransform parentPose = pxParent->getGlobalPose();
+        //        PxTransform childPose = pxChild->getGlobalPose();
+        //
+        //        // Use the child's "begin" point as the joint anchor in world
+        //        PxVec3 childAnchorLocal(linkBeginOffset.x, linkBeginOffset.y, linkBeginOffset.z);
+        //        PxVec3 anchorWorld = childPose.transform(childAnchorLocal);
+        //
+        //        // Build a world joint orientation (columns are X=right, Y=up, Z=forward)
+        //        PxVec3 forwardLocal(linkAxisLocal.x, linkAxisLocal.y, linkAxisLocal.z);
+        //        PxVec3 forwardWorld = childPose.q.rotate(forwardLocal);
+        //        forwardWorld.normalize();
+        //
+        //        PxVec3 upWorld(0.0f, 1.0f, 0.0f);
+        //        PxVec3 rightWorld = upWorld.cross(forwardWorld);
+        //        if (rightWorld.magnitudeSquared() < 1e-8f) {
+        //            rightWorld = PxVec3(1.0f, 0.0f, 0.0f).cross(forwardWorld);
+        //        }
+        //        rightWorld.normalize();
+        //        PxVec3 trueUpWorld = forwardWorld.cross(rightWorld);
+        //
+        //        PxQuat jointRotWorld(PxMat33(rightWorld, trueUpWorld, forwardWorld));
+        //        PxTransform jointWorld(anchorWorld, jointRotWorld);
+        //
+        //        // Convert joint world frame into each actor's local space
+        //        PxTransform parentLocal = parentPose.transformInv(jointWorld);
+        //        PxTransform childLocal = childPose.transformInv(jointWorld);
+        //
+        //        glm::mat4 parentFrame = PxTransformToGlmMat4(parentLocal);
+        //        glm::mat4 childFrame = PxTransformToGlmMat4(childLocal);
+        //
+        //        uint64_t jointId = Physics::CreateD6Joint(parentId, childId, parentFrame, childFrame);
+        //
+        //        D6Joint* d6 = Physics::GetD6JointById(jointId);
+        //        auto pxD6 = d6->GetPxD6Joint();
+        //
+        //        // Start FREE on all axes
+        //        pxD6->setMotion(PxD6Axis::eX, PxD6Motion::eLOCKED);
+        //        pxD6->setMotion(PxD6Axis::eY, PxD6Motion::eLOCKED);
+        //        pxD6->setMotion(PxD6Axis::eZ, PxD6Motion::eLOCKED);
+        //
+        //        // Allow it to rotate
+        //        pxD6->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLIMITED);
+        //        pxD6->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLIMITED);
+        //        pxD6->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+        //
+        //        // First link can only rotate on twist axis
+        //        if (i == 0) {
+        //            pxD6->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
+        //            pxD6->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLOCKED);
+        //            pxD6->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+        //        }
+        //
+        //        physx::PxJointLimitCone swingLimit(
+        //            DegToRad(45.0f),  // swing1 unused
+        //            DegToRad(45.0f)   // swing2
+        //        );
+        //        pxD6->setSwingLimit(swingLimit);
+        //
+        //        physx::PxJointAngularLimitPair twistLimit(
+        //            DegToRad(-00.0f), // lower limit
+        //            DegToRad(180.0f)  // upper limit
+        //        );
+        //        pxD6->setTwistLimit(twistLimit);
+        //    }
         //}
-
-        // Links
-        for (int i = 0; i < physicsIds.size(); i++) {
-            if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIds[i])) {
-                glm::mat4 modelMatrix = rigidDynamic->GetWorldTransform();
-
-                Material* material = AssetManager::GetMaterialByName("Tokarev");
-                RenderItem renderItem;
-                renderItem.modelMatrix = modelMatrix;
-                renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
-                renderItem.baseColorTextureIndex = material->m_basecolor;
-                renderItem.rmaTextureIndex = material->m_rma;
-                renderItem.normalMapTextureIndex = material->m_normal;
-                renderItem.meshIndex = chainLinkMeshIndex;
-                Util::UpdateRenderItemAABB(renderItem);
-
-                RenderDataManager::SubmitRenderItem(renderItem);
-
-                Renderer::DrawPoint(rigidDynamic->GetWorldTransform()[3], BLUE);
-
-            }
-        }
-
-
+        //
+        //
+        //
+        //// Links
+        //for (int i = 0; i < physicsIds.size(); i++) {
+        //    if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsIds[i])) {
+        //        glm::mat4 modelMatrix = rigidDynamic->GetWorldTransform();
+        //
+        //        Material* material = AssetManager::GetMaterialByName("Tokarev");
+        //        RenderItem renderItem;
+        //        renderItem.modelMatrix = modelMatrix;
+        //        renderItem.inverseModelMatrix = glm::inverse(renderItem.modelMatrix);
+        //        renderItem.baseColorTextureIndex = material->m_basecolor;
+        //        renderItem.rmaTextureIndex = material->m_rma;
+        //        renderItem.normalMapTextureIndex = material->m_normal;
+        //        renderItem.meshIndex = chainLinkMeshIndex;
+        //        Util::UpdateRenderItemAABB(renderItem);
+        //
+        //        RenderDataManager::SubmitRenderItem(renderItem);
+        //
+        //        Renderer::DrawPoint(rigidDynamic->GetWorldTransform()[3], BLUE);
+        //
+        //    }
+        //}
+        //
+        //
+        //Renderer::DrawPoint(chainOrigin, GREEN);
 
         //std::cout << GetGameObjects().size() << "\n";
 

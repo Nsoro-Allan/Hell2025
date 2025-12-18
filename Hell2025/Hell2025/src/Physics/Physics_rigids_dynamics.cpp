@@ -160,6 +160,14 @@ namespace Physics {
     }
 
     uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform.to_mat4(), boxExtents, kinematic, filterData, localOffset);
+    }
+
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, filterData, localOffset.to_mat4());
+    }
+
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
         PxScene* pxScene = Physics::GetPxScene();
         PxMaterial* material = Physics::GetDefaultMaterial();
@@ -184,8 +192,7 @@ namespace Physics {
         pxShape->setLocalPose(localOffsetTransform);
 
         // Create rigid dynamic
-        PxQuat quat = Physics::GlmQuatToPxQuat(glm::quat(transform.rotation));
-        PxTransform pxTransform = PxTransform(PxVec3(transform.position.x, transform.position.y, transform.position.z), quat);
+        PxTransform pxTransform = PxTransform(Physics::GlmMat4ToPxMat44(transform));
         PxRigidDynamic* pxRigidDynamic = pxPhysics->createRigidDynamic(pxTransform);
         pxRigidDynamic->attachShape(*pxShape);
         pxScene->addActor(*pxRigidDynamic);

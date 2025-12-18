@@ -96,6 +96,8 @@ namespace Physics {
 
     uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset);
     uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset);
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset);
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset);
     uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
     
     //uint64_t CreateRigidDynamicFromBoxExtents(Transform transform, glm::vec3 boxExtents, bool kinematic, PhysicsFilterData filterData, Transform localOffset = Transform());

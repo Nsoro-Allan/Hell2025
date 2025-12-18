@@ -515,6 +515,11 @@ enum struct DoorMaterialType {
     UNDEFINED
 };
 
+enum struct ChainLinkType {
+    DOOR_CHAIN,
+    UNDEFINED
+};
+
 //enum struct MeshNodeType {
 //    DEFAULT,
 //    OPENABLE,

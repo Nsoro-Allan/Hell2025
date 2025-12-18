@@ -9,6 +9,21 @@ namespace Physics {
         PxScene* pxScene = GetPxScene();
         std::vector<PxRigidActor*> ignoreList;
 
+        PxU32 constraintCount = pxScene->getNbConstraints();
+        if (!constraintCount) return;
+
+        std::vector<PxConstraint*> constraints(constraintCount);
+        pxScene->getConstraints(constraints.data(), constraintCount);
+
+        for (PxConstraint* constraint : constraints) {
+            constraint->setFlag(PxConstraintFlag::eVISUALIZATION, true);
+        }
+
+        //pxScene->setFlag(PxSceneFlag::eENABLE_DEBUG_VISUALIZATION, true);
+        pxScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 0.05f);
+        pxScene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LOCAL_FRAMES, 1.0f);
+        pxScene->setVisualizationParameter(PxVisualizationParameter::eJOINT_LIMITS, 1.0f);
+
         // Ignore player ragdolls
         auto playerRagdolls = Physics::GetIgnoreList(RaycastIgnoreFlags::PLAYER_RAGDOLLS);
        // ignoreList.insert(ignoreList.end(), playerRagdolls.begin(), playerRagdolls.end());
