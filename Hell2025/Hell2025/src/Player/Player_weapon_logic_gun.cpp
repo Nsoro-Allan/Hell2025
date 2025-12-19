@@ -138,9 +138,14 @@ void Player::LeaveADS() {
 }
 
 bool Player::CanReloadGun() {
-    WeaponState* weaponState = GetCurrentWeaponState();
-    WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     AmmoState* ammoState = GetCurrentAmmoState();
+    WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
+    WeaponState* weaponState = GetCurrentWeaponState();
+
+    if (!ammoState) return false;
+    if (!weaponInfo) return false;
+    if (!weaponState) return false;
+
     return (weaponState->ammoInMag < weaponInfo->magSize && ammoState->ammoOnHand > 0);
 }
 

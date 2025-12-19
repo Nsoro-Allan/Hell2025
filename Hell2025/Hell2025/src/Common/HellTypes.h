@@ -728,3 +728,9 @@ struct HouseLocation {
     glm::vec3 position = glm::vec3(0.0f);
     float rotation = 0.0f;
 };
+
+struct PickUpInfo {
+    std::string name = UNDEFINED_STRING;
+    PickUpType type = PickUpType::UNDEFINED;
+    float mass = 1.0f;
+};

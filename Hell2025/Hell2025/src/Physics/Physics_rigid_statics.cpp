@@ -220,6 +220,8 @@ namespace Physics {
        // Update its pointers
        rigidStatic.SetPxRigidStatic(pxRigidStatic);
 
+       std::cout << "APPARENTLY CRAETED CONVEX MESH: " << modelName << "\n";
+
        return physicsID;
    }
 

@@ -89,7 +89,7 @@ namespace nlohmann {
         j = nlohmann::json{
             {"Position", createInfo.position},
             {"Rotation", createInfo.rotation},
-            {"Type", Util::PickUpTypeToString(createInfo.type)}
+            //{"Type", Util::PickUpTypeToString(createInfo.type)}
         };
     }
     
@@ -235,7 +235,7 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, PickUpCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
-        info.type = Util::StringToPickUpType(j.value("Type", UNDEFINED_STRING));
+        //info.name = Util::StringToPickUpType(j.value("Type", UNDEFINED_STRING));
     }
 
     void from_json(const nlohmann::json& j, PictureFrameCreateInfo& info) {

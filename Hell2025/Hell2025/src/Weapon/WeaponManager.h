@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "WeaponCommon.h"
 
 namespace WeaponManager {
@@ -13,4 +13,4 @@ namespace WeaponManager {
     AmmoInfo* GetAmmoInfoByName(const std::string& name);
     AmmoInfo* GetAmmoInfoByIndex(int index);
     int32_t GetWeaponIndexFromWeaponName(const std::string& weaponName);
-}
+}*/

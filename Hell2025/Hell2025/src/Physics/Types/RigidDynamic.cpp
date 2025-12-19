@@ -33,6 +33,7 @@ void RigidDynamic::Update(float deltaTime) {
     }
 
     m_worldTransform = Physics::PxMat44ToGlmMat4(m_pxRigidDynamic->getGlobalPose());
+    m_currentPosition = m_worldTransform[3];
 }
 
 void RigidDynamic::ActivatePhsyics() {

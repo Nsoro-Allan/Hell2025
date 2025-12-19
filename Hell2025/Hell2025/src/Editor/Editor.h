@@ -12,11 +12,14 @@ namespace Editor {
         GenericObjectType genericObject = GenericObjectType::UNDEFINED;
         FireplaceType fireplace = FireplaceType::UNDEFINED;
         HousePlaneType housePlane = HousePlaneType::UNDEFINED;
+        std::string pickUpName = UNDEFINED_STRING;
 
         void Reset() {
             genericObject = GenericObjectType::UNDEFINED;
             fireplace = FireplaceType::UNDEFINED;
             housePlane = HousePlaneType::UNDEFINED;
+            pickUpName = UNDEFINED_STRING;
+
         }
     };
 
@@ -152,9 +155,11 @@ namespace Editor {
     void PlaceHousePlane(HousePlaneType housePlaneType);
     void PlaceFireplace(FireplaceType fireplaceType);
     void PlaceGenericObject(GenericObjectType objectType);
+    void PlacePickUp(const std::string& name);
+
     ObjectType GetPlacementObjectType();
-    //GenericObjectType GetGenericPlacementObjectType();
     PlacementObjectSubtype GetPlacementObjectSubtype();
+    const std::string& GetPlacementPickUpName();
     void ResetPlacementObjectSubtype();
 
     void UpdateDoorPlacement();

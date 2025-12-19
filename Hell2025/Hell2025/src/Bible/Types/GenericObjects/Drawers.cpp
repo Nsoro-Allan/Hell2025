@@ -7,11 +7,11 @@ namespace Bible {
         MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
         frame.meshName = "DrawersSmallFrame";
         frame.materialName = "Drawers_Frame";
-        frame.rigidDynamicAABB.createObject = true;
-        frame.rigidDynamicAABB.kinematic = true;
-        frame.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        frame.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        frame.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.rigidDynamic.createObject = true;
+        frame.rigidDynamic.kinematic = true;
+        frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawer1st = meshNodeCreateInfoSet.emplace_back();
@@ -99,11 +99,11 @@ namespace Bible {
         MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
         frame.meshName = "DrawersLargeFrame";
         frame.materialName = "Drawers_Frame";
-        frame.rigidDynamicAABB.createObject = true;
-        frame.rigidDynamicAABB.kinematic = true;
-        frame.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        frame.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        frame.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.rigidDynamic.createObject = true;
+        frame.rigidDynamic.kinematic = true;
+        frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawerTopL = meshNodeCreateInfoSet.emplace_back();

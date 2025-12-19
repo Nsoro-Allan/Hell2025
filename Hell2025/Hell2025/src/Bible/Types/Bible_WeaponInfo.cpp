@@ -4,6 +4,7 @@
 #include "Util.h">
 
 namespace Bible {
+
     void InitWeaponInfo() {
         WeaponInfo& aks74u = CreateWeaponInfo("AKS74U");
         aks74u.modelName = "AKS74U";
@@ -142,7 +143,7 @@ namespace Bible {
         goldeneGlock.animationSpeeds.adsIn = 3.0f;
         goldeneGlock.animationSpeeds.adsOut = 3.0f;
         goldeneGlock.casingEjectionImpulse = 0.0175f;
-        goldeneGlock.pickupName = "GLOCK";
+        goldeneGlock.pickupName = "GoldenGlock";
         goldeneGlock.silencerName = "GLOCK_SILENCER";
         goldeneGlock.sightName = "GLOCK_RED_DOT";
 
@@ -326,7 +327,7 @@ namespace Bible {
         glock.animationSpeeds.adsIn = 3.0f;
         glock.animationSpeeds.adsOut = 3.0f;
         glock.casingEjectionImpulse = 0.0175f;
-        glock.pickupName = "GOLDEN_GLOCK";
+        glock.pickupName = "Glock";
         glock.silencerName = "GLOCK_SILENCER";
         glock.sightName = "GLOCK_RED_DOT";
         glock.isGold = false;
@@ -428,7 +429,7 @@ namespace Bible {
         remington870.animationNames.dryFire = "SPAS_DryFire";
         remington870.animationNames.toggleAutoShotgun = "SPAS_ToggleAuto";
         remington870.hasAutoSwitch = false;
-        remington870.pickupName = "REMINGTON_870";
+        remington870.pickupName = "Remington870";
 
         WeaponInfo& p90 = CreateWeaponInfo("P90");
         p90.modelName = "P90";
@@ -566,5 +567,14 @@ namespace Bible {
         p90.animationNames.adsFire.push_back("P90_ADS_Fire0");
         p90.animationNames.adsFire.push_back("P90_ADS_Fire1");
         p90.animationNames.adsFire.push_back("P90_ADS_Fire2");
+    }
+
+
+
+    int32_t GetWeaponMagSize(const std::string& name) {
+        if (WeaponInfo* weaponInfo = GetWeaponInfoByName(name)) {
+            return weaponInfo->magSize;
+        }
+        return 0;
     }
 }

@@ -14,6 +14,7 @@ namespace Editor {
     void PlaceFireplace(FireplaceType fireplaceType, const glm::vec3& hitPosition);
     void PlaceHousePlane(HousePlaneType housePlaneType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
     void PlaceGenericObject(GenericObjectType genericObjectType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
+    void PlacePickUp(const std::string& pickUpName, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
 
     void UpdateObjectPlacement() {
         if (GetEditorState() == EditorState::PLACE_OBJECT) {
@@ -31,6 +32,9 @@ namespace Editor {
                 // u gotta fix this later, its a mess
                 if (rayResult.hitFound) {
 
+                    if (GetPlacementObjectType() == ObjectType::PICK_UP) {
+                        PlacePickUp(GetPlacementObjectSubtype().pickUpName, rayResult.hitPosition, rayResult.hitNormal);
+                    }
                     if (GetPlacementObjectType() == ObjectType::GENERIC_OBJECT) {
                         PlaceGenericObject(GetPlacementObjectSubtype().genericObject, rayResult.hitPosition, rayResult.hitNormal);
                     }
@@ -140,6 +144,15 @@ namespace Editor {
         createInfo.rotation.y = 0.0f;
         createInfo.type = genericObjectType;
         World::AddGenericObject(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
+    void PlacePickUp(const std::string& pickUpName, const glm::vec3& hitPosition, const glm::vec3& hitNormal) {
+        PickUpCreateInfo createInfo;;
+        createInfo.position = hitPosition;
+        createInfo.rotation.y = 0.0f;
+        createInfo.name = pickUpName;
+        World::AddPickUp(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }
 

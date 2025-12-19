@@ -113,8 +113,8 @@ namespace BackEnd {
         MidiFileManager::Init();
         Logging::Init() << "MidiFileManager::Init()";
 
-        WeaponManager::Init();
-        Logging::Init() << "WeaponManager::Init()";
+        //WeaponManager::Init();
+        //Logging::Init() << "WeaponManager::Init()";
 
         Physics::Init();
         RagdollManager::Init();

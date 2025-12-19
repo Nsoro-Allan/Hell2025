@@ -8,6 +8,7 @@ namespace Bible {
     void InitInventoryItemInfo() {
 
         InventoryItemInfo& glock = CreateInventoryItemInfo("Glock");
+        glock.m_itemType = InventoryItemType::WEAPON;
         glock.m_examineModelName = "World_Glock";
         glock.m_meshMaterialNames["Glock"] = "Glock";
         glock.m_cellSize = 1;
@@ -22,6 +23,7 @@ underwhelming at a distance. A proper piece
 of shit.)";
 
         InventoryItemInfo& goldenGlock = CreateInventoryItemInfo("GoldenGlock");
+        goldenGlock.m_itemType = InventoryItemType::WEAPON;
         goldenGlock.m_examineModelName = "Glock2";
         goldenGlock.m_meshMaterialNames["GlockNew"] = "GlockGold";
         goldenGlock.m_meshMaterialNames["GlockRedDotGlassNew"] = "TX_LeupoldGlass_01a";
@@ -38,6 +40,7 @@ glitter. Natalia gonna be in the good books
 for this one.)";
 
         InventoryItemInfo& tokarev = CreateInventoryItemInfo("Tokarev");
+        tokarev.m_itemType = InventoryItemType::WEAPON;
         tokarev.m_examineModelName = "World_Tokarev";
         tokarev.m_meshMaterialNames["TokarevBody"] = "Tokarev";
         tokarev.m_meshMaterialNames["TokarevGripPolymer"] = "TokarevGrip";
@@ -52,6 +55,7 @@ just prints pretty little holes. Straight out
 of Ourumov's briefcase.)";
 
         InventoryItemInfo& knife = CreateInventoryItemInfo("Knife");
+        knife.m_itemType = InventoryItemType::WEAPON;
         knife.m_examineModelName = "World_Knife";
         knife.m_initialExamineItemTransform.rotation.y = -0.2f;
         knife.m_initialExamineItemTransform.rotation.z = -0.6f;
@@ -66,6 +70,7 @@ takes the same short and messy path. Might
 wanna bring a cloth.)";
 
         InventoryItemInfo& remington870 = CreateInventoryItemInfo("Remington870");
+        remington870.m_itemType = InventoryItemType::WEAPON;
         remington870.m_examineModelName = "World_Remington870";
         remington870.m_meshMaterialNames["Remington870"] = "Shotgun";
         remington870.m_cellSize = 3;
@@ -79,6 +84,7 @@ damn room and barn in time for Judgment
 Day supper.)";
 
         InventoryItemInfo& spas = CreateInventoryItemInfo("SPAS");
+        spas.m_itemType = InventoryItemType::WEAPON;
         spas.m_examineModelName = "World_SPAS";
         spas.m_cellSize = 3;
         spas.m_meshMaterialNames["SPAS12_Main"] = "SPAS2_Main";
@@ -107,6 +113,7 @@ cadence of a fucking riot.)";
         //. !!!!!
 
         InventoryItemInfo& blackSkull = CreateInventoryItemInfo("BlackSkull");
+        blackSkull.m_itemType = InventoryItemType::UESLESS;
         blackSkull.m_cellSize = 1;
         blackSkull.m_examineModelName = "BlackSkull2";
         blackSkull.m_meshMaterialNames["BlackSkullExamine"] = "BlackSkull";
@@ -117,6 +124,7 @@ cadence of a fucking riot.)";
         blackSkull.m_description = R"(Worth little to you, worth everything to them.)";
 
         InventoryItemInfo& smallKey = CreateInventoryItemInfo("SmallKey");
+        smallKey.m_itemType = InventoryItemType::KEY;
         smallKey.m_cellSize = 1;
         smallKey.m_examineModelName = "SmallKey";
         smallKey.m_meshMaterialNames["SmallKeyExamine"] = "SmallKey";

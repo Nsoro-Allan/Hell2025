@@ -307,6 +307,13 @@ namespace Editor {
         g_placementObjectType = ObjectType::FIREPLACE;
     }
 
+    void PlacePickUp(const std::string& name) {
+        SetEditorState(EditorState::PLACE_OBJECT);
+        g_placementObjectSubtype.Reset();
+        g_placementObjectSubtype.pickUpName = name;
+        g_placementObjectType = ObjectType::PICK_UP;
+    }
+
     void PlaceHousePlane(HousePlaneType housePlaneType) {
         SetEditorState(EditorState::PLACE_OBJECT);
         g_placementObjectSubtype.Reset();
@@ -327,6 +334,10 @@ namespace Editor {
 
     PlacementObjectSubtype GetPlacementObjectSubtype() {
         return g_placementObjectSubtype;
+    }
+
+    const std::string& GetPlacementPickUpName() {
+        return g_placementObjectSubtype.pickUpName;
     }
 
     void ResetPlacementObjectSubtype() {

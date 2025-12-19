@@ -297,7 +297,9 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\BackEnd\BackEnd.cpp" />
     <ClCompile Include="src\BackEnd\Integration\GLFW.cpp" />
     <ClCompile Include="src\BackEnd\Integration\SDL.cpp" />
+    <ClCompile Include="src\Bible\Types\Bible_ByModelName.cpp" />
     <ClCompile Include="src\Bible\Types\Bible_Doors.cpp" />
+    <ClCompile Include="src\Bible\Types\Bible_PickUpInfo.cpp" />
     <ClCompile Include="src\Bible\Types\Bible_WeaponAttachmentInfo.cpp" />
     <ClCompile Include="src\Bible\Types\Bible_WeaponInfo.cpp" />
     <ClCompile Include="src\Bible\Types\GenericObjects\Bathroom.cpp" />

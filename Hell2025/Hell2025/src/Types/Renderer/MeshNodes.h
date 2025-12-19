@@ -14,7 +14,6 @@ struct MeshNode {
     uint64_t parentObjectId;
     uint32_t openableId;
     uint32_t customId;
-    uint64_t physicsId;
     uint64_t rigidDynamicId;
     uint64_t mirrorId;
     BlendingMode blendingMode;
@@ -40,6 +39,7 @@ struct MeshNode {
     glm::vec3 emissiveColor = glm::vec3(1.0f);
     glm::vec3 tintColor = glm::vec3(1.0f);
     bool addToNavMesh = false;
+    bool rigidIsKinematic = false;    // You need to be careful this does not get out of sync with actual physx kinematic state
 };
 
 struct MeshNodes {
@@ -71,6 +71,7 @@ struct MeshNodes {
     bool MeshNodeIsOpen(const std::string& meshName);
     bool MeshNodeIsClosed(const std::string& meshName);
     bool MeshNodeIsStatic(int nodeIndex);
+    bool MeshNodeIsNonKinematicRigidDynamic(int nodeIndex);
     
     int32_t GetGlobalMeshIndex(int nodeIndex);
     Material* GetMaterial(int nodeIndex);
@@ -105,7 +106,7 @@ private:
     void UpdateAABBs(const glm::mat4& worldMatrix);
     void UpdateHierarchy();
     void InitPhysicsTransforms();
-    void UpdatePhysicsTransforms();
+    void UpdateKinematicPhysicsTransforms();
 
     ArmatureData m_armatureData;
     size_t m_nodeCount = 0;

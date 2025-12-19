@@ -1,4 +1,4 @@
-#include "WeaponManager.h"
+/*#include "WeaponManager.h"
 #include <vector>
 #include <algorithm>
 #include "AssetManagement/AssetManager.h"
@@ -524,7 +524,7 @@ namespace WeaponManager {
         remington870.animationNames.dryFire = "SPAS_DryFire";
         remington870.animationNames.toggleAutoShotgun = "SPAS_ToggleAuto";
         remington870.hasAutoSwitch = false;
-        remington870.pickupName = "REMINGTON_870";
+        remington870.pickupName = "Remington870";
 
         
 
@@ -802,3 +802,4 @@ namespace WeaponManager {
         return -1;
     }
 }
+*/

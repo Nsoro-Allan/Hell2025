@@ -12,8 +12,8 @@ struct InventoryItem {
     std::string m_name = UNDEFINED_STRING;
     glm::ivec2 m_gridLocation = glm::ivec2(-1, -1);
     std::vector<std::string> m_attachments;
-    int m_ammoInMag = 0;
     bool m_rotatedInGrid = false;
+    InventoryItemType type = InventoryItemType::UNDEFINED;
 };
 
 struct InventoryStyle {
@@ -42,7 +42,7 @@ struct Inventory {
     Inventory() = default;
     void Init();
     void Update(float deltaTime);
-    void AddItem(const std::string& name);
+    void AddInventoryItem(const std::string& name);
     void ClearInventory();
     void OpenInventory();
     void CloseInventory();
@@ -52,6 +52,16 @@ struct Inventory {
     void SetLocalPlayerIndex(int localPlayerIndex);
     void SetGridCountX(int count);
     void SetGridCountY(int count);
+
+    void GiveAmmo(const std::string& name, int amount);
+    //void GiveItem(const std::string& name);
+    void GiveWeapon(const std::string& name);
+
+    AmmoState* GetAmmoStateByName(const std::string& name);
+    WeaponState* GetWeaponStateByName(const std::string& name);
+
+    std::vector<AmmoState>& GetAmmoStates()         { return m_ammoStates; }
+    std::vector<WeaponState>& GetWeaponStates()     { return m_weaponStates; }
 
     const int GetGridCountX()                       { return m_gridCountX; }
     const int GetGridCountY()                       { return m_gridCountY; }
@@ -63,7 +73,6 @@ struct Inventory {
     const bool IsOpen()                             { return m_state != InventoryState::CLOSED; }
 
 private:
-    void InitWeaponAndAmmoStates();
     glm::ivec2 GetNextFreeLocation(int itemCellSize);
     void UpdateOccupiedSlotsArray(); // rename this to reflect the actual name of the array: m_itemIndex2DArray
     void RenderButton(glm::ivec2 location, const std::string& letter, const std::string& description);

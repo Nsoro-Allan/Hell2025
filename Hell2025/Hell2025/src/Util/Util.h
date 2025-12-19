@@ -173,7 +173,7 @@ namespace Util {
     std::string LightTypeToString(LightType type);
     std::string ObjectTypeToString(ObjectType type);
     std::string OpenStateToString(OpenState mode);
-    std::string PickUpTypeToString(PickUpType type);
+    std::string PickUpTypeToString(PickUpTypeOld type);
     std::string PhysicsTypeToString(PhysicsType type);
     std::string PictureFrameTypeToString(PictureFrameType type);
     std::string SharkHuntingStateToString(SharkHuntingState state);
@@ -193,7 +193,7 @@ namespace Util {
     HouseType StringToHouseType(const std::string& str);
     HousePlaneType StringToHousePlaneType(const std::string& str);
     LightType StringToLightType(const std::string& str);
-    PickUpType StringToPickUpType(const std::string& str);
+    PickUpTypeOld StringToPickUpType(const std::string& str);
     PictureFrameType StringToPictureFrameType(const std::string& str);
     TreeType StringToTreeType(const std::string& str);
     TrimType StringToTrimType(const std::string& str);

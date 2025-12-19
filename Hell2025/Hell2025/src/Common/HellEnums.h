@@ -295,6 +295,20 @@ enum struct EditorViewportSplitMode {
 };
 
 enum struct PickUpType {
+    WEAPON,
+    KEY,
+    AMMO,
+    UNDEFINED
+};
+
+enum struct CollisionShapeType {
+    BOX,
+    CAPSULE,
+    CONVEX_MESH,
+    UNDEFINED
+};
+
+enum struct PickUpTypeOld {
     SHOTGUN_AMMO_BUCKSHOT,
     SHOTGUN_AMMO_SLUG,
     GLOCK,
@@ -470,6 +484,7 @@ enum struct InventoryItemType {
     AMMO,
     KEY,
     UESLESS,
+    UNDEFINED,
 };
 
 enum struct HouseType {
@@ -518,6 +533,11 @@ enum struct DoorMaterialType {
 enum struct ChainLinkType {
     DOOR_CHAIN,
     UNDEFINED
+};
+
+enum struct PhysicsShapeType {
+    BOX,
+    CONVEX_MESH
 };
 
 //enum struct MeshNodeType {

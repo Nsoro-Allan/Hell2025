@@ -41,9 +41,11 @@ struct OpenableCreateInfo {
 struct RigidDynamicCreateInfo {
     bool createObject = false;
     bool kinematic = true;
+    float mass = 1.0f;
     Transform offsetTransform;
     PhysicsFilterData filterData;
-    float mass = 1.0f;
+    PhysicsShapeType shapeType = PhysicsShapeType::BOX;
+    std::string convexMeshModelName = UNDEFINED_STRING;
 };
 
 struct RigidStaticCreateInfo {
@@ -55,7 +57,7 @@ struct MeshNodeCreateInfo {
     std::string materialName = UNDEFINED_STRING;
     BlendingMode blendingMode = BlendingMode::DEFAULT;
     OpenableCreateInfo openable;
-    RigidDynamicCreateInfo rigidDynamicAABB;
+    RigidDynamicCreateInfo rigidDynamic;
     RigidDynamicCreateInfo rigidDynamicConvexHull; // needs implementing
     RigidStaticCreateInfo rigidStatic;
     int32_t customId;
@@ -226,7 +228,9 @@ struct BasicDoorCreateInfo {
 };
 
 struct PickUpCreateInfo {
+    std::string name = UNDEFINED_STRING;
     PickUpType type = PickUpType::UNDEFINED;
+    PickUpTypeOld typeOld = PickUpTypeOld::UNDEFINED;
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
     glm::vec3 intitialForce = glm::vec3(0.0f);

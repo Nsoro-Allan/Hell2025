@@ -103,8 +103,8 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
             }
         }
 
-        // Rigid static
-        if (createInfo.rigidDynamicAABB.createObject) {
+        // Rigid dynamic
+        if (createInfo.rigidDynamic.createObject) {
             
             // Create RigidDynamic if it doesn't exist
 			if (meshNode->rigidDynamicId == 0) {
@@ -115,15 +115,31 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 				Transform offsetTransform;
                 offsetTransform.position = localCenter;
 
-                PhysicsFilterData filterData = createInfo.rigidDynamicAABB.filterData;
-                bool kinematic = createInfo.rigidDynamicAABB.kinematic;
+                PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
+                meshNode->rigidIsKinematic = createInfo.rigidDynamic.kinematic;
                 //float mass = 1.0f;
 
                 Logging::Init() << "Creating rigid box for " << mesh->GetName() << "\n";
 
-                meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, kinematic, filterData, offsetTransform);
+                if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::BOX) {
+                    meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, meshNode->rigidIsKinematic, filterData, offsetTransform);
+                }
+                else if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::CONVEX_MESH) {
 
-                //meshNode->rigidStaticId = Physics::CreateRigidStaticBoxFromExtents(spawnTransform, extents, filterData, offsetTransform);
+                    // Everything in here is sketchy. Fix it!
+                    if (Model* physicsModel = AssetManager::GetModelByName(createInfo.rigidDynamic.convexMeshModelName)) {
+                        int32_t meshIndex = physicsModel->GetMeshIndices()[0]; // you wanna do all mesh not just the first
+                        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
+                        if (mesh) {
+                            std::span<Vertex> vertices = AssetManager::GetVerticesSpan(mesh->baseVertex, mesh->vertexCount);
+                            std::span<uint32_t> indices = AssetManager::GetIndicesSpan(mesh->baseIndex, mesh->indexCount);
+                            float mass = createInfo.rigidDynamic.mass;
+                            meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
+                        }
+
+                        //meshNode->rigidDynamicId = Physics::CreateRigidStaticConvexMeshFromModel(spawnTransform, createInfo.rigidDynamicAABB.convexMeshModelName, filterData);
+                    }
+                }
             }
             else {
                 Logging::Warning() << "You tried to create an rigidDynamicAABB for mesh node " << mesh->GetName() << " but it already had a rigidDynamicId\n";
@@ -224,13 +240,26 @@ bool MeshNodes::MeshNodeIsStatic(int localNodeIndex) {
 	while (currentNode) {
 		if (currentNode->forceDynamic) return false;
 		if (currentNode->openableId != 0) return false;
-		if (currentNode->physicsId != 0) return false;
+		if (currentNode->rigidDynamicId != 0) return false;
 
         // Walk up the tree via parent index
         currentNode = GetMeshNodeByLocalIndex(currentNode->localParentIndex);
     }
 
     return true;
+}
+
+bool MeshNodes::MeshNodeIsNonKinematicRigidDynamic(int localNodeIndex) {
+    MeshNode* currentNode = GetMeshNodeByLocalIndex(localNodeIndex);
+
+    while (currentNode) {
+        if (currentNode->rigidDynamicId != 0 && !currentNode->rigidIsKinematic) return true;
+
+        // Walk up the tree via parent index
+        currentNode = GetMeshNodeByLocalIndex(currentNode->localParentIndex);
+    }
+
+    return false;
 }
 
 void MeshNodes::CleanUp() {
@@ -359,6 +388,21 @@ void MeshNodes::UpdateHierarchy() {
         }
         else {
             meshNode.localMatrix = meshNode.localTransform * meshNode.transform.to_mat4();
+
+            // Overwrite with non-kinematic rigid transform if this node has one
+            if (!m_firstFrame && meshNode.rigidDynamicId != 0 && !meshNode.rigidIsKinematic) {
+                if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {
+            
+                    meshNode.localMatrix = rigidDynamic->GetWorldTransform();
+            
+                    //meshNode.worldMatrix = rigidDynamic->GetWorldTransform();
+                    //meshNode.worldspaceAabb = rigidDynamic->GetAABB();
+                    //
+                    //Renderer::DrawPoint(rigidDynamic->GetWorldTransform()[3], YELLOW);
+                    //Renderer::DrawPoint(meshNode.worldMatrix[3], BLUE);
+                }
+            }
+
         }
     }
 }
@@ -390,13 +434,13 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         }
     }
 
-    //for (MeshNode& meshNode : m_meshNodes) {
-    //    if (meshNode.type == MeshNodeType::RIGID_DYNAMIC) {
-    //        if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.physicsId)) {
-    //            Renderer::DrawPoint(rigidDynamic->GetCurrentPosition(), YELLOW);
-    //        }
-    //    }
-    //}
+    // Always dirty the hierarchy if there are any rigid dynamic nodes (RETHINK THIS!)
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.rigidDynamicId != 0) {
+            hierarchyDirty = true;
+            break;
+        }
+    }
 
     if (hierarchyDirty) {
         UpdateHierarchy();
@@ -427,9 +471,14 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         Material* material = GetMaterial(i);
         if (!material) continue;
 
-        meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
-        meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
+        if (!m_firstFrame && MeshNodeIsNonKinematicRigidDynamic(i)) {
+            meshNode.worldMatrix = meshNode.localMatrix; // Local matrix is world matrix in this case
+        }
+        else {
+           meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
+        }
 
+        meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
         meshNode.renderItem.objectType = (int)UniqueID::GetType(meshNode.parentObjectId);
         meshNode.renderItem.openableId = meshNode.openableId;
         meshNode.renderItem.customId = meshNode.customId;
@@ -452,31 +501,6 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         meshNode.renderItem.tintColorB = meshNode.tintColor.b;
 
         Util::PackUint64(meshNode.parentObjectId, meshNode.renderItem.objectIdLowerBit, meshNode.renderItem.objectIdUpperBit);
-
-        // if (meshNode.blendingMode == BlendingMode::STAINED_GLASS) {
-        //     if (Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex)) {
-        //         std::cout << mesh->GetName() << ": (";
-        //         std::cout << meshNode.renderItem.tintColorR << ", ";
-        //         std::cout << meshNode.renderItem.tintColorG << ", ";
-        //         std::cout << meshNode.renderItem.tintColorB << ") " << meshNode.globalMeshIndex << "\n";
-        //     }
-        //     std::cout << "\n";
-        // }
-
-        //if (meshNode.blendingMode == BlendingMode::MIRROR) {
-        //    static bool test = true;
-        //    if (Input::KeyPressed(HELL_KEY_M)) {
-        //        test = !test;
-        //    }
-        //
-        //    if (test) {
-        //        m_renderItemsMirror.push_back(meshNode.renderItem);
-        //        m_renderItemsGlass.push_back(meshNode.renderItem);
-        //    }
-        //    else {
-        //        m_renderItems.push_back(meshNode.renderItem);
-        //    }
-        //}
 
         switch (meshNode.blendingMode) {
             case BlendingMode::DEFAULT:           m_renderItems.push_back(meshNode.renderItem);                 break;
@@ -509,12 +533,11 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     m_worldMatrixPreviousFrame = worldMatrix;
     m_forceDirty = false;
 
-
-	if (m_firstFrame) {
+    if (m_firstFrame) {
         InitPhysicsTransforms();
-	}
+    }
 
-    UpdatePhysicsTransforms();
+    UpdateKinematicPhysicsTransforms();
 
     m_firstFrame = false;
 }
@@ -529,12 +552,17 @@ void MeshNodes::InitPhysicsTransforms() {
 }
 
 
-void MeshNodes::UpdatePhysicsTransforms() {
+void MeshNodes::UpdateKinematicPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-		if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0) {
-			Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
-		}
+        if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0) {
+            //if (Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
+            if (meshNode.rigidIsKinematic) { // this bool may not be correctly reflecting physx state???
+                Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
+            }
+        }
 	}
+
+    // ATTENTION! Rewrite this. YOu only wan to update kinematic rigids
 }
 
 
@@ -553,6 +581,16 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
         glm::vec3 e = 0.5f * (localMax - localMin);
 
         glm::mat4 M = worldMatrix * meshNode.localMatrix;
+
+        // UGLY
+        // UGLY
+        // UGLY
+        if (MeshNodeIsNonKinematicRigidDynamic(meshNode.nodeIndex)) {
+            M = meshNode.localMatrix;
+        }
+        // UGLY
+        // UGLY
+        // UGLY
 
         glm::vec3 worldCenter = glm::vec3(M * glm::vec4(c, 1.0f));
 

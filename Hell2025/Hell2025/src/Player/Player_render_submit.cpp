@@ -1,12 +1,13 @@
 #include "Player.h"
 #include "AssetManagement/AssetManager.h"
+#include "Bible/Bible.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
 #include "Util.h"
 
 void Player::SubmitAttachmentRenderItem(const std::string& weaponAttachmentName) {
-    WeaponAttachmentInfo* weaponAttachmentInfo = WeaponManager::GetWeaponAttachmentInfoByName(weaponAttachmentName);
+    WeaponAttachmentInfo* weaponAttachmentInfo = Bible::GetWeaponAttachmentInfoByName(weaponAttachmentName);
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
 

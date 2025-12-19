@@ -54,13 +54,13 @@ namespace Editor {
             testModels.AddChild("Test Model 4", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL4);
             
             EditorUI::FileMenuNode& weapons = pickups.AddChild("Weapons", Shortcut::NONE);
-            weapons.AddChild("AKS74U",          Shortcut::NONE,     nullptr);
-            weapons.AddChild("FN-P90",          Shortcut::NONE,     nullptr);
-            weapons.AddChild("Glock",           Shortcut::NONE,     nullptr);
-            weapons.AddChild("Golden Glock",    Shortcut::NONE,     nullptr);
-            weapons.AddChild("Remington 870",   Shortcut::NONE,     nullptr);
-            weapons.AddChild("SPAS",            Shortcut::NONE,     nullptr);
-            weapons.AddChild("Tokarev",         Shortcut::NONE,     nullptr);
+            weapons.AddChild("AKS74U",          Shortcut::NONE,     Editor::PlacePickUp, "AKS74U");
+            weapons.AddChild("FN-P90",          Shortcut::NONE,     Editor::PlacePickUp, "FNP90");
+            weapons.AddChild("Glock",           Shortcut::NONE,     Editor::PlacePickUp, "Glock");
+            weapons.AddChild("Golden Glock",    Shortcut::NONE,     Editor::PlacePickUp, "GoldenGlock");
+            weapons.AddChild("Remington 870",   Shortcut::NONE,     Editor::PlacePickUp, "Remington870");
+            weapons.AddChild("SPAS",            Shortcut::NONE,     Editor::PlacePickUp, "SPAS");
+            weapons.AddChild("Tokarev",         Shortcut::NONE,     Editor::PlacePickUp, "Tokarev");
             
             EditorUI::FileMenuNode& ammo = pickups.AddChild("Ammo", Shortcut::NONE);
             ammo.AddChild("AKS74U",                     Shortcut::NONE,     nullptr);

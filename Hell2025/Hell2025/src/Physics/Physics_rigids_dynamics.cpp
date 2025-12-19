@@ -16,7 +16,7 @@ namespace Physics {
         for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
             RigidDynamic& rigidDynamic = it->second;
             PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-            if (!pxRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) {
+            if (pxRigidDynamic && !pxRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) {
                 g_activeRigidDynamicAABBs.push_back(rigidDynamic.GetAABB());
             }
             it++;
@@ -348,6 +348,16 @@ namespace Physics {
        
     bool RigidDynamicExists(uint64_t rigidDynamicId) {
         return (g_rigidDynamics.find(rigidDynamicId) != g_rigidDynamics.end());
+    }
+
+    bool RigidDynamicIsKinematic(uint64_t rigidDynamicId) {
+        if (RigidDynamicExists(rigidDynamicId)) return false;
+
+        RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
+        PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+
+        if (!pxRigidDynamic) return false;
+        return pxRigidDynamic->getRigidBodyFlags().isSet(physx::PxRigidBodyFlag::eKINEMATIC);
     }
 
     glm::mat4 GetRigidDynamicWorldMatrix(uint64_t rigidDynamicId) {

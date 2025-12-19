@@ -26,11 +26,11 @@ namespace Bible {
 
         MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
         door.meshName = "DoorOld_Sides";
-        door.rigidDynamicAABB.createObject = true;
-        door.rigidDynamicAABB.kinematic = true;
-        door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        door.rigidDynamic.createObject = true;
+        door.rigidDynamic.kinematic = true;
+        door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
         MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
         hinges.meshName = "Door_Hinges";
@@ -116,11 +116,11 @@ namespace Bible {
 
         MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
         door.meshName = "DoorGlass_Sides";
-        door.rigidDynamicAABB.createObject = true;
-        door.rigidDynamicAABB.kinematic = true;
-        door.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        door.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        door.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        door.rigidDynamic.createObject = true;
+        door.rigidDynamic.kinematic = true;
+        door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
         MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
         hinges.meshName = "Door_Hinges";

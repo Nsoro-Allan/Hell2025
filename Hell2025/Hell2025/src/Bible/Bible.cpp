@@ -5,30 +5,43 @@
 
 namespace Bible {
     std::unordered_map<std::string, AmmoInfo> g_ammoInfos;
-    std::unordered_map<std::string, InventoryItemInfo> m_inventoryItemInfos;
+    std::unordered_map<std::string, InventoryItemInfo> g_inventoryItemInfos;
+    std::unordered_map<std::string, PickUpInfo> g_pickUpInfos;
     std::unordered_map<std::string, WeaponAttachmentInfo> g_weaponAttachmentInfos;
     std::unordered_map<std::string, WeaponInfo> g_weaponsInfos;
 
-    std::vector<std::string> g_sortedWeaponNames;
+    std::vector<std::string> g_sortedWeaponNames;  // Sorted by weapon type, then damage
+    std::vector<std::string> g_sortedAmmoNames;    // Sorted alphabetically
 
     void InitAmmoInfo();
     void InitInventoryItemInfo();
+    void InitPickUpInfo();
     void InitWeaponInfo();
     void InitWeaponAttachmentInfo();
+    void CreateSortedAmmoNameList();
+    void CreateSortedWeaponNameList();
+    void Validate();
 
     void Init() {
         g_ammoInfos.clear();
-        m_inventoryItemInfos.clear();
+        g_inventoryItemInfos.clear();
+        g_pickUpInfos.clear();
         g_weaponAttachmentInfos.clear();
         g_weaponsInfos.clear();
         g_sortedWeaponNames.clear();
+        g_sortedAmmoNames.clear();
 
         InitAmmoInfo();
         InitInventoryItemInfo();
+        InitPickUpInfo();
         InitWeaponInfo();
         InitWeaponAttachmentInfo();
 
+        Validate();
+
+        CreateSortedAmmoNameList();
         CreateSortedWeaponNameList();
+
         PrintDebugInfo();
 
         Logging::Init() << "The Bible has been read";
@@ -49,6 +62,17 @@ namespace Bible {
 
             default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed: non-implemented GenericObjectType: '" << Util::GenericObjectTypeToString(type) << "'";
         }
+    }
+
+    void CreateSortedAmmoNameList() {
+        g_sortedAmmoNames.clear();
+        g_sortedAmmoNames.reserve(g_ammoInfos.size());
+
+        for (const auto& [key, value] : g_ammoInfos) {
+            g_sortedAmmoNames.push_back(key);
+        }
+
+        std::sort(g_sortedAmmoNames.begin(), g_sortedAmmoNames.end());
     }
 
     void CreateSortedWeaponNameList() {
@@ -90,12 +114,36 @@ namespace Bible {
         for (const auto& weapon : automatics)  g_sortedWeaponNames.push_back(weapon.name);
     }
 
+    void Validate() {
+        // Weapon Info
+        for (const auto& [name, value] : g_weaponsInfos) {
+            const WeaponInfo& weaponInfo = value;
+
+            // Check ammo name
+            if (!AmmoInfoExists(weaponInfo.ammoType) && name != "Knife") {
+                Logging::Warning() << "WeaponInfo '" << name << "' has a not found ammoType '" << weaponInfo.ammoType << "'";
+            }
+            // Check pickup name
+            if (!PickUpInfoExists(weaponInfo.pickupName) && name != "Knife") {
+                Logging::Warning() << "WeaponInfo '" << name << "' has a not found pickupName '" << weaponInfo.pickupName << "'";
+            }
+        }
+    }
+
     void PrintDebugInfo() {
         std::cout << "\n** BIBLE **\n";
-        std::cout << "\n";
 
-        // Sorted weapon names
-        std::cout << "Sorted weapon names\n";
+        std::cout << "\nAmmo\n";
+        for (size_t i = 0; i < g_sortedAmmoNames.size(); ++i) {
+            std::cout << " " << i << ": " << g_sortedAmmoNames[i] << "\n";
+        }
+
+        std::cout << "\nPickups\n";
+        for (const auto& [name, value] : g_pickUpInfos) {
+            std::cout << " - " << name << "\n";
+        }
+
+        std::cout << "\nWeapons\n";
         for (size_t i = 0; i < g_sortedWeaponNames.size(); ++i) {
             std::cout << " " << i << ": " << g_sortedWeaponNames[i] << "\n";
         }
@@ -110,8 +158,14 @@ namespace Bible {
     }
 
     InventoryItemInfo& CreateInventoryItemInfo(const std::string& name) {
-        InventoryItemInfo& info = m_inventoryItemInfos[name];
+        InventoryItemInfo& info = g_inventoryItemInfos[name];
         info.m_name = name;
+        return info;
+    }
+
+    PickUpInfo& CreatePickUpInfo(const std::string& name) {
+        PickUpInfo& info = g_pickUpInfos[name];
+        info.name = name;
         return info;
     }
 
@@ -132,7 +186,11 @@ namespace Bible {
     }
 
     bool InventoryItemInfoExists(const std::string& name) {
-        return m_inventoryItemInfos.find(name) != m_inventoryItemInfos.end();
+        return g_inventoryItemInfos.find(name) != g_inventoryItemInfos.end();
+    }
+
+    bool PickUpInfoExists(const std::string& name) {
+        return g_pickUpInfos.find(name) != g_pickUpInfos.end();
     }
 
     bool WeaponAttachmentInfoExists(const std::string& name) {
@@ -143,12 +201,56 @@ namespace Bible {
         return g_weaponsInfos.find(name) != g_weaponsInfos.end();
     }
 
+
+    AmmoInfo* GetAmmoInfoByName(const std::string& name) {
+        if (AmmoInfoExists(name))
+            return &g_ammoInfos[name];
+
+        Logging::Warning() << "Bible::GetAmmoInfoByName::(...) failed: '" << name << "' not found\n";
+        return nullptr;
+    }
+
     InventoryItemInfo* GetInventoryItemInfoByName(const std::string& name) {
         if (InventoryItemInfoExists(name)) 
-            return &m_inventoryItemInfos[name];
+            return &g_inventoryItemInfos[name];
 
         Logging::Warning() << "Bible::GetInventoryItemInfoByName::(...) failed: '" << name << "' not found\n";
         return nullptr;
+    }
+
+    PickUpInfo* GetPickUpInfoByName(const std::string& name) {
+        if (WeaponInfoExists(name))
+            return &g_pickUpInfos[name];
+
+        Logging::Warning() << "Bible::GetPickUpInfoByName::(...) failed: '" << name << "' not found\n";
+        return nullptr;
+    }
+
+    WeaponInfo* GetWeaponInfoByName(const std::string& name) {
+        if (WeaponInfoExists(name))
+            return &g_weaponsInfos[name];
+
+        Logging::Warning() << "Bible::GetWeaponInfoByName::(...) failed: '" << name << "' not found\n";
+        return nullptr;
+    }
+
+
+    WeaponAttachmentInfo* GetWeaponAttachmentInfoByName(const std::string& name) {
+        if (WeaponAttachmentInfoExists(name))
+            return &g_weaponAttachmentInfos[name];
+
+        Logging::Warning() << "Bible::GetWeaponAttachmentInfoByName::(...) failed: '" << name << "' not found\n";
+        return nullptr;
+    }
+
+    int32_t GetWeaponIndexFromWeaponName(const std::string& weaponName) {
+        std::vector<WeaponInfo> g_sortedWeaponNames;
+        for (int i = 0; i < g_sortedWeaponNames.size(); i++) {
+            if (g_sortedWeaponNames[i].name == weaponName) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     int GetInventoryItemSizeByName(const std::string& name) {
@@ -156,5 +258,13 @@ namespace Bible {
             return itemInfo->m_cellSize;
         
         return 0;
+    }
+
+    const std::vector<std::string>& GetAmmoNameList() {
+        return g_sortedAmmoNames;
+    }
+
+    const std::vector<std::string>& GetWeaponNameList() {
+        return g_sortedWeaponNames;
     }
 }

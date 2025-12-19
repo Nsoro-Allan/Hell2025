@@ -8,6 +8,7 @@
 
 #include "AssetManagement/AssetManager.h"
 #include "Audio/Audio.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "Input/Input.h"
@@ -984,6 +985,11 @@ namespace World {
     }
 
     void AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
+        if (!Bible::GetPickUpInfoByName(createInfo.name)) {
+            Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' not found in bible";
+            return;
+        }
+
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
         g_pickUps.emplace_with_id(id, id, createInfo, spawnOffset);
     }

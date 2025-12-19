@@ -91,6 +91,7 @@ namespace Physics {
     void RemoveRigidDynamic(uint64_t rigidDynamicId);
     void AddFoceToRigidDynamic(uint64_t rigidDynamicId, glm::vec3 force);
     bool RigidDynamicExists(uint64_t rigidDynamicId);
+    bool RigidDynamicIsKinematic(uint64_t rigidDynamicId);
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
    
 

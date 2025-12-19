@@ -23,11 +23,11 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
         MeshNodeCreateInfo& walls = meshNodeCreateInfoSet.emplace_back();
         walls.meshName = "Fireplace_Body_Lower.002";
-        walls.rigidDynamicAABB.createObject = true;
-        walls.rigidDynamicAABB.kinematic = true;
-        walls.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        walls.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        walls.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        walls.rigidDynamic.createObject = true;
+        walls.rigidDynamic.kinematic = true;
+        walls.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        walls.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        walls.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         walls.addtoNavMesh = true;
 
         m_meshNodes.Init(id, "Fireplace", meshNodeCreateInfoSet);
@@ -65,11 +65,11 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
         MeshNodeCreateInfo& walls = meshNodeCreateInfoSet.emplace_back();
         walls.meshName = "FireplaceBrick_WallMain";
-        walls.rigidDynamicAABB.createObject = true;
-        walls.rigidDynamicAABB.kinematic = true;
-        walls.rigidDynamicAABB.filterData.raycastGroup = RAYCAST_DISABLED;
-        walls.rigidDynamicAABB.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        walls.rigidDynamicAABB.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        walls.rigidDynamic.createObject = true;
+        walls.rigidDynamic.kinematic = true;
+        walls.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        walls.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        walls.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         walls.addtoNavMesh = true;
 
         MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();

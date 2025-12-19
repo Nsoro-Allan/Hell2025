@@ -196,7 +196,7 @@ void Player::Update(float deltaTime) {
 }
 
 void Player::Respawn() {
-    WeaponManager::Init();
+    //WeaponManager::Init();
     m_inventory.Init();
 
     //World::GetKangaroos()[0].Respawn();
@@ -232,30 +232,6 @@ void Player::Respawn() {
 
     m_alive = true;
 
-   //if (m_viewportIndex == 0) {
-   //    SetFootPosition(glm::vec3(17.0f, 30.7f, 41.5f));
-   //    //SetFootPosition(glm::vec3(27.0f, 32.7f, 36.5f)); // roo
-   //}
-   //if (m_viewportIndex == 1) {
-   //    SetFootPosition(glm::vec3(17.0f, 30.7f, 38.5f));
-   //    //SetFootPosition(glm::vec3(12.5f, 30.6f, 45.5f));
-   //    m_camera.SetEulerRotation(glm::vec3(0, 0, 0));
-   //}
-
-    m_weaponStates.clear();
-    for (int i = 0; i < WeaponManager::GetWeaponCount(); i++) {
-        WeaponState& state = m_weaponStates.emplace_back();
-        state.name = WeaponManager::GetWeaponInfoByIndex(i)->name;
-        state.has = false;
-        state.ammoInMag = 0;
-    }
-
-    m_ammoStates.clear();
-    for (int i = 0; i < WeaponManager::GetAmmoTypeCount(); i++) {
-        AmmoState& state = m_ammoStates.emplace_back();
-        state.name = WeaponManager::GetAmmoInfoByIndex(i)->name;
-        state.ammoOnHand = 0;
-    }
 
     GiveDefaultLoadout();
     SwitchWeapon("Glock", WeaponAction::DRAW_BEGIN);

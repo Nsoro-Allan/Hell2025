@@ -6,29 +6,11 @@
 #include "UI/UiBackend.h"
 #include "Weapon/WeaponManager.h"
 
+#include "HellLogging.h"
+
 void Inventory::Init() {
     CloseInventory();
     ClearInventory();
-    InitWeaponAndAmmoStates();
-}
-
-void Inventory::InitWeaponAndAmmoStates() {
-    m_weaponStates.clear();
-    m_ammoStates.clear();
-
-    for (int i = 0; i < WeaponManager::GetWeaponCount(); i++) {
-        WeaponState& state = m_weaponStates.emplace_back();
-        state.name = WeaponManager::GetWeaponInfoByIndex(i)->name;
-        state.has = false;
-        state.ammoInMag = 0;
-    }
-
-    m_ammoStates.clear();
-    for (int i = 0; i < WeaponManager::GetAmmoTypeCount(); i++) {
-        AmmoState& state = m_ammoStates.emplace_back();
-        state.name = WeaponManager::GetAmmoInfoByIndex(i)->name;
-        state.ammoOnHand = 0;
-    }
 }
 
 void Inventory::OpenInventory() {
@@ -48,7 +30,7 @@ void Inventory::CloseInventory() {
     SetState(InventoryState::CLOSED);
 }
 
-void Inventory::AddItem(const std::string& name) {
+void Inventory::AddInventoryItem(const std::string& name) {
     InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(name);
     if (!itemInfo) return;
 
@@ -97,6 +79,26 @@ bool Inventory::MoveItem(int itemIndex, int cellX, int cellY, bool rotated) {
 
 void Inventory::ClearInventory() {
     m_items.clear();
+    m_weaponStates.clear();
+    m_ammoStates.clear();
+
+    // Reset weapon states
+    for (const std::string& name : Bible::GetWeaponNameList()) {
+        WeaponState& state = m_weaponStates.emplace_back();
+        state.name = name;
+        state.has = false;
+        state.ammoInMag = 0;
+    }
+
+    // Reset ammo states
+    m_ammoStates.clear();
+    for (const std::string& name : Bible::GetAmmoNameList()) {
+        AmmoState& state = m_ammoStates.emplace_back();
+        state.name = name;
+        state.ammoOnHand = 0;
+        std::cout << name << "\n";
+    }
+
     UpdateOccupiedSlotsArray();
 }
 
@@ -301,4 +303,58 @@ bool Inventory::InBounds(int x, int y) {
 
 bool Inventory::ItemSelected() {
     return GetItemAtIndex(GetSelectedItemIndex()) != nullptr;
+}
+
+void Inventory::GiveAmmo(const std::string& name, int amount) {
+    for (AmmoState& ammoState : m_ammoStates) {
+        if (ammoState.name == name) {
+            ammoState.ammoOnHand += amount;
+            return;
+        }
+    }
+
+    Logging::Warning() << "Inventory::GiveAmmo(..) failed: '" << name << "' not found in m_ammoStates";
+}
+
+//void Inventory::GiveItem(const std::string& name) {
+//
+//}
+
+void Inventory::GiveWeapon(const std::string& name) {
+    for (WeaponState& weaponState : m_weaponStates) {
+        if (weaponState.name == name) {
+
+            // If you don't already have it
+            if (!weaponState.has) {
+                weaponState.has = true;
+                weaponState.ammoInMag = Bible::GetWeaponMagSize(name);
+                AddInventoryItem(name);
+            }
+            // If you do already have it
+            else {
+                Logging::ToDo() << "Inventory::GiveWeapon(..) for when you already have the weapon";
+            }
+            return;
+        }
+    }
+
+    Logging::Warning() << "Inventory::GiveWeapon(..) failed: '" << name << "' not found in g_weaponStates";
+}
+
+WeaponState* Inventory::GetWeaponStateByName(const std::string& name) {
+    for (int i = 0; i < m_weaponStates.size(); i++) {
+        if (m_weaponStates[i].name == name) {
+            return &m_weaponStates[i];
+        }
+    }
+    return nullptr;
+}
+
+AmmoState* Inventory::GetAmmoStateByName(const std::string& name) {
+    for (int i = 0; i < m_ammoStates.size(); i++) {
+        if (m_ammoStates[i].name == name) {
+            return &m_ammoStates[i];
+        }
+    }
+    return nullptr;
 }

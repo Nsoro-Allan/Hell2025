@@ -296,8 +296,8 @@ private:
     ShellEjectionState m_shellEjectionState;
     WeaponAction m_weaponAction = DRAW_BEGIN;
     
-    std::vector<WeaponState> m_weaponStates;
-    std::vector<AmmoState> m_ammoStates;
+    //std::vector<WeaponState> m_weaponStates;
+    //std::vector<AmmoState> m_ammoStates;
 
     float m_waterImpactVelocity = 0;
 

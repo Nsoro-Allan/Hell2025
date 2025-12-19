@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include "AssetManagement/AssetManager.h"
 #include "Audio/Audio.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "Input/Input.h"
 #include "Input/InputMulti.h"
@@ -101,22 +102,27 @@ void Player::UpdateWeaponLogic(float deltaTime) {
 
 void Player::GiveDefaultLoadout() {
     // Always give knife
-    m_inventory.AddItem("Knife");
-    m_inventory.AddItem("Glock");
-    m_inventory.AddItem("GoldenGlock");
-    m_inventory.AddItem("Tokarev");
-    m_inventory.AddItem("Remington870");
-    m_inventory.AddItem("SPAS");
-    m_inventory.AddItem("BlackSkull");
-    m_inventory.AddItem("SmallKey");
+    m_inventory.GiveWeapon("Knife");
 
+    // Dev load out
+    m_inventory.GiveWeapon("Glock");
+    m_inventory.GiveWeapon("GoldenGlock");
+    m_inventory.GiveWeapon("Tokarev");
+    m_inventory.GiveWeapon("Remington870");
+    m_inventory.GiveWeapon("SPAS");
 
-    GiveWeapon("Knife");
-    GiveWeapon("SPAS");
-    GiveWeapon("Remington870");
-    GiveWeapon("Glock");
-    GiveWeapon("Tokarev");
-    GiveWeapon("GoldenGlock");
+    m_inventory.GiveAmmo("Shotgun", 80);
+    m_inventory.GiveAmmo("Glock", 200);
+    m_inventory.GiveAmmo("Tokarev", 200);
+
+    //m_inventory.AddItem("Knife");
+    //m_inventory.AddItem("Glock");
+    //m_inventory.AddItem("GoldenGlock");
+    //m_inventory.AddItem("Tokarev");
+    //m_inventory.AddItem("Remington870");
+    //m_inventory.AddItem("SPAS");
+    m_inventory.AddInventoryItem("BlackSkull");
+    m_inventory.AddInventoryItem("SmallKey");
 
     GiveAmmo("Shotgun", 80);
     GiveAmmo("Glock", 200);
@@ -127,31 +133,34 @@ void Player::GiveDefaultLoadout() {
 }
 
 void Player::NextWeapon() {
+    std::vector<WeaponState>& weaponStates = m_inventory.GetWeaponStates();
+
     m_currentWeaponIndex++;
-    if (m_currentWeaponIndex == m_weaponStates.size()) {
+    if (m_currentWeaponIndex == weaponStates.size()) {
         m_currentWeaponIndex = 0;
     }
-    while (!m_weaponStates[m_currentWeaponIndex].has) {
+    while (!weaponStates[m_currentWeaponIndex].has) {
         m_currentWeaponIndex++;
-        if (m_currentWeaponIndex == m_weaponStates.size()) {
+        if (m_currentWeaponIndex == weaponStates.size()) {
             m_currentWeaponIndex = 0;
         }
     }
     Audio::PlayAudio("NextWeapon.wav", 0.5f);
-    SwitchWeapon(m_weaponStates[m_currentWeaponIndex].name, DRAW_BEGIN);
+    SwitchWeapon(weaponStates[m_currentWeaponIndex].name, DRAW_BEGIN);
 }
 
 void Player::SwitchWeapon(const std::string& name, WeaponAction weaponAction) {
+    std::vector<WeaponState>& weaponStates = m_inventory.GetWeaponStates();
     WeaponState* state = GetWeaponStateByName(name);
-    WeaponInfo* weaponInfo = WeaponManager::GetWeaponInfoByName(name);
+    WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(name);
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
 
     if (!state) return;
     if (!weaponInfo) return;
     if (!viewWeapon) return;
 
-    for (int i = 0; i < m_weaponStates.size(); i++) {
-        if (m_weaponStates[i].name == name) {
+    for (int i = 0; i < weaponStates.size(); i++) {
+        if (weaponStates[i].name == name) {
             m_currentWeaponIndex = i;
         }
     }
@@ -196,12 +205,13 @@ WeaponAction& Player::GetWeaponAction() {
 }
 
 WeaponInfo* Player::GetCurrentWeaponInfo() {
-    return WeaponManager::GetWeaponInfoByName(m_weaponStates[m_currentWeaponIndex].name);;
+    std::vector<WeaponState>& weaponStates = m_inventory.GetWeaponStates();
+    return Bible::GetWeaponInfoByName(weaponStates[m_currentWeaponIndex].name);;
 }
 
 void Player::GiveWeapon(const std::string& name) {
     WeaponState* state = GetWeaponStateByName(name);
-    WeaponInfo* weaponInfo = WeaponManager::GetWeaponInfoByName(name);
+    WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(name);
     if (state && weaponInfo) {
         state->has = true;
         state->ammoInMag = weaponInfo->magSize;
@@ -217,7 +227,7 @@ void Player::GiveAmmo(const std::string& name, int amount) {
 }
 
 void Player::GiveSight(const std::string& weaponName) {
-    WeaponInfo* weaponInfo = WeaponManager::GetWeaponInfoByName(weaponName);
+    WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(weaponName);
     WeaponState* state = GetWeaponStateByName(weaponName);
     if (state && weaponInfo) {
         state->hasSight = true;
@@ -225,7 +235,7 @@ void Player::GiveSight(const std::string& weaponName) {
 }
 
 void Player::GiveSilencer(const std::string& weaponName) {
-    WeaponInfo* weaponInfo = WeaponManager::GetWeaponInfoByName(weaponName);
+    WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(weaponName);
     WeaponState* state = GetWeaponStateByName(weaponName);
     if (state && weaponInfo) {
         state->hasSilencer = true;
@@ -233,21 +243,11 @@ void Player::GiveSilencer(const std::string& weaponName) {
 }
 
 WeaponState* Player::GetWeaponStateByName(const std::string& name) {
-    for (int i = 0; i < m_weaponStates.size(); i++) {
-        if (m_weaponStates[i].name == name) {
-            return &m_weaponStates[i];
-        }
-    }
-    return nullptr;
+    return m_inventory.GetWeaponStateByName(name);
 }
 
 AmmoState* Player::GetAmmoStateByName(const std::string& name) {
-    for (int i = 0; i < m_ammoStates.size(); i++) {
-        if (m_ammoStates[i].name == name) {
-            return &m_ammoStates[i];
-        }
-    }
-    return nullptr;
+    return m_inventory.GetAmmoStateByName(name);
 }
 
 AmmoState* Player::GetCurrentAmmoState() {
@@ -261,7 +261,7 @@ AmmoInfo* Player::GetCurrentAmmoInfo() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (!weaponInfo) return nullptr;
 
-    return WeaponManager::GetAmmoInfoByName(weaponInfo->ammoType);
+    return Bible::GetAmmoInfoByName(weaponInfo->ammoType);
 }
 
 WeaponState* Player::GetCurrentWeaponState() {
@@ -344,7 +344,7 @@ void Player::SpawnBullet(float variance) {
     createInfo.origin = GetCameraPosition();
     createInfo.direction = bulletDirection;
     createInfo.damage = weaponInfo->damage;
-    createInfo.weaponIndex = WeaponManager::GetWeaponIndexFromWeaponName(weaponInfo->name);
+    createInfo.weaponIndex = Bible::GetWeaponIndexFromWeaponName(weaponInfo->name);
     createInfo.ownerObjectId = m_playerId;
 
     World::AddBullet(createInfo);
@@ -369,10 +369,10 @@ void Player::UpdateWeaponSlide() {
 
 void Player::DropWeapons() {
 
-    for (WeaponState& weaponState : m_weaponStates) {
+    for (WeaponState& weaponState : m_inventory.GetWeaponStates()) {
         if (weaponState.has) {
             
-            WeaponInfo* weaponInfo = WeaponManager::GetWeaponInfoByName(weaponState.name);
+            WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(weaponState.name);
             if (!weaponInfo) {
                 std::cout << "You tried to drop a weapon with an invalid name somehow...\n";
                 continue;
@@ -384,7 +384,7 @@ void Player::DropWeapons() {
                 createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
-                createInfo.type = Util::StringToPickUpType(weaponInfo->pickupName);
+                createInfo.name = weaponInfo->pickupName;
 
                 createInfo.intitialForce.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
                 createInfo.intitialForce.y = 1.0f;
