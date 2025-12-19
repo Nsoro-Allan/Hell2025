@@ -66,8 +66,8 @@ namespace Editor {
             ammo.AddChild("AKS74U",                     Shortcut::NONE,     nullptr);
             ammo.AddChild("FN-P90",                     Shortcut::NONE,     nullptr);
             ammo.AddChild("Glock",                      Shortcut::NONE,     nullptr);
-            ammo.AddChild("Shotgun Shells Buckshot",    Shortcut::NONE,     nullptr);
-            ammo.AddChild("Shotgun Shells Slug",        Shortcut::NONE,     nullptr);
+            ammo.AddChild("Shotgun Shells Buckshot",    Shortcut::NONE,     Editor::PlacePickUp, "ShotgunBuckShotBox");
+            ammo.AddChild("Shotgun Shells Slug",        Shortcut::NONE,     Editor::PlacePickUp, "ShotgunSlugBox");
             ammo.AddChild("Tokarev",                    Shortcut::NONE,     nullptr);
 
             if (GetEditorMode() == EditorMode::MAP_OBJECT_EDITOR) {

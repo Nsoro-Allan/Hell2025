@@ -155,5 +155,5 @@ void Fireplace::Update(float deltaTime) {
 }
 
 void Fireplace::CleanUp() {
-
+    m_meshNodes.CleanUp();
 }

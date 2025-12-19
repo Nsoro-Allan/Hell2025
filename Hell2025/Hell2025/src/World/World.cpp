@@ -627,6 +627,10 @@ namespace World {
             UpdateWeatherBoardMeshBuffer();
         }
 
+        if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
+            pickUp->SetPosition(position);
+        }
+
         if (PictureFrame* pictureFrame = World::GetPictureFrameByObjectId(objectId)) {
             pictureFrame->SetPosition(position);
         }
@@ -658,6 +662,9 @@ namespace World {
         }
         if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
             genericObject->SetRotation(rotation);
+        }
+        if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
+            pickUp->SetRotation(rotation);
         }
     }
 
@@ -984,14 +991,16 @@ namespace World {
         piano.Init(createInfo);
     }
 
-    void AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
+    uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
         if (!Bible::GetPickUpInfoByName(createInfo.name)) {
             Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' not found in bible";
-            return;
+            return 0;
         }
 
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
         g_pickUps.emplace_with_id(id, id, createInfo, spawnOffset);
+   
+        return id;
     }
 
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset) {

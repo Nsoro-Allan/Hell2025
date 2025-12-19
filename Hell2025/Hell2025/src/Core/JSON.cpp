@@ -89,10 +89,15 @@ namespace nlohmann {
         j = nlohmann::json{
             {"Position", createInfo.position},
             {"Rotation", createInfo.rotation},
-            //{"Type", Util::PickUpTypeToString(createInfo.type)}
+            {"SaveToFile", createInfo.saveToFile},
+            {"Respawn", createInfo.respawn},
+            {"DisablePhysicsAtSpawn", createInfo.disablePhysicsAtSpawn},
+            {"Name", createInfo.name},
+            {"Type", Util::PickUpTypeToString(createInfo.type)},
+            {"EditorName", createInfo.editorName}
         };
     }
-    
+        
     void to_json(nlohmann::json& j, const PictureFrameCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
@@ -235,7 +240,12 @@ namespace nlohmann {
     void from_json(const nlohmann::json& j, PickUpCreateInfo& info) {
         info.position = j.value("Position", glm::vec3(0.0f));
         info.rotation = j.value("Rotation", glm::vec3(0.0f));
-        //info.name = Util::StringToPickUpType(j.value("Type", UNDEFINED_STRING));
+        info.type = Util::StringToPickUpType(j.value("Type", "UNDEFINED_STRING"));
+        info.respawn = j.value("Respawn", true);
+        info.saveToFile = j.value("SaveToFile", true);
+        info.disablePhysicsAtSpawn = j.value("DisablePhysicsAtSpawn", true);
+        info.name = j.value("Name", UNDEFINED_STRING);
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
     }
 
     void from_json(const nlohmann::json& j, PictureFrameCreateInfo& info) {

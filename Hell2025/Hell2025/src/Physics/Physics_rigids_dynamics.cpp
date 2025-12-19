@@ -155,19 +155,19 @@ namespace Physics {
         return physicsID;
     }
 
-    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset) {
-        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, filterData, localOffset.to_mat4());
+    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const Transform& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, mass, filterData, localOffset.to_mat4());
     }
 
-    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset) {
-        return CreateRigidDynamicFromBoxExtents(transform.to_mat4(), boxExtents, kinematic, filterData, localOffset);
+    uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const glm::mat4& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform.to_mat4(), boxExtents, kinematic, mass, filterData, localOffset);
     }
 
-    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const Transform& localOffset) {
-        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, filterData, localOffset.to_mat4());
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const Transform& localOffset) {
+        return CreateRigidDynamicFromBoxExtents(transform, boxExtents, kinematic, mass, filterData, localOffset.to_mat4());
     }
 
-    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, PhysicsFilterData filterData, const glm::mat4& localOffset) {
+    uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const glm::mat4& localOffset) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
         PxScene* pxScene = Physics::GetPxScene();
         PxMaterial* material = Physics::GetDefaultMaterial();
@@ -199,7 +199,13 @@ namespace Physics {
 
         // Kinematic flag
         pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
-        
+
+        // Mass stuff
+        float volume = Util::GetCubeVolume(halfWidth, halfHeight, halfDepth);
+        float density = Util::GetDensity(mass, volume);
+        pxRigidDynamic->attachShape(*pxShape);
+        PxRigidBodyExt::updateMassAndInertia(*pxRigidDynamic, density);
+
         // Create DynamicBox
         uint64_t physicsID = UniqueID::GetNextPhysicsId();
         RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
@@ -401,43 +407,43 @@ namespace Physics {
         }
     }
 
-    void RemoveRigidDynamic(uint64_t rigidDynamicId) {
-        if (RigidDynamicExists(rigidDynamicId)) {
-            PxPhysics* pxPhysics = Physics::GetPxPhysics();
-            PxScene* pxScene = Physics::GetPxScene();
-            RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
-            PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-            PxShape* pxShape = rigidDynamic.GetPxShape();
+    //void RemoveRigidDynamic(uint64_t rigidDynamicId) {
+    //    if (RigidDynamicExists(rigidDynamicId)) {
+    //        PxPhysics* pxPhysics = Physics::GetPxPhysics();
+    //        PxScene* pxScene = Physics::GetPxScene();
+    //        RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
+    //        PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+    //        PxShape* pxShape = rigidDynamic.GetPxShape();
+    //
+    //        // Remove rigid
+    //        if (pxRigidDynamic) {
+    //
+    //            // Clean up its user data
+    //            if (pxRigidDynamic->userData) {
+    //                delete static_cast<PhysicsUserData*>(pxRigidDynamic->userData);
+    //                pxRigidDynamic->userData = nullptr;
+    //            }
+    //            // Remove it from PxScene
+    //            if (pxRigidDynamic->getScene() != nullptr) {
+    //                pxScene->removeActor(*pxRigidDynamic);
+    //            }
+    //            // Release it
+    //            pxRigidDynamic->release();
+    //            pxRigidDynamic = nullptr;
+    //        }
+    //
+    //        // Remove shape
+    //        if (pxShape) {
+    //            pxShape->release();
+    //            pxShape = nullptr;
+    //        }
+    //
+    //        // Remove from container
+    //        g_rigidDynamics.erase(rigidDynamicId);
+    //    }
+    //}
 
-            // Remove rigid
-            if (pxRigidDynamic) {
-
-                // Clean up its user data
-                if (pxRigidDynamic->userData) {
-                    delete static_cast<PhysicsUserData*>(pxRigidDynamic->userData);
-                    pxRigidDynamic->userData = nullptr;
-                }
-                // Remove it from PxScene
-                if (pxRigidDynamic->getScene() != nullptr) {
-                    pxScene->removeActor(*pxRigidDynamic);
-                }
-                // Release it
-                pxRigidDynamic->release();
-                pxRigidDynamic = nullptr;
-            }
-
-            // Remove shape
-            if (pxShape) {
-                pxShape->release();
-                pxShape = nullptr;
-            }
-
-            // Remove from container
-            g_rigidDynamics.erase(rigidDynamicId);
-        }
-    }
-
-    void RemoveAnyRigidDynamicMarkedForRemoval() {
+    void RemoveAnyRigidDynamicMarkedForRemovalOLD() {
         PxScene* pxScene = Physics::GetPxScene();
 
         for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
@@ -470,6 +476,39 @@ namespace Physics {
             else {
                 ++it;
             }
+        }
+    }
+
+    void RemoveAnyRigidDynamicMarkedForRemoval() {
+        for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
+            RigidDynamic& rigidDynamic = it->second;
+
+            if (!rigidDynamic.IsMarkedForRemoval()) { ++it; continue; }
+
+
+            std::cout << "removed RigidDynmaic " << it->first << " ";
+
+            PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+            std::cout << pxRigidDynamic << "\n";
+
+            if (pxRigidDynamic) {
+                std::cout << "a\n";
+                if (PxScene* actorScene = pxRigidDynamic->getScene()) {
+                    std::cout << "b\n";
+                    actorScene->removeActor(*pxRigidDynamic);
+                    std::cout << "c\n";
+                }
+
+
+                std::cout << "d\n";
+                // Make future accidental reuse obvious
+                rigidDynamic.SetPxRigidDynamic(nullptr);
+                std::cout << "e\n";
+                pxRigidDynamic->release();
+                std::cout << "f\n";
+            }
+
+            it = g_rigidDynamics.erase(it);
         }
     }
 

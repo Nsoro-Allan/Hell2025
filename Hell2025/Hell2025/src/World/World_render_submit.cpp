@@ -33,6 +33,9 @@ namespace World {
 
         for (PickUp& pickUp : GetPickUps()) {
             RenderDataManager::SubmitRenderItems(pickUp.GetRenderItems());
+            if (Editor::GetSelectedObjectId() == pickUp.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(pickUp.GetRenderItems());
+            }
         }
 
         for (PictureFrame& pictureFrame : GetPictureFrames()) {

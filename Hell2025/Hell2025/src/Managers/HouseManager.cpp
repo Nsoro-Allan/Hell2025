@@ -40,6 +40,7 @@ namespace HouseManager {
         createInfoCollection.genericObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.housePlanes = json.value("Planes", std::vector<HousePlaneCreateInfo>{}); // error here
+        createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pictureFrames = json.value("PictureFrames", std::vector<PictureFrameCreateInfo>{});
         createInfoCollection.walls = json.value("Walls", std::vector<WallCreateInfo>{});

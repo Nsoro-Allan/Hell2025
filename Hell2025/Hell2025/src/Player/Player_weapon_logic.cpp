@@ -385,14 +385,22 @@ void Player::DropWeapons() {
                 createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.name = weaponInfo->pickupName;
+                createInfo.saveToFile = false;
+                createInfo.disablePhysicsAtSpawn = false;
+                createInfo.respawn = false;
 
-                createInfo.intitialForce.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
-                createInfo.intitialForce.y = 1.0f;
-                createInfo.intitialForce.z = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
-                createInfo.intitialForce = glm::normalize(createInfo.intitialForce);
-                createInfo.intitialForce *= 200.0f;     
+                glm::vec3 force = glm::vec3(0.0f);
+                force.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
+                force.y = 1.0f;
+                force.z = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
+                force = glm::normalize(force);
+                force *= 200.0f;     
 
-                World::AddPickUp(createInfo);
+                uint64_t id = World::AddPickUp(createInfo);
+                if (PickUp* pickUp = World::GetPickUpByObjectId(id)) {
+                    pickUp->GetMeshNodes().AddForceToPhsyics(force);
+                    std::cout << "tried to add force to " << weaponInfo->pickupName << "\n";
+                }
                 //std::cout << "Dropped weapon!  weapon name: '" << weaponState.name << "' pickup name: '" << weaponInfo->pickupName << "'\n";
             }
         }

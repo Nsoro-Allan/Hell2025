@@ -308,17 +308,17 @@ enum struct CollisionShapeType {
     UNDEFINED
 };
 
-enum struct PickUpTypeOld {
-    SHOTGUN_AMMO_BUCKSHOT,
-    SHOTGUN_AMMO_SLUG,
-    GLOCK,
-    GOLDEN_GLOCK,
-    AKS74U,
-    SPAS,
-    REMINGTON_870,
-    TOKAREV,
-    UNDEFINED
-};
+//enum struct PickUpTypeOld {
+//    SHOTGUN_AMMO_BUCKSHOT,
+//    SHOTGUN_AMMO_SLUG,
+//    GLOCK,
+//    GOLDEN_GLOCK,
+//    AKS74U,
+//    SPAS,
+//    REMINGTON_870,
+//    TOKAREV,
+//    UNDEFINED
+//};
 
 enum struct EditorMode {
     HOUSE_EDITOR,

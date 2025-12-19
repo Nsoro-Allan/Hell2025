@@ -14,23 +14,29 @@ struct PickUp {
     ~PickUp() = default;
 
     void SetPosition(const glm::vec3& position);
+    void SetRotation(const glm::vec3& rotation);
     void Update(float deltaTime);
     void CleanUp();
 
+    void SetDisabledPhysicsAtSpawnState(bool state);
+    void SetRespawnState(bool state);
+
+    MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
     const PickUpCreateInfo& GetCreateInfo() const       { return m_createInfo; }
     const PickUpType GetType() const                    { return m_createInfo.type; }
-
     const std::vector<RenderItem>& GetRenderItems()     { return m_meshNodes.GetRenderItems(); }
     const glm::vec3 GetPosition()                       { return m_modelMatrix[3]; }
     const glm::vec3& GetRotation()                      { return m_initialTransform.rotation; }
     const glm::mat4& GetModelMatrix()                   { return m_modelMatrix; }
     const uint64_t GetObjectId()                        { return m_objectId; }
+    const bool GetDisabledPhysicsAtSpawnState()         { return m_createInfo.disablePhysicsAtSpawn; }
+    const bool GetRespawnState()                        { return m_createInfo.respawn; }
 
 private:
     uint64_t m_objectId = 0;
-    uint64_t m_physicsId = 0;
     PickUpCreateInfo m_createInfo;
     Transform m_initialTransform;
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
     MeshNodes m_meshNodes;
+    bool m_firstFrame = true;
 };

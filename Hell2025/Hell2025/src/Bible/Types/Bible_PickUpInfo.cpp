@@ -21,6 +21,18 @@ namespace Bible {
         PickUpInfo& spas = CreatePickUpInfo("SPAS");
         spas.mass = 3.3f;
         spas.type = PickUpType::WEAPON;
+
+        PickUpInfo& tokarev = CreatePickUpInfo("Tokarev");
+        tokarev.mass = 0.7f;
+        tokarev.type = PickUpType::WEAPON;
+
+        PickUpInfo& shottyBuckShotBox = CreatePickUpInfo("ShotgunBuckShotBox");
+        shottyBuckShotBox.mass = 0.45f;
+        shottyBuckShotBox.type = PickUpType::AMMO;
+
+        PickUpInfo& shottySlugBox = CreatePickUpInfo("ShotgunSlugBox");
+        shottySlugBox.mass = 0.45f;
+        shottySlugBox.type = PickUpType::AMMO;
     }
 
     float GetPickUpMass(const std::string& name) {

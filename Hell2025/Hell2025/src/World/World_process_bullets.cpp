@@ -158,7 +158,7 @@ namespace World {
                     SpawnBlood(hitPosition, -bullet.GetDirection());
                 }
 
-                // Apply physics force
+                // Apply physics force      (THIS DOES NOT WORK FOR BVH PHYSICS HITS YOU THINK?????)
                 if (physicsId != 0) {
                     float strength = 25000.0f;
                     strength = 15000.0f;
@@ -191,6 +191,13 @@ namespace World {
                     decalPaintingInfo.rayOrigin = bullet.GetOrigin();
                     decalPaintingInfo.rayDirection = bullet.GetDirection();
                     RenderDataManager::SubmitDecalPaintingInfo(decalPaintingInfo);
+                }
+
+                // This is probably sketchy...
+                if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
+                    float strength = 1000.0f;
+                    glm::vec3 force = bullet.GetDirection() * strength;
+                    pickUp->GetMeshNodes().AddForceToPhsyics(force);
                 }
 
                 // TEST FOR CHAIN

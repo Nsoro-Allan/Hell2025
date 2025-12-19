@@ -57,6 +57,10 @@ namespace Editor {
     EditorUI::CheckBox g_doorHasDeadLock;
     EditorUI::CheckBox g_doorDeadLockedAtStart;
 
+    // Pickup stuff
+    EditorUI::CheckBox g_pickUpDisablePhysicsAtSpawn;
+    EditorUI::CheckBox g_pickUpRespawn;
+
     void InitLeftPanel() {
         g_mapPropertiesHeader.SetTitle("Map Editor");
         g_objectPropertiesHeader.SetTitle("Properties");
@@ -98,6 +102,9 @@ namespace Editor {
         g_doorFrameBackMaterial.SetText("Frame Back Material");
         g_doorHasDeadLock.SetText("Has Deadlock");
         g_doorDeadLockedAtStart.SetText("Deadlocked at start");
+
+        g_pickUpDisablePhysicsAtSpawn.SetText("No PhysX at Start");
+        g_pickUpRespawn.SetText("Respawn");
     }
 
     void UpdateOutliner() {
@@ -261,6 +268,33 @@ namespace Editor {
                         door->SetDeadLockedAtInitState(g_doorDeadLockedAtStart.GetState());
                     }
                 }
+
+
+                // Pick Ups
+                if (GetSelectedObjectType() == ObjectType::PICK_UP) {
+                    if (PickUp* pickUp = World::GetPickUpByObjectId(GetSelectedObjectId())) {
+                        // Retrieve state
+                        g_positionX.SetValue(pickUp->GetPosition().x);
+                        g_positionY.SetValue(pickUp->GetPosition().y);
+                        g_positionZ.SetValue(pickUp->GetPosition().z);
+                        g_rotationX.SetValue(pickUp->GetRotation().x);
+                        g_rotationY.SetValue(pickUp->GetRotation().y);
+                        g_rotationZ.SetValue(pickUp->GetRotation().y);
+                        g_pickUpDisablePhysicsAtSpawn.SetState(pickUp->GetDisabledPhysicsAtSpawnState());
+                        g_pickUpRespawn.SetState(pickUp->GetRespawnState());
+
+                        // Render and set state
+                        if (g_positionX.CreateImGuiElements())                      pickUp->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                        if (g_positionY.CreateImGuiElements())                      pickUp->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                        if (g_positionZ.CreateImGuiElements())                      pickUp->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                        if (g_rotationX.CreateImGuiElements())                      pickUp->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                        if (g_rotationY.CreateImGuiElements())                      pickUp->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                        if (g_rotationZ.CreateImGuiElements())                      pickUp->SetRotation(glm::vec3(g_rotationX.GetValue(), g_rotationY.GetValue(), g_rotationZ.GetValue()));
+                        if (g_pickUpDisablePhysicsAtSpawn.CreateImGuiElements())    pickUp->SetDisabledPhysicsAtSpawnState(g_pickUpDisablePhysicsAtSpawn.GetState());
+                        if (g_pickUpRespawn.CreateImGuiElements())                  pickUp->SetRespawnState(g_pickUpRespawn.GetState());
+                    }
+                }
+
 
                 // House planes (aka floors and ceilings)
                 if (HousePlane* housePlane = World::GetHousePlaneByObjectId(GetSelectedObjectId())) {

@@ -117,29 +117,28 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
 
                 PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
                 meshNode->rigidIsKinematic = createInfo.rigidDynamic.kinematic;
-                //float mass = 1.0f;
+
+                float mass = createInfo.rigidDynamic.mass;
+                bool kinematic = createInfo.rigidDynamic.kinematic;
 
                 Logging::Init() << "Creating rigid box for " << mesh->GetName() << "\n";
 
                 if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::BOX) {
-                    meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, meshNode->rigidIsKinematic, filterData, offsetTransform);
+                    meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, kinematic, mass, filterData, offsetTransform);
                 }
-                else if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::CONVEX_MESH) {
-
-                    // Everything in here is sketchy. Fix it!
-                    if (Model* physicsModel = AssetManager::GetModelByName(createInfo.rigidDynamic.convexMeshModelName)) {
-                        int32_t meshIndex = physicsModel->GetMeshIndices()[0]; // you wanna do all mesh not just the first
-                        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-                        if (mesh) {
-                            std::span<Vertex> vertices = AssetManager::GetVerticesSpan(mesh->baseVertex, mesh->vertexCount);
-                            std::span<uint32_t> indices = AssetManager::GetIndicesSpan(mesh->baseIndex, mesh->indexCount);
-                            float mass = createInfo.rigidDynamic.mass;
-                            meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
-                        }
-
-                        //meshNode->rigidDynamicId = Physics::CreateRigidStaticConvexMeshFromModel(spawnTransform, createInfo.rigidDynamicAABB.convexMeshModelName, filterData);
-                    }
-                }
+                //else if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::CONVEX_MESH) {
+                //
+                //    // Everything in here is sketchy. Fix it!
+                //    if (Model* physicsModel = AssetManager::GetModelByName(createInfo.rigidDynamic.convexMeshModelName)) {
+                //        int32_t meshIndex = physicsModel->GetMeshIndices()[0]; // you wanna do all mesh not just the first
+                //        Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
+                //        if (mesh) {
+                //            std::span<Vertex> vertices = AssetManager::GetVerticesSpan(mesh->baseVertex, mesh->vertexCount);
+                //            std::span<uint32_t> indices = AssetManager::GetIndicesSpan(mesh->baseIndex, mesh->indexCount);
+                //            meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
+                //        }
+                //    }
+                //}
             }
             else {
                 Logging::Warning() << "You tried to create an rigidDynamicAABB for mesh node " << mesh->GetName() << " but it already had a rigidDynamicId\n";
@@ -264,9 +263,13 @@ bool MeshNodes::MeshNodeIsNonKinematicRigidDynamic(int localNodeIndex) {
 
 void MeshNodes::CleanUp() {
     // First remove physics shapes
-	for (MeshNode& meshNode : m_meshNodes) {
-		Physics::RemoveRigidDynamic(meshNode.rigidDynamicId);
-	}
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.rigidDynamicId != 0) {
+            std::cout << "Marking rigid removal for meshNode from " << m_modelName << " " << meshNode.rigidDynamicId << "\n";
+            Physics::MarkRigidDynamicForRemoval(meshNode.rigidDynamicId);
+            //Physics::RemoveRigidDynamic(meshNode.rigidDynamicId);
+        }
+    }
 
     m_modelName = "";
     m_nodeCount = 0;
@@ -350,6 +353,10 @@ void MeshNodes::DrawWorldspaceAABBs(glm::vec4 color) {
 
 void MeshNodes::ForceDirty() {
     m_forceDirty = true;
+}
+
+void MeshNodes::ResetFirstFrame() {
+    m_firstFrame = true;
 }
 
 const AABB* MeshNodes::GetWorldSpaceAabbByMeshName(const std::string& meshName) {
@@ -542,6 +549,34 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     m_firstFrame = false;
 }
 
+
+void MeshNodes::SleepAllPhysics() {
+    return;
+
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.rigidDynamicId != 0) {
+            Physics::DeactivateRigidDynamicPhysics(meshNode.rigidDynamicId);
+
+            if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {
+                if (PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic()) {
+                    pxRigidDynamic->clearForce(PxForceMode::eFORCE);
+                    pxRigidDynamic->clearTorque(PxForceMode::eFORCE);
+                    pxRigidDynamic->setLinearVelocity(PxVec3(0.0f));
+                    pxRigidDynamic->setAngularVelocity(PxVec3(0.0f));
+                    pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+                }
+            }
+        }
+    }
+}
+
+void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.rigidDynamicId != 0) {
+            Physics::AddFoceToRigidDynamic(meshNode.rigidDynamicId, force);
+        }
+    }
+}
 
 void MeshNodes::InitPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {

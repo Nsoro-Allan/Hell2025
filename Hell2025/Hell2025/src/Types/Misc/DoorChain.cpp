@@ -50,7 +50,8 @@ DoorChain::DoorChain(uint64_t id, DoorChainCreateInfo& createInfo, SpawnOffset& 
 
     // Origin kinematic body
     {
-        m_kinematicOriginPhysicsId = Physics::CreateRigidDynamicFromBoxExtents(originTransform, sizeOfOriginBox, true, filterData, glm::mat4(1.0f));
+        float mass = 1.0f;
+        m_kinematicOriginPhysicsId = Physics::CreateRigidDynamicFromBoxExtents(originTransform, sizeOfOriginBox, true, mass, filterData, glm::mat4(1.0f));
         RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(m_kinematicOriginPhysicsId);
     }
 
@@ -77,13 +78,13 @@ DoorChain::DoorChain(uint64_t id, DoorChainCreateInfo& createInfo, SpawnOffset& 
         glm::mat4 localOffsetTransform = chainLinkMesh->localTransform;
         glm::mat4 shapeLocalPose = glm::inverse(localOffsetTransform);
 
+        float mass = 10.0f;
+
         // Create link rigid
-        uint64_t physicsId = Physics::CreateRigidDynamicFromBoxExtents(finalLinkTransform, extents, false, filterData, shapeLocalPose);
+        uint64_t physicsId = Physics::CreateRigidDynamicFromBoxExtents(finalLinkTransform, extents, false, mass, filterData, shapeLocalPose);
         RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(physicsId);
         m_chainLinkPhysicsIds.push_back(physicsId);
 
-
-        float mass = 10.0f;
 
         PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic();
         pxRigidDynamic->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, false);
@@ -206,11 +207,11 @@ void DoorChain::SubmitRenderItems() {
 
 void DoorChain::CleanUp() {
     // Remove origin
-    Physics::RemoveRigidDynamic(m_kinematicOriginPhysicsId);
+    Physics::MarkRigidDynamicForRemoval(m_kinematicOriginPhysicsId);
 
     // Remove links
     for (uint64_t id : m_chainLinkPhysicsIds) {
-        Physics::RemoveRigidDynamic(id);
+        Physics::MarkRigidDynamicForRemoval(id);
     }
 }
 
@@ -243,7 +244,7 @@ void DoorChain::Update(float deltaTime) {
             pxRigidDynamic->setAngularVelocity(PxVec3(0.0f));
 
             pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-            pxRigidDynamic->wakeUp();
+            //pxRigidDynamic->wakeUp();
         }
         else {
             pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);

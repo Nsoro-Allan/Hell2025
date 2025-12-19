@@ -61,6 +61,9 @@ struct MeshNodes {
     void DrawWorldspaceAABB(glm::vec4 color);
     void DrawWorldspaceAABBs(glm::vec4 color);
     void ForceDirty();
+    void ResetFirstFrame();
+    void SleepAllPhysics();
+    void AddForceToPhsyics(const glm::vec3 force);
     
     const void SubmitRenderItems() const;
     const void SubmitOutlineRenderItems() const;

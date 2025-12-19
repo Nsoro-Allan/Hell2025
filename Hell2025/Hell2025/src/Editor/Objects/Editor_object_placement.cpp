@@ -149,9 +149,11 @@ namespace Editor {
 
     void PlacePickUp(const std::string& pickUpName, const glm::vec3& hitPosition, const glm::vec3& hitNormal) {
         PickUpCreateInfo createInfo;;
-        createInfo.position = hitPosition;
+        createInfo.position = hitPosition + glm::vec3(0.0, 0.5f, 0.0f);
         createInfo.rotation.y = 0.0f;
         createInfo.name = pickUpName;
+        createInfo.respawn = true;
+        createInfo.saveToFile = true;
         World::AddPickUp(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }

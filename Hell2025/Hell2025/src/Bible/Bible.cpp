@@ -219,7 +219,7 @@ namespace Bible {
     }
 
     PickUpInfo* GetPickUpInfoByName(const std::string& name) {
-        if (WeaponInfoExists(name))
+        if (PickUpInfoExists(name))
             return &g_pickUpInfos[name];
 
         Logging::Warning() << "Bible::GetPickUpInfoByName::(...) failed: '" << name << "' not found\n";

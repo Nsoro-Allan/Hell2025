@@ -192,6 +192,11 @@ namespace Editor {
                 Gizmo::SetRotation(piano->GetPosition());
             }
 
+            if (PickUp* pickup = World::GetPickUpByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(pickup->GetPosition());
+                Gizmo::SetRotation(pickup->GetRotation());
+            }
+
             if (Fireplace* fireplace = World::GetFireplaceById(GetSelectedObjectId())) {
                 Gizmo::SetPosition(fireplace->GetPosition());
                 Gizmo::SetRotation(fireplace->GetRotation());

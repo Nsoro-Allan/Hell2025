@@ -229,13 +229,13 @@ struct BasicDoorCreateInfo {
 
 struct PickUpCreateInfo {
     std::string name = UNDEFINED_STRING;
-    PickUpType type = PickUpType::UNDEFINED;
-    PickUpTypeOld typeOld = PickUpTypeOld::UNDEFINED;
+    std::string editorName = UNDEFINED_STRING;
     glm::vec3 position = glm::vec3(0.0f);
     glm::vec3 rotation = glm::vec3(0.0f);
-    glm::vec3 intitialForce = glm::vec3(0.0f);
     bool saveToFile = false;
     bool respawn = false;
+    bool disablePhysicsAtSpawn = true;
+    PickUpType type = PickUpType::UNDEFINED;
 };
 
 struct PictureFrameCreateInfo {
@@ -281,29 +281,16 @@ struct TreeCreateInfo {
     std::string editorName = UNDEFINED_STRING;
 };
 
-struct SectorCreateInfo {
-    std::string sectorName;
-    std::string heightMapName;
-    std::vector<GameObjectCreateInfo> gameObjects;
-    std::vector<LightCreateInfo> lights;
-    std::vector<PickUpCreateInfo> pickUps;
-    std::vector<TreeCreateInfo> trees;
-
-    // TO DO:
-    //std::vector<InteractTextCreateInfo> interactTexts;
-    //std::vector<HouseLocation> houseLocations;
-    //glm::vec3 mermaidsLocation;
-};
-
-struct HouseCreateInfo {
-    std::vector<DoorCreateInfo> doors;
-    std::vector<HousePlaneCreateInfo> planes;
-    std::vector<LightCreateInfo> lights;
-    std::vector<PianoCreateInfo> pianos;
-    std::vector<PictureFrameCreateInfo> pictureFrames;
-    std::vector<WallCreateInfo> walls;
-    std::vector<WindowCreateInfo> windows;
-};
+//struct HouseCreateInfo {
+//    std::vector<DoorCreateInfo> doors;
+//    std::vector<HousePlaneCreateInfo> planes;
+//    std::vector<LightCreateInfo> lights;
+//    std::vector<PianoCreateInfo> pianos;
+//    std::vector<PickUpCreateInfo> pickUps;
+//    std::vector<PictureFrameCreateInfo> pictureFrames;
+//    std::vector<WallCreateInfo> walls;
+//    std::vector<WindowCreateInfo> windows;
+//};
 
 struct MapCreateInfo {
     std::string name;

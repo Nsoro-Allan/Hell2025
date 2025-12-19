@@ -120,13 +120,34 @@ PickUp::PickUp(uint64_t id, const PickUpCreateInfo& createInfo, const SpawnOffse
 void PickUp::Update(float deltaTime) {
     m_modelMatrix = m_initialTransform.to_mat4();
     m_meshNodes.Update(GetModelMatrix());
+
+    if (m_firstFrame && m_createInfo.disablePhysicsAtSpawn) {
+        m_meshNodes.SleepAllPhysics();
+    }
+
+    m_firstFrame = false;
 }
 
 void PickUp::CleanUp() {
     m_meshNodes.CleanUp();
-    Physics::MarkRigidDynamicForRemoval(m_physicsId);
 }
 
 void PickUp::SetPosition(const glm::vec3& position) {
+    m_createInfo.position = position;
     m_initialTransform.position = position;
+    m_meshNodes.ResetFirstFrame();
+}
+
+void PickUp::SetRotation(const glm::vec3& rotation) {
+    m_createInfo.rotation = rotation;
+    m_initialTransform.rotation = rotation;
+    m_meshNodes.ResetFirstFrame();
+}
+
+void PickUp::SetDisabledPhysicsAtSpawnState(bool state) {
+    m_createInfo.disablePhysicsAtSpawn = state;
+}
+
+void PickUp::SetRespawnState(bool state) {
+    m_createInfo.respawn = state;
 }

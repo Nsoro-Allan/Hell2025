@@ -19,7 +19,7 @@ namespace Util {
     LightType StringToLightType(const std::string& str)                         { return magic_enum::enum_cast<LightType>(str).value_or(LightType::UNDEFINED); }
     ObjectType StringToObjectType(const std::string& str)                       { return magic_enum::enum_cast<ObjectType>(str).value_or(ObjectType::UNDEFINED); }
     OpenState StringToOpenState(const std::string& str)                         { return magic_enum::enum_cast<OpenState>(str).value_or(OpenState::UNDEFINED); }
-    PickUpTypeOld StringToPickUpType(const std::string& str)                       { return magic_enum::enum_cast<PickUpTypeOld>(str).value_or(PickUpTypeOld::UNDEFINED); }
+    PickUpType StringToPickUpType(const std::string& str)                       { return magic_enum::enum_cast<PickUpType>(str).value_or(PickUpType::UNDEFINED); }
     PhysicsType StringToPhysicsType(const std::string& str)                     { return magic_enum::enum_cast<PhysicsType>(str).value_or(PhysicsType::UNDEFINED); }
     PictureFrameType StringToPictureFrameType(const std::string& str)           { return magic_enum::enum_cast<PictureFrameType>(str).value_or(PictureFrameType::UNDEFINED); }
     SharkHuntingState StringToSharkHuntingState(const std::string& str)         { return magic_enum::enum_cast<SharkHuntingState>(str).value_or(SharkHuntingState::UNDEFINED); }
