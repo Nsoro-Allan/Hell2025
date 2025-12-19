@@ -458,7 +458,44 @@
       ]
     }
   ],
-  "PickUps": [],
+  "PickUps": [
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "Remington870",
+      "Position": [
+        0.25311875343322754,
+        0.5,
+        -2.7518093585968018
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.13267464935779572,
+        0.18039481341838837,
+        1.7236331701278687
+      ],
+      "SaveToFile": true,
+      "Type": "UNDEFINED"
+    },
+    {
+      "DisablePhysicsAtSpawn": false,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "ShotgunBuckShotBox",
+      "Position": [
+        2.3284356594085693,
+        0.5,
+        -1.6010594367980957
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.8380497694015503,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "UNDEFINED"
+    }
+  ],
   "PictureFrames": [
     {
       "Position": [

@@ -203,7 +203,6 @@ namespace Physics {
         // Mass stuff
         float volume = Util::GetCubeVolume(halfWidth, halfHeight, halfDepth);
         float density = Util::GetDensity(mass, volume);
-        pxRigidDynamic->attachShape(*pxShape);
         PxRigidBodyExt::updateMassAndInertia(*pxRigidDynamic, density);
 
         // Create DynamicBox
@@ -357,7 +356,7 @@ namespace Physics {
     }
 
     bool RigidDynamicIsKinematic(uint64_t rigidDynamicId) {
-        if (RigidDynamicExists(rigidDynamicId)) return false;
+        if (!RigidDynamicExists(rigidDynamicId)) return false;
 
         RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
         PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
@@ -479,33 +478,30 @@ namespace Physics {
         }
     }
 
+
+    // Safer the than above.. maybe
+
     void RemoveAnyRigidDynamicMarkedForRemoval() {
         for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
             RigidDynamic& rigidDynamic = it->second;
 
             if (!rigidDynamic.IsMarkedForRemoval()) { ++it; continue; }
 
-
-            std::cout << "removed RigidDynmaic " << it->first << " ";
-
             PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-            std::cout << pxRigidDynamic << "\n";
+            PxShape* pxShape = rigidDynamic.GetPxShape();
+
+            if (pxRigidDynamic && pxRigidDynamic->getScene()) {
+                pxRigidDynamic->getScene()->removeActor(*pxRigidDynamic);
+            }
+
+            if (pxShape) {
+                pxShape->release();
+                rigidDynamic.SetPxShape(nullptr);
+            }
 
             if (pxRigidDynamic) {
-                std::cout << "a\n";
-                if (PxScene* actorScene = pxRigidDynamic->getScene()) {
-                    std::cout << "b\n";
-                    actorScene->removeActor(*pxRigidDynamic);
-                    std::cout << "c\n";
-                }
-
-
-                std::cout << "d\n";
-                // Make future accidental reuse obvious
                 rigidDynamic.SetPxRigidDynamic(nullptr);
-                std::cout << "e\n";
                 pxRigidDynamic->release();
-                std::cout << "f\n";
             }
 
             it = g_rigidDynamics.erase(it);

@@ -185,49 +185,49 @@ namespace Bible {
             glassClear.materialName = "DoorGlass";
             glassClear.blendingMode = BlendingMode::STAINED_GLASS;
             glassClear.decalType = DecalType::GLASS;
-            glassClear.tintColor = WHITE;
+            glassClear.tintColor = glm::vec3(1.0f, 1.0f, 1.0f);
 
             MeshNodeCreateInfo& glassGreen = meshNodeCreateInfoSet.emplace_back();
             glassGreen.meshName = "DoorGlassArt_Green";
             glassGreen.materialName = "DoorGlass";
             glassGreen.blendingMode = BlendingMode::STAINED_GLASS;
             glassGreen.decalType = DecalType::GLASS;
-            glassGreen.tintColor = GREEN;
+            glassGreen.tintColor = glm::vec3(0.0f, 0.95f, 0.5f);
 
             MeshNodeCreateInfo& glassOrange = meshNodeCreateInfoSet.emplace_back();
             glassOrange.meshName = "DoorGlassArt_Orange";
             glassOrange.materialName = "DoorGlass";
             glassOrange.blendingMode = BlendingMode::STAINED_GLASS;
             glassOrange.decalType = DecalType::GLASS;
-            glassOrange.tintColor = ORANGE;
+            glassOrange.tintColor = glm::vec3(0.6f, 0.2f, 0.0f);
 
             MeshNodeCreateInfo& glassPurple = meshNodeCreateInfoSet.emplace_back();
             glassPurple.meshName = "DoorGlassArt_Purple";
             glassPurple.materialName = "DoorGlass";
             glassPurple.blendingMode = BlendingMode::STAINED_GLASS;
             glassPurple.decalType = DecalType::GLASS;
-            glassPurple.tintColor = PURPLE;
+            glassPurple.tintColor = glm::vec3(0.15f, 0.0f, 0.5f);
 
             MeshNodeCreateInfo& glassRed = meshNodeCreateInfoSet.emplace_back();
             glassRed.meshName = "DoorGlassArt_Red";
             glassRed.materialName = "DoorGlass";
             glassRed.blendingMode = BlendingMode::STAINED_GLASS;
             glassRed.decalType = DecalType::GLASS;
-            glassRed.tintColor = RED;
+            glassRed.tintColor = glm::vec3(0.95f, 0.0f, 0.0f);
 
             MeshNodeCreateInfo& glassYellow = meshNodeCreateInfoSet.emplace_back();
             glassYellow.meshName = "DoorGlassArt_Yellow";
             glassYellow.materialName = "DoorGlass";
             glassYellow.blendingMode = BlendingMode::STAINED_GLASS;
             glassYellow.decalType = DecalType::GLASS;
-            glassYellow.tintColor = YELLOW;
+            glassYellow.tintColor = glm::vec3(1.00f, 0.8f, 0.25f);
 
             MeshNodeCreateInfo& glassCenterCircle = meshNodeCreateInfoSet.emplace_back();
             glassCenterCircle.meshName = "DoorGlassArt_CenterCircle";
             glassCenterCircle.materialName = "DoorGlass";
             glassCenterCircle.blendingMode = BlendingMode::STAINED_GLASS;
             glassCenterCircle.decalType = DecalType::GLASS;
-            glassCenterCircle.tintColor = BLACK; // change all these once you get the magic values from the shader
+            glassCenterCircle.tintColor = glm::vec3(0.5f, 0.35f, 0.0f);
 
             meshNodes.Init(id, "Door_StainedGlass", meshNodeCreateInfoSet);
 

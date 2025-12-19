@@ -8,7 +8,8 @@ namespace Bible {
         frame.meshName = "DrawersSmallFrame";
         frame.materialName = "Drawers_Frame";
         frame.rigidDynamic.createObject = true;
-        frame.rigidDynamic.kinematic = true;
+        frame.rigidDynamic.kinematic = true; 
+        frame.rigidDynamic.shapeType = PhysicsShapeType::BOX;
         frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
         frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
         frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
@@ -99,6 +100,7 @@ namespace Bible {
         MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
         frame.meshName = "DrawersLargeFrame";
         frame.materialName = "Drawers_Frame";
+        frame.rigidDynamic.shapeType = PhysicsShapeType::BOX;
         frame.rigidDynamic.createObject = true;
         frame.rigidDynamic.kinematic = true;
         frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
