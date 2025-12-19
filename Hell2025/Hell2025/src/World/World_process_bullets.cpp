@@ -83,6 +83,10 @@ namespace World {
                 bool createDecal = (meshNode && meshNode->decalType != DecalType::UNDEFINED) ||
                                    (Physics::GetRigidStaitcById(physicsId) != nullptr);
 
+                if (!bullet.CreatesDecals()) {
+                    createDecal = false;
+                }
+
                 //bool createBlood = (Physics::GetRagdollById(physicsId) != nullptr) ||
                 //                   (RagdollManager::GetRagdollV2ById(physicsId) != nullptr);
                 //
@@ -175,7 +179,7 @@ namespace World {
                 if (physXRayResult.userData.objectType == ObjectType::RAGDOLL_PLAYER) {
                     Player* player = Game::GetPlayerByPlayerId(objectId);
                     if (player) {
-                        player->Kill();
+                        player->GiveDamage(bullet.GetDamage(), bullet.GetOwnerObjectId());
 
                         // REMOVE ME!!!! you are already doing this below. figure out better force system
                         float strength = 1000.0f;

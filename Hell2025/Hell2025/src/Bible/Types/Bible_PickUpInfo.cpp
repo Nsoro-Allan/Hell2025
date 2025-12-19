@@ -6,6 +6,11 @@
 namespace Bible {
 
     void InitPickUpInfo() {
+
+        PickUpInfo& aks74u = CreatePickUpInfo("AKS74U");
+        aks74u.mass = 2.7f;
+        aks74u.type = PickUpType::WEAPON;
+
         PickUpInfo& glock = CreatePickUpInfo("Glock");
         glock.mass = 3.3f;
         glock.type = PickUpType::WEAPON;
@@ -26,11 +31,11 @@ namespace Bible {
         tokarev.mass = 0.7f;
         tokarev.type = PickUpType::WEAPON;
 
-        PickUpInfo& shottyBuckShotBox = CreatePickUpInfo("ShotgunBuckShotBox");
+        PickUpInfo& shottyBuckShotBox = CreatePickUpInfo("12GaugeBuckShot");
         shottyBuckShotBox.mass = 0.45f;
         shottyBuckShotBox.type = PickUpType::AMMO;
 
-        PickUpInfo& shottySlugBox = CreatePickUpInfo("ShotgunSlugBox");
+        PickUpInfo& shottySlugBox = CreatePickUpInfo("12GaugeSlug");
         shottySlugBox.mass = 0.45f;
         shottySlugBox.type = PickUpType::AMMO;
     }
@@ -40,5 +45,12 @@ namespace Bible {
             return pickUpInfo->mass;
         }
         return 0;
+    }
+
+    PickUpType GetPickUpTypeByName(const std::string& name) {
+        if (PickUpInfo* pickUpInfo = GetPickUpInfoByName(name)) {
+            return pickUpInfo->type;
+        }
+        return PickUpType::UNDEFINED;
     }
 }

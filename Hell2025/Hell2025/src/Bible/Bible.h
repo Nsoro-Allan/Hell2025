@@ -51,6 +51,8 @@ namespace Bible {
     int GetInventoryItemSizeByName(const std::string& name);
     int32_t GetWeaponIndexFromWeaponName(const std::string& weaponName);
     int32_t GetWeaponMagSize(const std::string& name);
+    int32_t GetAmmoPickUpAmount(const std::string& name);
     float GetPickUpMass(const std::string& name);
+    PickUpType GetPickUpTypeByName(const std::string& name);
 
 }

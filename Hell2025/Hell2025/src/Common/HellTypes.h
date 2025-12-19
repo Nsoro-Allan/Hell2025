@@ -731,6 +731,7 @@ struct HouseLocation {
 
 struct PickUpInfo {
     std::string name = UNDEFINED_STRING;
+    std::string subName = UNDEFINED_STRING;
     PickUpType type = PickUpType::UNDEFINED;
     float mass = 1.0f;
 };

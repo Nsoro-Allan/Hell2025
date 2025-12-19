@@ -14,7 +14,7 @@ namespace Bible {
         aks74u.animationNames.walk = "AKS74U_Walk";
         aks74u.animationNames.draw = "AKS74U_Draw";
         aks74u.animationNames.reload = "AKS74U_Reload";
-        aks74u.animationNames.reloadempty.push_back("AKS74U_ReloadEmpty");
+        aks74u.animationNames.reloadempty.push_back("AKS74U_ReloadEmpty2");
         aks74u.animationNames.fire.push_back("AKS74U_Fire0");
         aks74u.animationNames.fire.push_back("AKS74U_Fire1");
         aks74u.animationNames.fire.push_back("AKS74U_Fire2");
@@ -44,7 +44,7 @@ namespace Bible {
         aks74u.muzzleFlashOffset = glm::vec3(0, 0.002, 0.02f);
         aks74u.casingEjectionBoneName = "SlideCatch";
         aks74u.casingEjectionOffset = glm::vec3(0, 0, 0);
-        aks74u.animationCancelFrames.fire = 18.0f;
+        aks74u.animationCancelFrames.fire = 3.0f;
         aks74u.animationCancelFrames.reload = 80.0f;
         aks74u.animationCancelFrames.reloadFromEmpty = 95.0f;
         aks74u.animationCancelFrames.draw = 75.0f;
@@ -57,6 +57,7 @@ namespace Bible {
         aks74u.audioFiles.reloadEmpty = "AKS74U_ReloadEmpty.wav";
         aks74u.animationSpeeds.fire = 1.625f;
         aks74u.animationSpeeds.adsFire = 1.625f;
+        aks74u.animationSpeeds.draw = 1.225f;
         aks74u.muzzleFlashBoneName = "Muzzle";
         aks74u.casingEjectionBoneName = "EjectionPort";
         aks74u.muzzleFlashScale = 1.5f;
@@ -70,17 +71,17 @@ namespace Bible {
         aks74u.animationNames.adsFire.push_back("AKS74U_ADS_Fire2");
         aks74u.reloadMagInFrameNumber = 23;
         aks74u.reloadEmptyMagInFrameNumber = 21;
-        aks74u.pickupModelName = "AKS74U_Carlos";
-        aks74u.pickupConvexMeshModelName = "AKS74U_Carlos_ConvexMesh";
-        aks74u.pickUpMeshMaterials["FrontSight_low"] = "AKS74U_0";
-        aks74u.pickUpMeshMaterials["Receiver_low"] = "AKS74U_1";
-        aks74u.pickUpMeshMaterials["BoltCarrier_low"] = "AKS74U_1";
-        aks74u.pickUpMeshMaterials["SafetySwitch_low"] = "AKS74U_1";
-        aks74u.pickUpMeshMaterials["Pistol_low"] = "AKS74U_2";
-        aks74u.pickUpMeshMaterials["Trigger_low"] = "AKS74U_2";
-        aks74u.pickUpMeshMaterials["MagRelease_low"] = "AKS74U_2";
-        aks74u.pickUpMeshMaterials["Magazine_Housing_low"] = "AKS74U_3";
-        aks74u.pickUpMeshMaterials["BarrelTip_low"] = "AKS74U_4";
+        aks74u.pickupName = "AKS74U";
+        //aks74u.pickupConvexMeshModelName = "AKS74U_Carlos_ConvexMesh";
+        //aks74u.pickUpMeshMaterials["FrontSight_low"] = "AKS74U_0";
+        //aks74u.pickUpMeshMaterials["Receiver_low"] = "AKS74U_1";
+        //aks74u.pickUpMeshMaterials["BoltCarrier_low"] = "AKS74U_1";
+        //aks74u.pickUpMeshMaterials["SafetySwitch_low"] = "AKS74U_1";
+        //aks74u.pickUpMeshMaterials["Pistol_low"] = "AKS74U_2";
+        //aks74u.pickUpMeshMaterials["Trigger_low"] = "AKS74U_2";
+        //aks74u.pickUpMeshMaterials["MagRelease_low"] = "AKS74U_2";
+        //aks74u.pickUpMeshMaterials["Magazine_Housing_low"] = "AKS74U_3";
+        //aks74u.pickUpMeshMaterials["BarrelTip_low"] = "AKS74U_4";
 
         WeaponInfo& goldeneGlock = CreateWeaponInfo("GoldenGlock");
         goldeneGlock.modelName = "GlockGolden";
@@ -371,7 +372,7 @@ namespace Bible {
         spas.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         spas.damage = 15;
         spas.magSize = 8;
-        spas.ammoType = "Shotgun";
+        spas.ammoType = "12GaugeBuckShot";
         spas.hiddenMeshAtStart.push_back("ArmsFemale");
         spas.muzzleFlashBoneName = "Muzzle";
         spas.casingEjectionBoneName = "Shell_bone";
@@ -415,7 +416,7 @@ namespace Bible {
         remington870.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         remington870.damage = 14;
         remington870.magSize = 8;
-        remington870.ammoType = "Shotgun";
+        remington870.ammoType = "12GaugeBuckShot";
         remington870.hiddenMeshAtStart.push_back("ArmsFemale");
         remington870.muzzleFlashBoneName = "Muzzle";
         remington870.casingEjectionBoneName = "Shell_bone";
@@ -568,7 +569,6 @@ namespace Bible {
         p90.animationNames.adsFire.push_back("P90_ADS_Fire1");
         p90.animationNames.adsFire.push_back("P90_ADS_Fire2");
     }
-
 
 
     int32_t GetWeaponMagSize(const std::string& name) {

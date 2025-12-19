@@ -38,6 +38,11 @@ void Player::UpdateViewWeapon(float deltaTime) {
     float movementX = xOffset * SWAY_AMOUNT;
     float movementY = -yOffset * SWAY_AMOUNT;
 
+
+    if (GetCurrentWeaponInfo()->name == "AKS74U") {
+        xMax = 10.0f;
+    }
+
     movementX = std::min(movementX, SWAY_MAX_X);
     movementX = std::max(movementX, SWAY_MIN_X);
     movementY = std::min(movementY, SWAY_MAX_Y);
@@ -67,9 +72,17 @@ void Player::UpdateViewWeapon(float deltaTime) {
     transform.rotation.x = m_camera.GetEulerRotation().x;
     transform.rotation.y = m_camera.GetEulerRotation().y;
     transform.scale = glm::vec3(weaponScale);
-    //viewWeapon->m_cameraMatrix = transform.to_mat4() * glm::inverse(cameraBindMatrix) * glm::inverse(dmMaster);
+    
+    // HACK!!!!!!!!!!!!!
+    glm::mat4 hackMatrix = glm::mat4(1.0f);
+    if (GetCurrentWeaponInfo()->name == "AKS74U") {
+        Transform hackTransform;
+        hackTransform.rotation.x += HELL_PI * 0.5f;
+        hackTransform.rotation.z += HELL_PI;
+        hackMatrix = hackTransform.to_mat4();
+    }
 
-    viewWeapon->SetCameraMatrix(transform.to_mat4() * glm::inverse(cameraBindMatrix) * glm::inverse(dmMaster));
+    viewWeapon->SetCameraMatrix(transform.to_mat4() * glm::inverse(cameraBindMatrix) * hackMatrix * glm::inverse(dmMaster));
     viewWeapon->EnableCameraMatrix();
 }
 

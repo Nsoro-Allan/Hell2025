@@ -264,23 +264,23 @@
       "Type": "COUCH"
     },
     {
-      "EditorName": "Cabinet 2",
+      "EditorName": "Drawers Large 2",
       "Position": [
-        5.199999809265137,
-        1.2153091430664063,
-        1.399999976158142
+        6.650000095367432,
+        0.0,
+        5.75
       ],
       "Rotation": [
-        6.2831854820251465,
-        -1.5707963705062866,
-        0.0
+        3.1415927410125732,
+        1.5099580252808664e-07,
+        3.1415927410125732
       ],
       "Scale": [
         1.0,
         1.0,
         1.0
       ],
-      "Type": "BATHROOM_CABINET"
+      "Type": "DRAWERS_LARGE"
     },
     {
       "EditorName": "Generic Object 2",
@@ -319,25 +319,6 @@
         1.0
       ],
       "Type": "TEST_MODEL2"
-    },
-    {
-      "EditorName": "Drawers Large 2",
-      "Position": [
-        6.650000095367432,
-        0.0,
-        5.75
-      ],
-      "Rotation": [
-        3.1415927410125732,
-        1.5099580252808664e-07,
-        3.1415927410125732
-      ],
-      "Scale": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "Type": "DRAWERS_LARGE"
     }
   ],
   "Fireplaces": [
@@ -460,40 +441,40 @@
   ],
   "PickUps": [
     {
-      "DisablePhysicsAtSpawn": true,
-      "EditorName": "UNDEFINED_STRING",
-      "Name": "Remington870",
-      "Position": [
-        0.25311875343322754,
-        0.5,
-        -2.7518093585968018
-      ],
-      "Respawn": true,
-      "Rotation": [
-        0.13267464935779572,
-        0.18039481341838837,
-        1.7236331701278687
-      ],
-      "SaveToFile": true,
-      "Type": "UNDEFINED"
-    },
-    {
       "DisablePhysicsAtSpawn": false,
       "EditorName": "UNDEFINED_STRING",
-      "Name": "ShotgunBuckShotBox",
+      "Name": "12GaugeBuckShot",
       "Position": [
-        2.3284356594085693,
+        3.1722817420959473,
         0.5,
-        -1.6010594367980957
+        -0.9645194411277771
       ],
       "Respawn": true,
       "Rotation": [
         0.0,
-        0.8380497694015503,
+        0.0,
         0.0
       ],
       "SaveToFile": true,
-      "Type": "UNDEFINED"
+      "Type": "AMMO"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "Remington870",
+      "Position": [
+        0.5868498086929321,
+        0.5,
+        -2.853386878967285
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.06235421448945999,
+        1.4955533742904663
+      ],
+      "SaveToFile": true,
+      "Type": "WEAPON"
     }
   ],
   "PictureFrames": [
@@ -1071,6 +1052,47 @@
       "TextureScale": 0.4166666567325592,
       "TrimTypeCeiling": "TIMBER",
       "TrimTypeFloor": "NONE",
+      "UseReversePointOrder": false,
+      "WallType": "INTERIOR"
+    },
+    {
+      "EditorName": "Wall 7",
+      "Height": 2.4000000953674316,
+      "Material": "FloorBoards",
+      "MiddleTrimHeight": 2.4000000953674316,
+      "Points": [
+        [
+          0.03600001335144043,
+          -2.4000000953674316,
+          -2.8399996757507324
+        ],
+        [
+          -4.27400016784668,
+          -2.4000000953674316,
+          -2.8400001525878906
+        ],
+        [
+          -4.27400016784668,
+          -2.4000000953674316,
+          6.009999752044678
+        ],
+        [
+          -0.023999929428100586,
+          -2.4000000953674316,
+          6.009999752044678
+        ],
+        [
+          0.03600001335144043,
+          -2.4000000953674316,
+          -2.8399996757507324
+        ]
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": -1.399999976158142,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4000000059604645,
+      "TrimTypeCeiling": "TIMBER",
+      "TrimTypeFloor": "TIMBER",
       "UseReversePointOrder": false,
       "WallType": "INTERIOR"
     }

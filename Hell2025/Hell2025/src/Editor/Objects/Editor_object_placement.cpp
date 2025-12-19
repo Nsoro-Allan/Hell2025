@@ -1,5 +1,6 @@
 
 #include "Audio/Audio.h"
+#include "Bible/Bible.h"
 #include "Editor/Editor.h"
 #include "HellLogging.h"
 #include "Input/Input.h"
@@ -154,6 +155,7 @@ namespace Editor {
         createInfo.name = pickUpName;
         createInfo.respawn = true;
         createInfo.saveToFile = true;
+        createInfo.type = Bible::GetPickUpTypeByName(pickUpName);
         World::AddPickUp(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }

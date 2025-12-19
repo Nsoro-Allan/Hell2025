@@ -196,8 +196,8 @@ void Player::Update(float deltaTime) {
 }
 
 void Player::Respawn() {
-    //WeaponManager::Init();
     m_inventory.Init();
+    m_health = 100;
 
     //World::GetKangaroos()[0].Respawn();
 
@@ -206,12 +206,10 @@ void Player::Respawn() {
     //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
     SetFootPosition(spawnPoint.GetPosition());
 
-    if (m_viewportIndex == 0) {
-
-        SetFootPosition(glm::vec3(36.18, 31, 37.26));
-        //SetFootPosition(glm::vec3(500.18, 31, 500.26));
-        m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
-    }
+   //if (m_viewportIndex == 0) {
+   //    SetFootPosition(glm::vec3(36.18, 31, 37.26));
+   //    m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
+   //}
 
     //GetCamera().SetEulerRotation(spawnPoint.m_camEuler);
 
@@ -395,6 +393,14 @@ void Player::UpdateAnimatedGameObjects(float deltaTime) {
 
 const float Player::GetFov() {
     return m_cameraZoom;
+}
+
+void Player::GiveDamage(int damage, uint64_t enemyId) {
+    m_health -= damage;
+    if (m_health <= 0) {
+        m_health = 0;
+        Kill();
+    }
 }
 
 void Player::Kill() {

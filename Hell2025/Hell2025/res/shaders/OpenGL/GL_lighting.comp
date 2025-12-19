@@ -369,7 +369,7 @@ void main() {
     moonColor = mix(moonColor, moonColor2, 0.5);
 
     vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
-    float moonLightStrength = 0.125;//0.0125;
+    float moonLightStrength = 0.00125;//0.0125;
        
     //float shadow = ShadowCalculation(lightIndex, lightPosition, lightRadius, worldSpacePosition.xyz, viewPos, normal.xyz, shadowMapArray);
     vec3 moonLighting = GetDirectionalLighting(moonLightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);

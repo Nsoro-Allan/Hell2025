@@ -99,11 +99,18 @@ then Franchi's Special Purpose Automatic
 Shotgun will put you on the podium with the 
 cadence of a fucking riot.)";
 
-
-
-
-
-
+        InventoryItemInfo& shotgunSlugBox = CreateInventoryItemInfo("12GaugeBuckShot");
+        shotgunSlugBox.m_itemType = InventoryItemType::WEAPON;
+        shotgunSlugBox.m_examineModelName = "Ammo_ShotgunBox";
+        shotgunSlugBox.m_cellSize = 3;
+        shotgunSlugBox.m_meshMaterialNames["Ammo_ShotgunBox"] = "Shotgun_AmmoBox";
+        shotgunSlugBox.m_combineable = false;
+        shotgunSlugBox.m_discardable = true;
+        shotgunSlugBox.m_equipable = false;
+        shotgunSlugBox.m_itemHeading = "12 Gauge Ammo";
+        shotgunSlugBox.m_description = R"(Neque porro quisquam est qui dolorem 
+ipsum quia dolor sit amet, consectetur, 
+adipisci velit...)";
 
 
         // Below you need to swap out the models for the original World_ versions and add an offset to get the angle you want

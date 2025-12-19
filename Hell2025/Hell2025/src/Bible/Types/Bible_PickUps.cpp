@@ -12,6 +12,43 @@ namespace Bible {
         pickUpFilterData.collisionGroup = CollisionGroup::ITEM_PICK_UP;
         pickUpFilterData.collidesWith = CollisionGroup::ENVIROMENT_OBSTACLE;
 
+        // AKS74U
+        if (pickUpName == "AKS74U") {
+            MeshNodeCreateInfo& receiver = meshNodeCreateInfoSet.emplace_back();
+            receiver.meshName = "AKS74UReceiver";
+            receiver.materialName = "AKS74U_1";
+            receiver.rigidDynamic.createObject = true;
+            receiver.rigidDynamic.kinematic = false;
+            receiver.rigidDynamic.offsetTransform = Transform();
+            receiver.rigidDynamic.filterData = pickUpFilterData;
+            receiver.rigidDynamic.mass = Bible::GetPickUpMass(pickUpName);
+            receiver.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+            receiver.rigidDynamic.convexMeshModelName = "CollisionMesh_AKS74U";
+
+            MeshNodeCreateInfo& barrel = meshNodeCreateInfoSet.emplace_back();
+            barrel.meshName = "AKS74UBarrel";
+            barrel.materialName = "AKS74U_4";
+
+            MeshNodeCreateInfo& bolt = meshNodeCreateInfoSet.emplace_back();
+            bolt.meshName = "AKS74UBolt";
+            bolt.materialName = "AKS74U_1";
+
+            MeshNodeCreateInfo& handGuard = meshNodeCreateInfoSet.emplace_back();
+            handGuard.meshName = "AKS74UHandGuard";
+            handGuard.materialName = "AKS74U_0";
+
+            MeshNodeCreateInfo& mag = meshNodeCreateInfoSet.emplace_back();
+            mag.meshName = "AKS74UMag";
+            mag.materialName = "AKS74U_3";
+            
+            MeshNodeCreateInfo& pistolGrip = meshNodeCreateInfoSet.emplace_back();
+            pistolGrip.meshName = "AKS74UPistolGrip";
+            pistolGrip.materialName = "AKS74U_2";
+
+            meshNodes.Init(id, "Weapon_AKS74U", meshNodeCreateInfoSet);
+            return;
+        }
+
         // Glock
         if (pickUpName == "Glock") {
             MeshNodeCreateInfo& glock = meshNodeCreateInfoSet.emplace_back();
@@ -89,7 +126,7 @@ namespace Bible {
         }
 
         // Shotty Buckshot Box
-        if (pickUpName == "ShotgunBuckShotBox") {
+        if (pickUpName == "12GaugeBuckShot") {
             MeshNodeCreateInfo& ammo = meshNodeCreateInfoSet.emplace_back();
             ammo.meshName = "Ammo_ShotgunBox";
             ammo.materialName = "Shotgun_AmmoBox";
@@ -102,10 +139,10 @@ namespace Bible {
 
             meshNodes.Init(id, "Ammo_ShotgunBox", meshNodeCreateInfoSet);
             return;
-
         }
+
         // Shotty Slug Box
-        if (pickUpName == "ShotgunSlugBox") {
+        if (pickUpName == "12GaugeSlug") {
             MeshNodeCreateInfo& ammo = meshNodeCreateInfoSet.emplace_back();
             ammo.meshName = "Ammo_ShotgunBox";
             ammo.materialName = "Shotgun_AmmoBoxSlug";
@@ -118,7 +155,6 @@ namespace Bible {
 
             meshNodes.Init(id, "Ammo_ShotgunBox", meshNodeCreateInfoSet);
             return;
-
         }
 
         Logging::Error() << "Bible::ConfigureMeshNodesByPickUpName(..) failed: '" << pickUpName << "' not implemented\n";

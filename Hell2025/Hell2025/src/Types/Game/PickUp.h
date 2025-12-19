@@ -23,6 +23,7 @@ struct PickUp {
 
     MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
     const PickUpCreateInfo& GetCreateInfo() const       { return m_createInfo; }
+    const std::string GetName() const                   { return m_createInfo.name; }
     const PickUpType GetType() const                    { return m_createInfo.type; }
     const std::vector<RenderItem>& GetRenderItems()     { return m_meshNodes.GetRenderItems(); }
     const glm::vec3 GetPosition()                       { return m_modelMatrix[3]; }

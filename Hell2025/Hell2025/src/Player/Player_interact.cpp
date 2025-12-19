@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Audio/Audio.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "Physics/Physics.h"
 #include "Util/Util.h"
@@ -8,8 +9,7 @@
 #include <algorithm>
 #include "Input/Input.h"
 #include "Viewport/ViewportManager.h"
-
-
+#include "HellLogging.h"
 
 #pragma warning(disable : 26498)
 
@@ -216,6 +216,17 @@ void Player::UpdateInteract() {
 
         // Pickups
         if (PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId)) {
+
+            if (pickUp->GetType() == PickUpType::WEAPON) {
+                m_inventory.GiveWeapon(pickUp->GetName());
+            }
+            if (pickUp->GetType() == PickUpType::AMMO) {
+                m_inventory.GiveAmmo(pickUp->GetName(), Bible::GetAmmoPickUpAmount(pickUp->GetName()));
+            }
+            if (pickUp->GetType() == PickUpType::UNDEFINED) {
+                Logging::Warning() << "Player " << m_viewportIndex << " tried to pick up a PickUp with name '" << pickUp->GetName() << "' but type '" << Util::PickUpTypeToString(pickUp->GetType()) << "'";
+            }
+
             World::RemoveObject(m_interactObjectId);
             Audio::PlayAudio("ItemPickUp.wav", 1.0f);
         }

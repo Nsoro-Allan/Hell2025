@@ -121,8 +121,6 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                 float mass = createInfo.rigidDynamic.mass;
                 bool kinematic = createInfo.rigidDynamic.kinematic;
 
-                Logging::Init() << "Creating rigid box for " << mesh->GetName() << "\n";
-
                 if (createInfo.rigidDynamic.shapeType == PhysicsShapeType::BOX) {
                     meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromBoxExtents(spawnTransform, extents, kinematic, mass, filterData, offsetTransform);
                 }
@@ -275,7 +273,6 @@ void MeshNodes::CleanUp() {
     // First remove physics shapes
     for (MeshNode& meshNode : m_meshNodes) {
         if (meshNode.rigidDynamicId != 0) {
-            std::cout << "Marking rigid removal for meshNode from " << m_modelName << " " << meshNode.rigidDynamicId << "\n";
             Physics::MarkRigidDynamicForRemoval(meshNode.rigidDynamicId);
         }
     }

@@ -7,6 +7,7 @@
 #include "Input/InputMulti.h"
 #include "Util.h"
 #include "World/World.h"
+#include "HellLogging.h"
 
 // remove me
 #include "Renderer/Renderer.h"
@@ -108,12 +109,14 @@ void Player::GiveDefaultLoadout() {
     m_inventory.GiveWeapon("Glock");
     m_inventory.GiveWeapon("GoldenGlock");
     m_inventory.GiveWeapon("Tokarev");
-    m_inventory.GiveWeapon("Remington870");
+    //m_inventory.GiveWeapon("Remington870");
     m_inventory.GiveWeapon("SPAS");
+    m_inventory.GiveWeapon("AKS74U");
 
-    m_inventory.GiveAmmo("Shotgun", 80);
+    m_inventory.GiveAmmo("12GaugeBuckShot", 80);
     m_inventory.GiveAmmo("Glock", 200);
     m_inventory.GiveAmmo("Tokarev", 200);
+    m_inventory.GiveAmmo("AKS74U", 200);
 
     //m_inventory.AddItem("Knife");
     //m_inventory.AddItem("Glock");
@@ -121,12 +124,13 @@ void Player::GiveDefaultLoadout() {
     //m_inventory.AddItem("Tokarev");
     //m_inventory.AddItem("Remington870");
     //m_inventory.AddItem("SPAS");
+
     m_inventory.AddInventoryItem("BlackSkull");
     m_inventory.AddInventoryItem("SmallKey");
 
-    GiveAmmo("Shotgun", 80);
-    GiveAmmo("Glock", 200);
-    GiveAmmo("Tokarev", 200);
+   //GiveAmmo("Shotgun", 80);
+   //GiveAmmo("Glock", 200);
+   //GiveAmmo("Tokarev", 200);
 
     //GiveSilencer("Glock");
     //GiveSight("GoldenGlock");    
@@ -298,6 +302,11 @@ void Player::SpawnMuzzleFlash(float speed, float scale) {
 }
 
 void Player::SpawnCasing(AmmoInfo* ammoInfo, bool alternateAmmo) {
+    if (!ammoInfo) {
+        Logging::Error() << "Player::SpawnCasing(..) failed because ammoInfo was nullptr";
+        return;
+    }
+
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (!weaponInfo) return;
@@ -388,6 +397,7 @@ void Player::DropWeapons() {
                 createInfo.saveToFile = false;
                 createInfo.disablePhysicsAtSpawn = false;
                 createInfo.respawn = false;
+                createInfo.type = Bible::GetPickUpTypeByName(weaponInfo->pickupName);
 
                 glm::vec3 force = glm::vec3(0.0f);
                 force.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
@@ -410,7 +420,7 @@ void Player::DropWeapons() {
 void Player::UpdateMelleBulletWave(float deltaTime) {
     if (!m_meleeBulletWaveState.active) return;
 
-    std::cout << "Time: " << m_meleeBulletWaveState.time << "\n";
+    //std::cout << "Time: " << m_meleeBulletWaveState.time << "\n";
 
     m_meleeBulletWaveState.time += deltaTime;
 
@@ -439,7 +449,7 @@ void Player::UpdateMelleBulletWave(float deltaTime) {
             createInfo.origin = bulletOrigin;
             createInfo.direction = GetCameraForward();
             createInfo.weaponIndex = -1;
-            createInfo.damage = 100;
+            createInfo.damage = 1;
             createInfo.ownerObjectId = m_playerId;
             createInfo.rayLength = 1.5f;
             createInfo.createsDecals = false;

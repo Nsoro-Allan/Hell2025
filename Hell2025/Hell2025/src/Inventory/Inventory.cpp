@@ -306,6 +306,11 @@ bool Inventory::ItemSelected() {
 }
 
 void Inventory::GiveAmmo(const std::string& name, int amount) {
+    if (amount == 0) {
+        Logging::Warning() << "Inventory::GiveAmmo(..) tried to give 0 '" << name << "' ammo";
+        return;
+    }
+
     for (AmmoState& ammoState : m_ammoStates) {
         if (ammoState.name == name) {
             ammoState.ammoOnHand += amount;
@@ -332,7 +337,9 @@ void Inventory::GiveWeapon(const std::string& name) {
             }
             // If you do already have it
             else {
-                Logging::ToDo() << "Inventory::GiveWeapon(..) for when you already have the weapon";
+                if (WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(name)) {
+                    GiveAmmo(weaponInfo->ammoType, Bible::GetWeaponMagSize(name));
+                }
             }
             return;
         }

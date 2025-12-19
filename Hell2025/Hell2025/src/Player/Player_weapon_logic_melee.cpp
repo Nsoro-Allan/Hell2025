@@ -21,7 +21,7 @@ void Player::FireMelee() {
     if (weaponInfo->animationNames.fire.size()) {
         viewWeapon->PlayAnimation("MainLayer", weaponInfo->animationNames.fire, weaponInfo->animationSpeeds.fire);
     }
-
+    BeginMeleeBulletWave();
     m_weaponAction = WeaponAction::FIRE;
 }
 

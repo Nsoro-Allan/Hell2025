@@ -39,14 +39,13 @@ namespace Bible {
         aks74uAmmo.casingModelName = "CasingAKS74U";
         aks74uAmmo.casingMaterialName = "Casing_AkS74U";
 
-        AmmoInfo& shotgunAmmo = CreateAmmoInfo("Shotgun");
-        aks74uAmmo.modelName = "TODO!!!";
-        shotgunAmmo.modelName = "TODO!!!";
-        shotgunAmmo.convexMeshModelName = "TODO!!!";
-        shotgunAmmo.materialName = "TODO!!!";
-        shotgunAmmo.pickupAmount = 666;
-        shotgunAmmo.casingModelName = "Shell";
-        shotgunAmmo.casingMaterialName = "Shell";
+        AmmoInfo& shotgunBuckShotAmmo = CreateAmmoInfo("12GaugeBuckShot");
+        shotgunBuckShotAmmo.modelName = "TODO!!!";
+        shotgunBuckShotAmmo.convexMeshModelName = "TODO!!!";
+        shotgunBuckShotAmmo.materialName = "TODO!!!";
+        shotgunBuckShotAmmo.pickupAmount = 666;
+        shotgunBuckShotAmmo.casingModelName = "Shell";
+        shotgunBuckShotAmmo.casingMaterialName = "Shell";
 
         AmmoInfo& p90Ammo = CreateAmmoInfo("P90");
         p90Ammo.modelName = "TODO!!!";
@@ -55,5 +54,12 @@ namespace Bible {
         p90Ammo.pickupAmount = 666;
         p90Ammo.casingModelName = "CasingAKS74U";
         p90Ammo.casingMaterialName = "Casing_AkS74U";
+    }
+
+    int32_t GetAmmoPickUpAmount(const std::string& name) {
+        if (AmmoInfo* ammoInfo = GetAmmoInfoByName(name)) {
+            return ammoInfo->pickupAmount;
+        }
+        return 0;
     }
 }

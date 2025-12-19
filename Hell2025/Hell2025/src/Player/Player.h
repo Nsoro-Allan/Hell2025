@@ -20,6 +20,7 @@ struct Player {
     void DisableControl();
     void InitRagdoll();
     void InitCharacterModel();
+    void GiveDamage(int damage, uint64_t enemyId);
     void CreateCharacterController(glm::vec3 position);
     //void MoveCharacterController(glm::vec3 displacement);
     const bool IsAwaitingSpawn();
@@ -183,6 +184,8 @@ struct Player {
     void DisplayInfoText(const std::string& text);
     std::string m_infoText = "";
     float m_infoTextTimer = 0;
+    
+    int m_health = 100;
 
     // Dev keys
     bool PressedFullscreen();
