@@ -3,6 +3,8 @@ layout (location = 0) out vec4 FragOut;
 layout (binding = 0) uniform sampler2D Texture;
 in vec2 TexCoord;
 in vec2 TexCoordNext;
+in vec4 WorldPos;
+
 uniform float u_mixFactor;
 
 void main() {

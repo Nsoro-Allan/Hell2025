@@ -16,6 +16,8 @@ void SpriteSheetObject::Init(const SpriteSheetObjectCreateInfo& createInfo) {
     m_animationSpeed = createInfo.animationSpeed;
     m_renderingEnabled = createInfo.renderingEnabled;
     m_spriteSheetTexture = AssetManager::GetSpriteSheetTextureByName(m_textureName);
+    m_uOffset = createInfo.uvOffset.x;
+    m_vOffset = createInfo.uvOffset.y;
 }
 
 void SpriteSheetObject::Update(float deltaTime) {
@@ -57,6 +59,8 @@ void SpriteSheetObject::Update(float deltaTime) {
         m_renderItem.position = glm::vec4(m_position, 1.0);
         m_renderItem.rotation = glm::vec4(m_rotation, 0.0);
         m_renderItem.scale = glm::vec4(m_scale, 0.0);
+        m_renderItem.uOffset = m_uOffset;
+        m_renderItem.vOffset = m_vOffset;
     }
 }
 
@@ -70,6 +74,14 @@ void SpriteSheetObject::SetRotation(glm::vec3 rotation) {
 
 void SpriteSheetObject::SetScale(glm::vec3 scale) {
     m_scale = scale;
+}
+
+void SpriteSheetObject::SetUOffset(float value) {
+    m_uOffset = value;
+}
+
+void SpriteSheetObject::SetVOffset(float value) {
+    m_vOffset = value;
 }
 
 void SpriteSheetObject::SetTime(float time) {

@@ -105,14 +105,21 @@ struct SpriteSheetRenderItem {
     glm::vec4 position;
     glm::vec4 rotation;
     glm::vec4 scale;
+
+    float uOffset;
+    float vOffset;
     int textureIndex;
     int frameIndex;
+    
     int frameIndexNext;
     int rowCount;
     int columnCount;
     int isBillboard;
+
     float mixFactor;
-    float padding;
+    float padding0;
+    float padding1;
+    float padding2;
 };
 
 struct Vertex2D {

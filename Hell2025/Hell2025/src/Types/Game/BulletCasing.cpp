@@ -71,6 +71,7 @@ void BulletCasing::SubmitRenderItem() {
     renderItem.rmaTextureIndex = material->m_rma;
     renderItem.normalMapTextureIndex = material->m_normal;
     renderItem.meshIndex = GetMeshIndex();
+    renderItem.castShadows = false;
 
     Util::UpdateRenderItemAABB(renderItem);
     RenderDataManager::SubmitRenderItem(renderItem);

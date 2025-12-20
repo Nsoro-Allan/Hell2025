@@ -183,7 +183,10 @@ namespace Game {
     void NextSplitScreenMode() {
         int nextSplitscreenMode = ((int)(g_splitscreenMode) + 1) % ((int)(SplitscreenMode::SPLITSCREEN_MODE_COUNT));
         SetSplitscreenMode((SplitscreenMode)nextSplitscreenMode);
-        std::cout << "Splitscreen mode: " << nextSplitscreenMode << "\n";
+        //std::cout << "Splitscreen mode: " << nextSplitscreenMode << "\n";
+        if (nextSplitscreenMode >= 2) {
+            NextSplitScreenMode();
+        }
     }
 
     void SetSplitscreenMode(SplitscreenMode mode) {

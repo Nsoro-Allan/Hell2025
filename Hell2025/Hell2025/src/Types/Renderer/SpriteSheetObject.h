@@ -13,6 +13,8 @@ public:
     void Update(float deltaTime);
     void SetPosition(glm::vec3 position);
     void SetRotation(glm::vec3 position);
+    void SetUOffset(float value);
+    void SetVOffset(float value);
     void SetScale(glm::vec3 scale);
     void SetTime(float time);
     void SetSpeed(float speed);
@@ -48,6 +50,8 @@ private:
     float m_mixFactor = 0.0f;
     float m_time = 0;
     float m_timeAsPercentage = 0.0f;
+    float m_uOffset = 0.0f;
+    float m_vOffset = 0.0f;
     SpriteSheetTexture* m_spriteSheetTexture;
     SpriteSheetRenderItem m_renderItem;
 };
