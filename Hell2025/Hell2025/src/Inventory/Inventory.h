@@ -63,6 +63,7 @@ struct Inventory {
     std::vector<AmmoState>& GetAmmoStates()         { return m_ammoStates; }
     std::vector<WeaponState>& GetWeaponStates()     { return m_weaponStates; }
 
+    const std::string& GetDebugText()               { return m_debugText; }
     const int GetGridCountX()                       { return m_gridCountX; }
     const int GetGridCountY()                       { return m_gridCountY; }
     const glm::mat4 GetItemExamineModelMatrix()     { return m_examineModelMatrix; }
@@ -133,4 +134,6 @@ private:
 
     std::vector<WeaponState> m_weaponStates;
     std::vector<AmmoState> m_ammoStates;
+
+    std::string m_debugText = "";
 };

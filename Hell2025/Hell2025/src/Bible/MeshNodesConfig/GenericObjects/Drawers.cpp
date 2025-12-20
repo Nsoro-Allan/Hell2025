@@ -12,7 +12,7 @@ namespace Bible {
         frame.rigidDynamic.shapeType = PhysicsShapeType::BOX;
         frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
         frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawer1st = meshNodeCreateInfoSet.emplace_back();
@@ -105,7 +105,7 @@ namespace Bible {
         frame.rigidDynamic.kinematic = true;
         frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
         frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        frame.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
         frame.addtoNavMesh = true;
 
         MeshNodeCreateInfo& drawerTopL = meshNodeCreateInfoSet.emplace_back();

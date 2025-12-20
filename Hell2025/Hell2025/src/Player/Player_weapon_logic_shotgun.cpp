@@ -15,9 +15,9 @@ void Player::UpdateShotgunGunLogic(float deltaTime) {
         if (PressedReload() && CanReloadShotgun()) {
             ReloadShotgun();
         }
-        if (PressedWeaponMiscFunction() && CanUnloadShotgun()) {
-            UnloadShotgun();
-        }
+        //if (PressedWeaponMiscFunction() && CanUnloadShotgun()) {
+        //    UnloadShotgun();
+        //}
         if (PressedADS() && CanToggleShotgunAuto()) {
             ToggleAutoShotgun();
         }

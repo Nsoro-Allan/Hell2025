@@ -710,14 +710,18 @@ struct InventoryItemInfo {
     std::string m_name = UNDEFINED_STRING;
     std::string m_itemHeading = UNDEFINED_STRING;
     std::string m_description = UNDEFINED_STRING;
-    std::string m_examineModelName = UNDEFINED_STRING;
-    Transform m_initialExamineItemTransform;
+    //std::string m_examineModelName = UNDEFINED_STRING;
+    //Transform m_initialExamineItemTransform;
     InventoryItemType m_itemType = InventoryItemType::UESLESS;
     int m_cellSize = 1;
     bool m_combineable = false;
     bool m_discardable = true;
     bool m_equipable = true;
-    std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
+    float m_maxExamineZoom = 2.0f;
+    glm::vec3 m_examineModelTranslation = glm::vec3(0.0f);
+    glm::vec3 m_examineModelRotation = glm::vec3(0.0);
+    glm::vec3 m_examineModelScale = glm::vec3(1.0);
+    //std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
     std::vector<std::string> m_supportedAttachments;
 };
 
@@ -739,6 +743,9 @@ struct HouseLocation {
 struct PickUpInfo {
     std::string name = UNDEFINED_STRING;
     std::string subName = UNDEFINED_STRING;
+    std::string modelName = UNDEFINED_STRING;
+    std::string convexMeshName = UNDEFINED_STRING;
+    PhysicsShapeType physicsShapeType = PhysicsShapeType::BOX;
     PickUpType type = PickUpType::UNDEFINED;
     float mass = 1.0f;
 };

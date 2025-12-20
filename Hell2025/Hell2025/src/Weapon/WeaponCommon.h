@@ -105,7 +105,6 @@ struct WeaponInfo {
     glm::vec3 casingEjectionOffset = glm::vec3(0);
     WeaponType type;
     std::unordered_map<const char*, const char*> meshMaterials;
-    std::unordered_map<const char*, const char*> pickUpMeshMaterials;
     std::unordered_map<unsigned int, const char*> meshMaterialsByIndex;
     std::vector<const char*> hiddenMeshAtStart;
     int damage = 0;
@@ -120,8 +119,6 @@ struct WeaponInfo {
     float reloadEmptyMagInFrameNumber = 0;
     int revolverCockFrameNumber = 0;
     bool relolverStyleReload = false;
-    const char* pickupModelName = UNDEFINED_STRING;
-    const char* pickupConvexMeshModelName = UNDEFINED_STRING;
     bool emptyReloadRequiresSlideOffset = false;
     bool hasADS = false;
     std::string sightName = UNDEFINED_STRING;

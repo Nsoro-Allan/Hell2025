@@ -12,7 +12,7 @@ namespace Bible {
         body.rigidDynamic.kinematic = true;
         body.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
         body.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        body.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        body.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | ITEM_PICK_UP | RAGDOLL_ENEMY);
         body.addtoNavMesh = true;
 
         PhysicsFilterData filterData;

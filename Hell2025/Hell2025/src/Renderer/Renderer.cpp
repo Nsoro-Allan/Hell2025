@@ -98,6 +98,15 @@ namespace Renderer {
         }
     }
 
+    void DrawItemExamineLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawItemExamineLine(begin, end, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: DrawItemExamineLine()";
+        }
+    }
+
     void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec4& color) {
         if (BackEnd::GetAPI() == API::OPENGL) {
             OpenGLRenderer::DrawLine2D(begin, end, color);
@@ -113,6 +122,15 @@ namespace Renderer {
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
             Logging::ToDo() << "Vulkan: DrawAABB()";
+        }
+    }
+
+    void DrawItemExamineAABB(const AABB& aabb, const glm::vec4& color) {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            OpenGLRenderer::DrawItemExamineAABB(aabb, color);
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: DrawItemExamineAABB()";
         }
     }
 

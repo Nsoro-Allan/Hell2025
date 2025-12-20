@@ -26,6 +26,10 @@ namespace Renderer {
     void DrawOBB(const OBB& obb, const glm::vec4& color);
     void DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color);
 
+    void DrawItemExamineLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color);
+    void DrawItemExamineAABB(const AABB& aabb, const glm::vec4& color);
+
+
     void ReadBackHeightMapData(Map* map);
 
     RendererSettings& GetCurrentRendererSettings();

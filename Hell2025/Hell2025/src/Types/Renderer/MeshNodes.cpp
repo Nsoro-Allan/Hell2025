@@ -277,11 +277,24 @@ void MeshNodes::CleanUp() {
         }
     }
 
-    m_modelName = "";
+    m_modelName = UNDEFINED_STRING;
     m_nodeCount = 0;
     m_meshNodes.clear();
     m_localIndexMap.clear();
     m_renderItems.clear();
+    m_worldMatrixPreviousFrame = glm::mat4(0.0f); // Intentionally (0.0f) to force a dirty update on first use
+    // Write this: m_armatureData.CleanUp();
+    m_renderItems.clear();
+    m_renderItemsAlphaDiscarded.clear();
+    m_renderItemsBlended.clear();
+    m_renderItemsGlass.clear();
+    m_renderItemsHairTopLayer.clear();
+    m_renderItemsHairBottomLayer.clear();
+    m_renderItemsMirror.clear();
+    m_renderItemsToiletWater.clear();
+    m_renderItemsStainedGlass.clear();
+    m_isDirty = true;
+    m_forceDirty = true;
     m_firstFrame = true;
 }
 

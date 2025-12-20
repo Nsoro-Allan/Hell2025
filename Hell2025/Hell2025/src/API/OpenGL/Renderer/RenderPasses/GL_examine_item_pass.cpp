@@ -68,10 +68,12 @@ namespace OpenGLRenderer {
 
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
 
         gBuffer->ClearDepthAttachment();
 
         SetRasterizerState("GeometryPass_Default");
+
 
         glm::vec3 cameraPosition = glm::vec3(0, 0, 1.5f); // Remember the item is rendered at (0,0,0)
 
@@ -121,6 +123,9 @@ namespace OpenGLRenderer {
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.rmaTextureIndex)->GetGLTexture().GetHandle());
 
                     glDrawElementsBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), mesh->baseVertex);
+            
+                   //std::cout << mesh->GetName() << "\n";
+                   //std::cout << Util::Mat4ToString(renderItem.modelMatrix) << "\n\n";
                 }
         }
 

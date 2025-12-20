@@ -273,7 +273,6 @@ void Player::UpdateUI(float deltaTime) {
                 }
             }
 
-
             UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);
         }
     

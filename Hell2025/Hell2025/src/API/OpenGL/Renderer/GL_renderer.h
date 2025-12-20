@@ -120,10 +120,14 @@ namespace OpenGLRenderer {
     void DebugBlitOpenGLTexture(GLuint textureHandle, float scale);
     void BlitDebugTextures();
 
+    void DrawItemExamineLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color);
+    void DrawItemExamineAABB(const AABB& aabb, const glm::vec4& color);
+
     inline std::vector<DebugVertex2D> g_points2D;
     inline std::vector<DebugVertex3D> g_points3D;
     inline std::vector<DebugVertex2D> g_lines2D;
     inline std::vector<DebugVertex3D> g_lines3D;
+    inline std::vector<DebugVertex3D> g_itemExaminelines;
 
     void HotloadShaders();
     void CreateBlurBuffers();

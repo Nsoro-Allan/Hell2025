@@ -462,6 +462,15 @@ namespace World {
 
     void EndFrame() {
         // Nothing as of yet
+
+        //if (Input::KeyPressed(HELL_KEY_PAGE_UP)) {
+        //    g_spawnCampaignPoints.clear();
+        //}
+        //if (Input::KeyPressed(HELL_KEY_PAGE_DOWN)) {
+        //    Player* player = Game::GetLocalPlayerByIndex(0);            
+        //    SpawnPoint spawnPoint(player->GetFootPosition(), player->GetCameraRotation());
+        //    g_spawnCampaignPoints.push_back(spawnPoint);
+        //}
     }
 
 

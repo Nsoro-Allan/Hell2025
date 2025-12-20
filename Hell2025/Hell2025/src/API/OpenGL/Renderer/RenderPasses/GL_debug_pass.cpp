@@ -20,6 +20,7 @@ namespace OpenGLRenderer {
     OpenGLMesh g_debugMeshPoints3D;
     OpenGLMesh g_debugMeshLines2D;
     OpenGLMesh g_debugMeshLines3D;
+    OpenGLMesh g_debugMeshItemExamineLines;
 
     inline int Index1D(int x, int y, int mapWidth) { return y * mapWidth + x; }
 
@@ -64,6 +65,19 @@ namespace OpenGLRenderer {
             if (g_debugMeshPoints3D.GetVertexCount() > 0) {
                 glBindVertexArray(g_debugMeshPoints3D.GetVAO());
                 glDrawArrays(GL_POINTS, 0, g_debugMeshPoints3D.GetVertexCount());
+            }
+
+            // No render item inspect debug lines, but only for player 1
+            if (i == 0) {
+                if (g_debugMeshItemExamineLines.GetVertexCount() > 0) {
+                    Transform cameraTransform;
+                    cameraTransform.position = glm::vec3(0, 0, 1.5f);
+                    glm::mat4 viewMatrix = glm::inverse(cameraTransform.to_mat4());
+                    shader3D->SetInt("u_viewportIndex", i);
+                    shader3D->SetMat4("u_projectionView", viewportData[i].projection * viewMatrix);
+                    glBindVertexArray(g_debugMeshItemExamineLines.GetVAO());
+                    glDrawArrays(GL_LINES, 0, g_debugMeshItemExamineLines.GetVertexCount());
+                }
             }
         }
 
@@ -238,6 +252,16 @@ namespace OpenGLRenderer {
         g_lines3D.push_back(v1);
     }
 
+    void DrawItemExamineLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color) {
+        bool depthEnabled = true;
+        int exclusiveViewportIndex = -1;
+        DebugVertex3D v0 = DebugVertex3D(begin, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
+        DebugVertex3D v1 = DebugVertex3D(end, color, glm::ivec2(0, 0), int(depthEnabled), exclusiveViewportIndex);
+        g_itemExaminelines.push_back(v0);
+        g_itemExaminelines.push_back(v1);
+    }
+
+
     void DrawLine2D(const glm::ivec2& begin, const glm::ivec2& end, const glm::vec4& color) {
         g_lines2D.emplace_back(DebugVertex2D(begin, color));
         g_lines2D.emplace_back(DebugVertex2D(end, color));
@@ -272,6 +296,29 @@ namespace OpenGLRenderer {
         DrawLine(FrontTopRight, BackTopRight, color);
         DrawLine(FrontBottomLeft, BackBottomLeft, color);
         DrawLine(FrontBottomRight, BackBottomRight, color);
+    }
+
+    void DrawItemExamineAABB(const AABB& aabb, const glm::vec4& color) {
+        glm::vec3 FrontTopLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z);
+        glm::vec3 FrontTopRight = glm::vec3(aabb.GetBoundsMax().x, aabb.GetBoundsMax().y, aabb.GetBoundsMax().z);
+        glm::vec3 FrontBottomLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMin().y, aabb.GetBoundsMax().z);
+        glm::vec3 FrontBottomRight = glm::vec3(aabb.GetBoundsMax().x, aabb.GetBoundsMin().y, aabb.GetBoundsMax().z);
+        glm::vec3 BackTopLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMax().y, aabb.GetBoundsMin().z);
+        glm::vec3 BackTopRight = glm::vec3(aabb.GetBoundsMax().x, aabb.GetBoundsMax().y, aabb.GetBoundsMin().z);
+        glm::vec3 BackBottomLeft = glm::vec3(aabb.GetBoundsMin().x, aabb.GetBoundsMin().y, aabb.GetBoundsMin().z);
+        glm::vec3 BackBottomRight = glm::vec3(aabb.GetBoundsMax().x, aabb.GetBoundsMin().y, aabb.GetBoundsMin().z);
+        DrawItemExamineLine(FrontTopLeft, FrontTopRight, color);
+        DrawItemExamineLine(FrontBottomLeft, FrontBottomRight, color);
+        DrawItemExamineLine(BackTopLeft, BackTopRight, color);
+        DrawItemExamineLine(BackBottomLeft, BackBottomRight, color);
+        DrawItemExamineLine(FrontTopLeft, FrontBottomLeft, color);
+        DrawItemExamineLine(FrontTopRight, FrontBottomRight, color);
+        DrawItemExamineLine(BackTopLeft, BackBottomLeft, color);
+        DrawItemExamineLine(BackTopRight, BackBottomRight, color);
+        DrawItemExamineLine(FrontTopLeft, BackTopLeft, color);
+        DrawItemExamineLine(FrontTopRight, BackTopRight, color);
+        DrawItemExamineLine(FrontBottomLeft, BackBottomLeft, color);
+        DrawItemExamineLine(FrontBottomRight, BackBottomRight, color);
     }
 
     void DrawAABB(const AABB& aabb, const glm::vec4& color, const glm::mat4& worldTransform) {
@@ -392,11 +439,13 @@ namespace OpenGLRenderer {
         g_debugMeshLines3D.UpdateVertexData(g_lines3D);
         g_debugMeshPoints2D.UpdateVertexData(g_points2D);
         g_debugMeshPoints3D.UpdateVertexData(g_points3D);
+        g_debugMeshItemExamineLines.UpdateVertexData(g_itemExaminelines);
 
         g_lines3D.clear();
         g_lines2D.clear();
         g_points2D.clear();
         g_points3D.clear();
+        g_itemExaminelines.clear();
     }
 
     void RenderPointCloud() {

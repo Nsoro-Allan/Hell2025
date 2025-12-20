@@ -31,7 +31,7 @@ namespace Bible {
             door.rigidDynamic.kinematic = true;
             door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
             door.addtoNavMesh = true;
 
             // Openable mesh node
@@ -87,7 +87,7 @@ namespace Bible {
             door.rigidDynamic.kinematic = true;
             door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
             door.addtoNavMesh = true;
 
             // Openable mesh node
@@ -141,7 +141,7 @@ namespace Bible {
             door.rigidDynamic.kinematic = true;
             door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
             door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | ITEM_PICK_UP | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
             door.addtoNavMesh = true;
 
             // Openable mesh node

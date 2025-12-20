@@ -40,5 +40,5 @@ void main() {
 	TexCoord = vUV;
     WorldPos = modelMatrix * vec4(vPosition, 1.0);
 	gl_Position = projection * u_viewMatrix * WorldPos;
-    gl_Position.y += 0.25;
+    //gl_Position.y += 0.25;
 }

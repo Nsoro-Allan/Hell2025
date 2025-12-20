@@ -298,6 +298,7 @@ enum struct PickUpType {
     WEAPON,
     KEY,
     AMMO,
+    USELESS,
     UNDEFINED
 };
 

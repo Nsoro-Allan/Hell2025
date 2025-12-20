@@ -125,8 +125,10 @@ namespace World {
                 }
 
                 // Trigger the closest piano note on piano hit
-                if (Piano* piano = World::GetPianoByObjectId(objectId)) {
-                    piano->TriggerInternalNoteFromExternalBulletHit(hitPosition);
+                if (bullet.PlaysPiano()) {
+                    if (Piano* piano = World::GetPianoByObjectId(objectId)) {
+                        piano->TriggerInternalNoteFromExternalBulletHit(hitPosition);
+                    }
                 }
 
                 // Dobermann hit

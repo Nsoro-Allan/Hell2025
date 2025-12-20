@@ -152,7 +152,7 @@
     {
       "EditorName": "Drawers Large",
       "Position": [
-        6.446389675140381,
+        6.449999809265137,
         0.0,
         -2.6500000953674316
       ],
@@ -472,6 +472,78 @@
         0.0,
         0.06235421448945999,
         1.4955533742904663
+      ],
+      "SaveToFile": true,
+      "Type": "WEAPON"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "GoldenGlock",
+      "Position": [
+        4.8122406005859375,
+        0.9113616943359375,
+        3.3974926471710205
+      ],
+      "Respawn": true,
+      "Rotation": [
+        -1.570771336555481,
+        1.0559697151184082,
+        -0.03335500881075859
+      ],
+      "SaveToFile": true,
+      "Type": "WEAPON"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "SPAS",
+      "Position": [
+        9.969620704650879,
+        0.5,
+        1.1762535572052002
+      ],
+      "Respawn": true,
+      "Rotation": [
+        -1.4986250400543213,
+        -0.08500351011753082,
+        1.316798448562622
+      ],
+      "SaveToFile": true,
+      "Type": "WEAPON"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "AKS74U",
+      "Position": [
+        6.491191387176514,
+        1.17071533203125,
+        -2.573596954345703
+      ],
+      "Respawn": true,
+      "Rotation": [
+        -1.5460000038146973,
+        0.0,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "WEAPON"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "Tokarev",
+      "Position": [
+        4.12078332901001,
+        1.2438812255859375,
+        1.3364123106002808
+      ],
+      "Respawn": true,
+      "Rotation": [
+        1.2937431335449219,
+        0.9234950542449951,
+        -0.13626156747341156
       ],
       "SaveToFile": true,
       "Type": "WEAPON"
