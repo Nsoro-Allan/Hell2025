@@ -723,6 +723,8 @@ struct InventoryItemInfo {
     glm::vec3 m_examineModelScale = glm::vec3(1.0);
     //std::unordered_map<std::string, std::string> m_meshMaterialNames; // maps mesh name to material name
     std::vector<std::string> m_supportedAttachments;
+    std::string m_ammoType = UNDEFINED_STRING;
+    int m_healAmount = 0;
 };
 
 struct Bone {

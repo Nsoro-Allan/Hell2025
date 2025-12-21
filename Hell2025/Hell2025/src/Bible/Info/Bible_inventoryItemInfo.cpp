@@ -143,12 +143,41 @@ adipisci velit...)";
         smallKey.m_combineable = false;
         smallKey.m_discardable = true;
         smallKey.m_equipable = false;
-        smallKey.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        smallKey.m_examineModelScale = glm::vec3(2.5f);
+        smallKey.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        smallKey.m_examineModelScale = glm::vec3(8.5f);
         smallKey.m_maxExamineZoom = 1.75f;
         smallKey.m_itemHeading = "SMALL KEY";
         smallKey.m_description = R"(Smells of dust and secrets. One turn, one less 
 mystery.)";
+
+        InventoryItemInfo& smallKeySilver = CreateInventoryItemInfo("SmallKeySilver");
+        smallKeySilver.m_itemType = InventoryItemType::KEY;
+        smallKeySilver.m_cellSize = 1;
+        smallKeySilver.m_combineable = false;
+        smallKeySilver.m_discardable = true;
+        smallKeySilver.m_equipable = false;
+        smallKeySilver.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        smallKeySilver.m_examineModelScale = glm::vec3(8.5f);
+        smallKeySilver.m_maxExamineZoom = 1.75f;
+        smallKeySilver.m_itemHeading = "SMALL KEY SILVER";
+        smallKeySilver.m_description = R"(Someone carried this close for a long time. 
+Probably for a reason.)";
+
+        InventoryItemInfo& pills = CreateInventoryItemInfo("Pills");
+        pills.m_itemType = InventoryItemType::KEY;
+        pills.m_cellSize = 1;
+        pills.m_combineable = false;
+        pills.m_discardable = true;
+        pills.m_equipable = false;
+        pills.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        pills.m_examineModelScale = glm::vec3(8.5f);
+        pills.m_maxExamineZoom = 1.75f;
+        pills.m_itemHeading = "RELIEF PIILS";
+        pills.m_description = R"(Not a cure, but enough to keep you standing.)";
+
+        // The kind of key someone swore they destroyed.
+        // A spare for something important. Or something you were never meant to open.
+        // Someone carried this close for a long time. Probably for a reason.
 
 
     }

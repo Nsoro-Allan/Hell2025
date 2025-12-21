@@ -152,6 +152,44 @@ namespace Bible {
             return;
         }
 
+        // Small Key
+        if (pickUpInfo->name == "SmallKey") {
+            MeshNodeCreateInfo& smallKey = meshNodeCreateInfoSet.emplace_back();
+            smallKey.meshName = "SmallKey";
+            smallKey.materialName = "SmallKey";
+            if (createPhysicsObjects) {
+                smallKey.rigidDynamic.createObject = true;
+                smallKey.rigidDynamic.kinematic = false;
+                smallKey.rigidDynamic.offsetTransform = Transform();
+                smallKey.rigidDynamic.filterData = pickUpFilterData;
+                smallKey.rigidDynamic.mass = Bible::GetPickUpMass(pickUpName);
+                smallKey.rigidDynamic.shapeType = pickUpInfo->physicsShapeType;
+                smallKey.rigidDynamic.convexMeshModelName = pickUpInfo->convexMeshName;
+            }
+
+            meshNodes.Init(id, pickUpInfo->modelName, meshNodeCreateInfoSet);
+            return;
+        }
+
+        // Small Key Silver
+        if (pickUpInfo->name == "SmallKeySilver") {
+            MeshNodeCreateInfo& smallKey = meshNodeCreateInfoSet.emplace_back();
+            smallKey.meshName = "SmallKey";
+            smallKey.materialName = "SmallKeySilver";
+            if (createPhysicsObjects) {
+                smallKey.rigidDynamic.createObject = true;
+                smallKey.rigidDynamic.kinematic = false;
+                smallKey.rigidDynamic.offsetTransform = Transform();
+                smallKey.rigidDynamic.filterData = pickUpFilterData;
+                smallKey.rigidDynamic.mass = Bible::GetPickUpMass(pickUpName);
+                smallKey.rigidDynamic.shapeType = pickUpInfo->physicsShapeType;
+                smallKey.rigidDynamic.convexMeshModelName = pickUpInfo->convexMeshName;
+            }
+
+            meshNodes.Init(id, pickUpInfo->modelName, meshNodeCreateInfoSet);
+            return;
+        }
+
         // SPAS
         if (pickUpInfo->name == "SPAS") {
             MeshNodeCreateInfo& main = meshNodeCreateInfoSet.emplace_back();
@@ -198,7 +236,7 @@ namespace Bible {
         }
 
         // Shotty Slug Box
-        if (pickUpInfo->name == "12GaugeSlug") {
+        if (pickUpInfo->name == "12GaugeBuckShot") {
             MeshNodeCreateInfo& ammo = meshNodeCreateInfoSet.emplace_back();
             ammo.meshName = "Ammo_ShotgunBox";
             ammo.materialName = "Shotgun_AmmoBoxSlug";

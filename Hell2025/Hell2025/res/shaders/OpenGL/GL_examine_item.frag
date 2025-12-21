@@ -57,6 +57,14 @@ void main() {
         directLighting += GetDirectLighting(lightPosition, lightColor, lightRadius, lightStrength, normal, WorldPos.xyz, baseColor.rgb, roughness, metallic, u_viewPos);
     }
     
+    {
+        vec3 lightPosition = vec3(0.45, 0.-2, 0.5);
+        vec3 lightColor = vec3(1.00, 0.7799999713897705, 0.5289999842643738);
+        float lightRadius = 4.0;
+        float lightStrength = 2.5;
+        directLighting += GetDirectLighting(lightPosition, lightColor, lightRadius, lightStrength, normal, WorldPos.xyz, baseColor.rgb, roughness, metallic, u_viewPos);
+    }
+
     vec3 finalColor = directLighting.rgb;
 
     // Tone mapping

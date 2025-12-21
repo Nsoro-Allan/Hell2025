@@ -120,6 +120,9 @@ void Player::GiveDefaultLoadout() {
 
     m_inventory.AddInventoryItem("BlackSkull");
     m_inventory.AddInventoryItem("SmallKey");
+    m_inventory.AddInventoryItem("SmallKeySilver");
+    m_inventory.AddInventoryItem("Pills");
+    m_inventory.AddInventoryItem("ShotgunAmmo");
 
     //GiveSilencer("Glock");
     //GiveSight("GoldenGlock");    

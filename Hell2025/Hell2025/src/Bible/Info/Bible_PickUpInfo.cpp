@@ -48,6 +48,18 @@ namespace Bible {
         remington870.type = PickUpType::WEAPON;
         remington870.mass = 3.2f;
 
+        PickUpInfo& smallKey = CreatePickUpInfo("SmallKey");
+        smallKey.modelName = "Item_SmallKey";
+        smallKey.physicsShapeType = PhysicsShapeType::BOX;
+        smallKey.type = PickUpType::KEY;
+        smallKey.mass = 0.5f;
+
+        PickUpInfo& smallKeySilver = CreatePickUpInfo("SmallKeySilver");
+        smallKeySilver.modelName = "Item_SmallKey";
+        smallKeySilver.physicsShapeType = PhysicsShapeType::BOX;
+        smallKeySilver.type = PickUpType::KEY;
+        smallKeySilver.mass = 0.5f;
+
         PickUpInfo& spas = CreatePickUpInfo("SPAS");
         spas.modelName = "Weapon_SPAS";
         spas.convexMeshName = "CollisionMesh_SPAS";

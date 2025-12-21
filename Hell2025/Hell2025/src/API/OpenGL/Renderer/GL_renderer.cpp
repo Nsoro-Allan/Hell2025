@@ -410,10 +410,10 @@ namespace OpenGLRenderer {
 
         BlitRoads();
 
-        UpdateGlobalIllumintation();
-        PointCloudDirectLighting();
-        ComputeLightVolumeMask();
-        ComputeProbeLighting();
+        //UpdateGlobalIllumintation();
+        //PointCloudDirectLighting();
+        //ComputeLightVolumeMask();
+        //ComputeProbeLighting();
 
         ComputeSkinningPass();
         ClearRenderTargets();
