@@ -167,24 +167,13 @@ namespace World {
 		g_staticSceneInstances.clear();
 
         // Add any static mesh nodes to the primitive instances vector
-		for (Door& door : GetDoors()) {
-			CreateStaticPrimtiveInstances(door.GetMeshNodes());
-		}
-		for (Fireplace& fireplace : GetFireplaces()) {
-			CreateStaticPrimtiveInstances(fireplace.GetMeshNodes());
-		}
-		for (GenericObject& genericObject : GetGenericObjects()) {
-			CreateStaticPrimtiveInstances(genericObject.GetMeshNodes());
-		}
-		for (Light& light : GetLights()) {
-			CreateStaticPrimtiveInstances(light.GetMeshNodes());
-		}
-		for (Piano& piano : GetPianos()) {
-            CreateStaticPrimtiveInstances(piano.GetMeshNodes());
-		}
-		for (Window& window : GetWindows()) {
-			CreateStaticPrimtiveInstances(window.GetMeshNodes());
-        }
+        for (Door& object : GetDoors())                     CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (Fireplace& object : GetFireplaces())           CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (GenericObject& object : GetGenericObjects())   CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (Ladder& object : GetLadders())                 CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (Light& object : GetLights())                   CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (Piano& object : GetPianos())                   CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        for (Window& object : GetWindows())                 CreateStaticPrimtiveInstances(object.GetMeshNodes());
 
         // Recreate the TLAS
 		Bvh::Cpu::UpdateSceneBvh(g_staticSceneBvhId, g_staticSceneInstances);

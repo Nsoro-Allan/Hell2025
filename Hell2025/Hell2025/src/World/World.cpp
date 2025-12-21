@@ -41,6 +41,7 @@ namespace World {
     std::vector<GameObject> g_gameObjects;
     std::vector<Kangaroo> g_kangaroos;
     std::vector<HeightMapChunk> g_heightMapChunks;
+    Hell::SlotMap<Ladder> g_ladders;
     std::vector<Light> g_lights;
     std::vector<MapInstance> g_mapInstances;
     std::vector<Mermaid> g_mermaids;
@@ -215,56 +216,6 @@ namespace World {
         //christmasLightsCreateInfo.spiral = false;
         //christmasLightsCreateInfo.sag = 0.6f;
         //World::AddChristmasLights(christmasLightsCreateInfo, spawnOffset);
-        //
-        //
-        //glm::vec3 couchSpawnPosition = glm::vec3(0.02f, 0.0f, -1.5f);
-        //glm::vec3 couchSpawnRotation = glm::vec3(0.0f, HELL_PI * 0.5f, 0.0f);
-        //
-        //GenericStaticCreateInfo genericStaticCreateInfo;
-        //genericStaticCreateInfo.position = couchSpawnPosition;
-        //genericStaticCreateInfo.rotation = couchSpawnRotation;
-        //genericStaticCreateInfo.type = GenericStaticType::COUCH;
-        //World::AddGenericStatic(genericStaticCreateInfo, spawnOffset);
-        //
-        //
-        //GenericBouncableCreateInfo genericBouncableCreateInfo;
-        //genericBouncableCreateInfo.position = couchSpawnPosition;
-        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
-        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_0;
-        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
-        //
-        //genericBouncableCreateInfo.position = couchSpawnPosition;
-        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
-        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_0;
-        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
-        //
-        //genericBouncableCreateInfo.position = couchSpawnPosition;
-        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
-        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_1;
-        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
-        //
-        //genericBouncableCreateInfo.position = couchSpawnPosition;
-        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
-        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_2;
-        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
-        //
-        //genericBouncableCreateInfo.position = couchSpawnPosition;
-        //genericBouncableCreateInfo.rotation = couchSpawnRotation;
-        //genericBouncableCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //genericBouncableCreateInfo.type = GenericBouncableType::COUCH_CUSHION_3;
-        //World::AddGenericBouncable(genericBouncableCreateInfo, spawnOffset);
-        //
-        //ToiletCreateInfo toiletCreateInfo;
-        //toiletCreateInfo.position = glm::vec3(4.40f, 0.0f, -0.7f);
-        //toiletCreateInfo.rotation.y = HELL_PI * 0.5f;
-        //World::AddToilet(toiletCreateInfo, spawnOffset);
-        //
-
-
     }
 
     void LoadMapInstancesHeightMapData(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
@@ -336,6 +287,35 @@ namespace World {
         CreateInfoCollection& createInfoCollection = house->GetCreateInfoCollection();
         AddCreateInfoCollection(createInfoCollection, spawnOffset);
 
+        // Under water floor
+        float size = 1000.0f;
+        float y = -0.1f;
+        float xMin = -size;
+        float zMin = -size;
+        float xMax = size;
+        float zMax = size;
+        HousePlaneCreateInfo floorCreateInfo;
+        floorCreateInfo.materialName = "Ground_MudVeg";
+        floorCreateInfo.p0 = glm::vec3(xMin, y, zMin);
+        floorCreateInfo.p1 = glm::vec3(xMin, y, zMax);
+        floorCreateInfo.p2 = glm::vec3(xMax, y, zMax);
+        floorCreateInfo.p3 = glm::vec3(xMax, y, zMin);
+        floorCreateInfo.parentDoorId = 1;
+        AddHousePlane(floorCreateInfo, SpawnOffset());
+
+        MermaidCreateInfo mermaidCreateInfo;
+        mermaidCreateInfo.position = glm::vec3(14.0f, 29.0f, 36.5f);
+        //mermaidCreateInfo.position = glm::vec3(36.0f, 31.0f, 36.5f); // indoors
+        mermaidCreateInfo.rotation.y = 0.05f;
+        AddMermaid(mermaidCreateInfo);
+        Logging::Init() << " C R E A T E D   M E R M A I D\n";
+
+        std::cout << "Mermaid count: " << World::GetMermaids().size();
+        for (Mermaid& mermaid : World::GetMermaids()) {
+            std::cout << mermaid.GetPosition() << "\n";
+            ;
+        }
+
         Logging::Debug() << "World::LoadHouseInstance(): " << houseName << " at " << spawnOffset.translation;
     }
 
@@ -344,6 +324,7 @@ namespace World {
         for (FireplaceCreateInfo& createInfo : createInfoCollection.fireplaces)         AddFireplace(createInfo, spawnOffset);
         for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericObjects) AddGenericObject(createInfo, spawnOffset);
         for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
+        for (LadderCreateInfo& createInfo : createInfoCollection.ladders)               AddLadder(createInfo, spawnOffset);
         for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
         for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)   AddPictureFrame(createInfo, spawnOffset);
@@ -359,6 +340,7 @@ namespace World {
         for (Door& door : World::GetDoors())                            createInfoCollection.doors.push_back(door.GetCreateInfo());
         for (Fireplace& fireplace : World::GetFireplaces())             createInfoCollection.fireplaces.push_back(fireplace.GetCreateInfo());
         for (GenericObject& drawers : World::GetGenericObjects())       createInfoCollection.genericObjects.push_back(drawers.GetCreateInfo());
+        for (Ladder& ladder : World::GetLadders())                      createInfoCollection.ladders .push_back(ladder.GetCreateInfo());
         for (Light& light : World::GetLights())                         createInfoCollection.lights.push_back(light.GetCreateInfo());
         for (Piano& piano : World::GetPianos())                         createInfoCollection.pianos.push_back(piano.GetCreateInfo());
         for (PickUp& pickUp : World::GetPickUps())                      createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
@@ -502,6 +484,10 @@ namespace World {
         return g_housePlanes.get(objectId);
     }
 
+    Ladder* GetLadderByObjectId(uint64_t objectId) {
+        return g_ladders.get(objectId);
+    }
+
     PickUp* GetPickUpByObjectId(uint64_t objectId) {
         return g_pickUps.get(objectId);
     }
@@ -636,6 +622,10 @@ namespace World {
             UpdateWeatherBoardMeshBuffer();
         }
 
+        if (Ladder* ladder = World::GetLadderByObjectId(objectId)) {
+            ladder->SetPosition(position);
+        }
+
         if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
             pickUp->SetPosition(position);
         }
@@ -671,6 +661,9 @@ namespace World {
         }
         if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
             genericObject->SetRotation(rotation);
+        }
+        if (Ladder* ladder= World::GetLadderByObjectId(objectId)) {
+            ladder->SetRotation(rotation);
         }
         if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
             pickUp->SetRotation(rotation);
@@ -716,6 +709,11 @@ namespace World {
         if (g_pickUps.contains(objectId)) {
             g_pickUps.get(objectId)->CleanUp();
             g_pickUps.erase(objectId);
+            return true;
+        }
+        if (g_ladders.contains(objectId)) {
+            g_ladders.get(objectId)->CleanUp();
+            g_ladders.erase(objectId);
             return true;
         }
         if (g_walls.contains(objectId)) {
@@ -770,11 +768,6 @@ namespace World {
         // Cleanup all objects
         ClearAllObjects();
 
-        MermaidCreateInfo mermaidCreateInfo;
-        mermaidCreateInfo.position = glm::vec3(29.0f, 29.5f, 52.5f);
-        //mermaidCreateInfo.position = glm::vec3(500.0f, 29.5f, 500.0f);
-        mermaidCreateInfo.rotation.y = 0.05f;
-        AddMermaid(mermaidCreateInfo);
 
         //AnimatedGameObject* animatedGameObject = nullptr;
         //uint64_t id = World::CreateAnimatedGameObject();
@@ -787,6 +780,8 @@ namespace World {
         //animatedGameObject->SetPosition(glm::vec3(17, 31, 40));
         //animatedGameObject->SetMeshMaterialByMeshName("ArmsMale", "Hands");
         //animatedGameObject->SetMeshMaterialByMeshName("ArmsFemale", "FemaleArms");
+        
+
     }
 
     void ClearAllObjects() {
@@ -803,8 +798,9 @@ namespace World {
         for (Fence& fence : g_fences)                                   fence.CleanUp();
         for (GameObject& gameObject : g_gameObjects)                    gameObject.CleanUp();
         //for (Kangaroo& kangaroo : g_kangaroos)                        kangaroo.CleanUp();
+        for (Ladder& ladder : g_ladders)                                ladder.CleanUp();
         for (Mermaid& mermaid : g_mermaids)                             mermaid.CleanUp();
-        for (HousePlane& housePlane : g_housePlanes)                              housePlane.CleanUp();
+        for (HousePlane& housePlane : g_housePlanes)                    housePlane.CleanUp();
         for (Piano& piano : g_pianos)                                   piano.CleanUp();
         for (PickUp& pickUp : g_pickUps)                                pickUp.CleanUp();
         for (PowerPoleSet& powerPoleSet: g_powerPoleSets)               powerPoleSet.CleanUp();
@@ -830,6 +826,7 @@ namespace World {
         g_fences.clear();
         g_gameObjects.clear();
         //g_kangaroos.clear();
+        g_ladders.clear();
         g_lights.clear();
         g_mermaids.clear();
         g_pianos.clear();
@@ -977,6 +974,13 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
         g_gameObjects.push_back(GameObject(createInfo));
+    }
+
+    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::LADDER);
+        g_ladders.emplace_with_id(id, id, createInfo, spawnOffset);
+
+        return id;
     }
 
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1260,6 +1264,7 @@ namespace World {
     Hell::SlotMap<Fireplace>& GetFireplaces()                           { return g_fireplaces; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
     Hell::SlotMap<HousePlane>& GetHousePlanes()                         { return g_housePlanes; }
+    Hell::SlotMap<Ladder>& GetLadders ()                                { return g_ladders; }
     std::vector<Light>& GetLights()                                     { return g_lights; };
     std::vector<Kangaroo>& GetKangaroos()                               { return g_kangaroos; }
     std::vector<MapInstance>& GetMapInstances()                         { return g_mapInstances; }

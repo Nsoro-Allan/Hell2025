@@ -16,6 +16,9 @@ namespace Editor {
     void PlaceHousePlane(HousePlaneType housePlaneType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
     void PlaceGenericObject(GenericObjectType genericObjectType, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
     void PlacePickUp(const std::string& pickUpName, const glm::vec3& hitPosition, const glm::vec3& hitNormal);
+    void PlaceDoor(const glm::vec3& hitPosition);
+    void PlaceWindow(const glm::vec3& hitPosition);
+    void PlaceLadder(const glm::vec3& hitPosition);
 
     void UpdateObjectPlacement() {
         if (GetEditorState() == EditorState::PLACE_OBJECT) {
@@ -45,17 +48,22 @@ namespace Editor {
                     if (GetPlacementObjectType() == ObjectType::FIREPLACE) {
                         PlaceFireplace(GetPlacementObjectSubtype().fireplace, rayResult.hitPosition);
                     }
+                    if (GetPlacementObjectType() == ObjectType::DOOR) {
+                        PlaceDoor(rayResult.hitPosition);
+                    }
+                    if (GetPlacementObjectType() == ObjectType::WINDOW) {
+                        PlaceWindow(rayResult.hitPosition);
+                    }
+                    if (GetPlacementObjectType() == ObjectType::LADDER) {
+                        PlaceLadder(rayResult.hitPosition);
+                    }
                 }
             }
         }
-        if (GetEditorState() == EditorState::PLACE_DOOR) UpdateDoorPlacement();
-        //if (GetEditorState() == EditorState::PLACE_HOUSE) UpdateDoorPlacement();
-        //if (GetEditorState() == EditorState::PLACE_PICTURE_FRAME) UpdatePictureFramePlacement();
-        //if (GetEditorState() == EditorState::PLACE_TREE) UpdateTreePlacement();
+
         if (GetEditorState() == EditorState::PLACE_PLAYER_CAMPAIGN_SPAWN) UpdatePlayerCampaignSpawnPlacement();
         if (GetEditorState() == EditorState::PLACE_PLAYER_DEATHMATCH_SPAWN) UpdatePlayerDeathmatchSpawnPlacement();
         if (GetEditorState() == EditorState::PLACE_WALL) UpdateWallPlacement();
-        if (GetEditorState() == EditorState::PLACE_WINDOW) UpdateWindowPlacement();
         //
         //// Store last placement state
         //if (GetEditorState() == EditorState::PLACE_DOOR ||
@@ -94,18 +102,6 @@ namespace Editor {
             }
         }
     }
-
-    //void PlaceObject(ObjectType objectType, glm::vec3 hitPosition, glm::vec3 hitNormal) {
-    //    if (objectType == ObjectType::GENERIC_OBJECT) {
-    //        GenericObjectCreateInfo createInfo;
-    //        createInfo.position = hitPosition;
-    //        createInfo.rotation.y = 0.0f;
-    //        createInfo.type = GenericObjectType::DRAWERS_LARGE;
-    //        World::AddGenericObject(createInfo, SpawnOffset());
-    //        ExitObjectPlacement();
-    //        return;
-    //    }
-    //}
 
     void PlaceFireplace(FireplaceType fireplaceType, const glm::vec3& hitPosition) {
         FireplaceCreateInfo createInfo;
@@ -157,6 +153,39 @@ namespace Editor {
         createInfo.saveToFile = true;
         createInfo.type = Bible::GetPickUpTypeByName(pickUpName);
         World::AddPickUp(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
+    void PlaceDoor(const glm::vec3& hitPosition) {
+        DoorCreateInfo createInfo;
+        createInfo.type = DoorType::STANDARD_A;
+        createInfo.materialTypeFront = DoorMaterialType::RESIDENT_EVIL;
+        createInfo.materialTypeBack = DoorMaterialType::RESIDENT_EVIL;
+        createInfo.materialTypeFrameFront = DoorMaterialType::RESIDENT_EVIL;
+        createInfo.materialTypeFrameBack = DoorMaterialType::RESIDENT_EVIL;
+        createInfo.position = hitPosition;
+        createInfo.rotation = glm::vec3(0.0f);
+        createInfo.hasDeadLock = false;
+        createInfo.deadLockedAtInit = false;
+        createInfo.maxOpenValue = 2.1f;
+        createInfo.editorName = UNDEFINED_STRING;
+        World::AddDoor(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
+    void PlaceWindow(const glm::vec3& hitPosition) {
+        WindowCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        createInfo.rotation = glm::vec3(0.0f);
+        World::AddWindow(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
+    void PlaceLadder(const glm::vec3& hitPosition) {
+        LadderCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        createInfo.rotation = glm::vec3(0.0f);
+        World::AddLadder(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }
 

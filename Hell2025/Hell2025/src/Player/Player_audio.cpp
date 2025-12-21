@@ -2,7 +2,7 @@
 #include "Audio/Audio.h"
 #include "Core/Game.h"
 
-void Player::UpdateAudio() {
+void Player::UpdateAudio(float deltaTime) {
 
     const std::vector<const char*> indoorFootstepFilenames = {
                     "player_step_1.wav",
@@ -39,6 +39,23 @@ void Player::UpdateAudio() {
                     "player_step_ladder_3.wav",
                     "player_step_ladder_4.wav",
     };
+
+    bool pressingMovementKey = PressingWalkForward() || PressingWalkBackward() || PressingWalkLeft() || PressingWalkRight();
+
+    // Ladder
+    if (!pressingMovementKey || !IsOverlappingLadder()) {
+        m_ladderFootstepAudioTimer = 0;
+    }
+    if (m_ladderFootstepAudioTimer > 0.35f) {
+        m_ladderFootstepAudioTimer = 0;
+    }
+    if (m_ladderFootstepAudioTimer == 0) {
+        if (IsOverlappingLadder() && PressingWalkForward()) {
+            int random = rand() % ladderFootstepFilenames.size();
+            Audio::PlayAudio(ladderFootstepFilenames[random], 1.0f);
+        }
+    }
+    m_ladderFootstepAudioTimer += deltaTime;
 
     // Water
     if (StoppedWading() && false) {

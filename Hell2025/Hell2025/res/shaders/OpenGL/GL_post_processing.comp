@@ -177,7 +177,8 @@ vec3 OG() {
     finalColor = clamp(finalColor, 0, 1);
 	
     // Some more yolo tone mapping
-    //finalColor = mix(finalColor, Tonemap_ACES(finalColor), 0.35);  
+    //finalColor = mix(finalColor, Tonemap_ACES(finalColor), 0.35);
+    finalColor = mix(finalColor, Tonemap_ACES(finalColor), 0.125);  
     
     // Color tint
     finalColor *= colorTint;

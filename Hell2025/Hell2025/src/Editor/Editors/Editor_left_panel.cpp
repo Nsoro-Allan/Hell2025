@@ -210,6 +210,19 @@ namespace Editor {
                     }
                 }
 
+                // Windows (BARELY FUNCITONAL)
+                if (Window* window = World::GetWindowByObjectId(GetSelectedObjectId())) {
+                    g_positionX.SetValue(window->GetPosition().x);
+                    g_positionY.SetValue(window->GetPosition().y);
+                    g_positionZ.SetValue(window->GetPosition().z);
+                    g_rotationY.SetValue(window->GetRotation().y);
+
+                    if (g_positionX.CreateImGuiElements())  window->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_positionY.CreateImGuiElements())  window->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_positionZ.CreateImGuiElements())  window->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
+                    if (g_rotationY.CreateImGuiElements())  window->SetRotationY(g_rotationY.GetValue());
+                }
+
                 // Doors (BARELY FUNCITONAL)
                 if (Door* door = World::GetDoorByObjectId(GetSelectedObjectId())) {
                     g_positionX.SetValue(door->GetPosition().x);
@@ -221,6 +234,7 @@ namespace Editor {
                     types.push_back(Util::DoorTypeToString(DoorType::STANDARD_A));
                     types.push_back(Util::DoorTypeToString(DoorType::STANDARD_B));
                     types.push_back(Util::DoorTypeToString(DoorType::STAINED_GLASS));
+                    types.push_back(Util::DoorTypeToString(DoorType::STAINED_GLASS2));
                                           
                     std::vector<std::string> materialTypes;
                     materialTypes.push_back(Util::DoorMaterialTypeToString(DoorMaterialType::RESIDENT_EVIL));
@@ -244,7 +258,7 @@ namespace Editor {
                     if (g_positionX.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
                     if (g_positionY.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
                     if (g_positionZ.CreateImGuiElements())  door->SetPosition(glm::vec3(g_positionX.GetValue(), g_positionY.GetValue(), g_positionZ.GetValue()));
-                    if (g_rotationY.CreateImGuiElements()) {}; // TODO
+                    if (g_rotationY.CreateImGuiElements())  door->SetRotationY(g_rotationY.GetValue());
 
                     if (g_doorType.CreateImGuiElements()) {
                         door->SetType(Util::StringToDoorType(g_doorType.GetSelectedOptionText()));

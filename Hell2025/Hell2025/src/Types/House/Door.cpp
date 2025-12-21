@@ -161,6 +161,11 @@ void Door::SetPosition(const glm::vec3& position) {
     m_position = position;
 }
 
+void Door::SetRotationY(float value) {
+    m_createInfo.rotation.y = value;
+    m_rotation.y = value;
+}
+
 void Door::SetEditorName(const std::string& name) {
     m_createInfo.editorName = name;
     Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);

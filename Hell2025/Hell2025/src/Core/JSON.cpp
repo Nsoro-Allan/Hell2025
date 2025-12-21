@@ -68,6 +68,15 @@ namespace nlohmann {
         };
     }
 
+    void to_json(nlohmann::json& j, const LadderCreateInfo& createInfo) {
+        j = nlohmann::json{
+            {"Position", createInfo.position},
+            {"Rotation", createInfo.rotation},
+            {"StepCount", createInfo.stepCount},
+            {"EditorName", createInfo.editorName}
+        };
+    }
+
     void to_json(nlohmann::json& j, const LightCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Color", createInfo.color},
@@ -221,6 +230,13 @@ namespace nlohmann {
         info.textureRotation = j.value("TextureRotation", 0.0f);
         info.materialName = j.value("Material", "CheckerBoard");
         info.type = Util::StringToHousePlaneType(j.value("Type", UNDEFINED_STRING));
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
+    }
+
+    void from_json(const nlohmann::json& j, LadderCreateInfo& info) {
+        info.position = j.value("Position", glm::vec3(0.0f));
+        info.rotation = j.value("Rotation", glm::vec3(0.0f));
+        info.stepCount = j.value("StepCount", 1);
         info.editorName = j.value("EditorName", UNDEFINED_STRING);
     }
 

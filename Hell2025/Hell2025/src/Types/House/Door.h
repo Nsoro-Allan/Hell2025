@@ -14,6 +14,7 @@ struct Door {
     ~Door() = default;
 
     void SetPosition(const glm::vec3& position);
+    void SetRotationY(float value);
     void Update(float deltaTime);
 	void CleanUp();
     void UpdateFloor();

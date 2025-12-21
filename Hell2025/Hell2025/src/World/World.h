@@ -22,6 +22,7 @@
 #include "Types/Game/BulletCasing.h"
 #include "Types/Game/Decal.h"
 #include "Types/Game/GameObject.h"
+#include "Types/Game/Ladder.h"
 #include "Types/Game/Light.h"
 #include "Types/Game/PickUp.h"
 #include "Types/Generics/GenericBouncable.h"
@@ -96,6 +97,7 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddHousePlane(HousePlaneCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddKangaroo(const KangarooCreateInfo& createInfo);
+    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo);
@@ -169,6 +171,7 @@ namespace World {
     Fireplace* GetFireplaceById(uint64_t objectId);
     GenericObject* GetGenericObjectById(uint64_t objectId);
     HousePlane* GetHousePlaneByObjectId(uint64_t objectId);
+    Ladder* GetLadderByObjectId(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);
@@ -191,6 +194,7 @@ namespace World {
     Hell::SlotMap<GenericObject>& GetGenericObjects();
     Hell::SlotMap<Fireplace>& GetFireplaces();
     Hell::SlotMap<HousePlane>& GetHousePlanes();
+    Hell::SlotMap<Ladder>& GetLadders();
     Hell::SlotMap<PickUp>& GetPickUps();
     Hell::SlotMap<TrimSet>& GetTrimSets();
     Hell::SlotMap<Wall>& GetWalls();

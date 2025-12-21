@@ -9,7 +9,6 @@
 #include "Util.h"
 
 void Inventory::Update(float deltaTime) {
-
     //if (Input::KeyPressed(HELL_KEY_M)) {
     //    SetGridCountX(6);
     //}
@@ -22,11 +21,8 @@ void Inventory::Update(float deltaTime) {
     //MoveItem(5, 4, 2, true);
 
     if (m_state == InventoryState::MAIN_SCREEN) UpdateItemViewScreen(deltaTime);
+    if (m_state == InventoryState::SHOP) UpdateItemViewScreen(deltaTime);
     if (m_state == InventoryState::EXAMINE_ITEM) UpdateExamineScreen(deltaTime);
-
-    if (Input::KeyPressed(HELL_KEY_SPACE)) {
-        PrintGridOccupiedStateToConsole();
-    }
 }
 
 void Inventory::UpdateItemViewScreen(float deltaTime) {

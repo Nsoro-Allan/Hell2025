@@ -9,8 +9,21 @@ void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
     m_transform.position = m_createInfo.position + m_spawnOffset.translation;
     m_transform.rotation = m_createInfo.rotation + glm::vec3(0.0f, m_spawnOffset.yRotation, 0.0f);
 
-    std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-    m_meshNodes.Init(NO_ID, "Mermaid", emptyMeshNodeCreateInfoSet);
+    std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+    MeshNodeCreateInfo& rock = meshNodeCreateInfoSet.emplace_back();
+    rock.meshName = "Rock";
+    rock.rigidDynamic.createObject = true; 
+    rock.rigidDynamic.kinematic = true;
+    rock.rigidDynamic.offsetTransform = Transform();
+    rock.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+    rock.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    rock.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);   
+    rock.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+    rock.rigidDynamic.convexMeshModelName = "CollisionMesh_MermaidRock";
+    rock.materialName = "Rock";
+
+    m_meshNodes.Init(NO_ID, "Mermaid", meshNodeCreateInfoSet);
     m_meshNodes.SetMaterialByMeshName("Arms", "MermaidArms");
     m_meshNodes.SetMaterialByMeshName("Body", "MermaidBody");
     m_meshNodes.SetMaterialByMeshName("BoobTube", "BoobTube");
@@ -23,7 +36,7 @@ void Mermaid::Init(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
     m_meshNodes.SetMaterialByMeshName("HairOutta", "MermaidHair");
     m_meshNodes.SetMaterialByMeshName("HairScalp", "MermaidScalp");
     m_meshNodes.SetMaterialByMeshName("Nails", "Nails");
-    m_meshNodes.SetMaterialByMeshName("Rock", "Rock");
+    //m_meshNodes.SetMaterialByMeshName("Rock", "Rock");
     m_meshNodes.SetMaterialByMeshName("Tail", "MermaidTail");
     m_meshNodes.SetMaterialByMeshName("TailFin", "MermaidTail");
 

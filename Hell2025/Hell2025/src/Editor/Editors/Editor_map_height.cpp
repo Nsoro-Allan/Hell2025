@@ -8,6 +8,7 @@
 #include "Renderer/Renderer.h"
 #include "World/World.h"
 #include "Viewport/ViewportManager.h"
+#include "Managers/MapManager.h"
 
 #include "Imgui/ImguiBackEnd.h"
 #include <ImGui/imgui.h>
@@ -64,6 +65,9 @@ namespace Editor {
         World::ClearAllObjects();
         World::LoadMapInstancesHeightMapData({ mapInstanceCreateInfo });
         World::EnableOcean();
+
+        MapManager::Init();                          // ?
+        Renderer::RecalculateAllHeightMapData(true); // ?
 
         // Init UI
         InitFileMenuImGuiElements();

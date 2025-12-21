@@ -30,7 +30,8 @@ namespace Game {
     double g_deltaTimeAccumulator = 0.0;
     double g_fixedDeltaTime = 1.0 / 60.0;
     bool g_glassHitAudioPlayedThisFrame = false;
-    glm::vec3 g_moonlightDirection = glm::normalize(glm::vec3(0.0, 0.2, 0.5));
+    //glm::vec3 g_moonlightDirection = glm::normalize(glm::vec3(0.0f, 0.2f, 0.5f));
+    glm::vec3 g_moonlightDirection = glm::normalize(glm::vec3(-0.5f, 0.2f, 0.0f));
     std::vector<Player> g_localPlayers;
     std::vector<Player> g_onlinePlayers;
     SplitscreenMode g_splitscreenMode = SplitscreenMode::FULLSCREEN;

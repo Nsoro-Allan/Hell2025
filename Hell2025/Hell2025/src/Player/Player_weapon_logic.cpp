@@ -118,7 +118,7 @@ void Player::GiveDefaultLoadout() {
     m_inventory.GiveAmmo("Tokarev", 200);
     m_inventory.GiveAmmo("AKS74U", 200);
 
-    m_inventory.AddInventoryItem("BlackSkull");
+    //m_inventory.AddInventoryItem("BlackSkull");
     m_inventory.AddInventoryItem("SmallKey");
     m_inventory.AddInventoryItem("SmallKeySilver");
     m_inventory.AddInventoryItem("Pills");
@@ -126,6 +126,12 @@ void Player::GiveDefaultLoadout() {
 
     //GiveSilencer("Glock");
     //GiveSight("GoldenGlock");    
+
+    // hack fill the shop
+    m_shopInventory.AddInventoryItem("AKS74U");
+    m_shopInventory.AddInventoryItem("SmallKey");
+    m_shopInventory.AddInventoryItem("SmallKeySilver");
+    m_shopInventory.AddInventoryItem("Pills");
 }
 
 void Player::NextWeapon() {

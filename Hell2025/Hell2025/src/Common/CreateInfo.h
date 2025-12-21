@@ -5,6 +5,13 @@
 #include "Types/Game/SpawnPoint.h"
 #include <map>
 
+struct LadderCreateInfo {
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    std::string editorName = UNDEFINED_STRING;
+    uint32_t stepCount = 1;
+};
+
 struct TrimSetCreateInfo {
 	TrimSetType type = TrimSetType::CEILING;
 	std::vector<glm::vec3> points;
@@ -236,6 +243,13 @@ struct PickUpCreateInfo {
     bool respawn = false;
     bool disablePhysicsAtSpawn = true;
     PickUpType type = PickUpType::UNDEFINED;
+    std::string parentObjectName = UNDEFINED_STRING;
+    std::string parentMeshName = UNDEFINED_STRING;
+
+    // For when this pick up is placed inside objects
+    //uint64_t parentObjectId = 0;
+    //uint32_t parentLocalMeshNodeIndex = 0;
+    //uint64_t openableId = 0;
 };
 
 struct PictureFrameCreateInfo {
@@ -306,6 +320,7 @@ struct CreateInfoCollection {
     std::vector<FireplaceCreateInfo> fireplaces;
     std::vector<GenericObjectCreateInfo> genericObjects;
     std::vector<HousePlaneCreateInfo> housePlanes;
+    std::vector<LadderCreateInfo> ladders;
     std::vector<LightCreateInfo> lights;
     std::vector<PianoCreateInfo> pianos;
     std::vector<PickUpCreateInfo> pickUps;

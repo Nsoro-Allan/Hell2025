@@ -244,8 +244,9 @@ void main() {
 
     vec3 finalStainedGlassColor = (mainImage * tintColorWIP) + directLighting * 5;
     
-    finalStainedGlassColor += (tintColorWIP * 0.0025);
-
+    finalStainedGlassColor = (vec3(0) * tintColorWIP) + directLighting * 5;
+    //finalStainedGlassColor += (tintColorWIP * 0.0025);
+    finalStainedGlassColor = directLighting;
 
     FragOut.rgb = finalStainedGlassColor;    
 }

@@ -13,6 +13,7 @@ namespace MapManager {
 
     void Init() {
         //NewMap("Shit", 8, 16, 30.0f);
+        g_maps.clear();
         LoadMap("Shit");
     }
 
@@ -151,7 +152,7 @@ namespace MapManager {
         }
 
         // Load Create Info Collection from JSON string
-        CreateInfoCollection createInfoCollection = Util::CreateInfoCollectionFromJSON(createInfoJson);
+        CreateInfoCollection createInfoCollection = Util::CreateInfoCollectionFromJSONString(createInfoJson);
         AdditionalMapData additionalMapData = Util::AdditionalMapDataFromJSON(additionalJson);
         map.SetCreateInfoCollection(createInfoCollection);
         map.SetAdditionalMapData(additionalMapData);

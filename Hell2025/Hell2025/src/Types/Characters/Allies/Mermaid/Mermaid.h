@@ -10,6 +10,7 @@ struct Mermaid {
     void CleanUp();
 
     const MermaidCreateInfo& GetCreateInfo() const                          { return m_createInfo; }
+    const glm::vec3& GetPosition() const                                    { return m_transform.position; }
     const std::vector<RenderItem>& GetRenderItems() const                   { return m_meshNodes.GetRenderItems(); }
     const std::vector<RenderItem>& GetRenderItemsBlended()const             { return m_meshNodes.GetRenderItemsBlended(); }
     const std::vector<RenderItem>& GetRenderItemsAlphaDiscarded() const     { return m_meshNodes.GetRenderItemsAlphaDiscarded(); }

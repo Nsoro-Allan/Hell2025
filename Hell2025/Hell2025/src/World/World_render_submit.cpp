@@ -31,6 +31,13 @@ namespace World {
         // Clear global render item vectors
         g_skinnedRenderItems.clear();
 
+        for (Ladder& ladder : GetLadders()) {
+            RenderDataManager::SubmitRenderItems(ladder.GetRenderItems());
+            if (Editor::GetSelectedObjectId() == ladder.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(ladder.GetRenderItems());
+            }
+        }
+
         for (PickUp& pickUp : GetPickUps()) {
             RenderDataManager::SubmitRenderItems(pickUp.GetRenderItems());
             if (Editor::GetSelectedObjectId() == pickUp.GetObjectId()) {

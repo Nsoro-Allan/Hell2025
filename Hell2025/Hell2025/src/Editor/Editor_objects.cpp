@@ -212,6 +212,11 @@ namespace Editor {
                 }
             }
 
+            if (Ladder* ladder = World::GetLadderByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(ladder->GetPosition());
+                Gizmo::SetRotation(ladder->GetRotation());
+            }
+
             if (GetSelectedObjectType() == ObjectType::PICTURE_FRAME) {
                 PictureFrame* pictureFrame = World::GetPictureFrameByObjectId(GetSelectedObjectId());
                 if (pictureFrame) {

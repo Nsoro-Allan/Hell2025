@@ -47,6 +47,7 @@ in float FlashlightModifer;
 in vec3 CameraForward;
 
 uniform float u_alphaBoost = 1.5;
+uniform vec3 u_moonlightDir;
 
 void main() {
 #if ENABLE_BINDLESS
@@ -119,9 +120,8 @@ void main() {
    
     vec3 moonColor = vec3(1.0, 0.9, 0.9);
     moonColor = vec3(1, 0.7799999713897705, 0.5289999842643738);
-    vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
-    float moonLightStrength = 0.5;
-    vec3 moonLighting = GetDirectionalLighting(moonLightDir, moonColor, moonLightStrength, normal.xyz, WorldPos.xyz, baseColor.rgb, roughness, metallic, ViewPos);
+    float moonLightStrength = 0.05;
+    vec3 moonLighting = GetDirectionalLighting(u_moonlightDir, moonColor, moonLightStrength, normal.xyz, WorldPos.xyz, baseColor.rgb, roughness, metallic, ViewPos);
     
     // Ambient light
     vec3 amibentLightColor = vec3(1, 0.98, 0.94);

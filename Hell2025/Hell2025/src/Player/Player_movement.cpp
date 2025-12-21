@@ -29,6 +29,7 @@ void Player::UpdateMovement(float deltaTime) {
             //std::cout << " walking\n";
         }
     }
+    UpdateLadderMovement(deltaTime);
 
     // Character controller AABB
     m_characterControllerAABB = Physics::GetCharacterControllerAABB(m_characterControllerId);
@@ -120,6 +121,12 @@ void Player::UpdateWalkingMovement(float deltaTime) {
         glm::vec3 displacement = m_movementDirection * m_acceleration;
         displacement *= m_currentSpeed * deltaTime;
         displacement.y += m_yVelocity * deltaTime;
+
+        // Ladder
+        // TODO: instead make it so you can jump off ladders, this prevents it.
+        if (IsOverlappingLadder()) {
+            displacement.y = 0;
+        }
 
         // Update character controller
         Physics::MoveCharacterController(m_characterControllerId, displacement);
@@ -257,7 +264,7 @@ void Player::UpdateSwimmingMovement(float deltaTime) {
     m_swimmingSpeed = 3.0;
 
     // Snap to ocean surface
-    if (!PressingCrouch()) {
+    if (!PressingCrouch() && !IsOverlappingLadder()) {
         const float surfaceThreshold = 0.05f;
         float targetY = Ocean::GetWaterHeightAtPlayer(m_viewportIndex) - m_viewHeightStanding + 0.05f;
         m_smoothedWaterY = SmoothLerp(m_smoothedWaterY, targetY, deltaTime, 0.1f);
@@ -270,7 +277,6 @@ void Player::UpdateSwimmingMovement(float deltaTime) {
             const float lookDownThreshold = 0.01f;
             if (downDot < lookDownThreshold) {
                 Physics::MoveCharacterController(m_characterControllerId, snapDisplacement);
-                //MoveCharacterController(snapDisplacement);
             }
         }
     }

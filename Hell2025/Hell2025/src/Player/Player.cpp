@@ -49,6 +49,57 @@ void Player::BeginFrame() {
     m_interactOpenableId = 0;
 }
 
+void Player::EnterShop() {
+    m_isInShop = true;
+    m_shopInventory.OpenAsShop();
+    m_inventory.CloseInventory();
+
+
+    m_flashlightOn = true;
+    Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+}
+
+void Player::LeaveShop() {
+    m_isInShop = false;
+    m_inventory.CloseInventory();
+    m_shopInventory.CloseInventory();
+}
+
+static float WrapPi(float a) {
+    const float twoPi = 6.28318530718f;
+    a = std::fmod(a + 3.14159265359f, twoPi);
+    if (a < 0.0f) a += twoPi;
+    return a - 3.14159265359f;
+}
+
+static float LerpAngle(float a, float b, float t) {
+    float delta = WrapPi(b - a);
+    return a + delta * t;
+}
+
+void Player::UpdateShop(float deltaTime) {
+    glm::vec3 targetPosition = glm::vec3(28.1445, 29.15f, 52.785);
+    glm::vec3 targetCamEuler = glm::vec3(0.00199978, -1.688, 0.0f);
+    glm::vec3 currentPosition = GetFootPosition();
+    glm::vec3 currentCamEuler = m_camera.GetEulerRotation();
+
+    float positionInterpolationSpeed = 25.0f;
+    float rotationInterpolationSpeed = 50.0f;
+
+    float positionT = 1.0f - std::exp(-positionInterpolationSpeed * deltaTime);
+    float rotationT = 1.0f - std::exp(-rotationInterpolationSpeed * deltaTime);
+
+    glm::vec3 newPosition = glm::mix(currentPosition, targetPosition, positionT);
+
+    glm::vec3 newCamEuler = currentCamEuler;
+    newCamEuler.x = LerpAngle(currentCamEuler.x, targetCamEuler.x, rotationT); // pitch
+    newCamEuler.y = LerpAngle(currentCamEuler.y, targetCamEuler.y, rotationT); // yaw
+    newCamEuler.z = 0.0f;
+
+    SetFootPosition(newPosition);
+    m_camera.SetEulerRotation(newCamEuler);
+}
+
 void Player::Update(float deltaTime) {
     m_moving = false;
 
@@ -57,10 +108,10 @@ void Player::Update(float deltaTime) {
     }
 
     // Toggle inventory
-    if (PressedToggleInventory()) {
+    if (PressedToggleInventory() && m_shopInventory.IsClosed()) {
 
         // Was the inventory closed? Then open it
-        if (m_inventory.IsClosed()) {
+        if (m_inventory.IsClosed() ) {
             m_inventory.OpenInventory();
         }
         else {
@@ -73,13 +124,42 @@ void Player::Update(float deltaTime) {
                 m_inventory.GoToMainScreen();
             }
         }
+
+        // Hack to also exit shop if the inventory is being used to display your items when in shop to SELL
+        m_shopInventory.CloseInventory();
+        m_isInShop = false;
+
         Audio::PlayAudio(AUDIO_SELECT, 1.00f);
     }
+
+    // Close the shop
+    if (PressedToggleInventory() && IsInShop()) {
+        LeaveShop();
+    }
+
+    // Shop hack test
+    if (m_viewportIndex == 0 && Input::KeyPressed(HELL_KEY_U)) {
+        EnterShop();
+    }
+
+    if (IsInShop()) {
+        UpdateShop(deltaTime);
+    }
+    
+    //if (ViewportIsVisible()) {
+    //    std::cout << "Pos:" << GetFootPosition() << " cam: " << GetCameraRotation() << "\n";
+    //    
+    //    //std::cout << "Shop: " << m_shopInventory.IsOpen() << " Inv: " << m_inventory.IsOpen() << "\n";
+    //}
 
     // This may break code elsewhere in the player logic like anywhere
     if (m_inventory.IsOpen()) {
         DisableControl();
         m_inventory.Update(deltaTime);
+    }
+    if (m_shopInventory.IsOpen()) {
+        DisableControl();
+        m_shopInventory.Update(deltaTime);
     }
 
     // Inside or outside?
@@ -108,6 +188,7 @@ void Player::Update(float deltaTime) {
         }
     }
  
+    UpdateLadderIds();
     UpdateMovement(deltaTime);
     UpdateHeadBob(deltaTime);
     UpdateBreatheBob(deltaTime);
@@ -119,7 +200,7 @@ void Player::Update(float deltaTime) {
     UpdateAnimatedGameObjects(deltaTime);
     UpdateWeaponSlide();
     UpdateSpriteSheets(deltaTime);
-    UpdateAudio();
+    UpdateAudio(deltaTime);
     UpdateUI(deltaTime);
     UpdateFlashlight(deltaTime);
     UpdateFlashlightFrustum();
@@ -197,7 +278,9 @@ void Player::Update(float deltaTime) {
 
 void Player::Respawn() {
     m_inventory.Init();
+    m_shopInventory.Init();
     m_health = 100;
+    m_isInShop = false;
 
     //World::GetKangaroos()[0].Respawn();
 
@@ -206,10 +289,10 @@ void Player::Respawn() {
     //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
     SetFootPosition(spawnPoint.GetPosition());
 
-   //if (m_viewportIndex == 0) {
-   //    SetFootPosition(glm::vec3(36.18, 31, 37.26));
-   //    m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
-   //}
+    if (m_viewportIndex == 0) {
+        SetFootPosition(glm::vec3(36.18, 31, 37.26));
+        m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
+    }
 
     //GetCamera().SetEulerRotation(spawnPoint.m_camEuler);
 
@@ -469,5 +552,13 @@ bool Player::InventoryIsOpen() {
 
 bool Player::InventoryIsClosed() {
     return m_inventory.IsClosed();
+}
+
+bool Player::ShopInventoryIsOpen() {
+    return m_shopInventory.IsOpen();
+}
+
+bool Player::ShopInventoryIsClosed() {
+    return m_shopInventory.IsClosed();
 }
 

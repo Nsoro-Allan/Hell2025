@@ -30,6 +30,7 @@ uniform int u_ambientLightingBoost;
 uniform vec3 u_lightVolumeOffset;
 uniform vec3 u_lightVolumeWorldSize;
 uniform float u_lightVolumeSpacing;
+uniform vec3 u_moonlightDir;
 
 uniform float u_farPlane = 256.0;
 
@@ -282,6 +283,7 @@ void main() {
 		    vec3 spotLightDir = flashlightDir.xyz;
             vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
 
+
             // Prevent flashlight being drawn on the back of your head when viewed by another player
             if (i != viewportIndex) {
                 spotLightPos += spotLightDir * 0.2;
@@ -297,12 +299,19 @@ void main() {
             spotLightRadius = 20.0;
             spotLightStregth = 5.0;
             
+            float innerAngle = cos(radians(5.0 * flashlightModifer));
+            float outerAngle = cos(radians(25.0)); 
+            
+            bool shop = false;
+            if (shop) {
+                spotLightRadius = 5;
+                outerAngle = cos(radians(45.0)); 
+            }
+
             //if (worldSpacePosition.y < 10) {
             //    spotLightStregth = 25;
             //}
-
-            float innerAngle = cos(radians(5.0 * flashlightModifer));
-            float outerAngle = cos(radians(25.0));         
+        
             mat4 lightProjectionView = flashlightProjectionView;
             vec3 spotLighting = GetSpotlightLighting(spotLightPos, spotLightDir, spotLightColor, spotLightRadius, spotLightStregth, innerAngle, outerAngle, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, flashlightViewPos, lightProjectionView);
             
@@ -319,7 +328,9 @@ void main() {
             
             vec4 FragPosLightSpace = lightProjectionView * vec4(worldSpacePosition.xyz, 1.0);
             float shadow = SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
-
+            
+            
+            //shadow = 0;
             
             // Subsurface scattering
             vec3 radius = vec3(sssRadius);
@@ -354,8 +365,10 @@ void main() {
             //spotLighting *= spotLightColor;
 
             spotLighting *= vec3(1 - shadow);
-            spotLighting *= cookie;
-
+            
+            if (!shop) {
+                spotLighting *= cookie;
+            }
 
             directLighting += vec3(spotLighting) * flashlightModifer;
 
@@ -368,12 +381,15 @@ void main() {
     vec3 moonColor2 = vec3(1, 0.7799999713897705, 0.5289999842643738);
     moonColor = mix(moonColor, moonColor2, 0.5);
 
-    vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
+    //vec3 moonLightDir = normalize(vec3(-0.5, 0.2, 0.0));
+    //vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
     float moonLightStrength = 0.00125;//0.0125;
+
+    moonLightStrength = 0.05;
        
     //float shadow = ShadowCalculation(lightIndex, lightPosition, lightRadius, worldSpacePosition.xyz, viewPos, normal.xyz, shadowMapArray);
-    vec3 moonLighting = GetDirectionalLighting(moonLightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
-    vec3 csmShadow = ShadowCalculationCSM(worldSpacePosition.xyz, normal.xyz, moonLightDir, viewMatrix);
+    vec3 moonLighting = GetDirectionalLighting(u_moonlightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
+    vec3 csmShadow = ShadowCalculationCSM(worldSpacePosition.xyz, normal.xyz, u_moonlightDir, viewMatrix);
     
     //csmShadow = vec3(1,1,1);
     
@@ -382,7 +398,7 @@ void main() {
     // Moonlight subsurface scattering
     vec3 radius = vec3(sssRadius);
     vec3 subColor = Saturate(baseColor.rgb, 1.5);
-    vec3 L = moonLightDir;
+    vec3 L = u_moonlightDir;
     float NdotL = max(dot(normal.xyz, L), 0.0);
     vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
     vec3 sssColor = subColor * radius * sss * sssStrength;
@@ -573,7 +589,7 @@ void main() {
 
    // finalColor = indirect;
 
-    vec3 ambientTerm = baseColor.rgb * vec3(0.005);
+    vec3 ambientTerm = baseColor.rgb * vec3(0.0025);
 
     finalColor = directLighting. rgb + moonLighting  + ambientTerm;
 

@@ -58,7 +58,7 @@ struct Player {
     void UpdateSpriteSheets(float deltaTime);
     void UpdateHeadBob(float deltaTime);
     void UpdateBreatheBob(float deltaTime);
-    void UpdateAudio();
+    void UpdateAudio(float deltaTime);
     void UpdateFlashlight(float deltaTime);
     void UpdateFlashlightFrustum();
     void UpdateAnimatedGameObjects(float deltaTime);
@@ -76,6 +76,15 @@ struct Player {
     Ragdoll* GetRagdoll();
     glm::mat4 m_deathCamViewMatrix = glm::mat4(1.0f);
 
+    // Ladder
+    uint64_t m_ladderOverlapIndexFeet = -1;
+    uint64_t m_ladderOverlapIndexEyes = -1;
+    float m_overlappedLadderHeight = 0.0f;
+    float m_ladderFootstepAudioTimer = 0;
+    float m_ladderFootstepAudioLoopLength = 0.5;
+    void UpdateLadderIds();
+    void UpdateLadderMovement(float deltaTime);
+    bool IsOverlappingLadder();
 
     // Weapon shit
     int GetCurrentWeaponMagAmmo();
@@ -204,7 +213,9 @@ struct Player {
     ivecXZ GetChunkPos() { return m_chunkPos; }
 
     bool InventoryIsOpen();
-    bool InventoryIsClosed();
+    bool InventoryIsClosed(); 
+    bool ShopInventoryIsOpen();
+    bool ShopInventoryIsClosed();
 
     bool InteractFound()                        { return m_interactFound; }
     uint64_t GetInteractObjectId()              { return m_interactObjectId; }
@@ -215,6 +226,7 @@ struct Player {
 private:
     std::string m_name = "PLAYER_NAME";
     Inventory m_inventory;
+    Inventory m_shopInventory;
 
     // Interact
     PhysXRayResult m_physXRayResult;
@@ -343,6 +355,13 @@ private:
         // Melee
         void FireMelee();
         bool CanFireMelee();
+
+        // Shop
+        bool m_isInShop = false;
+        void EnterShop();
+        void LeaveShop();
+        void UpdateShop(float deltaTime);
+        bool IsInShop() { return m_isInShop; }
         
         // Gun
         void FireGun();

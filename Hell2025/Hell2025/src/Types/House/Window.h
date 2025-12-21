@@ -14,7 +14,8 @@ struct Window {
 
     void Update(float deltaTime);
     void CleanUp();
-    void SetPosition(const glm::vec3& position);
+    void SetPosition(const glm::vec3& position); 
+    void SetRotationY(float value);
     
     const uint64_t GetObjectId() const                          { return m_objectId; }
     const glm::vec3& GetPosition() const                        { return m_transform.position; }

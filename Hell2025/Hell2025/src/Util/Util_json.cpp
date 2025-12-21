@@ -3,13 +3,18 @@
 #include "Core/JSON.h"
 
 namespace Util {
-    CreateInfoCollection CreateInfoCollectionFromJSON(const std::string& jsonString) {
-        CreateInfoCollection createInfoCollection;
-        nlohmann::json json = nlohmann::json::parse(jsonString);
 
+    CreateInfoCollection CreateInfoCollectionFromJSONString(const std::string& jsonString) {
+        nlohmann::json json = nlohmann::json::parse(jsonString);
+        return CreateInfoCollectionFromJSONObject(json);
+    }
+ 
+    CreateInfoCollection CreateInfoCollectionFromJSONObject(nlohmann::json& json) {
+        CreateInfoCollection createInfoCollection;
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
         createInfoCollection.genericObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
-        createInfoCollection.fireplaces = json.value("Fireplace", std::vector<FireplaceCreateInfo>{});
+        createInfoCollection.fireplaces = json.value("Fireplaces", std::vector<FireplaceCreateInfo>{});
+        createInfoCollection.ladders = json.value("Ladders", std::vector<LadderCreateInfo>{});
         createInfoCollection.lights = json.value("Lights", std::vector<LightCreateInfo>{});
         createInfoCollection.pianos = json.value("Pianos", std::vector<PianoCreateInfo>{});
         createInfoCollection.pickUps = json.value("PickUps", std::vector<PickUpCreateInfo>{});
@@ -27,6 +32,7 @@ namespace Util {
         json["Doors"] = createInfoCollection.doors;
         json["Drawers"] = createInfoCollection.genericObjects;
         json["Fireplaces"] = createInfoCollection.fireplaces;
+        json["Ladders"] = createInfoCollection.ladders;
         json["Lights"] = createInfoCollection.lights;
         json["Pianos"] = createInfoCollection.pianos;
         json["PickUps"] = createInfoCollection.pickUps;

@@ -133,7 +133,8 @@ void main() {
     // Moon light
     {
         vec3 moonColor = vec3(1.0, 0.9, 0.9);
-        vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
+        //vec3 moonLightDir = normalize(vec3(0.0, 0.2 , 0.5));
+        vec3 moonLightDir = normalize(vec3(-0.5, 0.2, 0.0));
         vec3 L = normalize(moonLightDir);
         vec3 N = normalize(normal);
         vec3 V = normalize(u_viewPos - WorldPos);
@@ -145,11 +146,22 @@ void main() {
         vec3 spec_direct = microfacetSpecular(L, V, N, F0, roughness);
         vec3 Lo_direct = spec_direct * moonColor * NoL;
 
+        // Rotate R to match skybox -90 rotation
+        float angle = radians(-90.0);
+        float c = cos(angle);
+        float s = sin(angle);
+        mat3 rotateY = mat3(
+             c, 0.0, s,
+            0.0, 1.0, 0.0,
+            -s, 0.0, c
+        );
+        vec3 R_rotated = rotateY * R;
+
         // IBL Reflection (specular-only)
         float damping_IBL = 0.5;
         vec3 F_reflection = fresnelSchlick(clamp(dot(N, V), 0.0, 1.0), F0);
         vec3 kS_IBL = F_reflection;
-        vec3 reflection_IBL = texture(cubeMap, R).rgb * damping_IBL;;
+        vec3 reflection_IBL = texture(cubeMap, R_rotated).rgb * damping_IBL;;
 
         //kS_IBL *= kS_IBL; // HUGE HACK
         vec3 specular_IBL = reflection_IBL * kS_IBL;
@@ -244,7 +256,7 @@ void main() {
     // Fog
     float u_fogStartDistance = 0.0;
     float u_fogEndDistance = 100.0;
-    float u_fogExponent = 0.1;
+    float u_fogExponent = 0.15;
     float dist = length(u_viewPos - WorldPos);
     float fogRange = u_fogEndDistance - u_fogStartDistance;
     float normDist = (dist - u_fogStartDistance) / max(fogRange, 0.0001);
@@ -260,6 +272,8 @@ void main() {
     //// Output color
     //ColorOut = vec4(color_gamma, 1.0);
     ColorOut = vec4(surfaceLighting, 1.0);
+
+    ColorOut.rgb = surfaceLighting;
     
     // wireframe override
     if (u_wireframe) {

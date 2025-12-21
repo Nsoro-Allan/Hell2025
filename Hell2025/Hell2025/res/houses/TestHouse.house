@@ -33,7 +33,7 @@
       "Position": [
         4.449999809265137,
         0.0,
-        4.5
+        3.823184013366699
       ],
       "Rotation": [
         0.0,
@@ -146,6 +146,48 @@
         0.0
       ],
       "Type": "STANDARD_A"
+    },
+    {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 8",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
+      "Position": [
+        4.449999809265137,
+        0.0,
+        5.150000095367432
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Type": "STANDARD_A"
+    },
+    {
+      "DeadLockedAtStart": false,
+      "EditorName": "Door Standard A 9",
+      "HasDeadLock": false,
+      "MaterialTypeBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
+      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaxOpenValue": 2.0999999046325684,
+      "Position": [
+        0.8999999761581421,
+        2.799999952316284,
+        4.5
+      ],
+      "Rotation": [
+        0.0,
+        -1.5709999799728394,
+        0.0
+      ],
+      "Type": "STANDARD_A"
     }
   ],
   "Drawers": [
@@ -173,7 +215,7 @@
       "Position": [
         4.786611080169678,
         0.0,
-        3.4000000953674316
+        2.795891284942627
       ],
       "Rotation": [
         0.0,
@@ -319,6 +361,25 @@
         1.0
       ],
       "Type": "TEST_MODEL2"
+    },
+    {
+      "EditorName": "Drawers Large 3",
+      "Position": [
+        0.3209124803543091,
+        0.0,
+        3.7674407958984375
+      ],
+      "Rotation": [
+        0.0,
+        1.5707963705062866,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "DRAWERS_LARGE"
     }
   ],
   "Fireplaces": [
@@ -327,7 +388,7 @@
       "Position": [
         8.100000381469727,
         0.0,
-        -1.399999976158142
+        -1.350000023841858
       ],
       "Rotation": [
         3.1415927410125732,
@@ -341,7 +402,7 @@
       "Position": [
         8.899999618530273,
         0.0,
-        3.8499999046325684
+        3.75
       ],
       "Rotation": [
         3.1415927410125732,
@@ -349,6 +410,50 @@
         3.1415927410125732
       ],
       "Type": "WOOD_STOVE"
+    }
+  ],
+  "Ladders": [
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        -0.0,
+        0.0,
+        3.450000047683716
+      ],
+      "Rotation": [
+        0.0,
+        -1.5707963705062866,
+        0.0
+      ],
+      "StepCount": 1
+    },
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        -4.25,
+        -1.9500000476837158,
+        0.0
+      ],
+      "Rotation": [
+        0.0,
+        -1.5707963705062866,
+        0.0
+      ],
+      "StepCount": 1
+    },
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        -4.25,
+        -3.450000047683716,
+        -0.0
+      ],
+      "Rotation": [
+        0.0,
+        -1.5707963705062866,
+        0.0
+      ],
+      "StepCount": 1
     }
   ],
   "Lights": [
@@ -441,22 +546,22 @@
   ],
   "PickUps": [
     {
-      "DisablePhysicsAtSpawn": false,
+      "DisablePhysicsAtSpawn": true,
       "EditorName": "UNDEFINED_STRING",
-      "Name": "12GaugeBuckShot",
+      "Name": "Tokarev",
       "Position": [
-        3.1722817420959473,
-        0.5,
-        -0.9645194411277771
+        4.12078332901001,
+        1.2438812255859375,
+        1.3364123106002808
       ],
       "Respawn": true,
       "Rotation": [
-        0.0,
-        0.0,
-        0.0
+        1.2937431335449219,
+        0.9234950542449951,
+        -0.13626156747341156
       ],
       "SaveToFile": true,
-      "Type": "AMMO"
+      "Type": "WEAPON"
     },
     {
       "DisablePhysicsAtSpawn": true,
@@ -483,7 +588,7 @@
       "Position": [
         4.8122406005859375,
         0.9113616943359375,
-        3.3974926471710205
+        2.745727777481079
       ],
       "Respawn": true,
       "Rotation": [
@@ -531,22 +636,40 @@
       "Type": "WEAPON"
     },
     {
-      "DisablePhysicsAtSpawn": true,
+      "DisablePhysicsAtSpawn": false,
       "EditorName": "UNDEFINED_STRING",
-      "Name": "Tokarev",
+      "Name": "12GaugeBuckShot",
       "Position": [
-        4.12078332901001,
-        1.2438812255859375,
-        1.3364123106002808
+        2.4755239486694336,
+        0.5,
+        -1.0227279663085938
       ],
       "Respawn": true,
       "Rotation": [
-        1.2937431335449219,
-        0.9234950542449951,
-        -0.13626156747341156
+        0.0,
+        0.0,
+        0.0
       ],
       "SaveToFile": true,
-      "Type": "WEAPON"
+      "Type": "AMMO"
+    },
+    {
+      "DisablePhysicsAtSpawn": false,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "12GaugeBuckShot",
+      "Position": [
+        0.3673289120197296,
+        1.2356414794921875,
+        4.069762229919434
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.21998214721679688,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "AMMO"
     }
   ],
   "PictureFrames": [
@@ -628,12 +751,12 @@
       "P1": [
         9.0,
         2.700000047683716,
-        6.050000190734863
+        2.799999952316284
       ],
       "P2": [
         0.0,
         2.700000047683716,
-        6.0
+        2.799999952316284
       ],
       "P3": [
         0.0,
@@ -860,12 +983,12 @@
       "P1": [
         4.400000095367432,
         2.4000000953674316,
-        6.0
+        4.550000190734863
       ],
       "P2": [
         0.05000000074505806,
         2.4000000953674316,
-        6.0
+        4.550000190734863
       ],
       "P3": [
         0.05000000074505806,
@@ -877,6 +1000,64 @@
       "TextureRotation": 0.0,
       "TextureScale": 1.0,
       "Type": "CEILING"
+    },
+    {
+      "EditorName": "Floor 11",
+      "Material": "FloorBoards",
+      "P0": [
+        1.149999976158142,
+        2.799999952316284,
+        4.550000190734863
+      ],
+      "P1": [
+        1.149999976158142,
+        2.799999952316284,
+        6.0
+      ],
+      "P2": [
+        4.200000762939453,
+        0.005342841148376465,
+        6.0
+      ],
+      "P3": [
+        4.199999809265137,
+        0.0,
+        4.550000190734863
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 1.0,
+      "Type": "FLOOR"
+    },
+    {
+      "EditorName": "Floor 12",
+      "Material": "FloorBoards",
+      "P0": [
+        0.09999969601631165,
+        2.799999952316284,
+        2.5499985218048096
+      ],
+      "P1": [
+        0.09999969601631165,
+        2.799999952316284,
+        4.55000114440918
+      ],
+      "P2": [
+        2.1000003814697266,
+        2.799999952316284,
+        4.55000114440918
+      ],
+      "P3": [
+        2.1000003814697266,
+        2.799999952316284,
+        2.5499985218048096
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": 0.0,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4000000059604645,
+      "Type": "FLOOR"
     }
   ],
   "Trees": [],
@@ -1046,35 +1227,35 @@
       "WallType": "INTERIOR"
     },
     {
-      "EditorName": "Wall 5",
-      "Height": 2.4000000953674316,
+      "EditorName": "Wall 9",
+      "Height": 5.199999809265137,
       "Material": "Ceiling2",
       "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
-          0.10000000149011612,
-          0.0,
-          3.0
-        ],
-        [
-          4.400000095367432,
-          0.0,
-          3.0
-        ],
-        [
           4.400000095367432,
           0.0,
           6.0
         ],
         [
-          0.10000000149011612,
+          0.04842057824134827,
           0.0,
           6.0
         ],
         [
-          0.10000000149011612,
+          0.05000000074505806,
           0.0,
-          3.0
+          4.550000190734863
+        ],
+        [
+          4.400000095367432,
+          0.0,
+          4.550000190734863
+        ],
+        [
+          4.39963436126709,
+          0.0,
+          5.99850606918335
         ]
       ],
       "TextureOffsetU": 0.0,
@@ -1130,7 +1311,7 @@
     {
       "EditorName": "Wall 7",
       "Height": 2.4000000953674316,
-      "Material": "FloorBoards",
+      "Material": "Ceiling2",
       "MiddleTrimHeight": 2.4000000953674316,
       "Points": [
         [
@@ -1163,6 +1344,47 @@
       "TextureOffsetV": -1.399999976158142,
       "TextureRotation": 0.0,
       "TextureScale": 0.4000000059604645,
+      "TrimTypeCeiling": "TIMBER",
+      "TrimTypeFloor": "TIMBER",
+      "UseReversePointOrder": false,
+      "WallType": "INTERIOR"
+    },
+    {
+      "EditorName": "Wall 5",
+      "Height": 2.4000000953674316,
+      "Material": "Ceiling2",
+      "MiddleTrimHeight": 2.4000000953674316,
+      "Points": [
+        [
+          0.03000009059906006,
+          0.0,
+          2.9900002479553223
+        ],
+        [
+          4.400000095367432,
+          0.0,
+          3.0
+        ],
+        [
+          4.400000095367432,
+          0.0,
+          4.550000190734863
+        ],
+        [
+          0.03403671830892563,
+          0.0,
+          4.550000190734863
+        ],
+        [
+          0.03000009059906006,
+          0.0,
+          2.9900002479553223
+        ]
+      ],
+      "TextureOffsetU": 0.0,
+      "TextureOffsetV": -1.399999976158142,
+      "TextureRotation": 0.0,
+      "TextureScale": 0.4166666567325592,
       "TrimTypeCeiling": "TIMBER",
       "TrimTypeFloor": "TIMBER",
       "UseReversePointOrder": false,

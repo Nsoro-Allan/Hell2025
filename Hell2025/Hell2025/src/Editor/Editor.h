@@ -151,24 +151,22 @@ namespace Editor {
     void Save();
 
     // Object placement
-    //void PlaceObject(ObjectType objectType); // suss!!!!!!!!!!!
     void PlaceHousePlane(HousePlaneType housePlaneType);
     void PlaceFireplace(FireplaceType fireplaceType);
     void PlaceGenericObject(GenericObjectType objectType);
     void PlacePickUp(const std::string& name);
+    void PlaceObject(ObjectType objectType); // used for windows, doors, etc
 
     ObjectType GetPlacementObjectType();
     PlacementObjectSubtype GetPlacementObjectSubtype();
     const std::string& GetPlacementPickUpName();
     void ResetPlacementObjectSubtype();
 
-    void UpdateDoorPlacement();
     void UpdatePictureFramePlacement();
     void UpdatePlayerCampaignSpawnPlacement();
     void UpdatePlayerDeathmatchSpawnPlacement();
     void UpdateTreePlacement();
     void UpdateWallPlacement();
-    void UpdateWindowPlacement();
     void UpdateObjectPlacement();
     void ExitObjectPlacement();
     void SetPlacementObjectId(uint64_t objectId);

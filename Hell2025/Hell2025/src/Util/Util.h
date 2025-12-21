@@ -11,6 +11,7 @@
 #include <span>
 #include <type_traits>
 
+#include <nlohmann/json.hpp>
 #include <vector>
 
 namespace Util {
@@ -135,7 +136,8 @@ namespace Util {
 
     // JSON
     AdditionalMapData AdditionalMapDataFromJSON(const std::string& jsonString);
-    CreateInfoCollection CreateInfoCollectionFromJSON(const std::string& jsonString);
+    CreateInfoCollection CreateInfoCollectionFromJSONString(const std::string& jsonString);
+    CreateInfoCollection CreateInfoCollectionFromJSONObject(nlohmann::json& json);
     std::string AdditionalMapDataToJSON(AdditionalMapData& additionalMapData);
     std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection);
 

@@ -46,8 +46,6 @@ void Inventory::SubmitRenderItems() {
             m_locations.itemButtons = m_locations.itemDescription + glm::ivec2(0, GetSelectedItemDescriptionSize().y + m_style.itemButtonsTopPadding);
         }
 
-
-
         BlitInventoryBackground(m_locations.background, width, height);
         BlitItemGrid(m_locations.itemGrid);
         BlitTheLine(m_locations.theLine);
@@ -57,6 +55,64 @@ void Inventory::SubmitRenderItems() {
     }
 
     if (m_state == InventoryState::EXAMINE_ITEM) SubmitItemExamineRenderItems();
+
+
+    if (m_state == InventoryState::SHOP) {
+        //m_locations.background = glm::ivec2(m_style.invOriginX, m_style.invOriginY);
+        //m_locations.itemGrid = m_locations.background + glm::ivec2(m_style.gridMargin);
+        //m_locations.theLine = m_locations.itemGrid + glm::ivec2(0, GetItemGridSize().y + m_style.theLinePadding);
+        //m_locations.itemHeading = m_locations.theLine + glm::ivec2(0, m_style.itemHeadingTopPadding);
+        //m_locations.itemDescription = m_locations.itemHeading + glm::ivec2(0, GetSelectedItemHeadingSize().y + m_style.itemDescriptionTopPadding);
+        //m_locations.itemButtons = m_locations.itemDescription + glm::ivec2(0, GetSelectedItemDescriptionSize().y + m_style.itemButtonsTopPadding);
+
+        const Resolutions& resolutions = Config::GetResolutions();
+        int halfScreenHeight = resolutions.ui.y * 0.5f;
+        int screenWidth = resolutions.ui.x;
+        int screenHeight = resolutions.ui.y;
+
+        int magicExtraWidth = 400;
+        int width = GetItemGridSize().x + (m_style.gridMargin * 2) + magicExtraWidth;
+        int height = GetItemGridSize().y + (m_style.gridMargin * 2);
+
+        int newInvOriginX = screenWidth * 0.475f;
+        int newInvOriginY = screenHeight * 0.125f;
+        newInvOriginY = screenHeight * 0.25f;
+
+        if (Game::GetSplitscreenMode() == SplitscreenMode::TWO_PLAYER) {
+            newInvOriginX = screenWidth * 0.475f;
+            newInvOriginY = (halfScreenHeight - height) * 0.5f;
+        }
+
+        if (m_localPlayerIndex == 0) {
+            m_locations.background = glm::ivec2(newInvOriginX, newInvOriginY);
+        }
+        if (m_localPlayerIndex == 1) {
+            m_locations.background = glm::ivec2(newInvOriginX, newInvOriginY + (halfScreenHeight));
+        }
+
+        m_locations.itemGrid = m_locations.background + glm::ivec2(m_style.gridMargin);
+        m_locations.theLine = m_locations.itemGrid + glm::ivec2(GetItemGridSize().x + m_style.theLinePadding, 0);
+        m_locations.itemHeading = m_locations.theLine + glm::ivec2(0, m_style.itemHeadingTopPadding);
+        m_locations.itemDescription = m_locations.itemHeading + glm::ivec2(0, GetSelectedItemHeadingSize().y + m_style.itemDescriptionTopPadding);
+        m_locations.itemButtons = m_locations.itemDescription + glm::ivec2(0, GetSelectedItemDescriptionSize().y + m_style.itemButtonsTopPadding);
+
+        BlitInventoryBackground(m_locations.background, width, height);
+        BlitItemGrid(m_locations.itemGrid);
+        BlitTheLine(m_locations.theLine);
+        BlitItemHeading(m_locations.itemHeading);
+        BlitItemDescription(m_locations.itemDescription);
+        BlitItemButtons(m_locations.itemButtons);
+
+        if (ItemSelected()) {
+            int coinMargin = 13;
+            glm::ivec2 coinIconLocation = m_locations.itemHeading + glm::ivec2(GetSelectedItemHeadingSize().x + coinMargin, 16);
+            glm::ivec2 priceLocation = coinIconLocation + glm::ivec2(22, 0);
+
+            BlitCoinIcon(coinIconLocation);
+            BlitGenericText("100", priceLocation, Alignment::TOP_LEFT);
+        }
+    }
+
 }
 
 void Inventory::SubmitItemExamineRenderItems() {
@@ -404,6 +460,15 @@ void Inventory::BlitItemGrid(glm::ivec2 origin) {
 }
 
 
+void Inventory::BlitCoinIcon(const glm::ivec2& origin) {
+    BlitTextureInfo blitTextureInfo;
+    blitTextureInfo.textureName = "CoinIcon";
+    blitTextureInfo.location = origin;
+    blitTextureInfo.alignment = Alignment::TOP_LEFT;
+    blitTextureInfo.textureFilter = TextureFilter::LINEAR;
+    UIBackEnd::BlitTexture(blitTextureInfo);
+}
+
 void Inventory::BlitTheLine(glm::ivec2 origin) {
     BlitTextureInfo blitTextureInfo;
     blitTextureInfo.textureName = "Inv_TheLine";
@@ -423,9 +488,29 @@ void Inventory::BlitItemHeading(glm::ivec2 origin) {
     UIBackEnd::BlitText("[COL=0.839,0.784,0.635]" + GetSelectedItemHeading(), m_style.itemHeadingFont, origin, Alignment::TOP_LEFT, 1.0f, TextureFilter::LINEAR);
 }
 
+void Inventory::BlitShopHeading(const glm::ivec2& centerOrigin) {
+    BlitTextureInfo info;
+    info.textureName = "ShopHeading";
+    info.location = centerOrigin;
+    info.alignment = Alignment::TOP_LEFT;
+    info.textureFilter = TextureFilter::LINEAR;
+    //glm::vec4 colorTint = glm::vec4(1, 1, 1, 1);
+    //glm::ivec2 size = glm::ivec2(-1, -1);
+    //float rotation = 0.0f;
+    //int clipMinX = -1;
+    //int clipMinY = -1;
+    //int clipMaxX = -1;
+    //int clipMaxY = -1;
+    UIBackEnd::BlitTexture(info);
+}
+
 void Inventory::BlitItemDescription(glm::ivec2 origin) {
     if (!ItemSelected()) return;
     UIBackEnd::BlitText("[COL=0.839,0.784,0.635]" + GetSelectedItemDescription(), m_style.itemDescriptionFont, origin, Alignment::TOP_LEFT, 1.0f, TextureFilter::LINEAR);
+}
+
+void Inventory::BlitGenericText(const std::string& text, const glm::ivec2& origin, Alignment alignment) {
+    UIBackEnd::BlitText("[COL=0.839,0.784,0.635]" + text, m_style.itemDescriptionFont, origin, alignment, 1.0f, TextureFilter::LINEAR);
 }
 
 void Inventory::BlitItemButtons(glm::ivec2 origin) {

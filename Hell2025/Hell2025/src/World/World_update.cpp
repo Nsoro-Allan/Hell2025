@@ -223,6 +223,7 @@ namespace World {
         for (HousePlane& object : GetHousePlanes())                 //object.Update(deltaTime);
         for (GenericObject& object : GetGenericObjects())           object.Update(deltaTime);
         for (Kangaroo& object : GetKangaroos())                     object.Update(deltaTime);
+        for (Ladder& object : GetLadders())                         object.Update(deltaTime);
         for (Light& object : GetLights())                           object.Update(deltaTime);
         for (Mermaid& object : GetMermaids())                       object.Update(deltaTime);
         for (Piano& object : GetPianos())                           object.Update(deltaTime);

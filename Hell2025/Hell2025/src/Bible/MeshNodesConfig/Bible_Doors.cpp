@@ -253,6 +253,56 @@ namespace Bible {
             meshNodes.SetMaterialByMeshName("DoorGlassArtFrame", "DoorGlassFrame");
         }
 
+        if (createInfo.type == DoorType::STAINED_GLASS2) {
+
+            // Collision mesh node
+            MeshNodeCreateInfo& door = meshNodeCreateInfoSet.emplace_back();
+            door.meshName = "BlackDoor_Front";
+            door.rigidDynamic.createObject = true;
+            door.rigidDynamic.kinematic = true;
+            door.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+            door.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+            door.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | ITEM_PICK_UP | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+            door.addtoNavMesh = true;
+
+            // Openable mesh node
+            MeshNodeCreateInfo& hinges = meshNodeCreateInfoSet.emplace_back();
+            hinges.meshName = "Door_Hinges";
+            hinges.materialName = "T_BlackDoor_Door";
+            hinges.openable.additionalTriggerMeshNames = {
+                "Glass",
+                "MetalsDoorSide",
+                "BlackDoor_Back"
+            };
+            hinges.openable.isOpenable = true;
+            hinges.openable.openAxis = OpenAxis::ROTATE_Y_NEG;
+            hinges.openable.initialOpenState = OpenState::CLOSED;
+            hinges.openable.minOpenValue = 0.0f;
+            hinges.openable.maxOpenValue = createInfo.maxOpenValue;
+            hinges.openable.openSpeed = 5.208f;
+            hinges.openable.closeSpeed = 5.208f;
+            hinges.openable.openingAudio = "Door_Open.wav";
+            hinges.openable.closingAudio = "Door_Open.wav";
+            hinges.openable.isDeadLock = true;
+
+            MeshNodeCreateInfo& glass = meshNodeCreateInfoSet.emplace_back();
+            glass.meshName = "Glass";
+            glass.materialName = "T_BlackDoor_Glass";
+            glass.blendingMode = BlendingMode::STAINED_GLASS;
+            glass.decalType = DecalType::GLASS;
+            glass.tintColor = glm::vec3(1.0f);
+
+            meshNodes.Init(id, "Door_StainedGlass2", meshNodeCreateInfoSet);
+
+            meshNodes.SetMaterialByMeshName("BlackDoor_Front", "T_BlackDoor_Door");
+            meshNodes.SetMaterialByMeshName("BlackDoor_Back", "T_BlackDoor_Door_BACK");
+            meshNodes.SetMaterialByMeshName("BlackDoor_Sides", "T_BlackDoor_Door");
+
+            meshNodes.SetMaterialByMeshName("DoorGlassArtFrame", "DoorGlassFrame");
+            meshNodes.SetMaterialByMeshName("MetalsDoorSide", "T_BlackDoor_Metals");
+            meshNodes.SetMaterialByMeshName("MetalsFrameSide", "T_BlackDoor_Metals");
+        }
+
         // Frame material
         if (createInfo.materialTypeFrameFront == DoorMaterialType::RESIDENT_EVIL) {
             meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_RE");

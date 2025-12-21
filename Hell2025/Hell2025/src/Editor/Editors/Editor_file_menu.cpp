@@ -31,8 +31,8 @@ namespace Editor {
             bathroom.AddChild("Towel", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
 
             EditorUI::FileMenuNode& interior = insert.AddChild("Interior", Shortcut::NONE);
-            interior.AddChild("Door",          Shortcut::NONE, Callbacks::BeginAddingDoor);
-            interior.AddChild("Couch",         Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::COUCH);
+            interior.AddChild("Door",          Shortcut::NONE, Editor::PlaceObject, ObjectType::DOOR);
+            interior.AddChild("Couch",         Shortcut::NONE, Editor::PlaceObject, ObjectType::WINDOW);
             interior.AddChild("Drawers Small", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_SMALL);
             interior.AddChild("Drawers Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
 
@@ -41,10 +41,13 @@ namespace Editor {
 
             interior.AddChild("Window", Shortcut::NONE, Callbacks::BeginAddingWindow);
 
+            EditorUI::FileMenuNode& misc = insert.AddChild("Misc", Shortcut::NONE);
+            misc.AddChild("Ladder", Shortcut::NONE, Editor::PlaceObject, ObjectType::LADDER);
+
             EditorUI::FileMenuNode& nature = insert.AddChild("Nature", Shortcut::NONE);
             nature.AddChild("BlackBerries", Shortcut::NONE,     Callbacks::BeginAddingBlackBerries);
             nature.AddChild("Tree",         Shortcut::NONE,     Callbacks::BeginAddingTree);
-            
+                        
             EditorUI::FileMenuNode& pickups = insert.AddChild("Pick Ups", Shortcut::NONE);
 
             EditorUI::FileMenuNode& testModels = insert.AddChild("Test Models", Shortcut::NONE);

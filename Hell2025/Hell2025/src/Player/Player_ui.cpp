@@ -60,6 +60,9 @@ void Player::UpdateUI(float deltaTime) {
     if (m_inventory.IsOpen()) {
         m_inventory.SubmitRenderItems();
     }
+    if (m_shopInventory.IsOpen()) {
+        m_shopInventory.SubmitRenderItems();
+    }
 
 
     //std::string text = "Locked...";
@@ -239,7 +242,7 @@ void Player::UpdateUI(float deltaTime) {
 
             // Override with BVH CPU RAYS if that render mode is set
             if (Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS || true) {
-                text = "BVH ray hit: " + Util::BoolToString(m_bvhRayResult.hitFound) + "\n";
+                text += "\nBVH ray hit: " + Util::BoolToString(m_bvhRayResult.hitFound) + "\n";
 
                 if (m_bvhRayResult.hitFound) {
                     MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_bvhRayResult.objectId, m_bvhRayResult.localMeshNodeIndex);

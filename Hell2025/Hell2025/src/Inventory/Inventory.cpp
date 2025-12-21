@@ -17,6 +17,15 @@ void Inventory::OpenInventory() {
     GoToMainScreen();
 }
 
+void Inventory::OpenAsShop() {
+    SetState(InventoryState::SHOP);
+    m_selectedCellX = 0;
+    m_selectedCellY = 0;
+    m_examineRotationX = 0.0f;
+    m_examineRotationY = 0.0f;
+    m_examineZoom = 0.0f;
+}
+
 void Inventory::GoToMainScreen() {
     SetState(InventoryState::MAIN_SCREEN);
     m_selectedCellX = 0;
@@ -317,6 +326,8 @@ void Inventory::GiveAmmo(const std::string& name, int amount) {
             return;
         }
     }
+
+    AddInventoryItem(name);
 
     Logging::Warning() << "Inventory::GiveAmmo(..) failed: '" << name << "' not found in m_ammoStates";
 }

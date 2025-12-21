@@ -86,6 +86,7 @@ enum class ObjectType : uint16_t {
     GENERIC_STATIC,
     HEIGHT_MAP,
     HOUSE_PLANE,
+    LADDER,
     LIGHT,
     MIRROR,
     PICK_UP,
@@ -470,6 +471,7 @@ enum struct InventoryState {
     EXAMINE_ITEM,
     MOVING_ITEM,
     ROTATING_ITEM,
+    SHOP,
     UNDEFINED
 };
 
@@ -521,6 +523,7 @@ enum struct DoorType {
     STANDARD_A,
     STANDARD_B,
     STAINED_GLASS,
+    STAINED_GLASS2,
     UNDEFINED
 };
 

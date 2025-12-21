@@ -4,6 +4,7 @@
 #include "Renderer/RenderDataManager.h"
 #include "Viewport/ViewportManager.h"
 #include "Util.h"
+#include "World/World.h"
 
 void Player::UpdateFlashlight(float deltaTime) {
     // Toggle on/off
@@ -76,6 +77,13 @@ void Player::UpdateFlashlight(float deltaTime) {
     //    float viewportHeight = RenderDataManager::GetViewportData()[m_viewportIndex].height;
     //    aspectRatio = viewportWidth / viewportHeight;
     //}
+
+    if (IsInShop()) {
+        if (World::GetMermaids().size()) {
+            Mermaid& mermaid = World::GetMermaids()[0];
+            m_flashlightDirection = glm::normalize(mermaid.GetPosition() - GetFootPosition());
+        }
+    }
 
     // Projection view matrix
     float lightRadius = 20.0f;

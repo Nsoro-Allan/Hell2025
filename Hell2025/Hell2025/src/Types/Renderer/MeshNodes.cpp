@@ -134,6 +134,15 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                             std::span<Vertex> vertices = AssetManager::GetVerticesSpan(mesh->baseVertex, mesh->vertexCount);
                             std::span<uint32_t> indices = AssetManager::GetIndicesSpan(mesh->baseIndex, mesh->indexCount);
                             meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
+                            
+                            // DIRTY (fix me)
+                            if (meshNode->rigidIsKinematic) {
+                                if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode->rigidDynamicId)) {
+                                    if (PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic()) {
+                                        pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

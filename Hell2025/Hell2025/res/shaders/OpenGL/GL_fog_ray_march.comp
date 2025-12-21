@@ -208,6 +208,8 @@ void main() {
 
         if (accAlpha >= 0.99) break;
     }
+         
+    accCol *= 0.5;
     
     // Factor in fog color
     accCol *= fogColor;

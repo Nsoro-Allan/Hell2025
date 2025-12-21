@@ -101,6 +101,11 @@ void Window::SetPosition(const glm::vec3& position) {
     Physics::SetRigidStaticWorldTransform(m_physicsId, m_transform.to_mat4());
 }
 
+void Window::SetRotationY(float value) {
+    m_createInfo.rotation.y = value;
+    m_meshNodes.Update(m_transform.to_mat4());
+}
+
 void Window::Update(float deltaTime) {
     // Nothing as of yet
 }

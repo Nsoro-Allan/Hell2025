@@ -45,6 +45,7 @@ struct Inventory {
     void AddInventoryItem(const std::string& name);
     void ClearInventory();
     void OpenInventory();
+    void OpenAsShop();
     void CloseInventory();
     void SubmitRenderItems();
     void PrintGridOccupiedStateToConsole();
@@ -86,6 +87,10 @@ private:
     void BlitItemHeading(glm::ivec2 origin);
     void BlitItemDescription(glm::ivec2 origin);
     void BlitItemButtons(glm::ivec2 origin);
+
+    void BlitShopHeading(const glm::ivec2& origin);
+    void BlitCoinIcon(const glm::ivec2& origin);
+    void BlitGenericText(const std::string& text, const glm::ivec2& origin, Alignment alignment);
 
     void SubmitItemExamineRenderItems();
 

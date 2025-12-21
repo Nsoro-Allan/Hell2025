@@ -14,11 +14,21 @@ out vec4 WorldPos;
 uniform mat4 u_modelMatrix;
 
 void main() {
-    TexCoords = inPosition;
     int viewportIndex = gl_BaseInstance;
-	mat4 projectionView = viewportData[viewportIndex].skyboxProjectionView;	
-    vec3 viewPos = viewportData[viewportIndex].inverseView[3].xyz;    
-    //gl_Position = projectionView * vec4((inPosition * 8) + viewPos, 1.0);
+    mat4 projectionView = viewportData[viewportIndex].skyboxProjectionView;
+
+    float angle = radians(-90.0);
+    float c = cos(angle);
+    float s = sin(angle);
+
+    mat3 rotateY = mat3(
+         c, 0.0, s,
+        0.0, 1.0, 0.0,
+        -s, 0.0, c
+    );
+
+    vec3 rotatedDirection = rotateY * inPosition;
+    TexCoords = rotatedDirection;
 
     WorldPos = u_modelMatrix * vec4(inPosition, 1.0);
     gl_Position = projectionView * WorldPos;

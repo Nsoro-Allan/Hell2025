@@ -9,6 +9,7 @@
 #include "Audio/Audio.h"
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
+#include "Core/Game.h"
 
 namespace OpenGLRenderer {
 
@@ -151,6 +152,7 @@ namespace OpenGLRenderer {
             hairFrameBuffer->DrawBuffers({ "Lighting", "ViewspaceDepthPrevious" });
 
             hairLightingShader->Bind();
+            hairLightingShader->SetVec3("u_moonlightDir", Game::GetMoonlightDirection());
             glBindTextureUnit(3, hairFrameBuffer->GetColorAttachmentHandleByName("ViewspaceDepth"));
             glBindTextureUnit(4, AssetManager::GetTextureByName("Flashlight2")->GetGLTexture().GetHandle());
             SetRasterizerState("HairLighting");

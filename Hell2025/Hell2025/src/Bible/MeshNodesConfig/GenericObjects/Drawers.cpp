@@ -204,5 +204,22 @@ namespace Bible {
         handle4th.meshName = "Handle_4th";
 
         meshNodes.Init(id, "DrawersLarge", meshNodeCreateInfoSet);
+
+        //struct MeshNodePickUpCreateInfo {
+        //    glm::vec3 offsetPosition = glm::vec3(0.0f);
+        //    glm::vec3 offsetRotation = glm::vec3(0.0f);
+        //    std::string pickUpName = UNDEFINED_STRING;
+        //    std::string prerequisiteOpenableMeshName = UNDEFINED_STRING;
+        //    OpenState prerequisiteOpenableOpenState = OpenState::UNDEFINED;
+        //};
+
+        //int32_t meshNodeIndex = meshNodes.GetMeshNodeIndexByMeshName("DrawersLarge_2nd");
+        //MeshNode* meshNode = meshNodes.GetMeshNodeByLocalIndex(meshNodeIndex);
+        //
+        //PickUpCreateInfo pickUpCreateInfo;
+        //pickUpCreateInfo.name = "SPAS";
+        //pickUpCreateInfo.parentLocalMeshNodeIndex = meshNodeIndex;
+        //pickUpCreateInfo.position = 
+        //World::Create
     }
 }
