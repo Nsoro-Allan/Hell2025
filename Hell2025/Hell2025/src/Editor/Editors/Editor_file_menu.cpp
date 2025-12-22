@@ -41,6 +41,9 @@ namespace Editor {
 
             interior.AddChild("Window", Shortcut::NONE, Callbacks::BeginAddingWindow);
 
+            EditorUI::FileMenuNode& lights = insert.AddChild("Lights", Shortcut::NONE);
+            lights.AddChild("Light", Shortcut::NONE, Editor::PlaceObject, ObjectType::LIGHT);
+
             EditorUI::FileMenuNode& misc = insert.AddChild("Misc", Shortcut::NONE);
             misc.AddChild("Ladder", Shortcut::NONE, Editor::PlaceObject, ObjectType::LADDER);
 

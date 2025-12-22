@@ -3,7 +3,7 @@
 #include "Callbacks/Callbacks.h"
 #include "Config/Config.h"
 #include "Audio/Audio.h"
-#include "Core/JSON.h"
+#include "File/JSON.h"
 #include "Editor/Gizmo.h"
 #include "Managers/MapManager.h"
 #include "Renderer/Renderer.h"
@@ -119,10 +119,6 @@ namespace Editor {
         //    elements.openFileWindow.CreateImGuiElements();
         //}
     }
-
-    //void ReconfigureMapObjectEditorImGuiElements() {
-    //
-    //}
 
     void ShowNewSectorWindow() {
         CloseAllEditorWindows();

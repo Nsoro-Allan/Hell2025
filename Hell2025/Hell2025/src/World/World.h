@@ -25,6 +25,7 @@
 #include "Types/Game/Ladder.h"
 #include "Types/Game/Light.h"
 #include "Types/Game/PickUp.h"
+#include "Types/Game/Staircase.h"
 #include "Types/Generics/GenericBouncable.h"
 #include "Types/Generics/GenericStatic.h"
 #include "Types/Interior/PictureFrame.h"
@@ -83,6 +84,12 @@ namespace World {
 
     void AddDecal2(Decal2CreateInfo createInfo);
 
+    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddStaircase(StaircaseCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+
     void AddBullet(BulletCreateInfo createInfo);
     void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddBulletCasing(BulletCasingCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -90,23 +97,18 @@ namespace World {
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
-    void AddDecal(const DecalCreateInfo& createInfo);
     void AddDobermann(DobermannCreateInfo& createInfo);
     void AddFireplace(FireplaceCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGenericObject(GenericObjectCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddHousePlane(HousePlaneCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddKangaroo(const KangarooCreateInfo& createInfo);
-    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo);
     void AddPiano(PianoCreateInfo createInfo, SpawnOffset spawnOffset);
-    uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddVATBlood(glm::vec3 position, glm::vec3 front);
     void AddWindow(WindowCreateInfo createInfo, SpawnOffset spawnOffset);
 
@@ -172,6 +174,7 @@ namespace World {
     GenericObject* GetGenericObjectById(uint64_t objectId);
     HousePlane* GetHousePlaneByObjectId(uint64_t objectId);
     Ladder* GetLadderByObjectId(uint64_t objectId);
+    Staircase* GetStaircaseByObjectId(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);
     Piano* GetPianoByMeshNodeObjectId(uint64_t objectId);
@@ -196,6 +199,7 @@ namespace World {
     Hell::SlotMap<HousePlane>& GetHousePlanes();
     Hell::SlotMap<Ladder>& GetLadders();
     Hell::SlotMap<PickUp>& GetPickUps();
+    Hell::SlotMap<TrimSet>& GetStairs();
     Hell::SlotMap<TrimSet>& GetTrimSets();
     Hell::SlotMap<Wall>& GetWalls();
     Hell::SlotMap<Window>& GetWindows();

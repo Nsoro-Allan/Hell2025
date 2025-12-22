@@ -1,6 +1,6 @@
 #include "Physics.h"
 #include "Physics/Types/Ragdoll.h"
-#include "Core/JSON.h"
+#include "File/JSON.h"
 #include "UniqueId.h"
 #include "Util.h"
 

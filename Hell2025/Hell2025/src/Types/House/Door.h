@@ -32,7 +32,6 @@ struct Door {
 	MeshNodes& GetMeshNodes() { return m_meshNodes; }
     const bool MovedThisFrame() const                                   { return m_movedThisFrame; }
     const uint64_t GetObjectId() const                                  { return m_objectId; }
-    const uint64_t GetPhysicsId() const                                 { return m_physicsId; }
     const glm::vec3& GetPosition() const                                { return m_position; }
     const glm::vec3& GetRotation() const                                { return m_rotation; }
     const glm::vec3& GetInteractPosition() const                        { return m_interactPosition; }
@@ -65,8 +64,6 @@ private:
     bool m_deadLocked = false;
     uint64_t m_lifeTime = 0;
     uint64_t m_objectId = 0;
-    //uint64_t m_frameObjectId = 0;
-    uint64_t m_physicsId = 0;
     Model* m_doorModel = nullptr;
     Model * m_frameModel = nullptr;
     Material* m_material = nullptr;

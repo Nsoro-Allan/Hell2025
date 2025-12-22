@@ -110,7 +110,8 @@ namespace Physics {
     void DeactivateRigidDynamicPhysics(uint64_t rigidDynamicId);
     void SetRigidDynamicUserData(uint64_t rigidDynamicId, PhysicsUserData physicsUserData);
     void UpdateAllRigidDynamics(float deltaTime);
-    void SetRigidDynamicGlobalPose(uint64_t rigidDynamicId, glm::mat4 globalPoseMatrix);
+    void SetRigidDynamicGlobalPose(uint64_t rigidDynamicId, const glm::mat4& globalPoseMatrix);
+    void SetRigidDynamicKinematicTarget(uint64_t rigidDynamicId, const glm::mat4& globalPoseMatrix);
     const std::vector<AABB>& GetActiveRididDynamicAABBs();
     RigidDynamic* GetRigidDynamicById(uint64_t rigidDynamicId);
 

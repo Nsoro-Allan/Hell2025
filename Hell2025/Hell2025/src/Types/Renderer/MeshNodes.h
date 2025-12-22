@@ -39,7 +39,8 @@ struct MeshNode {
     glm::vec3 emissiveColor = glm::vec3(1.0f);
     glm::vec3 tintColor = glm::vec3(1.0f);
     bool addToNavMesh = false;
-    bool rigidIsKinematic = false;    // You need to be careful this does not get out of sync with actual physx kinematic state
+    //bool rigidIsKinematic = false;    // You need to be careful this does not get out of sync with actual physx kinematic state
+    bool movedThisFrame = true;
 };
 
 struct MeshNodes {
@@ -63,6 +64,7 @@ struct MeshNodes {
     void ForceDirty();
     void ResetFirstFrame();
     void SleepAllPhysics();
+    void WakeAllPhysics();
     void AddForceToPhsyics(const glm::vec3 force);
     
     const void SubmitRenderItems() const;

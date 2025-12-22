@@ -6,6 +6,14 @@
 #include "Util.h"
 #include "Timer.hpp"
 
+#include <vector>
+#include <iostream>
+#include "PxPhysicsAPI.h"
+#include "extensions/PxShapeExt.h"
+#include "geometry/PxGeometryQuery.h"
+
+#include "Renderer/Renderer.h"
+
 namespace Physics {
 
     std::unordered_map<uint64_t, RigidDynamic> g_rigidDynamics;
@@ -24,14 +32,29 @@ namespace Physics {
     }
 
     void UpdateAllRigidDynamics(float deltaTime) {
-        //Timer timer("UpdateAllRigidDynamics");
-        //std::cout << "g_rigidDynamics.size(): " << g_rigidDynamics.size() << "\n";
-        for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
+        for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ++it) {
             RigidDynamic& rigidDynamic = it->second;
             rigidDynamic.Update(deltaTime);
-            it++;
+
+            PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+            if (!pxRigidDynamic) {
+                continue;
+            }
+
+            const bool awake = pxRigidDynamic->isSleeping() == false;
+            const glm::vec4 color = awake ? RED : GREEN;
+            const PxBounds3 bounds = pxRigidDynamic->getWorldBounds();
+            const glm::vec3 aabbMin = Physics::PxVec3toGlmVec3(bounds.minimum);
+            const glm::vec3 aabbMax = Physics::PxVec3toGlmVec3(bounds.maximum);
+            AABB aabb(aabbMin, aabbMax);
+            Renderer::DrawAABB(aabb, color);
+
+            if (Physics::RigidDynamicIsKinematic(it->first)) {
+                Renderer::DrawPoint(aabb.GetCenter(), YELLOW);
+            }
         }
     }
+
 
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce, glm::vec3 initialTorque) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
@@ -393,17 +416,109 @@ namespace Physics {
         }
     }
 
-    void SetRigidDynamicGlobalPose(uint64_t rigidDynamicId, glm::mat4 globalPoseMatrix) {
+    void SetRigidDynamicGlobalPose(uint64_t rigidDynamicId, const glm::mat4& globalPoseMatrix) {
         if (RigidDynamicExists(rigidDynamicId)) {
             RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
-            PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-            PxMat44 pxMatrix = GlmMat4ToPxMat44(globalPoseMatrix);
-            PxTransform pxTransform = PxTransform(pxMatrix);
-            pxRigidDynamic->setGlobalPose(pxTransform);
+
+            if (PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic()) {
+                PxMat44 pxMatrix = GlmMat4ToPxMat44(globalPoseMatrix);
+                PxTransform pxTransform = PxTransform(pxMatrix);
+                pxRigidDynamic->setGlobalPose(pxTransform);
+            }
         }
         else {
             std::cout << "Phyics::SetRigidDynamicGlobalPose() failed to set global pose: id " << rigidDynamicId << " not found\n";
         }
+    }
+
+    void SetRigidDynamicKinematicTarget(uint64_t rigidDynamicId, const glm::mat4& globalPoseMatrix) {
+        if (!RigidDynamicExists(rigidDynamicId)) {
+            std::cout << "Physics::SetRigidDynamicKinematicTarget() failed: id " << rigidDynamicId << " not found\n";
+            return;
+        }
+
+        RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
+        PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+        PxScene* pxScene = GetPxScene();
+
+        if (!pxScene) return;
+        if (!pxRigidDynamic) return;
+        if (pxRigidDynamic->getScene() == nullptr) return;
+        if (!pxRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) return;
+
+        PxTransform targetPose(PxMat44(GlmMat4ToPxMat44(globalPoseMatrix)));
+        if (!targetPose.isValid()) return;
+
+        //PxTransform currentPose = pxRigidDynamic->getGlobalPose();
+        //
+        //PxVec3 deltaPosition = targetPose.p - currentPose.p;
+        //float deltaPositionMagnitudeSquared = deltaPosition.magnitudeSquared();
+        //float quaternionDot = targetPose.q.dot(currentPose.q);
+        //
+        //bool hasMeaningfulMotion =
+        //    (deltaPositionMagnitudeSquared > 0.000001f) ||
+        //    (quaternionDot < 0.999999f);
+        //
+        //if (hasMeaningfulMotion) {
+        //    PxU32 shapeCount = pxRigidDynamic->getNbShapes();
+        //    if (shapeCount > 0) {
+        //        std::vector<PxShape*> pxShapes(shapeCount);
+        //        pxRigidDynamic->getShapes(pxShapes.data(), shapeCount);
+        //
+        //        PxBounds3 sweptBounds;
+        //        sweptBounds.setEmpty();
+        //
+        //        float boundsOffset = 0.02f;
+        //        float boundsInflationScale = 1.02f;
+        //
+        //        for (PxShape* pxShape : pxShapes) {
+        //            if (!pxShape) continue;
+        //
+        //            PxGeometryHolder geometryHolder = pxShape->getGeometry();
+        //
+        //            PxTransform shapeWorldPoseCurrent = currentPose * pxShape->getLocalPose();
+        //            PxTransform shapeWorldPoseTarget = targetPose * pxShape->getLocalPose();
+        //
+        //            PxBounds3 boundsCurrent;
+        //            PxBounds3 boundsTarget;
+        //
+        //            PxGeometryQuery::computeGeomBounds(boundsCurrent, geometryHolder.any(), shapeWorldPoseCurrent, boundsOffset, boundsInflationScale);
+        //            PxGeometryQuery::computeGeomBounds(boundsTarget, geometryHolder.any(), shapeWorldPoseTarget, boundsOffset, boundsInflationScale);
+        //
+        //            sweptBounds.include(boundsCurrent);
+        //            sweptBounds.include(boundsTarget);
+        //        }
+        //
+        //        if (!sweptBounds.isEmpty()) {
+        //            PxVec3 wakeCenter = sweptBounds.getCenter();
+        //            PxVec3 wakeExtents = sweptBounds.getExtents();
+        //            wakeExtents += PxVec3(0.05f);
+        //
+        //            PxBoxGeometry wakeGeometry(wakeExtents);
+        //            PxTransform wakePose(wakeCenter);
+        //
+        //            PxOverlapBuffer overlap;
+        //            PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
+        //
+        //            if (pxScene->overlap(wakeGeometry, wakePose, overlap, filterData)) {
+        //                for (PxU32 i = 0; i < overlap.getNbAnyHits(); i++) {
+        //                    PxRigidActor* hitActor = overlap.getAnyHit(i).actor;
+        //                    if (!hitActor) continue;
+        //                    if (hitActor == pxRigidDynamic) continue;
+        //
+        //                    PxRigidDynamic* hitRigidDynamic = hitActor->is<PxRigidDynamic>();
+        //                    if (!hitRigidDynamic) continue;
+        //                    if (hitRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) continue;
+        //
+        //                    hitRigidDynamic->wakeUp();
+        //                    hitRigidDynamic->setWakeCounter(0.2f);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
+        pxRigidDynamic->setKinematicTarget(targetPose);
     }
 
     //void RemoveRigidDynamic(uint64_t rigidDynamicId) {
@@ -509,17 +624,19 @@ namespace Physics {
     }
 
     void ActivateRigidDynamicPhysics(uint64_t rigidDynamicId) {
-        if (RigidDynamicExists(rigidDynamicId)) {
-            RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
-            rigidDynamic.ActivatePhsyics();
-        }
+        //if (RigidDynamicExists(rigidDynamicId)) {
+        //    RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
+        //    rigidDynamic.ActivatePhsyics();
+        //}
+        std::cout << "u called ActivateRigidDynamicPhysics()\n";
     }
 
     void DeactivateRigidDynamicPhysics(uint64_t rigidDynamicId) {
-        if (RigidDynamicExists(rigidDynamicId)) {
-            RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
-            rigidDynamic.DeactivatePhysics();
-        }
+        //if (RigidDynamicExists(rigidDynamicId)) {
+        //    RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];
+        //    rigidDynamic.DeactivatePhysics();
+        //}
+        std::cout << "u called DeactivateRigidDynamicPhysics()\n";
     }    
 
     void SetRigidDynamicUserData(uint64_t rigidDynamicId, PhysicsUserData physicsUserData) {

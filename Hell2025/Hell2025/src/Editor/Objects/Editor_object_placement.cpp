@@ -19,6 +19,7 @@ namespace Editor {
     void PlaceDoor(const glm::vec3& hitPosition);
     void PlaceWindow(const glm::vec3& hitPosition);
     void PlaceLadder(const glm::vec3& hitPosition);
+    void PlaceLight(const glm::vec3& hitPosition);
 
     void UpdateObjectPlacement() {
         if (GetEditorState() == EditorState::PLACE_OBJECT) {
@@ -56,6 +57,9 @@ namespace Editor {
                     }
                     if (GetPlacementObjectType() == ObjectType::LADDER) {
                         PlaceLadder(rayResult.hitPosition);
+                    }
+                    if (GetPlacementObjectType() == ObjectType::LIGHT) {
+                        PlaceLight(rayResult.hitPosition);
                     }
                 }
             }
@@ -181,9 +185,23 @@ namespace Editor {
         ExitObjectPlacement();
     }
 
+    // Hey. Some time when you see this message, you could 
+    // rewrite the generic object placement sub type thing
+    // to use a string parameter "subType", that way the same
+    // logic could be used for other objects with sub types,
+    // like lights for example, rather than GenericObjects 
+    // only as it is currently.
+
+    void PlaceLight(const glm::vec3& hitPosition) {
+        LightCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        World::AddLight(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
     void PlaceLadder(const glm::vec3& hitPosition) {
         LadderCreateInfo createInfo;
-        createInfo.position = hitPosition;
+        createInfo.position = hitPosition + glm::vec3(0.0f, 1.0f, 0.0f);
         createInfo.rotation = glm::vec3(0.0f);
         World::AddLadder(createInfo, SpawnOffset());
         ExitObjectPlacement();

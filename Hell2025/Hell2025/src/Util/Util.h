@@ -134,13 +134,6 @@ namespace Util {
     float EaseInOut(float t, float a);
     float HermiteEaseInOut(float t);
 
-    // JSON
-    AdditionalMapData AdditionalMapDataFromJSON(const std::string& jsonString);
-    CreateInfoCollection CreateInfoCollectionFromJSONString(const std::string& jsonString);
-    CreateInfoCollection CreateInfoCollectionFromJSONObject(nlohmann::json& json);
-    std::string AdditionalMapDataToJSON(AdditionalMapData& additionalMapData);
-    std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection);
-
     // Animation
     //int FindAnimatedNodeIndex(float AnimationTime, const AnimatedNode* animatedNode);
     const AnimatedNode* FindAnimatedNode(Animation* animation, const char* NodeName);

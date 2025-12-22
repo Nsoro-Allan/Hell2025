@@ -116,7 +116,6 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                 offsetTransform.position = localCenter;
 
                 PhysicsFilterData filterData = createInfo.rigidDynamic.filterData;
-                meshNode->rigidIsKinematic = createInfo.rigidDynamic.kinematic;
 
                 float mass = createInfo.rigidDynamic.mass;
                 bool kinematic = createInfo.rigidDynamic.kinematic;
@@ -136,7 +135,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                             meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
                             
                             // DIRTY (fix me)
-                            if (meshNode->rigidIsKinematic) {
+                            if (kinematic) {
                                 if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode->rigidDynamicId)) {
                                     if (PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic()) {
                                         pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
@@ -269,7 +268,7 @@ bool MeshNodes::MeshNodeIsNonKinematicRigidDynamic(int localNodeIndex) {
     MeshNode* currentNode = GetMeshNodeByLocalIndex(localNodeIndex);
 
     while (currentNode) {
-        if (currentNode->rigidDynamicId != 0 && !currentNode->rigidIsKinematic) return true;
+        if (currentNode->rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(currentNode->rigidDynamicId)) return true;
 
         // Walk up the tree via parent index
         currentNode = GetMeshNodeByLocalIndex(currentNode->localParentIndex);
@@ -425,7 +424,7 @@ void MeshNodes::UpdateHierarchy() {
             meshNode.localMatrix = meshNode.localTransform * meshNode.transform.to_mat4();
 
             // Overwrite with non-kinematic rigid transform if this node has one
-            if (!m_firstFrame && meshNode.rigidDynamicId != 0 && !meshNode.rigidIsKinematic) {
+            if (!m_firstFrame && meshNode.rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
                 if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {
             
                     meshNode.localMatrix = rigidDynamic->GetWorldTransform();
@@ -437,12 +436,16 @@ void MeshNodes::UpdateHierarchy() {
                     //Renderer::DrawPoint(meshNode.worldMatrix[3], BLUE);
                 }
             }
-
         }
+        meshNode.movedThisFrame = true;
     }
 }
 
 void MeshNodes::Update(const glm::mat4& worldMatrix) {
+    for (MeshNode& meshNode : m_meshNodes) {
+        meshNode.movedThisFrame = false;
+    }
+
     //for (MeshNode& meshNode : m_meshNodes) {
     //    Renderer::DrawOBB(meshNode.worldSpaceObb, GREEN);
     //}
@@ -471,7 +474,7 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
 
     // Always dirty the hierarchy if there are any rigid dynamic nodes (RETHINK THIS!)
     for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.rigidDynamicId != 0) {
+        if (meshNode.rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
             hierarchyDirty = true;
             break;
         }
@@ -563,6 +566,13 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     // Store previous frame data
     for (MeshNode& meshNode : m_meshNodes) {
         meshNode.worldModelMatrixPreviousFrame = meshNode.worldMatrix;
+
+        //if (!m_firstFrame) {
+        //    meshNode.movedThisFrame = !Util::Mat4NearlyEqual(meshNode.worldMatrix, meshNode.worldModelMatrixPreviousFrame);
+        //}
+        //else {
+        //    meshNode.movedThisFrame = true;
+        //}
     }
 
     m_worldMatrixPreviousFrame = worldMatrix;
@@ -596,6 +606,30 @@ void MeshNodes::SleepAllPhysics() {
     }
 }
 
+void MeshNodes::WakeAllPhysics() {
+    for (MeshNode& meshNode : m_meshNodes) {
+        if (meshNode.rigidDynamicId == 0) {
+            continue;
+        }
+
+        if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {
+            if (PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic()) {
+
+                pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, false);
+
+                // Nuke any leftover velocities/forces so waking is deterministic.
+                pxRigidDynamic->clearForce(PxForceMode::eFORCE);
+                pxRigidDynamic->clearTorque(PxForceMode::eFORCE);
+                pxRigidDynamic->setLinearVelocity(PxVec3(0.0f));
+                pxRigidDynamic->setAngularVelocity(PxVec3(0.0f));
+
+                pxRigidDynamic->setWakeCounter(0.4f);
+                pxRigidDynamic->wakeUp();
+            }
+        }
+    }
+}
+
 void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
     for (MeshNode& meshNode : m_meshNodes) {
         if (meshNode.rigidDynamicId != 0) {
@@ -606,8 +640,8 @@ void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
 
 void MeshNodes::InitPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-		if (meshNode.rigidDynamicId != 0) {
-			Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
+        if (meshNode.rigidDynamicId != 0) {
+            Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
 		}
 	}
 }
@@ -616,14 +650,14 @@ void MeshNodes::InitPhysicsTransforms() {
 void MeshNodes::UpdateKinematicPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
         if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0) {
-            //if (Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
-            if (meshNode.rigidIsKinematic) { // this bool may not be correctly reflecting physx state???
-                Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
+            if (Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
+                if (meshNode.movedThisFrame) {
+                    Physics::SetRigidDynamicKinematicTarget(meshNode.rigidDynamicId, meshNode.worldMatrix);
+                    std::cout << "Updating " << meshNode.parentObjectId << " " << Util::ObjectTypeToString(UniqueID::GetType(meshNode.parentObjectId)) << "\n";
+               }
             }
         }
 	}
-
-    // ATTENTION! Rewrite this. YOu only wan to update kinematic rigids
 }
 
 

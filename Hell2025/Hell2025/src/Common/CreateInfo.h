@@ -12,6 +12,13 @@ struct LadderCreateInfo {
     uint32_t stepCount = 1;
 };
 
+struct StaircaseCreateInfo {
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 rotation = glm::vec3(0.0f);
+    std::string editorName = UNDEFINED_STRING;
+    uint32_t stepCount = 1;
+};
+
 struct TrimSetCreateInfo {
 	TrimSetType type = TrimSetType::CEILING;
 	std::vector<glm::vec3> points;
@@ -212,6 +219,7 @@ struct LightCreateInfo {
     glm::vec3 color = glm::vec3(1, 0.7799999713897705, 0.5289999842643738);
     float radius = 6.0f;
     float strength = 1.0f;
+    bool saveToFile = true;
     LightType type = LightType::HANGING_LIGHT;
 };
 
@@ -325,6 +333,7 @@ struct CreateInfoCollection {
     std::vector<PianoCreateInfo> pianos;
     std::vector<PickUpCreateInfo> pickUps;
     std::vector<PictureFrameCreateInfo> pictureFrames;
+    std::vector<StaircaseCreateInfo> staircases;
     std::vector<TreeCreateInfo> trees;
     std::vector<WallCreateInfo> walls;
     std::vector<WindowCreateInfo> windows;

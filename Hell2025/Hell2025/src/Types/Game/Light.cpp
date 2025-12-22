@@ -10,6 +10,7 @@
 Light::Light(LightCreateInfo createInfo) {   
     m_createInfo = createInfo;
 	m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
+    ConfigureMeshNodes();
 }
 
 void Light::Update(float deltaTime) {

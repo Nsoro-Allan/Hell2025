@@ -53,6 +53,7 @@ namespace World {
     std::vector<Shark> g_sharks;
     std::vector<SpawnPoint> g_spawnCampaignPoints;
     std::vector<SpawnPoint> g_spawnDeathmatchPoints;
+    Hell::SlotMap<Staircase> g_staircases;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
     std::vector<Tree> g_trees;
     Hell::SlotMap<TrimSet> g_trimSets;
@@ -979,7 +980,6 @@ namespace World {
     uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset) {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::LADDER);
         g_ladders.emplace_with_id(id, id, createInfo, spawnOffset);
-
         return id;
     }
 
@@ -1021,6 +1021,12 @@ namespace World {
 
         PictureFrame& pictureFrame = g_pictureFrames.emplace_back();
         pictureFrame.Init(createInfo);
+    }
+
+    uint64_t AddStaircase(StaircaseCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::STAIRCASE);
+        g_staircases.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
     }
 
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1248,6 +1254,18 @@ namespace World {
 
     size_t GetLightCount()                                              { return g_lights.size(); }
 
+
+    Hell::SlotMap<Door>& GetDoors()                     { return g_doors; }
+    Hell::SlotMap<GenericObject>& GetGenericObjects()   { return g_genericObjects; }
+    Hell::SlotMap<Fireplace>& GetFireplaces()           { return g_fireplaces; }
+    Hell::SlotMap<HousePlane>& GetHousePlanes()         { return g_housePlanes; }
+    Hell::SlotMap<Ladder>& GetLadders()                 { return g_ladders; }
+    Hell::SlotMap<PickUp>& GetPickUps()                 { return g_pickUps; }
+    Hell::SlotMap<Staircase>& GetStaircases()           { return g_staircases; }
+    Hell::SlotMap<TrimSet>& GetTrimSets()               { return g_trimSets; }
+    Hell::SlotMap<Wall>& GetWalls()                     { return g_walls; }
+    Hell::SlotMap<Window>& GetWindows()                 { return g_windows; }
+
     std::vector<AnimatedGameObject>& GetAnimatedGameObjects()           { return g_animatedGameObjects; }
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals()     { return g_screenSpaceBloodDecals; }
     std::vector<Bullet>& GetBullets()                                   { return g_bullets; }
@@ -1256,21 +1274,15 @@ namespace World {
     std::vector<ChristmasLights>& GetChristmasLights()                  { return g_christmasLights; }
     std::vector<ChristmasTree>& GetChristmasTrees()                     { return g_christmasTrees; }
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
-    std::vector<Decal>& GetDecals()                                 { return g_newDecals; }
-    Hell::SlotMap<Door>& GetDoors()                                     { return g_doors; }
+    std::vector<Decal>& GetDecals()                                     { return g_newDecals; }
     std::vector<Dobermann>& GetDobermanns()                             { return g_dobermanns; }
-    Hell::SlotMap<GenericObject>& GetGenericObjects()                   { return g_genericObjects; }
     std::vector<Fence>& GetFences()                                     { return g_fences; }
-    Hell::SlotMap<Fireplace>& GetFireplaces()                           { return g_fireplaces; }
     std::vector<GameObject>& GetGameObjects()                           { return g_gameObjects; }
-    Hell::SlotMap<HousePlane>& GetHousePlanes()                         { return g_housePlanes; }
-    Hell::SlotMap<Ladder>& GetLadders ()                                { return g_ladders; }
     std::vector<Light>& GetLights()                                     { return g_lights; };
     std::vector<Kangaroo>& GetKangaroos()                               { return g_kangaroos; }
     std::vector<MapInstance>& GetMapInstances()                         { return g_mapInstances; }
     std::vector<Mermaid>& GetMermaids()                                 { return g_mermaids; }
     std::vector<Piano>& GetPianos()                                     { return g_pianos; }
-    Hell::SlotMap<PickUp>& GetPickUps()                                 { return g_pickUps; }
     std::vector<PictureFrame>& GetPictureFrames()                       { return g_pictureFrames; }
     std::vector<PowerPoleSet>& GetPowerPoleSets()                       { return g_powerPoleSets; }
     std::vector<SpawnPoint>& GetCampaignSpawnPoints()                   { return g_spawnCampaignPoints; }
@@ -1279,10 +1291,7 @@ namespace World {
     std::vector<Road>& GetRoads()                                       { return g_roads; }
     std::vector<Shark>& GetSharks()                                     { return g_sharks; }
     std::vector<Tree>& GetTrees()                                       { return g_trees; }
-    Hell::SlotMap<TrimSet>& GetTrimSets()                               { return g_trimSets; }
-    Hell::SlotMap<Wall>& GetWalls()                                     { return g_walls; }
     std::vector<VolumetricBloodSplatter>& GetVolumetricBloodSplatters() { return g_volumetricBloodSplatters; }
-    Hell::SlotMap<Window>& GetWindows()                                 { return g_windows; }
 
     std::vector<GPULight>& GetGPULightsLowRes()                 { return g_gpuLightsLowRes; }
     std::vector<GPULight>& GetGPULightsMidRes()                 { return g_gpuLightsMidRes; }

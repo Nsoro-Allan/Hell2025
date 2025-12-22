@@ -1,7 +1,7 @@
 #include "HouseManager.h"
 #include <fstream>
 #include "HellLogging.h"
-#include "Core/JSON.h"
+#include "File/JSON.h"
 #include "World/World.h"
 #include "Util.h"
 
@@ -31,7 +31,7 @@ namespace HouseManager {
             return;
         }
 
-        CreateInfoCollection createInfoCollection = Util::CreateInfoCollectionFromJSONObject(json);
+        CreateInfoCollection createInfoCollection = JSON::CreateInfoCollectionFromJSONObject(json);
 
         House& house = g_houses.emplace_back();
         house.SetFilename(filename);
@@ -49,7 +49,7 @@ namespace HouseManager {
 
         Logging::Debug()
             << "Loaded: " << path
-            << "\n" << Util::CreateInfoCollectionToJSON(createInfoCollection)
+            << "\n" << JSON::CreateInfoCollectionToJSON(createInfoCollection)
             //<< "- signature:     " << header.signature << "\n"
             //<< "- version:       " << header.version << "\n"
             //<< "- chunk count x: " << header.chunkCountX << "\n"
@@ -70,7 +70,7 @@ namespace HouseManager {
         CreateInfoCollection createInfoCollection = World::GetCreateInfoCollection();
         house->SetCreateInfoCollection(createInfoCollection);
 
-        std::string createInfoJson = Util::CreateInfoCollectionToJSON(createInfoCollection);
+        std::string createInfoJson = JSON::CreateInfoCollectionToJSON(createInfoCollection);
 
         // Create the file
         std::string outputPath = "res/houses/" + filename + ".house";

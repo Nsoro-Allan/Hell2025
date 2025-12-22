@@ -9,8 +9,19 @@ Ladder::Ladder(uint64_t id, LadderCreateInfo& createInfo, SpawnOffset& spawnOffs
     m_rotation = createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
     std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+    MeshNodeCreateInfo& ladder = meshNodeCreateInfoSet.emplace_back();
+    ladder.meshName = "Ladder";
+    ladder.materialName = "Ladder";
+    ladder.rigidDynamic.createObject = true;
+    ladder.rigidDynamic.kinematic = true;
+    ladder.rigidDynamic.shapeType = PhysicsShapeType::BOX;
+    ladder.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+    ladder.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+    ladder.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+    ladder.addtoNavMesh = true;
+
     m_meshNodes.Init(id, "Ladder", meshNodeCreateInfoSet);
-    m_meshNodes.SetMaterialByMeshName("Ladder", "Ladder");
 
     RecomputeModelMatrix();
 }
@@ -42,7 +53,7 @@ void Ladder::Update(float deltaTime) {
     boundsMin.z += shrink;
     boundsMax.x -= shrink;
     boundsMax.z -= shrink;
-    boundsMax.y += 0.9;
+    boundsMax.y += 1.1;
     m_overlapHitAABB = AABB(boundsMin, boundsMax);
     // Clean me up
 

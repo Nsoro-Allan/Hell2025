@@ -277,26 +277,27 @@ namespace GlobalIllumination {
         // Add all the doors
         int objectId = 1;
         for (Door& door : World::GetDoors()) {
-            uint64_t rigidStaticId = door.GetPhysicsId();
-            RigidStatic* rigidStatic = Physics::GetRigidStaitcById(rigidStaticId);
-            PxRigidStatic* pxRigidStatic = rigidStatic->GetPxRigidStatic();
-            PxRigidActor* pxRigidActor = static_cast<PxRigidActor*>(pxRigidStatic);
-            PxBounds3 bounds = pxRigidActor->getWorldBounds();
-            PxVec3 minBounds = bounds.minimum;
-            PxVec3 maxBounds = bounds.maximum;
-
-            PrimitiveInstance& instance = instances.emplace_back();
-            instance.worldAabbBoundsMin.x = minBounds.x;
-            instance.worldAabbBoundsMin.y = minBounds.y;
-            instance.worldAabbBoundsMin.z = minBounds.z;
-            instance.worldAabbBoundsMax.x = maxBounds.x;
-            instance.worldAabbBoundsMax.y = maxBounds.y;
-            instance.worldAabbBoundsMax.z = maxBounds.z;
-            instance.objectId = objectId;// door.GetObjectId();
-            instance.worldTransform = door.GetDoorModelMatrix();
-            instance.meshBvhId = g_doorBvhId;
-            instance.worldAabbCenter = (instance.worldAabbBoundsMin + instance.worldAabbBoundsMax) * 0.5f;
-            objectId++;
+            // BROKKEN BECAUSE OF physicsId now gone
+            //uint64_t rigidStaticId = door.GetPhysicsId();
+            //RigidStatic* rigidStatic = Physics::GetRigidStaitcById(rigidStaticId);
+            //PxRigidStatic* pxRigidStatic = rigidStatic->GetPxRigidStatic();
+            //PxRigidActor* pxRigidActor = static_cast<PxRigidActor*>(pxRigidStatic);
+            //PxBounds3 bounds = pxRigidActor->getWorldBounds();
+            //PxVec3 minBounds = bounds.minimum;
+            //PxVec3 maxBounds = bounds.maximum;
+            //
+            //PrimitiveInstance& instance = instances.emplace_back();
+            //instance.worldAabbBoundsMin.x = minBounds.x;
+            //instance.worldAabbBoundsMin.y = minBounds.y;
+            //instance.worldAabbBoundsMin.z = minBounds.z;
+            //instance.worldAabbBoundsMax.x = maxBounds.x;
+            //instance.worldAabbBoundsMax.y = maxBounds.y;
+            //instance.worldAabbBoundsMax.z = maxBounds.z;
+            //instance.objectId = objectId;// door.GetObjectId();
+            //instance.worldTransform = door.GetDoorModelMatrix();
+            //instance.meshBvhId = g_doorBvhId;
+            //instance.worldAabbCenter = (instance.worldAabbBoundsMin + instance.worldAabbBoundsMax) * 0.5f;
+            //objectId++;
         }
 
         Bvh::Gpu::UpdateSceneBvh(g_sceneBvhId, instances);

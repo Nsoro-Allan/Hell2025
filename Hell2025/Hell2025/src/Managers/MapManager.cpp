@@ -1,6 +1,7 @@
 #include "MapManager.h"
 
 #include "BackEnd/BackEnd.h"
+#include "File/JSON.h"
 #include "File/File.h"
 #include "HellLogging.h"
 #include "Renderer/Renderer.h"
@@ -53,8 +54,8 @@ namespace MapManager {
         CreateInfoCollection createInfoCollection = World::GetCreateInfoCollection();
         map->SetCreateInfoCollection(createInfoCollection);
         
-        std::string createInfoJson = Util::CreateInfoCollectionToJSON(createInfoCollection);
-        std::string additionalJson = Util::AdditionalMapDataToJSON(map->GetAdditionalMapData());
+        std::string createInfoJson = JSON::CreateInfoCollectionToJSON(createInfoCollection);
+        std::string additionalJson = JSON::AdditionalMapDataToJSON(map->GetAdditionalMapData());
 
         // Create the file
         std::string outputPath = "res/maps/" + mapName + ".map";
@@ -152,8 +153,8 @@ namespace MapManager {
         }
 
         // Load Create Info Collection from JSON string
-        CreateInfoCollection createInfoCollection = Util::CreateInfoCollectionFromJSONString(createInfoJson);
-        AdditionalMapData additionalMapData = Util::AdditionalMapDataFromJSON(additionalJson);
+        CreateInfoCollection createInfoCollection = JSON::CreateInfoCollectionFromJSONString(createInfoJson);
+        AdditionalMapData additionalMapData = JSON::AdditionalMapDataFromJSON(additionalJson);
         map.SetCreateInfoCollection(createInfoCollection);
         map.SetAdditionalMapData(additionalMapData);
 

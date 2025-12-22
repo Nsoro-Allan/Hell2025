@@ -469,6 +469,7 @@
         0.0
       ],
       "Radius": 8.0,
+      "SaveToFile": true,
       "Strength": 1.25,
       "Type": "HANGING_LIGHT"
     },
@@ -484,6 +485,7 @@
         -0.5
       ],
       "Radius": 3.75,
+      "SaveToFile": true,
       "Strength": 2.0,
       "Type": "HANGING_LIGHT"
     },
@@ -499,6 +501,7 @@
         4.099999904632568
       ],
       "Radius": 3.5,
+      "SaveToFile": true,
       "Strength": 2.0,
       "Type": "HANGING_LIGHT"
     },
@@ -514,6 +517,7 @@
         0.5
       ],
       "Radius": 3.0,
+      "SaveToFile": true,
       "Strength": 1.25,
       "Type": "HANGING_LIGHT"
     }
@@ -666,6 +670,42 @@
       "Rotation": [
         0.0,
         0.21998214721679688,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "AMMO"
+    },
+    {
+      "DisablePhysicsAtSpawn": false,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "12GaugeBuckShot",
+      "Position": [
+        0.3825710415840149,
+        0.41773390769958496,
+        0.034005194902420044
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "AMMO"
+    },
+    {
+      "DisablePhysicsAtSpawn": true,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "12GaugeBuckShot",
+      "Position": [
+        0.18162889778614044,
+        0.5233830213546753,
+        -0.16188785433769226
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.0,
         0.0
       ],
       "SaveToFile": true,
@@ -1060,6 +1100,7 @@
       "Type": "FLOOR"
     }
   ],
+  "Staircases": [],
   "Trees": [],
   "Walls": [
     {

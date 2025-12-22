@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 #include "Backend/Backend.h"
 #include "Audio/Audio.h"
-#include "Core/JSON.h"
+#include "File/JSON.h"
 #include "Editor/Editor.h"
 #include "Imgui/ImGuiBackEnd.h"
 #include "File/File.h"

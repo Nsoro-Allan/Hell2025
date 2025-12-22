@@ -359,6 +359,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\Core\Openable.cpp" />
     <ClCompile Include="src\Types\Game\Decal.cpp" />
     <ClCompile Include="src\Types\Game\Ladder.cpp" />
+    <ClCompile Include="src\Types\Game\Staircase.cpp" />
     <ClCompile Include="src\Types\Game\TypeWriter.cpp" />
     <ClCompile Include="src\Types\House\Fireplace.cpp" />
     <ClCompile Include="src\Types\House\TrimSet.cpp" />
@@ -409,7 +410,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Modelling\Unused\EditableMesh.cpp" />
     <ClCompile Include="src\Modelling\Unused\Modelling.cpp" />
     <ClCompile Include="src\Imgui\ImguiBackEnd.cpp" />
-    <ClCompile Include="src\Core\JSON.cpp" />
+    <ClCompile Include="src\File\JSON.cpp" />
     <ClCompile Include="src\Imgui\Types\Types.cpp" />
     <ClCompile Include="src\File\File_height_map.cpp" />
     <ClCompile Include="src\Math\AABB.cpp" />
@@ -450,7 +451,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\Types\House\Wall.cpp" />
     <ClCompile Include="src\Types\House\Window.cpp" />
     <ClCompile Include="src\Util\Util_black_magic.cpp" />
-    <ClCompile Include="src\Util\Util_json.cpp" />
     <ClCompile Include="src\Util\Util_debug_info.cpp" />
     <ClCompile Include="src\Util\Util_easing.cpp" />
     <ClCompile Include="src\Weapon\MeleeBulletWave.cpp" />
@@ -760,6 +760,8 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Common\SlotMap.h" />
     <ClInclude Include="src\Types\Game\Decal.h" />
     <ClInclude Include="src\Types\Game\Ladder.h" />
+    <ClInclude Include="src\Types\Game\Staircase.h" />
+    <ClInclude Include="src\Types\Game\Stairs.h" />
     <ClInclude Include="src\Types\Game\TypeWriter.h" />
     <ClInclude Include="src\Types\House\Fireplace.h" />
     <ClInclude Include="src\Types\House\TrimSet.h" />
@@ -775,7 +777,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\Modelling\Unused\EditableMesh.h" />
     <ClInclude Include="src\Modelling\Unused\Modelling.h" />
     <ClInclude Include="src\Imgui\ImguiBackEnd.h" />
-    <ClInclude Include="src\Core\JSON.h" />
+    <ClInclude Include="src\File\JSON.h" />
     <ClInclude Include="src\Imgui\Types\Types.h" />
     <ClInclude Include="src\Math\AABB.h" />
     <ClInclude Include="src\Ocean\Ocean.h" />

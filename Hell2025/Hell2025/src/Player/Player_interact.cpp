@@ -34,51 +34,6 @@ void Player::UpdateCursorRays() {
     glm::vec3 rayOrigin = GetCameraPosition();
     glm::vec3 rayDir = GetCameraForward();
     m_bvhRayResult = World::ClosestHit(rayOrigin, rayDir, maxRayDistance);
-
-
-    //m_rayHitObjectType = UniqueID::GetType(m_bvhRayResult.objectId);
-    //m_rayhitObjectId = m_bvhRayResult.objectId;
-    //m_rayHitPosition = m_bvhRayResult.hitPosition;
-
-    // Store the closest of the two hits
-    //m_rayHitObjectType = ObjectType::UNDEFINED;
-    //m_rayhitObjectId = 0;
-    //m_rayHitPosition = glm::vec3(0.0f);
-    //
-    //if (m_physXRayResult.hitFound && m_bvhRayResult.hitFound) {
-    //    float physXDistance = glm::distance(m_physXRayResult.hitPosition, GetCameraPosition());
-    //    float bvhDistance = glm::distance(m_bvhRayResult.hitPosition, GetCameraPosition());
-    //
-    //    if (physXDistance < bvhDistance) {
-    //        m_rayHitObjectType = m_physXRayResult.userData.objectType;
-    //        m_rayhitObjectId = m_physXRayResult.userData.objectId;
-    //        m_rayHitPosition = m_physXRayResult.hitPosition;
-    //        m_rayHitFound = true;
-    //    }
-    //    else {
-    //        m_rayHitObjectType = m_bvhRayResult.objectType;
-    //        m_rayhitObjectId = m_bvhRayResult.objectId;
-    //        m_rayHitPosition = m_bvhRayResult.hitPosition;
-    //        m_rayHitFound = true;
-    //    }
-    //}    
-    //// Or if there was only a physx ray hit...
-    //else if (m_physXRayResult.hitFound) {
-    //    m_rayHitObjectType = m_physXRayResult.userData.objectType;
-    //    m_rayhitObjectId = m_physXRayResult.userData.objectId;
-    //    m_rayHitPosition = m_physXRayResult.hitPosition;
-    //    m_rayHitFound = true;
-    //}
-    //// Or if there was only a bvh ray hit...
-    //else if (m_bvhRayResult.hitFound) {
-    //    m_rayHitObjectType = m_bvhRayResult.objectType;
-    //    m_rayhitObjectId = m_bvhRayResult.objectId;
-    //    m_rayHitPosition = m_bvhRayResult.hitPosition;
-    //    m_rayHitFound = true;
-    //}
-    //else {
-    //    // No ray hit
-    //}
 }
 
 
@@ -91,57 +46,6 @@ void Player::UpdateInteract() {
 
     // Probably make this cleaner, but for now this handles the fact you can interact while inventory is open. 
     if (InventoryIsOpen()) return;
-
-    // Rewrite me in such a way to consider pickups and openable ids only, you'll need to think how doors and piano keys will work with that...
-    //{
-    //    // If ray hit object is intractable, store it       
-    //    if (World::ObjectTypeIsInteractable(m_rayHitObjectType, m_rayhitObjectId, GetCameraPosition(), m_rayHitPosition)) {
-    //        m_interactObjectType = m_rayHitObjectType;
-    //        m_interactObjectId = m_rayhitObjectId;
-    //    }
-    //}
-
-    // If it's not an openable, maybe it's parent is? Search and stop at the first parent
-    //ObjectType hitObjectType = UniqueID::GetType(m_rayhitObjectId);
-    //if (hitObjectType == ObjectType::GENERIC_OBJECT) {
-    //   // std::cout << "generic hit " << m_rayhitObjectId << "\n";
-    //
-    //    //if(GenericObject * parent = World::GetGenericObjects().get(m_interactObjectId)) {
-    //    //    parent->GetMeshNodes().SetTransformByMeshName(openable.m_meshName, openable.m_transform);
-    //    //    continue;
-    //    //}
-    //}
-
-    // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
-    // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
-    // you broke the test below adding ragdolls, you are probably hitting it, find a way to omit the ragdoll from overlap test, although looks like you are
-
-    // Overwrite with PhysX overlap test if an overlap with interact object is found
-    // //if (m_rayHitObjectType != ObjectType::NO_TYPE) {
-    // 
-    //     glm::vec3 spherePosition = m_rayHitPosition;
-    //     float sphereRadius = 0.15f;
-    //     PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
-    //     const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));
-    //     PhysXOverlapReport overlapReport = Physics::OverlapTest(overlapSphereShape, overlapSphereTranform, CollisionGroup(GENERIC_BOUNCEABLE | GENERTIC_INTERACTBLE | ITEM_PICK_UP | ENVIROMENT_OBSTACLE));
-    // 
-    //     // Sort by distance to player
-    //     sort(overlapReport.hits.begin(), overlapReport.hits.end(), [this, spherePosition](PhysXOverlapResult& lhs, PhysXOverlapResult& rhs) {
-    //         float distanceA = glm::distance(spherePosition, lhs.objectPosition);
-    //         float distanceB = glm::distance(spherePosition, rhs.objectPosition);
-    //         return distanceA < distanceB;
-    //     });
-    // 
-    //     if (overlapReport.hits.size()) {
-    //         PhysicsUserData userData = overlapReport.hits[0].userData;
-    //         if (World::ObjectTypeIsInteractable(userData.objectType, userData.objectId, GetCameraPosition(), m_rayHitPosition)) {
-    //             if (userData.objectType != ObjectType::DOOR) {
-    //                 m_interactObjectType = userData.objectType;
-    //                 m_interactObjectId = userData.objectId;
-    //             }
-    //         }
-    //     }
-    // //}
 
     m_interactHitPosition = glm::vec3(-9999.0f);
     bool hitFound = false;
@@ -166,8 +70,9 @@ void Player::UpdateInteract() {
 
     // Sweep test
     if (hitFound) {
-        glm::vec3 spherePosition = m_interactHitPosition;
         float sphereRadius = 0.15f;
+        glm::vec3 spherePosition = m_interactHitPosition - GetCameraForward() * (sphereRadius * 1.25f);
+
         PxCapsuleGeometry overlapSphereShape = PxCapsuleGeometry(sphereRadius, 0);
         const PxTransform overlapSphereTranform = PxTransform(Physics::GlmVec3toPxVec3(spherePosition));
         PhysXOverlapReport overlapReport = Physics::OverlapTest(overlapSphereShape, overlapSphereTranform, CollisionGroup(GENERIC_BOUNCEABLE | GENERTIC_INTERACTBLE | ITEM_PICK_UP | ENVIROMENT_OBSTACLE));

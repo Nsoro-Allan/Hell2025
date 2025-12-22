@@ -1,6 +1,6 @@
 #include "World.h"
 #include "AssetManagement/AssetManager.h"
-#include "Core/JSON.h"
+#include "File/JSON.h"
 #include "Managers/HouseManager.h"
 #include "Renderer/GlobalIllumination.h"
 #include "Renderer/RenderDataManager.h"
