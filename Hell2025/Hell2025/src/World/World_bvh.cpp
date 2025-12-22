@@ -28,7 +28,6 @@ namespace World {
 		//DebugDraw();
 	}
 
-
     void CreateObjectInstanceDataFromRenderItem(const RenderItem& renderItem, std::vector<PrimitiveInstance>& container) {
         PrimitiveInstance& instance = container.emplace_back();
 		instance.worldTransform = renderItem.modelMatrix;
@@ -44,6 +43,12 @@ namespace World {
         Util::UnpackUint64(renderItem.objectIdLowerBit, renderItem.objectIdUpperBit, instance.objectId);
     }
 
+
+    void CreateObjectInstanceDataFromRenderItems(const std::vector<RenderItem>& renderItems, std::vector<PrimitiveInstance>& container) {
+        for (const RenderItem& renderItem : renderItems) {
+            CreateObjectInstanceDataFromRenderItem(renderItem, container);
+        }
+    }
 
 	void CreatePrimtiveInstanceFromMeshNode(const MeshNode* meshNode, std::vector<PrimitiveInstance>& container) {
         if (!meshNode) return;
@@ -165,6 +170,9 @@ namespace World {
 
         // Clear any existing primitive instances
 		g_staticSceneInstances.clear();
+
+        // Render items
+        for (ChristmasLights& christmasLights : GetChristmasLights()) CreateObjectInstanceDataFromRenderItems(christmasLights.GetRenderItems(), g_staticSceneInstances);
 
         // Add any static mesh nodes to the primitive instances vector
         for (Door& object : GetDoors())                     CreateStaticPrimtiveInstances(object.GetMeshNodes());

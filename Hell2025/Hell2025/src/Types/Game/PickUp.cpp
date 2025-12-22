@@ -126,10 +126,6 @@ void PickUp::Update(float deltaTime) {
     }
 
     m_firstFrame = false;
-
-    if (Input::RightMousePressed()) {
-        m_meshNodes.WakeAllPhysics();
-    }
 }
 
 void PickUp::CleanUp() {

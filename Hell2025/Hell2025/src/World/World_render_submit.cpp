@@ -142,6 +142,13 @@ namespace World {
             }
         }
 
+        for (ChristmasLights& christmasLights : GetChristmasLights()) {
+            RenderDataManager::SubmitRenderItems(christmasLights.GetRenderItems());
+            if (Editor::GetSelectedObjectId() == christmasLights.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(christmasLights.GetRenderItems());
+            }
+        }
+
         for (Wall& wall : GetWalls()) {
             wall.SubmitRenderItems();
             RenderDataManager::SubmitRenderItems(wall.GetWeatherBoardstopRenderItems());
@@ -153,10 +160,6 @@ namespace World {
 
         for (Fence& fence: GetFences()) {
             RenderDataManager::SubmitRenderItems(fence.GetRenderItems());
-        }
-
-        for (ChristmasLights& christmasLights : GetChristmasLights()) {
-            RenderDataManager::SubmitRenderItems(christmasLights.GetRenderItems());
         }
 
         for (ChristmasPresent& christmasPresent : GetChristmasPresents()) {

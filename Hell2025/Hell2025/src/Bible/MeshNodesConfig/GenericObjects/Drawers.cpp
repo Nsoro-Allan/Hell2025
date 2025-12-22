@@ -101,7 +101,7 @@ namespace Bible {
         frame.meshName = "DrawersLargeFrame";
         frame.materialName = "Drawers_Frame";
         frame.rigidDynamic.shapeType = PhysicsShapeType::BOX;
-        frame.rigidDynamic.createObject = true;
+        frame.rigidDynamic.createObject = false;
         frame.rigidDynamic.kinematic = true;
         frame.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
         frame.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
@@ -152,6 +152,13 @@ namespace Bible {
         drawer2nd.openable.openingAudio = "DrawerOpen.wav";
         drawer2nd.openable.closingAudio = "DrawerClose.wav";
         drawer2nd.openable.lockedAudio = "Locked.wav";
+        drawer2nd.rigidDynamic.createObject = true;
+        drawer2nd.rigidDynamic.kinematic = true;
+        drawer2nd.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        drawer2nd.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        drawer2nd.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        drawer2nd.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+        drawer2nd.rigidDynamic.convexMeshModelName = "CollisionMesh_DrawersLarge_2nd";
 
         MeshNodeCreateInfo& drawer3rd = meshNodeCreateInfoSet.emplace_back();
         drawer3rd.materialName = "Drawers_Drawers";

@@ -3,7 +3,7 @@
 #include "Types/Renderer/MeshBuffer.h"
 
 struct Wire {
-    void Init(glm::vec3 begin, glm::vec3 end, float sag, float radius);
+    void Init(glm::vec3 begin, glm::vec3 end, float sag, float radius, float spacing);
     void Update();
 
     MeshBuffer& GetMeshBuffer()                             { return m_meshBuffer; }

@@ -74,7 +74,8 @@ namespace Physics {
             pvdClient->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
             pvdClient->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
         }
-        g_defaultMaterial = g_physics->createMaterial(0.5f, 0.5f, 0.6f);
+        //g_defaultMaterial = g_physics->createMaterial(0.5f, 0.5f, 0.6f);
+        g_defaultMaterial = g_physics->createMaterial(0.7f, 0.6f, 0.0f);
         g_grassMaterial = g_physics->createMaterial(0.5f, 0.5f, 0.6f);
         //g_grassMaterial = g_physics->createMaterial(0.8f, 0.7f, 0.05f);
 

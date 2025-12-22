@@ -108,7 +108,8 @@ struct MeshNodes {
     const std::vector<RenderItem>& GetRenderItemsStainedGlass() const       { return m_renderItemsStainedGlass; }
 
 private:
-    void UpdateAABBs(const glm::mat4& worldMatrix);
+    void UpdateAABBsFromWorldMatrices();
+    //void UpdateAABBs(const glm::mat4& worldMatrix);
     void UpdateHierarchy();
     void InitPhysicsTransforms();
     void UpdateKinematicPhysicsTransforms();

@@ -9,6 +9,20 @@ namespace nlohmann {
         j = json::array({ v.x, v.y, v.z });
     }
 
+
+    void to_json(nlohmann::json& j, const ChristmasLightsCreateInfo& info) {
+        j = nlohmann::json{
+            {"Points", info.points},
+            {"SagHeights", info.sagHeights},
+            {"Spiral", info.spiral},
+            {"SpiralRadius", info.spiralRadius},
+            {"SpiarlHeight", info.spiarlHeight},
+            {"SprialTopCenter", info.sprialTopCenter},
+
+            {"EditorName", info.editorName},
+        };
+    }
+
     void to_json(nlohmann::json& j, const DoorCreateInfo& createInfo) {
         j = nlohmann::json{
             {"Position", createInfo.position},
@@ -192,6 +206,18 @@ namespace nlohmann {
             arr.push_back(item);
         }
         j = arr;
+    }
+
+    void from_json(const nlohmann::json& j, ChristmasLightsCreateInfo& info) {
+        info.editorName = j.value("EditorName", UNDEFINED_STRING);
+
+        info.points = j.value("Points", std::vector<glm::vec3>{});
+        info.sagHeights = j.value("SagHeights", std::vector<float>{});
+
+        info.spiral = j.value("Spiral", false);
+        info.spiralRadius = j.value("SpiralRadius", 1.0f);
+        info.spiarlHeight = j.value("SpiarlHeight", 1.0f);
+        info.sprialTopCenter = j.value("SprialTopCenter", glm::vec3(0.0f));
     }
 
     void from_json(const nlohmann::json& j, DoorCreateInfo& info) {
@@ -418,6 +444,7 @@ namespace JSON {
 
     CreateInfoCollection CreateInfoCollectionFromJSONObject(nlohmann::json& json) {
         CreateInfoCollection createInfoCollection;
+        createInfoCollection.christmasLights = json.value("ChristmasLights", std::vector<ChristmasLightsCreateInfo>{});
         createInfoCollection.doors = json.value("Doors", std::vector<DoorCreateInfo>{});
         createInfoCollection.fireplaces = json.value("Fireplaces", std::vector<FireplaceCreateInfo>{});
         createInfoCollection.genericObjects = json.value("Drawers", std::vector<GenericObjectCreateInfo>{});
@@ -437,6 +464,7 @@ namespace JSON {
 
     std::string CreateInfoCollectionToJSON(CreateInfoCollection& createInfoCollection) {
         nlohmann::json json;
+        json["ChristmasLights"] = createInfoCollection.christmasLights;
         json["Doors"] = createInfoCollection.doors;
         json["Drawers"] = createInfoCollection.genericObjects;
         json["Fireplaces"] = createInfoCollection.fireplaces;

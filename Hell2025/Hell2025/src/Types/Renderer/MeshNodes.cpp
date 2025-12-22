@@ -132,8 +132,9 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
                         if (mesh) {
                             std::span<Vertex> vertices = AssetManager::GetVerticesSpan(mesh->baseVertex, mesh->vertexCount);
                             std::span<uint32_t> indices = AssetManager::GetIndicesSpan(mesh->baseIndex, mesh->indexCount);
-                            meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);
-                            
+                            //meshNode->rigidDynamicId = Physics::CreateRigidDynamicFromConvexMeshVertices(spawnTransform, vertices, indices, mass, filterData);                            
+                            meshNode->rigidDynamicId = Physics::CreateRigidDynamicWithCompoundConvexMeshesFromModel(createInfo.rigidDynamic.convexMeshModelName, mass, kinematic, filterData);
+
                             // DIRTY (fix me)
                             if (kinematic) {
                                 if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode->rigidDynamicId)) {
@@ -491,8 +492,23 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     }
     m_isDirty = worldMatrixDirty || hierarchyDirty;
 
-    // If you made it this far, then AABBs are now also dirty
-    UpdateAABBs(worldMatrix);
+    // DrawWorldspaceAABBs(YELLOW); // NOTE THIS only draws aabbs when the hierachy was dirty
+
+    // Compute world matrices FIRST
+    for (size_t i = 0; i < m_meshNodes.size(); i++) {
+        MeshNode& meshNode = m_meshNodes[i];
+
+        if (!m_firstFrame && MeshNodeIsNonKinematicRigidDynamic((int32_t)i)) {
+            meshNode.worldMatrix = meshNode.localMatrix; // Local matrix is world in this case
+        }
+        else {
+            meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
+        }
+        meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
+    }
+
+    // Now compute AABBs from the final world matrices
+    UpdateAABBsFromWorldMatrices();
 
     m_renderItems.clear();
     m_renderItemsAlphaDiscarded.clear();
@@ -508,13 +524,6 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         MeshNode& meshNode = m_meshNodes[i];
         Material* material = GetMaterial(i);
         if (!material) continue;
-
-        if (!m_firstFrame && MeshNodeIsNonKinematicRigidDynamic(i)) {
-            meshNode.worldMatrix = meshNode.localMatrix; // Local matrix is world matrix in this case
-        }
-        else {
-           meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
-        }
 
         meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
         meshNode.renderItem.objectType = (int)UniqueID::GetType(meshNode.parentObjectId);
@@ -573,6 +582,7 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         //else {
         //    meshNode.movedThisFrame = true;
         //}
+
     }
 
     m_worldMatrixPreviousFrame = worldMatrix;
@@ -653,15 +663,54 @@ void MeshNodes::UpdateKinematicPhysicsTransforms() {
             if (Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
                 if (meshNode.movedThisFrame) {
                     Physics::SetRigidDynamicKinematicTarget(meshNode.rigidDynamicId, meshNode.worldMatrix);
-                    std::cout << "Updating " << meshNode.parentObjectId << " " << Util::ObjectTypeToString(UniqueID::GetType(meshNode.parentObjectId)) << "\n";
                }
             }
         }
 	}
 }
 
+void MeshNodes::UpdateAABBsFromWorldMatrices() {
+    glm::vec3 minBounds(std::numeric_limits<float>::max());
+    glm::vec3 maxBounds(-std::numeric_limits<float>::max());
+    bool found = false;
 
-void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
+    for (MeshNode& meshNode : m_meshNodes) {
+        Mesh* mesh = AssetManager::GetMeshByIndex(meshNode.globalMeshIndex);
+        if (!mesh) continue;
+
+        const glm::vec3 localMin = mesh->aabbMin;
+        const glm::vec3 localMax = mesh->aabbMax;
+        const glm::vec3 localCenter = 0.5f * (localMin + localMax);
+        const glm::vec3 localExtents = 0.5f * (localMax - localMin);
+
+        const glm::mat4& M = meshNode.worldMatrix;
+
+        const glm::vec3 worldCenter = glm::vec3(M * glm::vec4(localCenter, 1.0f));
+
+        const glm::vec3 col0 = glm::vec3(M[0]);
+        const glm::vec3 col1 = glm::vec3(M[1]);
+        const glm::vec3 col2 = glm::vec3(M[2]);
+
+        const glm::vec3 worldExtents =
+            glm::abs(col0) * localExtents.x +
+            glm::abs(col1) * localExtents.y +
+            glm::abs(col2) * localExtents.z;
+
+        const glm::vec3 worldMin = worldCenter - worldExtents;
+        const glm::vec3 worldMax = worldCenter + worldExtents;
+
+        meshNode.worldspaceAabb = AABB(worldMin, worldMax);
+        meshNode.worldSpaceObb.SetTransform(M);
+
+        minBounds = glm::min(minBounds, worldMin);
+        maxBounds = glm::max(maxBounds, worldMax);
+        found = true;
+    }
+
+    m_worldspaceAABB = found ? AABB(minBounds, maxBounds) : AABB();
+}
+
+/*/void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
     glm::vec3 min(std::numeric_limits<float>::max());
     glm::vec3 max(-std::numeric_limits<float>::max());
     bool found = false;
@@ -710,7 +759,8 @@ void MeshNodes::UpdateAABBs(const glm::mat4& worldMatrix) {
     }
 
     m_worldspaceAABB = found ? AABB(min, max) : AABB();
-}
+
+}*/
 
 const void MeshNodes::SubmitRenderItems() const {
     RenderDataManager::SubmitRenderItems(m_renderItems);

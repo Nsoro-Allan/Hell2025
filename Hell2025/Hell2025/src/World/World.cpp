@@ -27,25 +27,34 @@
 #include "SlotMap.h"
 
 namespace World {
+    Hell::SlotMap<ChristmasLights> g_christmasLights;
+    Hell::SlotMap<Door> g_doors;
+    Hell::SlotMap<Fireplace> g_fireplaces;
+    Hell::SlotMap<GenericObject> g_genericObjects;
+    Hell::SlotMap<HousePlane> g_housePlanes;
+    Hell::SlotMap<Ladder> g_ladders;
+    Hell::SlotMap<PickUp> g_pickUps;
+    Hell::SlotMap<Staircase> g_staircases;
+    Hell::SlotMap<TrimSet> g_trimSets;
+    Hell::SlotMap<Wall> g_walls;
+    Hell::SlotMap<Window> g_windows;
+
     std::vector<AnimatedGameObject> g_animatedGameObjects;
     std::vector<ScreenSpaceBloodDecal> g_screenSpaceBloodDecals;
     std::vector<Bullet> g_bullets;
     std::vector<BulletCasing> g_bulletCasings;
-    std::vector<ChristmasLights> g_christmasLights;
     std::vector<ChristmasPresent> g_christmasPresents;
     std::vector<ChristmasTree> g_christmasTrees;
     std::vector<ClippingCube> g_clippingCubes;
+    std::vector<Decal> g_newDecals;
     std::vector<Dobermann> g_dobermanns;
     std::vector<Fence> g_fences;
-    Hell::SlotMap<Fireplace> g_fireplaces;
     std::vector<GameObject> g_gameObjects;
     std::vector<Kangaroo> g_kangaroos;
     std::vector<HeightMapChunk> g_heightMapChunks;
-    Hell::SlotMap<Ladder> g_ladders;
     std::vector<Light> g_lights;
     std::vector<MapInstance> g_mapInstances;
     std::vector<Mermaid> g_mermaids;
-    Hell::SlotMap<PickUp> g_pickUps;
     std::vector<PictureFrame> g_pictureFrames;
     std::vector<PowerPoleSet> g_powerPoleSets;
     std::vector<Piano> g_pianos;
@@ -53,26 +62,9 @@ namespace World {
     std::vector<Shark> g_sharks;
     std::vector<SpawnPoint> g_spawnCampaignPoints;
     std::vector<SpawnPoint> g_spawnDeathmatchPoints;
-    Hell::SlotMap<Staircase> g_staircases;
     std::vector<Transform> g_doorAndWindowCubeTransforms;
     std::vector<Tree> g_trees;
-    Hell::SlotMap<TrimSet> g_trimSets;
-    Hell::SlotMap<Wall> g_walls;
     std::vector<VolumetricBloodSplatter> g_volumetricBloodSplatters;
-
-
-
-
-    std::vector<Decal> g_newDecals;
-
-
-
-
-
-    Hell::SlotMap<Door> g_doors;
-    Hell::SlotMap<GenericObject> g_genericObjects;
-    Hell::SlotMap<HousePlane> g_housePlanes;
-    Hell::SlotMap<Window> g_windows;
 
     // std::unordered_map<uint64_t, HouseInstance> g_houseInstances; // unused???
 
@@ -147,6 +139,20 @@ namespace World {
             LoadMapInstanceHouses(mapInstanceCreateInfo.mapName, spawnOffset);
 
 
+        // Add all this to the map editor tomorrow
+        // Add all this to the map editor tomorrow
+        // Add all this to the map editor tomorrow
+
+            // Hack in a Christmas tree
+            //ChristmasTreeCreateInfo christmasTreeCreateInfo;
+            //christmasTreeCreateInfo.position = glm::vec3(8.13f, 0.15f, 1.2f);
+            //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
+            //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
+            //
+            //christmasTreeCreateInfo.position = glm::vec3(0.78f, 0.15f, 2.25f);
+            //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
+            //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
+
             Logging::Warning() << "MAKE SURE YOU REMOVE THIS LINE break IT IS DISABLING THE LOAD OF THE SECOND MAP INSTANCE";
             break;
             i++;
@@ -195,28 +201,6 @@ namespace World {
 
         dobermannCreateInfo.position = glm::vec3(36.8f, 31.0f, 35.5f);
         AddDobermann(dobermannCreateInfo);
-
-        // Add all this to the map editor tomorrow
-        // Add all this to the map editor tomorrow
-        // Add all this to the map editor tomorrow
-
-        // Hack in a Christmas tree
-        //ChristmasTreeCreateInfo christmasTreeCreateInfo;
-        //christmasTreeCreateInfo.position = glm::vec3(8.13f, 0.15f, 1.2f);
-        //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
-        //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
-        //
-        //christmasTreeCreateInfo.position = glm::vec3(0.78f, 0.15f, 2.25f);
-        //christmasTreeCreateInfo.rotation.y = Util::RandomFloat(0, HELL_PI);
-        //AddChristmasTree(christmasTreeCreateInfo, spawnOffset);
-        //
-        //
-        //ChristmasLightsCreateInfo christmasLightsCreateInfo;
-        //christmasLightsCreateInfo.start = glm::vec3(4.4, 2.13241, 0.861675);
-        //christmasLightsCreateInfo.end = glm::vec3(2.99485, 2.16198, 2.9);
-        //christmasLightsCreateInfo.spiral = false;
-        //christmasLightsCreateInfo.sag = 0.6f;
-        //World::AddChristmasLights(christmasLightsCreateInfo, spawnOffset);
     }
 
     void LoadMapInstancesHeightMapData(std::vector<MapInstanceCreateInfo> mapInstanceCreateInfoSet) {
@@ -321,34 +305,36 @@ namespace World {
     }
 
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset) {
-        for (DoorCreateInfo& createInfo : createInfoCollection.doors)                   AddDoor(createInfo, spawnOffset);
-        for (FireplaceCreateInfo& createInfo : createInfoCollection.fireplaces)         AddFireplace(createInfo, spawnOffset);
-        for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericObjects) AddGenericObject(createInfo, spawnOffset);
-        for (LightCreateInfo& createInfo : createInfoCollection.lights)                 AddLight(createInfo, spawnOffset);
-        for (LadderCreateInfo& createInfo : createInfoCollection.ladders)               AddLadder(createInfo, spawnOffset);
-        for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                 AddPiano(createInfo, spawnOffset);
-        for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)               AddPickUp(createInfo, spawnOffset);
-        for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)   AddPictureFrame(createInfo, spawnOffset);
-        for (HousePlaneCreateInfo& createInfo : createInfoCollection.housePlanes)       AddHousePlane(createInfo, spawnOffset);
-        for (TreeCreateInfo& createInfo : createInfoCollection.trees)                   AddTree(createInfo, spawnOffset);
-        for (WallCreateInfo& createInfo : createInfoCollection.walls)                   AddWall(createInfo, spawnOffset);
-        for (WindowCreateInfo& createInfo : createInfoCollection.windows)               AddWindow(createInfo, spawnOffset);
+        for (ChristmasLightsCreateInfo& createInfo : createInfoCollection.christmasLights)  AddChristmasLights(createInfo, spawnOffset);
+        for (DoorCreateInfo& createInfo : createInfoCollection.doors)                       AddDoor(createInfo, spawnOffset);
+        for (FireplaceCreateInfo& createInfo : createInfoCollection.fireplaces)             AddFireplace(createInfo, spawnOffset);
+        for (GenericObjectCreateInfo& createInfo : createInfoCollection.genericObjects)     AddGenericObject(createInfo, spawnOffset);
+        for (LightCreateInfo& createInfo : createInfoCollection.lights)                     AddLight(createInfo, spawnOffset);
+        for (LadderCreateInfo& createInfo : createInfoCollection.ladders)                   AddLadder(createInfo, spawnOffset);
+        for (PianoCreateInfo& createInfo : createInfoCollection.pianos)                     AddPiano(createInfo, spawnOffset);
+        for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)                   AddPickUp(createInfo, spawnOffset);
+        for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)       AddPictureFrame(createInfo, spawnOffset);
+        for (HousePlaneCreateInfo& createInfo : createInfoCollection.housePlanes)           AddHousePlane(createInfo, spawnOffset);
+        for (TreeCreateInfo& createInfo : createInfoCollection.trees)                       AddTree(createInfo, spawnOffset);
+        for (WallCreateInfo& createInfo : createInfoCollection.walls)                       AddWall(createInfo, spawnOffset);
+        for (WindowCreateInfo& createInfo : createInfoCollection.windows)                   AddWindow(createInfo, spawnOffset);
     }
 
     CreateInfoCollection GetCreateInfoCollection() {
         CreateInfoCollection createInfoCollection;
 
-        for (Door& door : World::GetDoors())                            createInfoCollection.doors.push_back(door.GetCreateInfo());
-        for (Fireplace& fireplace : World::GetFireplaces())             createInfoCollection.fireplaces.push_back(fireplace.GetCreateInfo());
-        for (GenericObject& drawers : World::GetGenericObjects())       createInfoCollection.genericObjects.push_back(drawers.GetCreateInfo());
-        for (Ladder& ladder : World::GetLadders())                      createInfoCollection.ladders .push_back(ladder.GetCreateInfo());
-        for (Light& light : World::GetLights())                         createInfoCollection.lights.push_back(light.GetCreateInfo());
-        for (Piano& piano : World::GetPianos())                         createInfoCollection.pianos.push_back(piano.GetCreateInfo());
-        for (PickUp& pickUp : World::GetPickUps())                      createInfoCollection.pickUps.push_back(pickUp.GetCreateInfo());
-        for (PictureFrame& pictureFrame : World::GetPictureFrames())    createInfoCollection.pictureFrames.push_back(pictureFrame.GetCreateInfo());
-        for (Tree& tree : World::GetTrees())                            createInfoCollection.trees.push_back(tree.GetCreateInfo());
-        for (Wall& wall : World::GetWalls())                            createInfoCollection.walls.push_back(wall.GetCreateInfo());
-        for (Window& window : World::GetWindows())                      createInfoCollection.windows.push_back(window.GetCreateInfo());
+        for (ChristmasLights& object : World::GetChristmasLights())  createInfoCollection.christmasLights.push_back(object.GetCreateInfo());
+        for (Door& object            : World::GetDoors())            createInfoCollection.doors.push_back(object.GetCreateInfo());
+        for (Fireplace& object       : World::GetFireplaces())       createInfoCollection.fireplaces.push_back(object.GetCreateInfo());
+        for (GenericObject& object   : World::GetGenericObjects())   createInfoCollection.genericObjects.push_back(object.GetCreateInfo());
+        for (Ladder& object          : World::GetLadders())          createInfoCollection.ladders.push_back(object.GetCreateInfo());
+        for (Light& object           : World::GetLights())           createInfoCollection.lights.push_back(object.GetCreateInfo());
+        for (Piano& object           : World::GetPianos())           createInfoCollection.pianos.push_back(object.GetCreateInfo());
+        for (PickUp& object          : World::GetPickUps())          createInfoCollection.pickUps.push_back(object.GetCreateInfo());
+        for (PictureFrame& object    : World::GetPictureFrames())    createInfoCollection.pictureFrames.push_back(object.GetCreateInfo());
+        for (Tree& object            : World::GetTrees())            createInfoCollection.trees.push_back(object.GetCreateInfo());
+        for (Wall& object            : World::GetWalls())            createInfoCollection.walls.push_back(object.GetCreateInfo());
+        for (Window& object          : World::GetWindows())          createInfoCollection.windows.push_back(object.GetCreateInfo());
 
         // Conditionals
         for (HousePlane& housePlane : World::GetHousePlanes()) {
@@ -467,7 +453,9 @@ namespace World {
         return animatedGameObject.GetObjectId();
     }
 
-
+    ChristmasLights* GetChristmasLightsByObjectId(uint64_t objectId) {
+        return g_christmasLights.get(objectId);
+    }
 
     Door* GetDoorByObjectId(uint64_t objectId) {
         return g_doors.get(objectId);
@@ -682,6 +670,11 @@ namespace World {
     bool RemoveObject(uint64_t objectId) {
         if (objectId == 0) return false;
 
+        if (g_christmasLights.contains(objectId)) {
+            g_christmasLights.get(objectId)->CleanUp();
+            g_christmasLights.erase(objectId);
+            return true;
+        }
         if (g_doors.contains(objectId)) {
             g_doors.get(objectId)->CleanUp();
             g_doors.erase(objectId);
@@ -908,6 +901,44 @@ namespace World {
         g_housePlanes.emplace_with_id(id, id, createInfo, spawnOffset);
     }
 
+
+
+    uint64_t AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::CHRISTMAS_LIGHTS);
+        g_christmasLights.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
+    }
+
+    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::LADDER);
+        g_ladders.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
+    }
+
+    uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
+        if (!Bible::GetPickUpInfoByName(createInfo.name)) {
+            Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' not found in bible";
+            return 0;
+        }
+
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
+        g_pickUps.emplace_with_id(id, id, createInfo, spawnOffset);
+
+        return id;
+    }
+
+    uint64_t AddStaircase(StaircaseCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::STAIRCASE);
+        g_staircases.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
+    }
+
+    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset) {
+        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::TRIM_SET);
+        g_trimSets.emplace_with_id(id, id, createInfo, spawnOffset);
+        return id;
+    }
+
     uint64_t AddWall(WallCreateInfo createInfo, SpawnOffset spawnOffset) {
         if (createInfo.points.empty()) {
             std::cout << "World::AddWall() failed: createInfo has zero points!\n";
@@ -915,7 +946,7 @@ namespace World {
         }
 
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::WALL);
-           
+
         // Assign editor name
         if (createInfo.editorName == UNDEFINED_STRING) {
             createInfo.editorName = Editor::GetNextAvailableWallName();
@@ -926,11 +957,12 @@ namespace World {
         return id;
     }
 
-    uint64_t AddTrimSet(TrimSetCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::TRIM_SET);
-        g_trimSets.emplace_with_id(id, id, createInfo, spawnOffset);
-        return id;
-    }
+
+
+
+
+
+
 
     void AddFireplace(FireplaceCreateInfo createInfo, SpawnOffset spawnOffset) {
         const uint64_t id = UniqueID::GetNextObjectId(ObjectType::FIREPLACE);
@@ -960,10 +992,6 @@ namespace World {
         kangaroo.Init(createInfo);        
     }
 
-    void AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset) {
-        g_christmasLights.push_back(ChristmasLights(createInfo, spawnOffset));
-    }
-
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset) {
         g_christmasPresents.push_back(ChristmasPresent(createInfo, spawnOffset));
     }
@@ -975,12 +1003,6 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
         g_gameObjects.push_back(GameObject(createInfo));
-    }
-
-    uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::LADDER);
-        g_ladders.emplace_with_id(id, id, createInfo, spawnOffset);
-        return id;
     }
 
     void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1004,29 +1026,12 @@ namespace World {
         piano.Init(createInfo);
     }
 
-    uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
-        if (!Bible::GetPickUpInfoByName(createInfo.name)) {
-            Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' not found in bible";
-            return 0;
-        }
-
-        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::PICK_UP);
-        g_pickUps.emplace_with_id(id, id, createInfo, spawnOffset);
-   
-        return id;
-    }
 
     void AddPictureFrame(PictureFrameCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
 
         PictureFrame& pictureFrame = g_pictureFrames.emplace_back();
         pictureFrame.Init(createInfo);
-    }
-
-    uint64_t AddStaircase(StaircaseCreateInfo createInfo, SpawnOffset spawnOffset) {
-        const uint64_t id = UniqueID::GetNextObjectId(ObjectType::STAIRCASE);
-        g_staircases.emplace_with_id(id, id, createInfo, spawnOffset);
-        return id;
     }
 
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1255,23 +1260,23 @@ namespace World {
     size_t GetLightCount()                                              { return g_lights.size(); }
 
 
-    Hell::SlotMap<Door>& GetDoors()                     { return g_doors; }
-    Hell::SlotMap<GenericObject>& GetGenericObjects()   { return g_genericObjects; }
-    Hell::SlotMap<Fireplace>& GetFireplaces()           { return g_fireplaces; }
-    Hell::SlotMap<HousePlane>& GetHousePlanes()         { return g_housePlanes; }
-    Hell::SlotMap<Ladder>& GetLadders()                 { return g_ladders; }
-    Hell::SlotMap<PickUp>& GetPickUps()                 { return g_pickUps; }
-    Hell::SlotMap<Staircase>& GetStaircases()           { return g_staircases; }
-    Hell::SlotMap<TrimSet>& GetTrimSets()               { return g_trimSets; }
-    Hell::SlotMap<Wall>& GetWalls()                     { return g_walls; }
-    Hell::SlotMap<Window>& GetWindows()                 { return g_windows; }
+    Hell::SlotMap<ChristmasLights>& GetChristmasLights() { return g_christmasLights; }
+    Hell::SlotMap<Door>& GetDoors()                      { return g_doors; }
+    Hell::SlotMap<GenericObject>& GetGenericObjects()    { return g_genericObjects; }
+    Hell::SlotMap<Fireplace>& GetFireplaces()            { return g_fireplaces; }
+    Hell::SlotMap<HousePlane>& GetHousePlanes()          { return g_housePlanes; }
+    Hell::SlotMap<Ladder>& GetLadders()                  { return g_ladders; }
+    Hell::SlotMap<PickUp>& GetPickUps()                  { return g_pickUps; }
+    Hell::SlotMap<Staircase>& GetStaircases()            { return g_staircases; }
+    Hell::SlotMap<TrimSet>& GetTrimSets()                { return g_trimSets; }
+    Hell::SlotMap<Wall>& GetWalls()                      { return g_walls; }
+    Hell::SlotMap<Window>& GetWindows()                  { return g_windows; }
 
     std::vector<AnimatedGameObject>& GetAnimatedGameObjects()           { return g_animatedGameObjects; }
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals()     { return g_screenSpaceBloodDecals; }
     std::vector<Bullet>& GetBullets()                                   { return g_bullets; }
     std::vector<BulletCasing>& GetBulletCasings()                       { return g_bulletCasings; }
     std::vector<ChristmasPresent>& GetChristmasPresents()               { return g_christmasPresents; }
-    std::vector<ChristmasLights>& GetChristmasLights()                  { return g_christmasLights; }
     std::vector<ChristmasTree>& GetChristmasTrees()                     { return g_christmasTrees; }
     std::vector<ClippingCube>& GetClippingCubes()                       { return g_clippingCubes; }
     std::vector<Decal>& GetDecals()                                     { return g_newDecals; }

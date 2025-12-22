@@ -15,6 +15,7 @@
 
 
 #include "Renderer/RenderDataManager.h"
+#include "Renderer/Renderer.h"
 
 void Player::UpdateUI(float deltaTime) {
     if (Editor::IsOpen()) return;
@@ -246,7 +247,7 @@ void Player::UpdateUI(float deltaTime) {
 
                 if (m_bvhRayResult.hitFound) {
                     MeshNode* meshNode = World::GetMeshNodeByObjectIdAndLocalNodeIndex(m_bvhRayResult.objectId, m_bvhRayResult.localMeshNodeIndex);
-
+                   
                     uint64_t hitId = m_bvhRayResult.objectId;
                     ObjectType hitType = UniqueID::GetType(hitId);
                     text += "- Hit pos: " + Util::Vec3ToString(m_bvhRayResult.hitPosition) + "\n";
@@ -260,6 +261,8 @@ void Player::UpdateUI(float deltaTime) {
 
                     if (meshNode) {
                         text += "- BlendingMode: " + Util::BlendingModeToString(meshNode->blendingMode) + "\n";
+                        text += "- World AABB min: " + Util::Vec3ToString(meshNode->worldspaceAabb.GetBoundsMin()) + "\n";
+                        text += "- World AABB max: " + Util::Vec3ToString(meshNode->worldspaceAabb.GetBoundsMax()) + "\n";
                     }
 
                     if (Openable* openable = OpenableManager::GetOpenableByOpenableId(m_bvhRayResult.openableId)) {

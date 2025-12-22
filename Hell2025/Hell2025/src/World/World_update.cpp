@@ -208,7 +208,6 @@ namespace World {
         ProcessBullets();
         LazyDebugSpawns();
 
-
         for (AnimatedGameObject& object : GetAnimatedGameObjects()) object.Update(deltaTime);
         for (BulletCasing& object : GetBulletCasings())             object.Update(deltaTime);
         for (ChristmasLights& object : GetChristmasLights())        object.Update(deltaTime);

@@ -12,6 +12,7 @@
 #include "extensions/PxShapeExt.h"
 #include "geometry/PxGeometryQuery.h"
 
+#include "AssetManagement/AssetManager.h"
 #include "Renderer/Renderer.h"
 
 namespace Physics {
@@ -41,20 +42,100 @@ namespace Physics {
                 continue;
             }
 
-            const bool awake = pxRigidDynamic->isSleeping() == false;
-            const glm::vec4 color = awake ? RED : GREEN;
-            const PxBounds3 bounds = pxRigidDynamic->getWorldBounds();
-            const glm::vec3 aabbMin = Physics::PxVec3toGlmVec3(bounds.minimum);
-            const glm::vec3 aabbMax = Physics::PxVec3toGlmVec3(bounds.maximum);
-            AABB aabb(aabbMin, aabbMax);
-            Renderer::DrawAABB(aabb, color);
-
-            if (Physics::RigidDynamicIsKinematic(it->first)) {
-                Renderer::DrawPoint(aabb.GetCenter(), YELLOW);
-            }
+            //const bool awake = pxRigidDynamic->isSleeping() == false;
+            //const glm::vec4 color = awake ? RED : GREEN;
+            //const PxBounds3 bounds = pxRigidDynamic->getWorldBounds();
+            //const glm::vec3 aabbMin = Physics::PxVec3toGlmVec3(bounds.minimum);
+            //const glm::vec3 aabbMax = Physics::PxVec3toGlmVec3(bounds.maximum);
+            //AABB aabb(aabbMin, aabbMax);
+            //Renderer::DrawAABB(aabb, color);
+            //
+            //if (Physics::RigidDynamicIsKinematic(it->first)) {
+            //    Renderer::DrawPoint(aabb.GetCenter(), YELLOW);
+            //}
         }
     }
 
+
+    uint64_t CreateRigidDynamicWithCompoundConvexMeshesFromModel(const std::string& modelName, float mass, bool kinematic, PhysicsFilterData filterData) {
+        Model* model = AssetManager::GetModelByName(modelName);
+        if (!model) return 0;
+
+        PxPhysics* pxPhysics = Physics::GetPxPhysics();
+        PxScene* pxScene = Physics::GetPxScene();
+        PxMaterial* material = Physics::GetDefaultMaterial();
+
+        PxFilterData pxFilterData;
+        pxFilterData.word0 = (PxU32)filterData.raycastGroup;
+        pxFilterData.word1 = (PxU32)filterData.collisionGroup;
+        pxFilterData.word2 = (PxU32)filterData.collidesWith;
+
+        // Create RigidDynamic
+        uint64_t physicsID = UniqueID::GetNextPhysicsId();
+        RigidDynamic& rigidDynamic = g_rigidDynamics[physicsID];
+
+        // Create rigid dynamic
+        PxTransform pxTransform = PxTransform(GlmMat4ToPxMat44(glm::mat4(1.0f)));
+        PxRigidDynamic* pxRigidDynamic = pxPhysics->createRigidDynamic(pxTransform);
+
+        std::vector<PxShape*> pxShapes;
+        float volume = 0.0f;
+
+        for (uint32_t meshIndex : model->GetMeshIndices()) {
+            Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
+            if (!mesh) continue;
+
+            std::span<Vertex> vertices = AssetManager::GetMeshVerticesSpan(mesh);
+            std::span<uint32_t> indices = AssetManager::GetMeshIndicesSpan(mesh);
+
+            volume += Util::GetConvexHullVolume(vertices, indices);
+
+            // Create convex shape
+            std::vector<PxVec3> pxVertices;
+            for (Vertex& vertex : vertices) {
+                pxVertices.push_back(Physics::GlmVec3toPxVec3(vertex.position));
+            }
+
+            PxConvexMeshDesc convexDesc;
+            convexDesc.points.count = pxVertices.size();
+            convexDesc.points.stride = sizeof(PxVec3);
+            convexDesc.points.data = pxVertices.data();
+            convexDesc.flags = PxConvexFlag::eSHIFT_VERTICES | PxConvexFlag::eCOMPUTE_CONVEX;
+            
+            PxTolerancesScale scale;
+            PxCookingParams params(scale);
+
+            PxDefaultMemoryOutputStream buf;
+            PxConvexMeshCookingResult::Enum result;
+            if (!PxCookConvexMesh(params, convexDesc, buf, &result)) {
+                std::cout << "some convex mesh shit failed\n";
+                return 0;
+            }
+
+            PxDefaultMemoryInputData input(buf.getData(), buf.getSize());
+            PxConvexMesh* convexMesh = pxPhysics->createConvexMesh(input);
+            PxConvexMeshGeometryFlags flags(~PxConvexMeshGeometryFlag::eTIGHT_BOUNDS);
+            PxConvexMeshGeometry geometry(convexMesh, PxMeshScale(PxVec3(1.0f)), flags);
+
+            PxShape* pxShape = pxPhysics->createShape(geometry, *material);
+            pxShape->setQueryFilterData(pxFilterData);       // ray casts
+            pxShape->setSimulationFilterData(pxFilterData);  // collisions
+
+            pxRigidDynamic->attachShape(*pxShape);
+            pxShapes.push_back(pxShape);
+        }
+
+        float density = Util::GetDensity(mass, volume);
+        PxRigidBodyExt::updateMassAndInertia(*pxRigidDynamic, density);
+
+        pxScene->addActor(*pxRigidDynamic);
+
+        // Update its pointers
+        rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
+        rigidDynamic.SetPxShapes(pxShapes);
+
+        return physicsID;
+    }
 
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce, glm::vec3 initialTorque) {
         PxPhysics* pxPhysics = Physics::GetPxPhysics();
@@ -125,7 +206,7 @@ namespace Physics {
 
         // Update its pointers
         rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
-        rigidDynamic.SetPxShape(pxShape);
+        rigidDynamic.SetPxShapes({ pxShape });
 
         return physicsID;
     }
@@ -173,7 +254,7 @@ namespace Physics {
 
         // Update its pointers
         rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
-        rigidDynamic.SetPxShape(pxShape);
+        rigidDynamic.SetPxShapes({ pxShape });
 
         return physicsID;
     }
@@ -234,7 +315,7 @@ namespace Physics {
 
         // Update its pointers
         rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
-        rigidDynamic.SetPxShape(pxShape);
+        rigidDynamic.SetPxShapes({ pxShape });
 
         return physicsID;
     }
@@ -260,7 +341,7 @@ namespace Physics {
 
         // Update its pointers
         rigidDynamic.SetPxRigidDynamic(pxRigidDynamic);
-        rigidDynamic.SetPxShape(pxShape);
+        rigidDynamic.SetPxShapes({ pxShape });
 /*
         std::cout << " - created " << Physics::GetPxShapeTypeAsString(pxShape) << "\n";
 
@@ -449,75 +530,6 @@ namespace Physics {
         PxTransform targetPose(PxMat44(GlmMat4ToPxMat44(globalPoseMatrix)));
         if (!targetPose.isValid()) return;
 
-        //PxTransform currentPose = pxRigidDynamic->getGlobalPose();
-        //
-        //PxVec3 deltaPosition = targetPose.p - currentPose.p;
-        //float deltaPositionMagnitudeSquared = deltaPosition.magnitudeSquared();
-        //float quaternionDot = targetPose.q.dot(currentPose.q);
-        //
-        //bool hasMeaningfulMotion =
-        //    (deltaPositionMagnitudeSquared > 0.000001f) ||
-        //    (quaternionDot < 0.999999f);
-        //
-        //if (hasMeaningfulMotion) {
-        //    PxU32 shapeCount = pxRigidDynamic->getNbShapes();
-        //    if (shapeCount > 0) {
-        //        std::vector<PxShape*> pxShapes(shapeCount);
-        //        pxRigidDynamic->getShapes(pxShapes.data(), shapeCount);
-        //
-        //        PxBounds3 sweptBounds;
-        //        sweptBounds.setEmpty();
-        //
-        //        float boundsOffset = 0.02f;
-        //        float boundsInflationScale = 1.02f;
-        //
-        //        for (PxShape* pxShape : pxShapes) {
-        //            if (!pxShape) continue;
-        //
-        //            PxGeometryHolder geometryHolder = pxShape->getGeometry();
-        //
-        //            PxTransform shapeWorldPoseCurrent = currentPose * pxShape->getLocalPose();
-        //            PxTransform shapeWorldPoseTarget = targetPose * pxShape->getLocalPose();
-        //
-        //            PxBounds3 boundsCurrent;
-        //            PxBounds3 boundsTarget;
-        //
-        //            PxGeometryQuery::computeGeomBounds(boundsCurrent, geometryHolder.any(), shapeWorldPoseCurrent, boundsOffset, boundsInflationScale);
-        //            PxGeometryQuery::computeGeomBounds(boundsTarget, geometryHolder.any(), shapeWorldPoseTarget, boundsOffset, boundsInflationScale);
-        //
-        //            sweptBounds.include(boundsCurrent);
-        //            sweptBounds.include(boundsTarget);
-        //        }
-        //
-        //        if (!sweptBounds.isEmpty()) {
-        //            PxVec3 wakeCenter = sweptBounds.getCenter();
-        //            PxVec3 wakeExtents = sweptBounds.getExtents();
-        //            wakeExtents += PxVec3(0.05f);
-        //
-        //            PxBoxGeometry wakeGeometry(wakeExtents);
-        //            PxTransform wakePose(wakeCenter);
-        //
-        //            PxOverlapBuffer overlap;
-        //            PxQueryFilterData filterData(PxQueryFlag::eDYNAMIC);
-        //
-        //            if (pxScene->overlap(wakeGeometry, wakePose, overlap, filterData)) {
-        //                for (PxU32 i = 0; i < overlap.getNbAnyHits(); i++) {
-        //                    PxRigidActor* hitActor = overlap.getAnyHit(i).actor;
-        //                    if (!hitActor) continue;
-        //                    if (hitActor == pxRigidDynamic) continue;
-        //
-        //                    PxRigidDynamic* hitRigidDynamic = hitActor->is<PxRigidDynamic>();
-        //                    if (!hitRigidDynamic) continue;
-        //                    if (hitRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) continue;
-        //
-        //                    hitRigidDynamic->wakeUp();
-        //                    hitRigidDynamic->setWakeCounter(0.2f);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
         pxRigidDynamic->setKinematicTarget(targetPose);
     }
 
@@ -557,41 +569,41 @@ namespace Physics {
     //    }
     //}
 
-    void RemoveAnyRigidDynamicMarkedForRemovalOLD() {
-        PxScene* pxScene = Physics::GetPxScene();
-
-        for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
-            RigidDynamic& rigidDynamic = it->second;
-            if (rigidDynamic.IsMarkedForRemoval()) {
-                // Retrieve pointers
-                PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-                PxShape* pxShape = rigidDynamic.GetPxShape();
-
-                // Remove the actor from the scene if active
-                if (pxRigidDynamic && rigidDynamic.HasActivePhysics()) {
-                    if (pxRigidDynamic->getScene() != nullptr) {
-                        pxScene->removeActor(*pxRigidDynamic);
-                    }
-                }
-
-                // Release the shape
-                if (pxShape) {
-                    pxShape->release();
-                }
-
-                // Release the actor
-                if (pxRigidDynamic) {
-                    pxRigidDynamic->release();
-                }
-
-                // Remove from container
-                it = g_rigidDynamics.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
-    }
+    //void RemoveAnyRigidDynamicMarkedForRemovalOLD() {
+    //    PxScene* pxScene = Physics::GetPxScene();
+    //
+    //    for (auto it = g_rigidDynamics.begin(); it != g_rigidDynamics.end(); ) {
+    //        RigidDynamic& rigidDynamic = it->second;
+    //        if (rigidDynamic.IsMarkedForRemoval()) {
+    //            // Retrieve pointers
+    //            PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
+    //            PxShape* pxShape = rigidDynamic.GetPxShape();
+    //
+    //            // Remove the actor from the scene if active
+    //            if (pxRigidDynamic && rigidDynamic.HasActivePhysics()) {
+    //                if (pxRigidDynamic->getScene() != nullptr) {
+    //                    pxScene->removeActor(*pxRigidDynamic);
+    //                }
+    //            }
+    //
+    //            // Release the shape
+    //            if (pxShape) {
+    //                pxShape->release();
+    //            }
+    //
+    //            // Release the actor
+    //            if (pxRigidDynamic) {
+    //                pxRigidDynamic->release();
+    //            }
+    //
+    //            // Remove from container
+    //            it = g_rigidDynamics.erase(it);
+    //        }
+    //        else {
+    //            ++it;
+    //        }
+    //    }
+    //}
 
 
     // Safer the than above.. maybe
@@ -603,15 +615,15 @@ namespace Physics {
             if (!rigidDynamic.IsMarkedForRemoval()) { ++it; continue; }
 
             PxRigidDynamic* pxRigidDynamic = rigidDynamic.GetPxRigidDynamic();
-            PxShape* pxShape = rigidDynamic.GetPxShape();
 
             if (pxRigidDynamic && pxRigidDynamic->getScene()) {
                 pxRigidDynamic->getScene()->removeActor(*pxRigidDynamic);
             }
 
-            if (pxShape) {
-                pxShape->release();
-                rigidDynamic.SetPxShape(nullptr);
+            for (PxShape* pxShape : rigidDynamic.GetPxShapes()) {
+                if (pxShape) {
+                    pxShape->release();
+                }
             }
 
             if (pxRigidDynamic) {
@@ -672,7 +684,7 @@ namespace Physics {
             RigidDynamic& rigidDynamic = it->second;
 
             std::cout << " " << id << " - ";
-            std::cout << "[" << GetPxShapeTypeAsString(rigidDynamic.GetPxShape()) << "] ";
+            //std::cout << "[" << GetPxShapeTypeAsString(rigidDynamic.GetPxShape()) << "] ";
             //std::cout << "position: " << rigidDynamic.GetCurrentPosition() << " ";
             std::cout << "\n";
 

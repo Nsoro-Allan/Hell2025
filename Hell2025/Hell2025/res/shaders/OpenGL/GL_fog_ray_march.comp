@@ -21,8 +21,8 @@ uniform float u_time;
 const vec3 fogSpeed = vec3(0.10, 0.02, 0.10);
 vec3 fogColor = vec3(0.222, 0.233, 0.260) * 0.5325 * 0.35;
 
-const float MAX_FOG_DIST = 15.0;      
-const int NUM_STEPS = 48;     
+const float MAX_FOG_DIST = 20.0;      
+const int NUM_STEPS = 24;     
 
 const float nearFadeAmbient = 1.0;
 const float farFadeAmbient = MAX_FOG_DIST;
@@ -120,102 +120,103 @@ void main() {
     float yScroll = fract(u_time * yScrollSpeed / float(fogTextureSize));
 
     for (int i = 0; i < NUM_STEPS + 0; ++i) {
-        float t = dt * float(i) + t0;
+    float t = dt * float(i) + t0;
 
-        if(t >= sceneDist) break; 
+    if (t >= sceneDist) break;
 
-        vec3 raySampleWorldPos = origin + dir * t;
-        vec3 dynamicOffset = fogSpeed * u_time;
-        
-        vec3 uvScale = vec3(noiseScaleXZ, noiseScaleY, noiseScaleXZ);
-        vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
-        vec3 nuv1 = baseUV;
-        nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
-        nuv1.z = fract(nuv1.z + zMorph + 0.1 + timeScroll);
-        nuv1.y = fract(nuv1.y + yScroll);
-        float d1 = texture(uNoiseVol, nuv1).r;
+    vec3 raySampleWorldPos = origin + dir * t;
+    vec3 dynamicOffset = fogSpeed * u_time;
 
-        vec3 nuv2 = baseUV;
-        nuv2.x = fract(nuv2.x + xMorph);
-        nuv2.z = fract(nuv2.z - zMorph);
-        nuv2.y = fract(nuv1.y - yScroll);
-        float d2 = texture(uNoiseVol, nuv2).r;
+    vec3 uvScale = vec3(noiseScaleXZ, noiseScaleY, noiseScaleXZ);
+    vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
 
-        float dens = mix(d1, d2, 0.5);
-        float ext = exp(-dens * dt);
+    vec3 nuv1 = baseUV;
+    nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
+    nuv1.z = fract(nuv1.z + zMorph + 0.1 + timeScroll);
+    nuv1.y = fract(nuv1.y + yScroll);
+    float d1 = texture(uNoiseVol, nuv1).r;
 
-        // Fade in the fog
-        float fadeAmbient = clamp( (t - nearFadeAmbient) / (farFadeAmbient - nearFadeAmbient), 0.0, 1.0 );
-        float fadeFlashlight = clamp( (t - nearFadeFlashlight) / (farFadeFlashlight - nearFadeFlashlight), 0.0, 1.0 );
-        
-        // Ambient fog
-        vec3 ambientFogColor = vec3(dens * dt * fadeAmbient);
+    vec3 nuv2 = baseUV;
+    nuv2.x = fract(nuv2.x + xMorph);
+    nuv2.z = fract(nuv2.z - zMorph);
+    nuv2.y = fract(nuv1.y - yScroll);
+    float d2 = texture(uNoiseVol, nuv2).r;
 
+    float dens = mix(d1, d2, 0.5);
+    float ext = exp(-dens * dt);
 
+    // Fade in the fog
+    float fadeAmbient    = clamp((t - nearFadeAmbient) / (farFadeAmbient - nearFadeAmbient), 0.0, 1.0);
+    float fadeFlashlight = clamp((t - nearFadeFlashlight) / (farFadeFlashlight - nearFadeFlashlight), 0.0, 1.0);
 
+    // Ambient fog
+    vec3 ambientFogColor = vec3(dens * dt * fadeAmbient);
 
+    // Flashlight term (sum 2 flashlights: player 0 and 1)
+    vec3 flashlightLightingSum = vec3(0.0);
 
+    for (int flashlightPlayerIndex = 0; flashlightPlayerIndex < 2; ++flashlightPlayerIndex) {
 
-        // Flashlight term
-        int flashlightPlayerIndex = 0;
-        vec3 flashlightPosition = viewportData[flashlightPlayerIndex].flashlightPosition.xyz ;//+ (cameraForward * 2);        
+        vec3 flashlightPosition = viewportData[flashlightPlayerIndex].flashlightPosition.xyz;
+        vec3 flashLightDir      = viewportData[flashlightPlayerIndex].flashlightDir.xyz;
 
-        vec3 flashlightColor = vec3(0.9, 0.95, 1.1);
-        vec3 flashLightDir = viewportData[flashlightPlayerIndex].flashlightDir.xyz;
-
-        float flashlightModifer = viewportData[flashlightPlayerIndex].flashlightModifer;
-        float flashlightRadius = 10.0;
+        float flashlightModifer  = viewportData[flashlightPlayerIndex].flashlightModifer;
+        float flashlightRadius   = 10.0;
         float flashlightStrength = 0.5;
 
-            // experimental new flashlight colors
-            flashlightColor = vec3(0.9, 0.95, 1.1);
-            vec3 defaultLightColor = vec3(1.0, 0.7799999713897705, 0.5289999842643738);
-            flashlightColor = mix(defaultLightColor, flashlightColor, 0.95);
+        // experimental new flashlight colors
+        vec3 flashlightColor   = vec3(0.9, 0.95, 1.1);
+        vec3 defaultLightColor = vec3(1.0, 0.7799999713897705, 0.6289999842643738);
+        flashlightColor = mix(defaultLightColor, flashlightColor, 0.95);
 
         float innerAngle = cos(radians(5.0 * flashlightModifer));
-        float outerAngle = cos(radians(25.0));         
+        float outerAngle = cos(radians(25.0));
 
         vec3 d = flashlightPosition - raySampleWorldPos;
         float dist = length(d);
-        vec3 toLight = d / dist;
-        vec3 viewDir = normalize(viewPos - raySampleWorldPos);
-    
+        vec3 toLight = d / max(dist, 1e-6);
+
         // distance fall-off + strength
         float lightAttenuation = smoothstep(flashlightRadius, 0.0, dist) * flashlightStrength;
-    
+
         // cone fall-off
         float spotFactor = smoothstep(outerAngle, innerAngle, dot(toLight, -flashLightDir));
-    
+
         // extra smooth fade by distance
         float distanceFactor = clamp(1.0 - dist / flashlightRadius, 0.0, 1.0);
         spotFactor *= distanceFactor * distanceFactor;
-    
-        // Lambert
-        float irradiance = lightAttenuation * spotFactor;        
+
         vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
-        
+
         // Hack
-        flashlightLighting *= 0.275;                
+        flashlightLighting *= 1.0;
+        if (flashlightPlayerIndex != viewportIndex) {
+            flashlightLighting *= 2;
+        }
 
-        // Total in scattering at this step
-        float fogStrength = 0.5;
-        vec3 insc = (ambientFogColor + flashlightLighting) * fogStrength; 
-
-        // front-to-back composite
-        accCol += (1.0 - accAlpha) * insc;
-        accAlpha += (1.0 - accAlpha) * (1.0 - ext);
-        t += dt;
-
-        if (accAlpha >= 0.99) break;
+        flashlightLightingSum += flashlightLighting;
     }
-         
-    accCol *= 0.5;
+
+    // Total in scattering at this step
+    float fogStrength = 0.5;
+    vec3 insc = (ambientFogColor + flashlightLightingSum) * fogStrength;
+
+    // front-to-back composite
+    accCol += (1.0 - accAlpha) * insc;
+    accAlpha += (1.0 - accAlpha) * (1.0 - ext);
+
+    t += dt;
+
+    if (accAlpha >= 0.99) break;
+}
+
+    //accCol *= 0.25;
     
     // Factor in fog color
     accCol *= fogColor;
 
     // Tone it down a bit
-    //accCol *= 0.75;
+    accCol *= 0.5;
     
     //accCol *= 0.0;
 

@@ -25,7 +25,8 @@ namespace Editor {
         else if (GetEditorState() == EditorState::RESIZING_VERTICAL) {
             BackEnd::SetCursor(HELL_CURSOR_VRESIZE);
         }
-        else if (GetEditorState() == EditorState::PLACE_DOOR ||
+        else if (GetEditorState() == EditorState::PLACE_CHRISTMAS_LIGHTS||
+                 GetEditorState() == EditorState::PLACE_DOOR ||
                  GetEditorState() == EditorState::PLACE_HOUSE ||
                  GetEditorState() == EditorState::PLACE_PICTURE_FRAME ||
                  GetEditorState() == EditorState::PLACE_TREE ||

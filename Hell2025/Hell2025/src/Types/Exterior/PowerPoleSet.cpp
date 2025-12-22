@@ -73,28 +73,32 @@ void PowerPoleSet::Init() {
     }
 
     for (int i = 0; i < m_wirePositionsBackA.size() - 1; i++) {
+        int spacing = 2;
+
         Wire& wireA = m_wires.emplace_back();
-        wireA.Init(m_wirePositionsBackA[i], m_wirePositionsFrontA[i + 1], 0.5f, 0.015f);
+        wireA.Init(m_wirePositionsBackA[i], m_wirePositionsFrontA[i + 1], 0.5f, 0.015f, spacing);
 
         Wire& wireB = m_wires.emplace_back();
-        wireB.Init(m_wirePositionsBackB[i], m_wirePositionsFrontB[i + 1], 0.5f, 0.015f);
+        wireB.Init(m_wirePositionsBackB[i], m_wirePositionsFrontB[i + 1], 0.5f, 0.015f, spacing);
 
         Wire& wireC = m_wires.emplace_back();
-        wireC.Init(m_wirePositionsBackC[i], m_wirePositionsFrontC[i + 1], 0.5f, 0.015f);
+        wireC.Init(m_wirePositionsBackC[i], m_wirePositionsFrontC[i + 1], 0.5f, 0.015f, spacing);
 
         Wire& wireD = m_wires.emplace_back();
-        wireD.Init(m_wirePositionsBackD[i], m_wirePositionsFrontD[i + 1], 0.5f, 0.015f);
+        wireD.Init(m_wirePositionsBackD[i], m_wirePositionsFrontD[i + 1], 0.5f, 0.015f, spacing);
     }
 }
-
 
 void PowerPoleSet::Update() {
     // Nothing as of yet
 }
 
-
 void PowerPoleSet::CleanUp() {
-    // Nothing as of yet
+    for (Wire& wire : m_wires) {
+        wire.GetMeshBuffer().Reset();
+    }
+
+    m_meshNodes.CleanUp();
 }
 
 const std::vector<RenderItem>& const PowerPoleSet::GetRenderItems() {

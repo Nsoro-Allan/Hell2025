@@ -92,10 +92,15 @@ struct GenericObjectCreateInfo {
 };
 
 struct ChristmasLightsCreateInfo {
+    std::string editorName = UNDEFINED_STRING;
+
+    glm::vec3 position = glm::vec3(0.0f);
+
     // Hanging lights
-    glm::vec3 start = glm::vec3(0);
-    glm::vec3 end = glm::vec3(0);
-    float sag = 0;
+    std::vector<glm::vec3> points;
+    std::vector<float> sagHeights;
+    float spacing = 0.05f;
+    float wireRadius = 0.002f;
 
     // Tree spiral lights
     bool spiral = false;
@@ -324,6 +329,7 @@ struct MapCreateInfo {
 };
 
 struct CreateInfoCollection {
+    std::vector<ChristmasLightsCreateInfo> christmasLights;
     std::vector<DoorCreateInfo> doors;
     std::vector<FireplaceCreateInfo> fireplaces;
     std::vector<GenericObjectCreateInfo> genericObjects;

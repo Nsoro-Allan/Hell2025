@@ -94,7 +94,7 @@ namespace Physics {
     bool RigidDynamicIsKinematic(uint64_t rigidDynamicId);
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
    
-
+    uint64_t CreateRigidDynamicWithCompoundConvexMeshesFromModel(const std::string& modelName, float mass, bool kinematic, PhysicsFilterData filterData);
     uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const Transform& localOffset);
     uint64_t CreateRigidDynamicFromBoxExtents(const Transform& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const glm::mat4& localOffset);
     uint64_t CreateRigidDynamicFromBoxExtents(const glm::mat4& transform, const glm::vec3& boxExtents, bool kinematic, float mass, PhysicsFilterData filterData, const Transform& localOffset);

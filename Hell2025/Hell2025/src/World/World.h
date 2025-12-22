@@ -84,6 +84,7 @@ namespace World {
 
     void AddDecal2(Decal2CreateInfo createInfo);
 
+    uint64_t AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddLadder(LadderCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     uint64_t AddStaircase(StaircaseCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
@@ -93,7 +94,6 @@ namespace World {
     void AddBullet(BulletCreateInfo createInfo);
     void AddDoor(DoorCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddBulletCasing(BulletCasingCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
-    void AddChristmasLights(ChristmasLightsCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasPresent(ChristmasPresentCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddChristmasTree(ChristmasTreeCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddCreateInfoCollection(CreateInfoCollection& createInfoCollection, SpawnOffset spawnOffset);
@@ -169,6 +169,7 @@ namespace World {
     CreateInfoCollection GetCreateInfoCollection();
     MeshNode* GetMeshNodeByObjectIdAndLocalNodeIndex(uint64_t id, int32_t meshNodeLocalIndex);
 
+    ChristmasLights* GetChristmasLightsByObjectId(uint64_t objectId);
     Door* GetDoorByObjectId(uint64_t objectId);
     Fireplace* GetFireplaceById(uint64_t objectId);
     GenericObject* GetGenericObjectById(uint64_t objectId);
@@ -193,13 +194,14 @@ namespace World {
 
     size_t GetLightCount();
 
+    Hell::SlotMap<ChristmasLights>& GetChristmasLights();
     Hell::SlotMap<Door>& GetDoors();
     Hell::SlotMap<GenericObject>& GetGenericObjects();
     Hell::SlotMap<Fireplace>& GetFireplaces();
     Hell::SlotMap<HousePlane>& GetHousePlanes();
     Hell::SlotMap<Ladder>& GetLadders();
     Hell::SlotMap<PickUp>& GetPickUps();
-    Hell::SlotMap<TrimSet>& GetStairs();
+    Hell::SlotMap<Staircase>& GetStaircases();
     Hell::SlotMap<TrimSet>& GetTrimSets();
     Hell::SlotMap<Wall>& GetWalls();
     Hell::SlotMap<Window>& GetWindows();
@@ -208,7 +210,6 @@ namespace World {
     std::vector<ScreenSpaceBloodDecal>& GetScreenSpaceBloodDecals();
     std::vector<Bullet>& GetBullets();
     std::vector<BulletCasing>& GetBulletCasings();
-    std::vector<ChristmasLights>& GetChristmasLights();
     std::vector<ChristmasPresent>& GetChristmasPresents();
     std::vector<ChristmasTree>& GetChristmasTrees();
     std::vector<ClippingCube>& GetClippingCubes();

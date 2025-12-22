@@ -76,6 +76,7 @@ enum class TextureFilter {
 enum class ObjectType : uint16_t {
     NO_TYPE = 0,
     CHARACTER_CONTROLLER,
+    CHRISTMAS_LIGHTS,
     DECAL,
     DOOR,
     DOOR_FRAME,
@@ -180,8 +181,9 @@ enum struct EditorState {
     GIZMO_ROTATING,
     DRAGGING_SELECT_RECT,
 
-
+    PLACE_CHRISTMAS_LIGHTS,
     PLACE_OBJECT,
+    PLACE_WALL,
 
     // Object placement REMOVEEEEEEE MEEEEEEEE
     PLACE_DOOR,
@@ -190,7 +192,6 @@ enum struct EditorState {
     PLACE_HOUSE,
     PLACE_PICTURE_FRAME,
     PLACE_TREE,
-    PLACE_WALL,
     PLACE_WINDOW,
     PLACE_PLAYER_CAMPAIGN_SPAWN,
     PLACE_PLAYER_DEATHMATCH_SPAWN

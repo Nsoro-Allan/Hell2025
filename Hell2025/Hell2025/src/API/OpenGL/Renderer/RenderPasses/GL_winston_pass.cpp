@@ -16,19 +16,24 @@ namespace OpenGLRenderer {
         OpenGLShader* shader = GetShader("Winston");
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
 
+        static float time = 0.0f;
+        time += Game::GetDeltaTime();
+
         shader->Bind();
         shader->SetVec3("color", { 0, 0.9f, 1 });
         shader->SetFloat("alpha", 0.01f);
         shader->SetVec2("screensize", gBuffer->GetWidth(), gBuffer->GetHeight());
         shader->SetFloat("near", NEAR_PLANE);
         shader->SetFloat("far", FAR_PLANE);
+        shader->SetFloat("u_time", time);
 
         gBuffer->Bind();
         gBuffer->DrawBuffer("FinalLighting");
 
-        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glEnable(GL_BLEND);
+        glDepthFunc(GL_EQUAL);
 
         glBindTextureUnit(0, gBuffer->GetDepthAttachmentHandle());
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
@@ -72,5 +77,7 @@ namespace OpenGLRenderer {
                 }
             }
         } 
+        
+        glDepthFunc(GL_LEQUAL);
     }
 }

@@ -2,14 +2,39 @@
 #include "Renderer/Renderer.h"
 #include "Util.h"
 
-void Wire::Init(glm::vec3 begin, glm::vec3 end, float sag, float radius) {
+void Wire::Init(glm::vec3 begin, glm::vec3 end, float sag, float radius, float spacing) {
     m_begin = begin;
     m_end = end;
     m_sag = sag;
     m_radius = radius;
-    float span = glm::distance(m_begin, m_end);
-    float numPoints = span * 2;
-    m_segmentPoints = Util::GenerateSagPoints(m_begin, m_end, numPoints, m_sag);
+
+    const float span = glm::distance(m_begin, m_end);
+    const float minSpan = 0.0001f;
+
+    if (span < minSpan) {
+        m_segmentPoints.clear();
+        m_meshBuffer.Reset();
+        return;
+    }
+
+    if (spacing <= 0.0f) {
+        spacing = 0.25f; // Sensible default
+    }
+
+    // Number of points along the sag polyline, including endpoints
+    const int segmentCount = std::max(1, (int)std::ceil(span / spacing));
+    const int numSagPoints = segmentCount + 1;
+
+    m_segmentPoints = Util::GenerateSagPoints(m_begin, m_end, numSagPoints, m_sag);
+    
+    // If sag generation failed or returned too few points, fall back to a straight segment.
+    if (m_segmentPoints.size() < 2) {
+        m_segmentPoints.clear();
+        m_segmentPoints.push_back(m_begin);
+        m_segmentPoints.push_back(m_end);
+    }
+    
+    const int ringPointCount = 12;
 
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
@@ -18,8 +43,12 @@ void Wire::Init(glm::vec3 begin, glm::vec3 end, float sag, float radius) {
         glm::vec3& p0 = m_segmentPoints[j];
         glm::vec3& p1 = m_segmentPoints[j + 1];
         glm::vec3 forward = p0 - p1;
-        const std::vector<glm::vec3>& circle1 = Util::GenerateCirclePoints(p0, forward, m_radius, numPoints);
-        const std::vector<glm::vec3>& circle2 = Util::GenerateCirclePoints(p1, forward, m_radius, numPoints);
+
+        const std::vector<glm::vec3>& circle1 = Util::GenerateCirclePoints(p0, forward, m_radius, ringPointCount);
+        const std::vector<glm::vec3>& circle2 = Util::GenerateCirclePoints(p1, forward, m_radius, ringPointCount);
+
+        //const std::vector<glm::vec3>& circle1 = Util::GenerateCirclePoints(p0, forward, m_radius, numSagPoints);
+        //const std::vector<glm::vec3>& circle2 = Util::GenerateCirclePoints(p1, forward, m_radius, numSagPoints);
         size_t pointCount = circle1.size();
         glm::vec3 center1(0.0f), center2(0.0f);
         for (const auto& p : circle1) center1 += p;

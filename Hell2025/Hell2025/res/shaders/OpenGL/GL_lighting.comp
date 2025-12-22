@@ -284,11 +284,6 @@ void main() {
             vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
 
 
-            // Prevent flashlight being drawn on the back of your head when viewed by another player
-            if (i != viewportIndex) {
-                spotLightPos += spotLightDir * 0.2;
-            }
-
             float fresnelReflect = 0.9;
             float spotLightRadius = 20.0;
             float spotLightStregth = 4.5;
@@ -299,6 +294,15 @@ void main() {
             spotLightRadius = 20.0;
             spotLightStregth = 5.0;
             
+
+            // Prevent flashlight being drawn on the back of your head when viewed by another player
+            if (i != viewportIndex) {
+                spotLightPos += spotLightDir * 0.2;
+
+                // and weaken it for other players
+                spotLightColor *= 0.5;
+            }
+
             float innerAngle = cos(radians(5.0 * flashlightModifer));
             float outerAngle = cos(radians(25.0)); 
             
@@ -473,113 +477,113 @@ void main() {
 
 
 
-
-
-    // Indirect diffuse
-    //normal = normalize(normal);
-
-    vec3 safeWorldPos = worldSpacePosition.xyz + (normal.xyz * 0.05);
-
-    vec3 voxelF = (safeWorldPos - u_lightVolumeOffset) / u_lightVolumeSpacing;
- 
-    ivec3 base = ivec3(floor(voxelF));
-    vec3 frac = fract(voxelF);
-       
-    const ivec3 offsets[8] = ivec3[8](
-        ivec3(0,0,0), 
-        ivec3(1,0,0), 
-        ivec3(0,1,0), 
-        ivec3(1,1,0),
-        ivec3(0,0,1), 
-        ivec3(1,0,1), 
-        ivec3(0,1,1), 
-        ivec3(1,1,1)
-    );
-
-    // Tri-linear weights
-    float weights[8];
-    weights[0] = (1 - frac.x)*(1 - frac.y)*(1 - frac.z);
-    weights[1] = (    frac.x)*(1 - frac.y)*(1 - frac.z);
-    weights[2] = (1 - frac.x)*(    frac.y)*(1 - frac.z);
-    weights[3] = (    frac.x)*(    frac.y)*(1 - frac.z);
-    weights[4] = (1 - frac.x)*(1 - frac.y)*(    frac.z);
-    weights[5] = (    frac.x)*(1 - frac.y)*(    frac.z);
-    weights[6] = (1 - frac.x)*(    frac.y)*(    frac.z);
-    weights[7] = (    frac.x)*(    frac.y)*(    frac.z);
-
-    //vec3 probeColor[8];
-    //for(int i = 0; i < 8; ++i){
-    //    probeColor[i] = texelFetch(u_lightVolume, base + offsets[i], 0).rgb;
-    //}
-
-    float weightSum = 0;
-
-    for(int i = 0; i < 8; ++i) {
-        vec3 probePos = u_lightVolumeOffset + vec3(base + offsets[i]) * u_lightVolumeSpacing;
-
-        // Zero out weight for probes with no color
-        //if(probeColor[i] == vec3(0.0)) {
-        //    //weights[i] *= 0.0;
-        //}
-
-        // Skip probes behind fragment, otherwise weight of probes by their angle to the fragment
-        weights[i] *= max(dot(normal.xyz, normalize(probePos - safeWorldPos)), 0.0);
-
-        // Same as above but with fall off
-        //float d = max(dot(normal, normalize(probePos - safeWorldPos)), 0.0);
-        //float p = 0.5;
-        //weights[i] *= pow(d, p);
-
-        // Skip probes behind the fragment, but DONT otherwise weight based on angle to the fragment
-        if (dot(normal.xyz, normalize(probePos - safeWorldPos)) < 0.0) {
-        //    weights[i] = 0;
-        }
-
-        weightSum += weights[i];
-    }
-
-    // Normalize weights
-    if(weightSum > 0) {
-        for(int i = 0; i < 8; ++i) {
-            weights[i] /= weightSum;
-        }
-    }
-
-    // Fetch and weighted blend 
+    
     vec3 indirect = vec3(0);
-    for(int i = 0; i < 8; ++i) {    
-        //indirect += probeColor[i] * weights[i];
-        indirect += texelFetch(LightVolumeTexture, base + offsets[i], 0).rgb * weights[i];
-    }
+    if (false) {
+                    // Indirect diffuse
+                    //normal = normalize(normal);
 
-    // Fall off the indirect lighting towards the light volume boundaries
-    float boundaryFadeDistance = 2;
-    float boundaryFadeExponent = 1;
-    vec3 volMin = u_lightVolumeOffset;
-    vec3 volMax = u_lightVolumeOffset + u_lightVolumeWorldSize;
-    float distX = min(worldSpacePosition.x - volMin.x, volMax.x - worldSpacePosition.x);
-    //float distY = min(worldPos.y - volMin.y, volMax.y - worldPos.y);
-    float distZ = min(worldSpacePosition.z - volMin.z, volMax.z - worldSpacePosition.z);
-    //float distToBoundary = min(min(distX, distY), distZ);
-    float distToBoundary = min(distX, distZ);
-    float fadeRaw = clamp(distToBoundary / boundaryFadeDistance, 0.0, 1.0);
-    float fadeFactor = pow(fadeRaw, boundaryFadeExponent);
-    indirect *= fadeFactor;
+                    vec3 safeWorldPos = worldSpacePosition.xyz + (normal.xyz * 0.05);
+
+                    vec3 voxelF = (safeWorldPos - u_lightVolumeOffset) / u_lightVolumeSpacing;
+ 
+                    ivec3 base = ivec3(floor(voxelF));
+                    vec3 frac = fract(voxelF);
+       
+                    const ivec3 offsets[8] = ivec3[8](
+                        ivec3(0,0,0), 
+                        ivec3(1,0,0), 
+                        ivec3(0,1,0), 
+                        ivec3(1,1,0),
+                        ivec3(0,0,1), 
+                        ivec3(1,0,1), 
+                        ivec3(0,1,1), 
+                        ivec3(1,1,1)
+                    );
+
+                    // Tri-linear weights
+                    float weights[8];
+                    weights[0] = (1 - frac.x)*(1 - frac.y)*(1 - frac.z);
+                    weights[1] = (    frac.x)*(1 - frac.y)*(1 - frac.z);
+                    weights[2] = (1 - frac.x)*(    frac.y)*(1 - frac.z);
+                    weights[3] = (    frac.x)*(    frac.y)*(1 - frac.z);
+                    weights[4] = (1 - frac.x)*(1 - frac.y)*(    frac.z);
+                    weights[5] = (    frac.x)*(1 - frac.y)*(    frac.z);
+                    weights[6] = (1 - frac.x)*(    frac.y)*(    frac.z);
+                    weights[7] = (    frac.x)*(    frac.y)*(    frac.z);
+
+                    //vec3 probeColor[8];
+                    //for(int i = 0; i < 8; ++i){
+                    //    probeColor[i] = texelFetch(u_lightVolume, base + offsets[i], 0).rgb;
+                    //}
+
+                    float weightSum = 0;
+
+                    for(int i = 0; i < 8; ++i) {
+                        vec3 probePos = u_lightVolumeOffset + vec3(base + offsets[i]) * u_lightVolumeSpacing;
+
+                        // Zero out weight for probes with no color
+                        //if(probeColor[i] == vec3(0.0)) {
+                        //    //weights[i] *= 0.0;
+                        //}
+
+                        // Skip probes behind fragment, otherwise weight of probes by their angle to the fragment
+                        weights[i] *= max(dot(normal.xyz, normalize(probePos - safeWorldPos)), 0.0);
+
+                        // Same as above but with fall off
+                        //float d = max(dot(normal, normalize(probePos - safeWorldPos)), 0.0);
+                        //float p = 0.5;
+                        //weights[i] *= pow(d, p);
+
+                        // Skip probes behind the fragment, but DONT otherwise weight based on angle to the fragment
+                        if (dot(normal.xyz, normalize(probePos - safeWorldPos)) < 0.0) {
+                        //    weights[i] = 0;
+                        }
+
+                        weightSum += weights[i];
+                    }
+
+                    // Normalize weights
+                    if(weightSum > 0) {
+                        for(int i = 0; i < 8; ++i) {
+                            weights[i] /= weightSum;
+                        }
+                    }
+
+                    // Fetch and weighted blend 
+                    for(int i = 0; i < 8; ++i) {    
+                        //indirect += probeColor[i] * weights[i];
+                        indirect += texelFetch(LightVolumeTexture, base + offsets[i], 0).rgb * weights[i];
+                    }
+
+                    // Fall off the indirect lighting towards the light volume boundaries
+                    float boundaryFadeDistance = 2;
+                    float boundaryFadeExponent = 1;
+                    vec3 volMin = u_lightVolumeOffset;
+                    vec3 volMax = u_lightVolumeOffset + u_lightVolumeWorldSize;
+                    float distX = min(worldSpacePosition.x - volMin.x, volMax.x - worldSpacePosition.x);
+                    //float distY = min(worldPos.y - volMin.y, volMax.y - worldPos.y);
+                    float distZ = min(worldSpacePosition.z - volMin.z, volMax.z - worldSpacePosition.z);
+                    //float distToBoundary = min(min(distX, distY), distZ);
+                    float distToBoundary = min(distX, distZ);
+                    float fadeRaw = clamp(distToBoundary / boundaryFadeDistance, 0.0, 1.0);
+                    float fadeFactor = pow(fadeRaw, boundaryFadeExponent);
+                    indirect *= fadeFactor;
                         
-    float indirectStrength = 0.00235;
-    indirectStrength = 0.5;
-    indirect *= indirectStrength;
+                    float indirectStrength = 0.00235;
+                    indirectStrength = 0.5;
+                    indirect *= indirectStrength;
         
-	float indirectHackFactor = min(1, 1 - metallic * 1.0);
-    indirect *= indirectHackFactor; 
+	                float indirectHackFactor = min(1, 1 - metallic * 1.0);
+                    indirect *= indirectHackFactor; 
         
-    //vec3 finalColor = directLight + (indirect * indirectStrength);
+                    //vec3 finalColor = directLight + (indirect * indirectStrength);
                           
-    //imageStore(LightingImage, pixelCoords, vec4(finalColor, 1.0));
+                    //imageStore(LightingImage, pixelCoords, vec4(finalColor, 1.0));
                       
-    //imageStore(LightingImage, pixelCoords, vec4(indirect, 1.0));
+                    //imageStore(LightingImage, pixelCoords, vec4(indirect, 1.0));
 
-
+    }
 
 
     
@@ -590,8 +594,7 @@ void main() {
    // finalColor = indirect;
 
     vec3 ambientTerm = baseColor.rgb * vec3(0.0025);
-
-    finalColor = directLighting. rgb + moonLighting  + ambientTerm;
+    finalColor = directLighting. rgb + moonLighting;
 
    //finalColor = ambientTerm;
 

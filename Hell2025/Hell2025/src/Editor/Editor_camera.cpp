@@ -175,20 +175,22 @@ namespace Editor {
         zoomSpeed *= viewport->GetOrthoSize();
 
         // Iterate over all viewports, check any for hover
-        for (int i = 0; i < 4; i++) {
-            Viewport* queryViewport = ViewportManager::GetViewportByIndex(i);
-            if (queryViewport->IsHovered()) {
-                if (queryViewport->IsOrthographic()) {
-                    if (Input::MouseWheelUp()) {
-                        queryViewport->SetOrthoSize(queryViewport->GetOrthoSize() - (1 * zoomSpeed));
+        if (!Input::KeyDown(HELL_KEY_LEFT_ALT)) {
+            for (int i = 0; i < 4; i++) {
+                Viewport* queryViewport = ViewportManager::GetViewportByIndex(i);
+                if (queryViewport->IsHovered()) {
+                    if (queryViewport->IsOrthographic()) {
+                        if (Input::MouseWheelUp()) {
+                            queryViewport->SetOrthoSize(queryViewport->GetOrthoSize() - (1 * zoomSpeed));
+                        }
+                        if (Input::MouseWheelDown()) {
+                            queryViewport->SetOrthoSize(queryViewport->GetOrthoSize() + (1 * zoomSpeed));
+                        }
                     }
-                    if (Input::MouseWheelDown()) {
-                        queryViewport->SetOrthoSize(queryViewport->GetOrthoSize() + (1 * zoomSpeed));
+                    else {
+                        //Camera* camera = GetCameraByIndex(i);
+                        //camera->SetPosition(camera->GetPosition() + (camera->GetForward() * zoomSpeed * (float)Input::GetMouseWheelValue()));
                     }
-                }
-                else {
-                    //Camera* camera = GetCameraByIndex(i);
-                    //camera->SetPosition(camera->GetPosition() + (camera->GetForward() * zoomSpeed * (float)Input::GetMouseWheelValue()));
                 }
             }
         }
