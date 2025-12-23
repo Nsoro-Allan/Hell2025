@@ -165,13 +165,13 @@ void main() {
         vec3 R = reflect(-V_view, N);
         vec3 R_rotated = kRotateYMinus90 * R;
 
-        float damping_IBL = 0.275;
+        float damping_IBL = 0.375;
         vec3 kS_IBL = fresnelSchlick(clamp(dot(N, V_view), 0.0, 1.0), F0);
         vec3 reflection_IBL = texture(cubeMap, R_rotated).rgb * damping_IBL;
         vec3 specular_IBL = reflection_IBL * kS_IBL;
 
         vec3 irradiance = moonColor * 1.0;
-        vec3 diffuse_IBL = irradiance * WATER_ALBEDO * 0.01;
+        vec3 diffuse_IBL = irradiance * WATER_ALBEDO * 0.075;
 
         surfaceLighting += Lo_direct;
         surfaceLighting += diffuse_IBL;
@@ -179,8 +179,8 @@ void main() {
 
         // SSS
         vec3 sss_albedo = WATER_ALBEDO;
-        float sssFactor = 1.5;
-        vec3 subColor = Saturate(sss_albedo.rgb, 1.5);
+        float sssFactor = 2.5;
+        vec3 subColor = Saturate(sss_albedo.rgb, 2.0);
 
         float NdotL = max(dot(N, L), 0.0);
         vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001));
@@ -228,7 +228,7 @@ void main() {
             vec3 subColor = Saturate(WATER_ALBEDO, 1.0);
             float NdotL_flash = max(dot(N, spotLightDir), 0.0);
             vec3 sss = 0.2 * exp(-3.0 * abs(NdotL_flash) / (radius + 0.01));
-            vec3 sssColor = subColor * radius * sss * 2.5;
+            vec3 sssColor = subColor * radius * sss * 1.5;
 
             flashlightLighting += sssColor * flashlightModifer * coneFalloff;
 
@@ -240,7 +240,7 @@ void main() {
     {
         float u_fogStartDistance = 0.0;
         float u_fogEndDistance = 100.0;
-        float u_fogExponent = 0.15;
+        float u_fogExponent = 0.1;
 
         float fogRange = u_fogEndDistance - u_fogStartDistance;
         float normDist = (viewDist - u_fogStartDistance) / max(fogRange, 0.0001);

@@ -29,6 +29,8 @@ namespace OpenGLRenderer {
     }
 
     void RayMarchFog() {
+        ProfilerOpenGLZoneFunction();
+
         if (Editor::IsOpen()) return;
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();

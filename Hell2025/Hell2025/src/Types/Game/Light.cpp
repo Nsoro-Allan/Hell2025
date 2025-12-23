@@ -4,6 +4,7 @@
 #include "World/World.h"
 #include "Util.h"
 #include "UniqueID.h"
+#include "Timer.hpp"
 
 #include "Ragdoll/RagdollManager.h"
 
@@ -74,48 +75,78 @@ void Light::UpdateDirtyState() {
         return;
     }
 
-    m_dirty = false;
+    //std::string name = "Light " + std::to_string(m_objectId) + " UpdateDirtyState()";
+    //Timer timer(name);
 
-    for (Door& door : World::GetDoors()) {
-        if (door.MovedThisFrame()) {
-            for (const RenderItem& renderItem : door.GetRenderItems()) {
+    m_dirty = false;
+    bool printDebug = true;
+
+    for (Door& object : World::GetDoors()) {
+        if (object.IsDirty()) {
+            for (const RenderItem& renderItem : object.GetRenderItems()) {
                 AABB aabb(renderItem.aabbMin, renderItem.aabbMax);
                 if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
                     m_dirty = true;
+                    if (printDebug) std::cout << m_objectId << " Door triggered dirty\n";
                     return;
                 }
             }
         }
     }
 
-    for (GenericObject& drawers : World::GetGenericObjects()) {
-        if (drawers.IsDirty()) {
-            m_dirty = true;
-            return;
-        }
-    }
-    for (Piano& pianos : World::GetPianos()) {
-        if (pianos.GetMeshNodes().IsDirty()) {
-            m_dirty = true;
-            return;
-        }
-    }
-
-    bool m_renderEnabled = true;
-
-    // Ragdolls
-    auto& ragdolls = RagdollManager::GetRagdolls();
-    for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
-        RagdollV2& ragdoll = it->second;
-        if (ragdoll.RenderingEnabled() && ragdoll.IsInMotion()) {
-            AABB aabb = ragdoll.GetWorldSpaceAABB();
-            if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
-                m_dirty = true;
-                return;
+    for (GenericObject& object : World::GetGenericObjects()) {
+        if (object.IsDirty()) {
+            for (const RenderItem& renderItem : object.GetRenderItems()) {
+                AABB aabb(renderItem.aabbMin, renderItem.aabbMax);
+                if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
+                    m_dirty = true;
+                    if (printDebug) std::cout << m_objectId << " GenericObject triggered dirty\n";
+                    return;
+                }
             }
         }
-        it++;
     }
+    for (Piano& object : World::GetPianos()) {
+        if (object.IsDirty()) {
+            for (const RenderItem& renderItem : object.GetRenderItems()) {
+                AABB aabb(renderItem.aabbMin, renderItem.aabbMax);
+                if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
+                    m_dirty = true;
+                    if (printDebug) std::cout << m_objectId << " Piano triggered dirty\n";
+                    return;
+                }
+            }
+        }
+    }
+
+    for (PickUp& object : World::GetPickUps()) {
+        if (object.IsDirty()) {
+            for (const RenderItem& renderItem : object.GetRenderItems()) {
+                AABB aabb(renderItem.aabbMin, renderItem.aabbMax);
+                if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
+                    m_dirty = true;
+                    if (printDebug) std::cout << m_objectId << " PickUp triggered dirty\n";
+                    return;
+                }
+            }
+        }
+    }
+
+    //bool m_renderEnabled = true;
+    //
+    //// Ragdolls
+    //auto& ragdolls = RagdollManager::GetRagdolls();
+    //for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
+    //    RagdollV2& ragdoll = it->second;
+    //    if (ragdoll.RenderingEnabled() && ragdoll.IsInMotion()) {
+    //        AABB aabb = ragdoll.GetWorldSpaceAABB();
+    //        if (aabb.IntersectsSphere(GetPosition(), GetRadius())) {
+    //            m_dirty = true;
+    //            return;
+    //        }
+    //    }
+    //    it++;
+    //}
 }
 
 void Light::SetPosition(const glm::vec3& position) {

@@ -45,8 +45,8 @@ namespace RenderDataManager {
     void SubmitOutlineRenderItems(const std::vector<RenderItem>& renderItems);
 
     // House submissions
-    void SubmitRenderItem(const HouseRenderItem& renderItem);
-    void SubmitRenderItems(const std::vector<HouseRenderItem>& renderItems);
+    void SubmitHouseRenderItem(const HouseRenderItem& renderItem);
+    void SubmitHouseRenderItems(const std::vector<HouseRenderItem>& renderItems);
     void SubmitOutlineRenderItem(const HouseRenderItem& renderItem);
     void SubmitOutlineRenderItems(const std::vector<HouseRenderItem>& renderItems);
 

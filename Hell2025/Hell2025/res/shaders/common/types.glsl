@@ -9,6 +9,8 @@ struct ViewportData {
     mat4 skyboxProjectionView;
     mat4 flashlightProjectionView;
 
+    mat4 csmLightProjectionView[5];
+
     int xOffset;
     int yOffset;
     int width;
@@ -106,7 +108,7 @@ struct RenderItem {
     float tintColorR;
     float tintColorG;
     float tintColorB;
-    float UNUSED;
+    int castCSMShadows;                 // True or false
 };
 
 struct Light {

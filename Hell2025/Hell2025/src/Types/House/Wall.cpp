@@ -267,7 +267,7 @@ void Wall::SubmitRenderItems() {
         renderItem.aabbMin = glm::vec4(mesh->aabbMin, 0.0f);
         renderItem.aabbMax = glm::vec4(mesh->aabbMax, 0.0f);
         renderItem.meshIndex = wallSegment.GetMeshIndex();
-        RenderDataManager::SubmitRenderItem(renderItem);
+        RenderDataManager::SubmitHouseRenderItem(renderItem);
 
         // Outline?
         //if (Editor::GetHoveredObjectId() == m_objectId) {

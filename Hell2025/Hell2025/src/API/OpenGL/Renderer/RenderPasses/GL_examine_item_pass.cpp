@@ -13,6 +13,8 @@
 namespace OpenGLRenderer {
 
     void InventoryGaussianPass() {
+        ProfilerOpenGLZoneFunction();
+
         if (Editor::IsOpen()) return;
 
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
@@ -58,6 +60,8 @@ namespace OpenGLRenderer {
     }
 
     void ExamineItemPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("ExamineItem");
         if (!gBuffer) return;

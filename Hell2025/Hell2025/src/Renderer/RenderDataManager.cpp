@@ -14,6 +14,7 @@
 #include <span>
 #include <unordered_map>
 
+#include "HellLogging.h"
 #include "Timer.hpp"
 
 // Get me out of here
@@ -30,7 +31,7 @@ namespace RenderDataManager {
     std::vector<HouseRenderItem> g_houseRenderItems;
     std::vector<HouseRenderItem> g_houseOutlineRenderItems;
     std::vector<RenderItem> g_decalRenderItems;
-    
+
     std::vector<RenderItem> g_glassRenderItems;
     std::vector<RenderItem> g_renderItems;
     std::vector<RenderItem> g_renderItemsBlended;
@@ -53,6 +54,7 @@ namespace RenderDataManager {
     uint32_t g_baseSkinnedVertex;
 
     std::vector<glm::mat4> g_oceanPatchTransforms;
+    std::vector<float> g_shadowCascadeLevels{ 5.0f, 10.0f, 20.0f, 40.0f }; // WARNING! YOU have a duplicate of this in GL_renderer.h
 
     void UpdateOceanPatchTransforms();
     void UpdateViewportData();
@@ -64,7 +66,8 @@ namespace RenderDataManager {
     void CreateMultiDrawIndirectCommands(std::vector<DrawIndexedIndirectCommand>& commands, std::span<RenderItem> renderItems, int viewportIndex, int instanceOffset);
     void CreateMultiDrawIndirectCommandsSkinned(std::vector<DrawIndexedIndirectCommand>& commands, std::span<RenderItem> renderItems, int viewportIndex, int instanceOffset);
     void CreateShadowCubeMapMultiDrawIndirectCommands(std::vector<DrawIndexedIndirectCommand>& commands, uint32_t faceIndex, GPULight& gpuLight);
-    
+    void CreateMoonLightShadowMapDrawCommands();
+
     int EncodeBaseInstance(int playerIndex, int instanceOffset);
     void DecodeBaseInstance(int baseInstance, int& playerIndex, int& instanceOffset);
 
@@ -180,6 +183,18 @@ namespace RenderDataManager {
                     g_viewportData[i].flashlightModifer = player->GetFlashLightModifer();
                 }
             }
+
+            // CSM matrices
+            glm::vec3 lightDir = Game::GetMoonlightDirection();
+            float viewportWidth = g_viewportData[i].width;
+            float viewportHeight = g_viewportData[i].height;
+            float fov = g_viewportData[i].fov;
+            const std::vector<glm::mat4> lightProjectionViews = Util::GetLightProjectionViews(viewMatrix, lightDir, g_shadowCascadeLevels, viewportWidth, viewportHeight, fov);
+
+            if (lightProjectionViews.size() != SHADOW_CASCADE_COUNT) Logging::Error() << "INCORRECT SIZE: " << lightProjectionViews.size();
+            for (int j = 0; j < SHADOW_CASCADE_COUNT && j < lightProjectionViews.size(); j++) {
+                g_viewportData[i].csmLightProjectionView[j] = lightProjectionViews[j];
+            }
         }
     }
 
@@ -207,6 +222,47 @@ namespace RenderDataManager {
         });
     }
 
+    void CreateMoonLightShadowMapDrawCommands() {
+        auto& set = g_drawCommandsSet;
+        int viewportCount = 4;
+        int cascadeCount = SHADOW_CASCADE_COUNT;
+
+        // Clear last frames draw commands
+        for (int x = 0; x < viewportCount; x++) {
+            for (int y = 0; y < cascadeCount; y++) {
+                set.moonLightCascades[x][y].clear();
+            }
+        }
+
+        Frustum frustum;
+
+        for (int i = 0; i < viewportCount; i++) {
+            Viewport* viewport = ViewportManager::GetViewportByIndex(i);
+            if (!viewport || !viewport->IsVisible()) continue;
+
+            for (int j = 0; j < cascadeCount; j++) {
+                frustum.Update(g_viewportData[i].csmLightProjectionView[j]);
+
+                // Store the instance offset for this player
+                int instanceStart = g_instanceData.size();
+
+                // Preallocate an estimate
+                g_instanceData.reserve(g_instanceData.size() + g_renderItems.size());
+
+                // Append new render items to the global instance data if its within this cascade's frustum
+                for (const RenderItem& renderItem : g_renderItems) {
+                    if (renderItem.castCSMShadows && frustum.IntersectsAABBFast(renderItem)) {
+                        g_instanceData.push_back(renderItem);
+                    }
+                }
+
+                // Create indirect draw commands using the stored offset
+                std::span<RenderItem> instanceView(g_instanceData.begin() + instanceStart, g_instanceData.end());
+                CreateMultiDrawIndirectCommands(set.moonLightCascades[i][j], instanceView, -1, instanceStart);
+            }
+        }
+    }
+
     void UpdateDrawCommandsSet() {
         g_instanceData.clear();
         auto& set = g_drawCommandsSet;
@@ -223,6 +279,8 @@ namespace RenderDataManager {
             g_flashLightShadowMapDrawInfo.heightMapChunkIndices[i].clear();
             g_flashLightShadowMapDrawInfo.houseMeshRenderItems[i].clear();
         }
+
+
 
         SortRenderItems(g_renderItems);
         SortRenderItems(g_renderItemsBlended);
@@ -262,6 +320,9 @@ namespace RenderDataManager {
             }
         }
 
+        // CSM render items (moon light shadowmaps)
+        CreateMoonLightShadowMapDrawCommands();
+
         // Flashlight stuff
         for (int playerIndex = 0; playerIndex < Game::GetLocalPlayerCount(); playerIndex++) {
             Player* player = Game::GetLocalPlayerByIndex(playerIndex);
@@ -298,7 +359,7 @@ namespace RenderDataManager {
 
         int instanceCount = World::GetScreenSpaceBloodDecals().size();
         g_screenSpaceBloodDecalInstances.resize(instanceCount);
-        
+
         for (int i = 0; i < instanceCount; i++) {
             ScreenSpaceBloodDecal& decal = World::GetScreenSpaceBloodDecals()[i];
             g_screenSpaceBloodDecalInstances[i].modelMatrix = decal.GetModelMatrix();
@@ -405,6 +466,8 @@ namespace RenderDataManager {
 
             if (renderItem.castShadows && frustum->IntersectsAABBFast(renderItem)) {
                 g_instanceData.push_back(renderItem);
+
+                //std::cout << gpuLight.lightIndex << " " << AssetManager::GetMeshByIndex(renderItem.meshIndex)->name << "\n";
             }
         }
 
@@ -649,7 +712,7 @@ namespace RenderDataManager {
         g_stainedGlassRenderItems.insert(g_stainedGlassRenderItems.begin(), renderItems.begin(), renderItems.end());
     }
 
-    void SubmitRenderItem(const HouseRenderItem& renderItem) {
+    void SubmitHouseRenderItem(const HouseRenderItem& renderItem) {
         g_houseRenderItems.push_back(renderItem);
     }
 
@@ -677,7 +740,7 @@ namespace RenderDataManager {
         g_renderItemsHairBottomLayer.insert(g_renderItemsHairBottomLayer.begin(), renderItems.begin(), renderItems.end());
     }
 
-    void SubmitRenderItems(const std::vector<HouseRenderItem>& renderItems) {
+    void SubmitHouseRenderItems(const std::vector<HouseRenderItem>& renderItems) {
         g_houseRenderItems.insert(g_houseRenderItems.begin(), renderItems.begin(), renderItems.end());
     }
 

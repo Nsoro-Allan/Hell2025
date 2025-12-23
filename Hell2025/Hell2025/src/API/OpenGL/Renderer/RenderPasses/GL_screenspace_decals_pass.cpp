@@ -10,16 +10,16 @@ namespace OpenGLRenderer {
 
     void InitDecalCube();
     void MaskPass();
-    void CompositePass();
-    void DrawDecals();
+    void ScreenSpaceDecalsComposite();
+    void ScreenSpaceDecalsDraw();
 
     GLuint g_cubeVao = 0;
 
     void ScreenSpaceDecalsPass() {
         if (g_cubeVao == 0) InitDecalCube();
         
-        DrawDecals();
-        CompositePass();
+        ScreenSpaceDecalsDraw();
+        ScreenSpaceDecalsComposite();
     }
 
     void InitDecalCube() {
@@ -111,7 +111,9 @@ namespace OpenGLRenderer {
         glBlendEquation(GL_FUNC_ADD);
     }
 
-    void CompositePass() {
+    void ScreenSpaceDecalsComposite() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLShader* shader = GetShader("BloodScreenSpaceDecalsComposite");
         OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
@@ -134,7 +136,9 @@ namespace OpenGLRenderer {
     // This was a compute pass, but you rewrote it to be a vert/frag quad style screenspace pass for the hardware mipmapping
     // This was a compute pass, but you rewrote it to be a vert/frag quad style screenspace pass for the hardware mipmapping
 
-    void DrawDecals() {
+    void ScreenSpaceDecalsDraw() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");
         OpenGLShader* shader = GetShader("ScreenSpaceDecals");
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");

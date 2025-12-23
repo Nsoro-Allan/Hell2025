@@ -8,6 +8,8 @@
 namespace OpenGLRenderer {
 
     void SkyBoxPass() {
+        ProfilerOpenGLZoneFunction();
+
         //if (Editor::IsOpen()) return;
 
         OpenGLShader* shader = GetShader("Skybox");

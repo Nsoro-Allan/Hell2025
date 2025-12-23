@@ -222,7 +222,6 @@ namespace World {
         for (GenericObject& object : GetGenericObjects())           object.Update(deltaTime);
         for (Kangaroo& object : GetKangaroos())                     object.Update(deltaTime);
         for (Ladder& object : GetLadders())                         object.Update(deltaTime);
-        for (Light& object : GetLights())                           object.Update(deltaTime);
         for (Mermaid& object : GetMermaids())                       object.Update(deltaTime);
         for (Piano& object : GetPianos())                           object.Update(deltaTime);
         for (PickUp& object : GetPickUps())                         object.Update(deltaTime);
@@ -232,6 +231,9 @@ namespace World {
         for (Tree& object : GetTrees())                             object.Update(deltaTime);
         for (TrimSet& object : GetTrimSets())                       object.Update();
         for (Window& object : GetWindows())                         object.Update(deltaTime);
+
+        // Lights must go last or isDirty checks are a frame behind
+        for (Light& object : GetLights())                           object.Update(deltaTime);
 
         //lights[2].SetColor(DEFAULT_LIGHT_COLOR);
         //GetLights()[2].SetStrength(2.0f);

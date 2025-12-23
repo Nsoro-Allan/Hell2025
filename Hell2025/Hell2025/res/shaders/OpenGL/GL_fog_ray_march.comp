@@ -160,6 +160,11 @@ void main() {
         vec3 flashlightPosition = viewportData[flashlightPlayerIndex].flashlightPosition.xyz;
         vec3 flashLightDir      = viewportData[flashlightPlayerIndex].flashlightDir.xyz;
 
+        // Lower for non-current player flash light
+        if (flashlightPlayerIndex != viewportIndex) {
+            flashlightPosition.y -= 0.4;
+        }
+
         float flashlightModifer  = viewportData[flashlightPlayerIndex].flashlightModifer;
         float flashlightRadius   = 10.0;
         float flashlightStrength = 0.5;
@@ -168,6 +173,7 @@ void main() {
         vec3 flashlightColor   = vec3(0.9, 0.95, 1.1);
         vec3 defaultLightColor = vec3(1.0, 0.7799999713897705, 0.6289999842643738);
         flashlightColor = mix(defaultLightColor, flashlightColor, 0.95);
+        flashlightColor = vec3(0.7, 0.75, 1.0);;
 
         float innerAngle = cos(radians(5.0 * flashlightModifer));
         float outerAngle = cos(radians(25.0));
@@ -189,9 +195,9 @@ void main() {
         vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
 
         // Hack
-        flashlightLighting *= 1.0;
+        flashlightLighting *= 0.5;
         if (flashlightPlayerIndex != viewportIndex) {
-            flashlightLighting *= 2;
+            flashlightLighting *= 5;
         }
 
         flashlightLightingSum += flashlightLighting;
@@ -216,7 +222,7 @@ void main() {
     accCol *= fogColor;
 
     // Tone it down a bit
-    accCol *= 0.5;
+    accCol *= 0.45;
     
     //accCol *= 0.0;
 

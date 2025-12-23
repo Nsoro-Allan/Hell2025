@@ -10,6 +10,7 @@
 namespace OpenGLRenderer {
 
     void WinstonPass() {
+        ProfilerOpenGLZoneFunction();
         
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 

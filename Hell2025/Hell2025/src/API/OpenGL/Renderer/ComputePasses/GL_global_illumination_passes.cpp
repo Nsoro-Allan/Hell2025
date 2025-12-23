@@ -109,8 +109,6 @@ namespace OpenGLRenderer {
         glDispatchCompute(numGroupsX, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-       // glFinish();
-
        // RaytraceScene();
     }
 

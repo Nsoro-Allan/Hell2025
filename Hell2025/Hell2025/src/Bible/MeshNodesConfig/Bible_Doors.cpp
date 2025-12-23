@@ -324,5 +324,6 @@ namespace Bible {
         meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals");
         meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals");
         meshNodes.SetMaterialByMeshName("DoorFrame_KnobLatch", "DoorOldKnob");
+        meshNodes.CastCSMShadows();
     }
 }

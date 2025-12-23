@@ -9,6 +9,8 @@
 namespace OpenGLRenderer {
 
     void VatBloodPass() {
+        ProfilerOpenGLZoneFunction();
+
         SetRasterizerState("GeometryPass_Default");
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();

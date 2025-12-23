@@ -11,6 +11,7 @@
 namespace OpenGLRenderer {
 
     void SpriteSheetPass() {
+        ProfilerOpenGLZoneFunction();
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
         OpenGLShader* shader = GetShader("SpriteSheet");

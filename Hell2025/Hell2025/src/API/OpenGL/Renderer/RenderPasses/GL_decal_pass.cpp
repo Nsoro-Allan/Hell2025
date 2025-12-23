@@ -9,6 +9,8 @@
 namespace OpenGLRenderer {
 
     void DecalPass() {
+        ProfilerOpenGLZoneFunction();
+
         SetRasterizerState("DecalPass");
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();

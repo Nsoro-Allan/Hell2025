@@ -35,6 +35,7 @@ struct MeshNode {
     DecalType decalType = DecalType::PLASTER;
     bool forceDynamic;
     bool castShadows;
+    bool castCSMShadows;
     bool ownsOpenableId = false;      // Only nodes with this flag set to true receive the transform from the openable ID
     glm::vec3 emissiveColor = glm::vec3(1.0f);
     glm::vec3 tintColor = glm::vec3(1.0f);
@@ -66,6 +67,7 @@ struct MeshNodes {
     void SleepAllPhysics();
     void WakeAllPhysics();
     void AddForceToPhsyics(const glm::vec3 force);
+    void CastCSMShadows();
     
     const void SubmitRenderItems() const;
     const void SubmitOutlineRenderItems() const;

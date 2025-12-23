@@ -12,6 +12,7 @@
 #include "API/OpenGL/Types/GL_shadow_map_array.h"
 #include "API/OpenGL/Types/GL_texture_array.h"
 #include "API/OpenGL/Types/GL_texture_3d.h"
+#include "API/OpenGL/Types/GL_timer.h"
 #include "API/OpenGL/Types/GL_ssbo.hpp"
 #include "Types/Map/Map.h"
 #include "Viewport/Viewport.h"
@@ -199,4 +200,11 @@ namespace OpenGLRenderer {
         return g_flipNormalMapY;
     }
     // TIDY ME
+
+    // Profiling
+    const std::string& GetZoneNames();
+    const std::string& GetZoneGPUTimings();
+    const std::string& GetZoneCPUTimings();
+    const std::string& GetTotalGPUTime();
+    const std::string& GetTotalCPUTime();
 }

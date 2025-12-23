@@ -28,6 +28,8 @@ namespace OpenGLRenderer {
     }
 
     void HairPass() {
+        ProfilerOpenGLZoneFunction();
+
         UpdateHairDebugInput();
 
         OpenGLShader* shader = GetShader("HairFinalComposite");

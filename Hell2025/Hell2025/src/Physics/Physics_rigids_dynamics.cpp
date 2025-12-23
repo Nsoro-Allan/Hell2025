@@ -469,6 +469,13 @@ namespace Physics {
         return pxRigidDynamic->getRigidBodyFlags().isSet(physx::PxRigidBodyFlag::eKINEMATIC);
     }
 
+
+    bool RigidDynamicIsDirty(uint64_t rigidDynamicId) {
+        if (!RigidDynamicExists(rigidDynamicId)) return false;
+
+        return g_rigidDynamics[rigidDynamicId].IsDirty();
+    }
+
     glm::mat4 GetRigidDynamicWorldMatrix(uint64_t rigidDynamicId) {
         if (RigidDynamicExists(rigidDynamicId)) {
             RigidDynamic& rigidDynamic = g_rigidDynamics[rigidDynamicId];

@@ -6,6 +6,8 @@
 namespace OpenGLRenderer {
 
     void ComputeSkinningPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLShader* shader = GetShader("ComputeSkinning");
         OpenGLSSBO* skinningTransforms = GetSSBO("SkinningTransforms");
 

@@ -152,7 +152,7 @@ void HousePlane::SubmitRenderItem() {
     renderItem.indexCount = mesh->indexCount;
     renderItem.aabbMin = glm::vec4(mesh->aabbMin, 0.0f);
     renderItem.aabbMax = glm::vec4(mesh->aabbMax, 0.0f);
-    RenderDataManager::SubmitRenderItem(renderItem);
+    RenderDataManager::SubmitHouseRenderItem(renderItem);
 }
 
 void HousePlane::DrawVertices(glm::vec4 color) {

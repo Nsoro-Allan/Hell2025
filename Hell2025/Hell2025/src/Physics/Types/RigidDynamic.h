@@ -18,21 +18,20 @@ struct RigidDynamic {
     void UpdateMassAndInertia(float density);
     float GetVolume();
 
-    bool IsMarkedForRemoval()               { return m_markedForRemoval; }
-    PxRigidDynamic* GetPxRigidDynamic()     { return m_pxRigidDynamic; }
-    std::vector<PxShape*>& GetPxShapes()    { return m_pxShapes; }
-    const AABB& GetAABB()                   { return m_aabb; }
-    const glm::vec3& GetCurrentPosition()   { return m_currentPosition; }
-    const glm::vec3& GetPreviousPosition()  { return m_previousPosition; }
-    const glm::mat4& GetWorldTransform()    { return m_worldTransform; }
-    size_t GetPxShapeCount() const          { return m_pxShapes.size(); }
+    const glm::mat4& GetWorldTransform() const  { return m_worldTransform; }
+    const bool IsDirty() const                  { return m_isDirty; }
+    bool IsMarkedForRemoval()                   { return m_markedForRemoval; }
+    PxRigidDynamic* GetPxRigidDynamic()         { return m_pxRigidDynamic; }
+    std::vector<PxShape*>& GetPxShapes()        { return m_pxShapes; }
+    const AABB& GetAABB()                       { return m_aabb; }
+    size_t GetPxShapeCount() const              { return m_pxShapes.size(); }
 
 private:
     AABB m_aabb; 
     std::vector<PxShape*> m_pxShapes;
     PxRigidDynamic* m_pxRigidDynamic = nullptr;
-    glm::vec3 m_currentPosition;
-    glm::vec3 m_previousPosition;
+    PxTransform m_previousGlobalPose = PxTransform(physx::PxIdentity);
     glm::mat4 m_worldTransform = glm::mat4(1.0f);
     bool m_markedForRemoval = false;
+    bool m_isDirty = true;
 };

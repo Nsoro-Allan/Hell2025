@@ -12,6 +12,8 @@
 namespace OpenGLRenderer {
 
     void DecalPaintingPass() {
+        ProfilerOpenGLZoneFunction();
+
         if (Editor::IsOpen()) return;
 
         const std::vector<DecalPaintingInfo>& decalPaintingInfoSet = RenderDataManager::GetDecalPaintingInfo();

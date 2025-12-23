@@ -9,6 +9,8 @@
 namespace OpenGLRenderer {
 
     void GlassPass() {
+        ProfilerOpenGLZoneFunction();
+
         SetRasterizerState("GlassPass");
 
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();

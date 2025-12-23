@@ -92,6 +92,7 @@ namespace Physics {
     void AddFoceToRigidDynamic(uint64_t rigidDynamicId, glm::vec3 force);
     bool RigidDynamicExists(uint64_t rigidDynamicId);
     bool RigidDynamicIsKinematic(uint64_t rigidDynamicId);
+    bool RigidDynamicIsDirty(uint64_t rigidDynamicId);
     uint64_t CreateRigidDynamicFromConvexMeshVertices(Transform transform, const std::span<Vertex>& vertices, const std::span<uint32_t>& indices, float mass, PhysicsFilterData filterData, glm::vec3 initialForce = glm::vec3(0.0f), glm::vec3 initialTorque = glm::vec3(0.0f));
    
     uint64_t CreateRigidDynamicWithCompoundConvexMeshesFromModel(const std::string& modelName, float mass, bool kinematic, PhysicsFilterData filterData);
@@ -172,6 +173,7 @@ namespace Physics {
     void PrintSceneRagdollInfo();
 
     // Util
+    bool PxTransformNearlyEqual(const PxTransform& a, const PxTransform& b);
     std::vector<PxRigidActor*> GetIgnoreList(RaycastIgnoreFlags flags);
     std::string GetPxShapeTypeAsString(PxShape* pxShape);
     float ComputeShapeVolume(PxShape* pxShape);

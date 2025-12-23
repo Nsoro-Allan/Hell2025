@@ -29,8 +29,13 @@ namespace Renderer {
     void DrawItemExamineLine(const glm::vec3& begin, const glm::vec3& end, const glm::vec4& color);
     void DrawItemExamineAABB(const AABB& aabb, const glm::vec4& color);
 
-
     void ReadBackHeightMapData(Map* map);
 
     RendererSettings& GetCurrentRendererSettings();
+
+    const std::string& GetZoneNames();
+    const std::string& GetZoneGPUTimings();
+    const std::string& GetZoneCPUTimings();
+    const std::string& GetTotalGPUTime();
+    const std::string& GetTotalCPUTime();
 }

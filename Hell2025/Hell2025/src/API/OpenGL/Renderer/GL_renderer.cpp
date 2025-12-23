@@ -31,6 +31,7 @@
 #include "HellLogging.h"
 #include "World/World.h"
 
+
 namespace OpenGLRenderer {
     std::unordered_map<std::string, OpenGLShader> g_shaders;
     std::unordered_map<std::string, OpenGLFrameBuffer> g_frameBuffers;
@@ -397,7 +398,7 @@ namespace OpenGLRenderer {
     }
 
     void RenderGame() {
-        Logging::Function() << "OpenGLRenderer::RenderGame()";
+        ProfilerOpenGLFrame();
 
         OpenGLFrameBuffer& gBuffer = g_frameBuffers["GBuffer"];
         OpenGLFrameBuffer& hairFrameBuffer = g_frameBuffers["Hair"];
@@ -410,7 +411,7 @@ namespace OpenGLRenderer {
             FlipNormalMapY();
         }
 
-        BlitRoads();
+        //BlitRoads();
 
         //UpdateGlobalIllumintation();
         //PointCloudDirectLighting();
@@ -718,4 +719,25 @@ namespace OpenGLRenderer {
             glDisable(GL_CULL_FACE);
         }
     }
+
+    const std::string& GetZoneNames() {
+        return ProfilerOpenGLZoneNames();
+    }
+
+    const std::string& GetZoneGPUTimings() {
+        return ProfilerOpenGLGpuTimings();
+    }
+
+    const std::string& GetZoneCPUTimings() {
+        return ProfilerOpenGLCpuTimings();
+    }
+
+    const std::string& GetTotalGPUTime() {
+        return ProfilerOpenGLTotalGPU();
+    }
+
+    const std::string& GetTotalCPUTime() {
+        return ProfilerOpenGLTotalCPU();
+    }
+
 }

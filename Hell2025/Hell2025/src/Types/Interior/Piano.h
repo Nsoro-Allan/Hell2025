@@ -53,6 +53,7 @@ struct Piano {
 	PianoKey* GetPianoKey(uint64_t pianoKeyId);
 
 	MeshNodes& GetMeshNodes()                               { return m_meshNodes; }
+    const bool IsDirty() const                              { return m_meshNodes.IsDirty(); }
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
     const uint64_t& GetObjectId() const                     { return m_pianoObjectId; };
     const glm::vec3 GetPosition() const                     { return m_transform.position; }

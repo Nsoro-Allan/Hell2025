@@ -30,7 +30,7 @@ struct Door {
     bool CameraFacingDoorWorldForward(const glm::vec3& cameraPositon, const glm::vec3& cameraForward);
 
 	MeshNodes& GetMeshNodes() { return m_meshNodes; }
-    const bool MovedThisFrame() const                                   { return m_movedThisFrame; }
+    const bool IsDirty() const                                          { return m_meshNodes.IsDirty(); }
     const uint64_t GetObjectId() const                                  { return m_objectId; }
     const glm::vec3& GetPosition() const                                { return m_position; }
     const glm::vec3& GetRotation() const                                { return m_rotation; }
@@ -60,7 +60,7 @@ private:
 	MeshNodes m_meshNodes;
     SpawnOffset m_spawnOffset;
 
-    bool m_movedThisFrame = true;
+    //bool m_movedThisFrame = true;
     bool m_deadLocked = false;
     uint64_t m_lifeTime = 0;
     uint64_t m_objectId = 0;

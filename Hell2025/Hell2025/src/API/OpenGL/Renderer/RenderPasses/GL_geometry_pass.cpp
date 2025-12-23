@@ -20,6 +20,8 @@
 namespace OpenGLRenderer {
 
     void HouseGeometryPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("DebugTextured");
 
@@ -72,6 +74,8 @@ namespace OpenGLRenderer {
 
 
     void GeometryPass() {
+        ProfilerOpenGLZoneFunction();
+
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 
@@ -264,6 +268,8 @@ namespace OpenGLRenderer {
     }
 
     void MirrorGeometryPass() {
+        ProfilerOpenGLZoneFunction();
+
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         const std::vector<ViewportData>& viewportData = RenderDataManager::GetViewportData();
 

@@ -13,6 +13,8 @@ namespace OpenGLRenderer {
     GLuint g_nearestSampler = 0;
 
     void UIPass() {
+        ProfilerOpenGLZoneFunction();
+
         const Resolutions& resolutions = Config::GetResolutions();
 
         OpenGLShader* shader = GetShader("UI");

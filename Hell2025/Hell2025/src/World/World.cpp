@@ -90,22 +90,22 @@ namespace World {
     } g_worldState;
 
     void Init() {
-        KangarooCreateInfo kangarooCreateInfo;
-
-        kangarooCreateInfo.position = glm::vec3(48, 32.6, 39);
-        kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
-        AddKangaroo(kangarooCreateInfo);
-
-        kangarooCreateInfo.position = glm::vec3(48, 32.6, 36);
-        kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
-        AddKangaroo(kangarooCreateInfo);
+        //KangarooCreateInfo kangarooCreateInfo;
+        //
+        //kangarooCreateInfo.position = glm::vec3(48, 32.6, 39);
+        //kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
+        //AddKangaroo(kangarooCreateInfo);
+        //
+        //kangarooCreateInfo.position = glm::vec3(48, 32.6, 36);
+        //kangarooCreateInfo.rotation = glm::vec3(0, HELL_PI * -0.5f, 0);
+        //AddKangaroo(kangarooCreateInfo);
 
         NewRun();
 
-        if (GetRoads().size() == 0) {
-            Road& road = GetRoads().emplace_back();
-            road.Init();
-        }
+        //if (GetRoads().size() == 0) {
+        //    Road& road = GetRoads().emplace_back();
+        //    road.Init();
+        //}
     }
 
     void LoadMapInstance(const std::string& mapName) {
@@ -273,20 +273,20 @@ namespace World {
         AddCreateInfoCollection(createInfoCollection, spawnOffset);
 
         // Under water floor
-        float size = 1000.0f;
-        float y = -0.1f;
-        float xMin = -size;
-        float zMin = -size;
-        float xMax = size;
-        float zMax = size;
-        HousePlaneCreateInfo floorCreateInfo;
-        floorCreateInfo.materialName = "Ground_MudVeg";
-        floorCreateInfo.p0 = glm::vec3(xMin, y, zMin);
-        floorCreateInfo.p1 = glm::vec3(xMin, y, zMax);
-        floorCreateInfo.p2 = glm::vec3(xMax, y, zMax);
-        floorCreateInfo.p3 = glm::vec3(xMax, y, zMin);
-        floorCreateInfo.parentDoorId = 1;
-        AddHousePlane(floorCreateInfo, SpawnOffset());
+        //float size = 1000.0f;
+        //float y = -0.1f;
+        //float xMin = -size;
+        //float zMin = -size;
+        //float xMax = size;
+        //float zMax = size;
+        //HousePlaneCreateInfo floorCreateInfo;
+        //floorCreateInfo.materialName = "Ground_MudVeg";
+        //floorCreateInfo.p0 = glm::vec3(xMin, y, zMin);
+        //floorCreateInfo.p1 = glm::vec3(xMin, y, zMax);
+        //floorCreateInfo.p2 = glm::vec3(xMax, y, zMax);
+        //floorCreateInfo.p3 = glm::vec3(xMax, y, zMin);
+        //floorCreateInfo.parentDoorId = 1;
+        //AddHousePlane(floorCreateInfo, SpawnOffset());
 
         MermaidCreateInfo mermaidCreateInfo;
         mermaidCreateInfo.position = glm::vec3(14.0f, 29.0f, 36.5f);
@@ -415,10 +415,10 @@ namespace World {
         mapInstanceCreateInfo.spawnOffsetChunkZ = 0;
         mapInstanceCreateInfoSet.push_back(mapInstanceCreateInfo);
 
-        mapInstanceCreateInfo.mapName = "Shit";
-        mapInstanceCreateInfo.spawnOffsetChunkX = 8;
-        mapInstanceCreateInfo.spawnOffsetChunkZ = 4;
-        mapInstanceCreateInfoSet.push_back(mapInstanceCreateInfo);
+        //mapInstanceCreateInfo.mapName = "Shit";
+        //mapInstanceCreateInfo.spawnOffsetChunkX = 8;
+        //mapInstanceCreateInfo.spawnOffsetChunkZ = 4;
+        //mapInstanceCreateInfoSet.push_back(mapInstanceCreateInfo);
 
         LoadMapInstances(mapInstanceCreateInfoSet);
 
@@ -723,6 +723,15 @@ namespace World {
             return true;
         }
         if (g_pickUps.contains(objectId)) {
+            // Dirty any lights within range... maybe put this somewhere else
+            PickUp* pickUp = GetPickUpByObjectId(objectId);
+
+            for (Light& light : GetLights()) {
+                if (pickUp->GetMeshNodes().m_worldspaceAABB.IntersectsSphere(light.GetPosition(), light.GetRadius())) {
+                    light.ForceDirty();
+                }
+            }
+            
             g_pickUps.get(objectId)->CleanUp();
             g_pickUps.erase(objectId);
             return true;

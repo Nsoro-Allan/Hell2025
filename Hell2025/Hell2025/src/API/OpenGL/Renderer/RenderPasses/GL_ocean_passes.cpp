@@ -17,6 +17,8 @@ namespace OpenGLRenderer {
     GLsync readbackSyncs[g_readbackBufferCount] = { 0 };
 
     void OceanGeometryPass() {
+        ProfilerOpenGLZoneFunction();
+
         if (!World::HasOcean()) {
             return;
         }
@@ -175,6 +177,8 @@ namespace OpenGLRenderer {
     }
 
     void OceanSurfaceCompositePass() {
+        ProfilerOpenGLZoneFunction();
+
         if (!World::HasOcean()) {
             return;
         }
@@ -226,6 +230,8 @@ namespace OpenGLRenderer {
 
 
     void OceanUnderwaterCompositePass() {
+        ProfilerOpenGLZoneFunction();
+
         if (!World::HasOcean()) {
             return;
         }

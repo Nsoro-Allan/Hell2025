@@ -22,6 +22,7 @@ struct PickUp {
     void SetRespawnState(bool state);
 
     MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
+    const bool IsDirty() const                          { return m_meshNodes.IsDirty(); }
     const PickUpCreateInfo& GetCreateInfo() const       { return m_createInfo; }
     const std::string GetName() const                   { return m_createInfo.name; }
     const PickUpType GetType() const                    { return m_createInfo.type; }

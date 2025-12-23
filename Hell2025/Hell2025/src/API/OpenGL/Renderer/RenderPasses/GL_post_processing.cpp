@@ -5,6 +5,8 @@
 namespace OpenGLRenderer {
 
     void PostProcessingPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("PostProcessing");
         OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");

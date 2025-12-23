@@ -263,6 +263,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\API\OpenGL\Types\GL_texture.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_texture_3d.cpp" />
     <ClCompile Include="src\API\OpenGL\Types\GL_texture_array.cpp" />
+    <ClCompile Include="src\API\OpenGL\Types\GL_timer.cpp" />
     <ClCompile Include="src\API\Vulkan\Managers\vk_command_manager.cpp" />
     <ClCompile Include="src\API\Vulkan\Managers\vk_device_manager.cpp" />
     <ClCompile Include="src\API\Vulkan\Managers\vk_frame_manager.cpp" />
@@ -676,6 +677,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
   <ItemGroup>
     <ClInclude Include="src\API\OpenGL\Types\GL_shadow_map_array.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_texture_3d.h" />
+    <ClInclude Include="src\API\OpenGL\Types\GL_timer.h" />
     <ClInclude Include="src\BackEnd\Integration\SDL.h" />
     <ClInclude Include="src\Bvh\Gpu\Bvh.h" />
     <ClInclude Include="src\Common\CopyableAtomic.h" />

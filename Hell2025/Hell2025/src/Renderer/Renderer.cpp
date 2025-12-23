@@ -231,4 +231,64 @@ namespace Renderer {
         }
         g_freeWoundMaskIndices[index] = true;
     }
+
+    const std::string& GetZoneNames() {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            return OpenGLRenderer::GetZoneNames();
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: GetZoneNames()";
+        }
+
+        static std::string empty = "";
+        return empty;
+    }
+
+    const std::string& GetZoneGPUTimings() {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            return OpenGLRenderer::GetZoneGPUTimings();
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: GetZoneGPUTimings()";
+        }
+
+        static std::string empty = "";
+        return empty;
+    }
+
+    const std::string& GetZoneCPUTimings() {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            return OpenGLRenderer::GetZoneCPUTimings();
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: GetZoneCPUTimings()";
+        }
+
+        static std::string empty = "";
+        return empty;
+    }
+
+    const std::string& GetTotalGPUTime() {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            return OpenGLRenderer::GetTotalGPUTime();
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: GetTotalGPUTime()";
+        }
+
+        static std::string empty = "";
+        return empty;
+    }
+
+    const std::string& GetTotalCPUTime() {
+        if (BackEnd::GetAPI() == API::OPENGL) {
+            return OpenGLRenderer::GetTotalCPUTime();
+        }
+        else if (BackEnd::GetAPI() == API::VULKAN) {
+            Logging::ToDo() << "Vulkan: GetTotalGPUTime()";
+        }
+
+        static std::string empty = "";
+        return empty;
+    }
 }

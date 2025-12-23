@@ -3,6 +3,50 @@
 
 namespace Physics {
 
+    #include <physx/PxPhysicsAPI.h>
+
+    bool PxTransformNearlyEqual(const PxTransform& a, const PxTransform& b) {
+        constexpr float positionEps = 1e-4f;
+        constexpr float rotationEps = 1e-4f;
+
+        const float dxp = a.p.x - b.p.x;
+        const float dyp = a.p.y - b.p.y;
+        const float dzp = a.p.z - b.p.z;
+
+        if (dxp > positionEps || dxp < -positionEps) return false;
+        if (dyp > positionEps || dyp < -positionEps) return false;
+        if (dzp > positionEps || dzp < -positionEps) return false;
+
+        // q and -q represent the same rotation, so align via dot sign.
+        const float dot = a.q.x * b.q.x + a.q.y * b.q.y + a.q.z * b.q.z + a.q.w * b.q.w;
+
+        if (dot >= 0.0f) {
+            const float dxq = a.q.x - b.q.x;
+            const float dyq = a.q.y - b.q.y;
+            const float dzq = a.q.z - b.q.z;
+            const float dwq = a.q.w - b.q.w;
+
+            if (dxq > rotationEps || dxq < -rotationEps) return false;
+            if (dyq > rotationEps || dyq < -rotationEps) return false;
+            if (dzq > rotationEps || dzq < -rotationEps) return false;
+            if (dwq > rotationEps || dwq < -rotationEps) return false;
+            return true;
+        }
+        else {
+            // Compare a.q to -b.q without modifying b.
+            const float dxq = a.q.x + b.q.x;
+            const float dyq = a.q.y + b.q.y;
+            const float dzq = a.q.z + b.q.z;
+            const float dwq = a.q.w + b.q.w;
+
+            if (dxq > rotationEps || dxq < -rotationEps) return false;
+            if (dyq > rotationEps || dyq < -rotationEps) return false;
+            if (dzq > rotationEps || dzq < -rotationEps) return false;
+            if (dwq > rotationEps || dwq < -rotationEps) return false;
+            return true;
+        }
+    }
+
     glm::vec3 PxVec3toGlmVec3(PxVec3 vec) {
         return { vec.x, vec.y, vec.z };
     }

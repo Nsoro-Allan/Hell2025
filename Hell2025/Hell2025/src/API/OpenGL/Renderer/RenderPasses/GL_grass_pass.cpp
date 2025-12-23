@@ -130,6 +130,8 @@ namespace OpenGLRenderer {
     }
 
     void GrassPass() {
+        ProfilerOpenGLZoneFunction();
+
         RendererSettings& rendererSettings = Renderer::GetCurrentRendererSettings();
         if (!rendererSettings.drawGrass) return;
 

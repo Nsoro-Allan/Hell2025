@@ -481,6 +481,7 @@ enum class DebugTextMode{
     NONE,
     PER_PLAYER,
     GLOBAL,
+    PROFILING,
     DEBUG_TEXT_MODE_COUNT
 };
 

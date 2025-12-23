@@ -65,7 +65,7 @@ struct RenderItem {
     float tintColorR = 1.0f;
     float tintColorG = 1.0f;
     float tintColorB = 1.0f;
-    float UNUSED = 66.6f;               // UNUSED
+    int32_t castCSMShadows = 0;          // True or false
 };
 
 struct AABBRayResult {
@@ -293,7 +293,9 @@ struct ViewportData {
     glm::mat4 projectionView;
     glm::mat4 inverseProjectionView;
     glm::mat4 skyboxProjectionView;
-    glm::mat4 flashlightProjectionView;
+    glm::mat4 flashlightProjectionView; 
+    
+    glm::mat4 csmLightProjectionView[SHADOW_CASCADE_COUNT];
 
     int xOffset;
     int yOffset;
@@ -387,6 +389,7 @@ struct DrawCommandsSet {
     //std::vector<DrawIndexedIndirectCommand> skinnedGeometry[4];
     DrawCommands skinnedGeometry;
     std::vector<DrawIndexedIndirectCommand> shadowMapHiRes[SHADOWMAP_HI_RES_COUNT][6];
+    std::vector<DrawIndexedIndirectCommand> moonLightCascades[4][SHADOW_CASCADE_COUNT]; // [player][cascade]
 };
 
 struct FlashLightShadowMapDrawInfo {

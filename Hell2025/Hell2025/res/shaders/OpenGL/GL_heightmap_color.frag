@@ -24,8 +24,13 @@ in vec3 WorldPos;
 
 uniform float u_worldWidth;
 uniform float u_worldDepth;
+uniform float u_discardHeight = 0.01;
 
 void main() {
+    if (WorldPos.y < u_discardHeight) {
+        discard;
+    }
+
     vec4 dirtBaseColor = texture2D(baseColorTexture, TexCoord);
     vec3 dirtNormalMap = texture2D(normalTexture, TexCoord).rgb;
     vec3 dirtRma = texture2D(rmaTexture, TexCoord).rgb;

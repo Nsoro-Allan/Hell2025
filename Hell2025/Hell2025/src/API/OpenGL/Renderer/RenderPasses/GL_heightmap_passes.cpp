@@ -247,6 +247,8 @@ namespace OpenGLRenderer {
     }
 
     void DrawHeightMap() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* roadFramebuffer = GetFrameBuffer("Road");
         OpenGLShader* shader = GetShader("HeightMapColor");

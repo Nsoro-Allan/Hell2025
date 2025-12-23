@@ -10,12 +10,13 @@ readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
 
 out vec3 TexCoords;
 out vec4 WorldPos;
+out flat int ViewportIndex;
 
 uniform mat4 u_modelMatrix;
 
 void main() {
-    int viewportIndex = gl_BaseInstance;
-    mat4 projectionView = viewportData[viewportIndex].skyboxProjectionView;
+    ViewportIndex = gl_BaseInstance;
+    mat4 projectionView = viewportData[ViewportIndex].skyboxProjectionView;
 
     float angle = radians(-90.0);
     float c = cos(angle);

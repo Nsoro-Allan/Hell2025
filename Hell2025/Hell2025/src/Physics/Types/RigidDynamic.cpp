@@ -4,16 +4,16 @@
 void RigidDynamic::Update(float deltaTime) {
     if (!m_pxRigidDynamic) return;
 
-    if (!m_pxRigidDynamic->getRigidBodyFlags().isSet(PxRigidBodyFlag::eKINEMATIC)) {
-        // Update AABB
-        PxBounds3 bounds = m_pxRigidDynamic->getWorldBounds();
-        glm::vec3 aabbMin(bounds.minimum.x, bounds.minimum.y, bounds.minimum.z);
-        glm::vec3 aabbMax(bounds.maximum.x, bounds.maximum.y, bounds.maximum.z);
-        m_aabb = AABB(aabbMin, aabbMax);
-    }
+    const PxBounds3 bounds = m_pxRigidDynamic->getWorldBounds();
+    const glm::vec3 aabbMin(bounds.minimum.x, bounds.minimum.y, bounds.minimum.z);
+    const glm::vec3 aabbMax(bounds.maximum.x, bounds.maximum.y, bounds.maximum.z);
+    m_aabb = AABB(aabbMin, aabbMax);
 
-    m_worldTransform = Physics::PxMat44ToGlmMat4(m_pxRigidDynamic->getGlobalPose());
-    m_currentPosition = m_worldTransform[3];
+    const PxTransform currentGlobalPose = m_pxRigidDynamic->getGlobalPose();
+
+    m_isDirty = !Physics::PxTransformNearlyEqual(m_previousGlobalPose, currentGlobalPose);
+    m_worldTransform = Physics::PxMat44ToGlmMat4(currentGlobalPose);
+    m_previousGlobalPose = currentGlobalPose;
 }
 
 void RigidDynamic::MarkForRemoval() {

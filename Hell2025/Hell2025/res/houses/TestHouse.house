@@ -787,24 +787,6 @@
       ],
       "SaveToFile": true,
       "Type": "AMMO"
-    },
-    {
-      "DisablePhysicsAtSpawn": true,
-      "EditorName": "UNDEFINED_STRING",
-      "Name": "12GaugeBuckShot",
-      "Position": [
-        0.18162889778614044,
-        0.5233830213546753,
-        -0.16188785433769226
-      ],
-      "Respawn": true,
-      "Rotation": [
-        0.0,
-        0.0,
-        0.0
-      ],
-      "SaveToFile": true,
-      "Type": "AMMO"
     }
   ],
   "PictureFrames": [

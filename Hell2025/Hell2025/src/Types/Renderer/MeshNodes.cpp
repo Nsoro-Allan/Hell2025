@@ -56,6 +56,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode.meshBvhId = mesh->meshBvhId;
         meshNode.forceDynamic = false;
         meshNode.castShadows = true;
+        meshNode.castCSMShadows = false;
         meshNode.emissiveColor = glm::vec3(1.0f);
         meshNode.tintColor = glm::vec3(1.0f);
         meshNode.rigidDynamicId = 0;
@@ -474,9 +475,9 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         }
     }
 
-    // Always dirty the hierarchy if there are any rigid dynamic nodes (RETHINK THIS!)
+    // Dirty if any node was rigid and moved
     for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
+        if (meshNode.rigidDynamicId != 0 && Physics::RigidDynamicIsDirty(meshNode.rigidDynamicId)) {
             hierarchyDirty = true;
             break;
         }
@@ -493,7 +494,7 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     }
     m_isDirty = worldMatrixDirty || hierarchyDirty;
 
-    // DrawWorldspaceAABBs(YELLOW); // NOTE THIS only draws aabbs when the hierachy was dirty
+    // DrawWorldspaceAABBs(YELLOW); // NOTE THIS only draws aabbs when the hierarchy was dirty
 
     // Compute world matrices FIRST
     for (size_t i = 0; i < m_meshNodes.size(); i++) {
@@ -540,7 +541,8 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
         meshNode.renderItem.aabbMin = glm::vec4(meshNode.worldspaceAabb.GetBoundsMin(), 0.0f);
         meshNode.renderItem.aabbMax = glm::vec4(meshNode.worldspaceAabb.GetBoundsMax(), 0.0f);
         meshNode.renderItem.localMeshNodeIndex = i;
-		meshNode.renderItem.castShadows = meshNode.castShadows;
+        meshNode.renderItem.castShadows = meshNode.castShadows;
+        meshNode.renderItem.castCSMShadows = meshNode.castCSMShadows;
 		meshNode.renderItem.emissiveR = meshNode.emissiveColor.r;
 		meshNode.renderItem.emissiveG = meshNode.emissiveColor.g;
         meshNode.renderItem.emissiveB = meshNode.emissiveColor.b;
@@ -646,6 +648,12 @@ void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
         if (meshNode.rigidDynamicId != 0) {
             Physics::AddFoceToRigidDynamic(meshNode.rigidDynamicId, force);
         }
+    }
+}
+
+void MeshNodes::CastCSMShadows() {
+    for (MeshNode& meshNode : m_meshNodes) {
+        meshNode.castCSMShadows = true;
     }
 }
 

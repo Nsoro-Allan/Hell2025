@@ -3,10 +3,13 @@
 #include "Core/Game.h"
 #include "Renderer/GlobalIllumination.h"
 #include "World/World.h"
+#include "Ocean/Ocean.h"
 
 namespace OpenGLRenderer {
 
     void LightCullingPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLShader* shader = GetShader("LightCulling");
 
@@ -29,6 +32,8 @@ namespace OpenGLRenderer {
     }
 
     void LightingPass() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* finalImageFBO = GetFrameBuffer("FinalImage");
         OpenGLShadowMap* flashLightShadowMapsFBO = GetShadowMap("FlashlightShadowMaps");
@@ -47,6 +52,13 @@ namespace OpenGLRenderer {
         lightingShader->SetFloat("u_viewportHeight", gBuffer->GetHeight());
         lightingShader->SetInt("u_tileXCount", gBuffer->GetWidth() / TILE_SIZE);
         lightingShader->SetInt("u_tileYCount", gBuffer->GetHeight() / TILE_SIZE);
+
+        if (World::HasOcean()) {
+            lightingShader->SetFloat("u_oceanHeight", Ocean::GetOceanOriginY());
+        }
+        else {
+            lightingShader->SetFloat("u_oceanHeight", -1000);
+        }
 
         // Warning this CSM shit is p1 only atm, especially cause of hardcoded FULL SCREEN viewport dimensions
 

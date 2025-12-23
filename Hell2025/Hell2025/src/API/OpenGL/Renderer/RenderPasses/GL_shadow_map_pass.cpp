@@ -21,6 +21,8 @@ namespace OpenGLRenderer {
     }
 
     void RenderFlashLightShadowMaps() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLShader* shader = GetShader("ShadowMap");
         OpenGLShadowMap* shadowMapsFBO = GetShadowMap("FlashlightShadowMaps");
         OpenGLHeightMapMesh& heightMapMesh = OpenGLBackEnd::GetHeightMapMesh();
@@ -116,6 +118,7 @@ namespace OpenGLRenderer {
     }
 
     void RenderPointLightShadowMaps() {
+        ProfilerOpenGLZoneFunction();
 
         OpenGLShader* shader = GetShader("ShadowCubeMap");
         OpenGLShadowCubeMapArray* hiResShadowMaps = GetShadowCubeMapArray("HiRes");
@@ -126,8 +129,6 @@ namespace OpenGLRenderer {
 
         shader->Bind();
         shader->SetBool("u_useInstanceData", true);
-
-        //hiResShadowMaps->ClearDepthLayers(1.0f);
 
         const std::vector<GPULight>& gpuLightsHighRes = RenderDataManager::GetGPULightsHighRes();
 
@@ -141,15 +142,6 @@ namespace OpenGLRenderer {
             }
         }
 
-        //GLuint shadowMapTextureID = hiResShadowMaps->GetDepthTexture();
-        //if (shadowMapTextureID != 0) {
-        //    float clearDepthValue = 1.0f;
-        //    glClearTexImage(shadowMapTextureID, 0, GL_DEPTH_COMPONENT, GL_FLOAT, &clearDepthValue);
-        //}
-        //else {
-        //    std::cout << "Error: Invalid shadow map texture handle for clearing.\n";
-        //}
-
         glDepthMask(true);
         glDisable(GL_BLEND);
         glDisable(GL_CULL_FACE);
@@ -159,8 +151,6 @@ namespace OpenGLRenderer {
 
         glCullFace(GL_FRONT);
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-
- //     const std::vector<GPULight>& gpuLightsHighRes = RenderDataManager::GetGPULightsHighRes();
 
         for (int i = 0; i < gpuLightsHighRes.size(); i++) {
             const GPULight& gpuLight = gpuLightsHighRes[i];
@@ -182,16 +172,21 @@ namespace OpenGLRenderer {
                 shader->SetInt("faceIndex", face);
                 glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, hiResShadowMaps->GetDepthTexture(), 0, layer);
                 MultiDrawIndirect(drawInfoSet.shadowMapHiRes[i][face]);
+
+                //const std::vector<DrawIndexedIndirectCommand>& commands = drawInfoSet.shadowMapHiRes[i][face];
+                //std::cout << gpuLight.lightIndex << ": " << face << " " << commands.size() << "\n";
+
             }
         }
-
-        size_t maxLights = 4;
-        size_t lightCount = std::min(maxLights, World::GetLights().size());
 
         OpenGLMeshBuffer& houseMeshBuffer = World::GetHouseMeshBuffer().GetGLMeshBuffer();
         glBindVertexArray(houseMeshBuffer.GetVAO());
         shader->SetBool("u_useInstanceData", false);
         shader->SetMat4("u_modelMatrix", glm::mat4(1.0f));
+
+        // OPTIMIZE ME! 
+        // Make lights store a list of their HouseRenderItems per frustum face that is only updated when the map changes
+        // That will be when a HousePlane or Wall is added/modified
 
         for (int i = 0; i < gpuLightsHighRes.size(); i++) {
             const GPULight& gpuLight = gpuLightsHighRes[i];
@@ -232,6 +227,7 @@ namespace OpenGLRenderer {
         }
 
 
+        return;
 
 
         // Ragdoll
@@ -292,9 +288,13 @@ namespace OpenGLRenderer {
 
 
     void RenderMoonLightCascadedShadowMaps() {
+        ProfilerOpenGLZoneFunction();
+
         OpenGLSSBO* lightProjViewSSBO = GetSSBO("CSMLightProjViewMatrices");
         OpenGLShader* shader = GetShader("ShadowMap");
         OpenGLShadowMapArray* shadowMapArray = GetShadowMapArray("MoonlightPlayer1");
+
+        const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
 
         if (!lightProjViewSSBO) return;
         if (!shader) return;
@@ -340,22 +340,31 @@ namespace OpenGLRenderer {
                 shadowMapArray->SetTextureLayer(textureLayer);
                 shadowMapArray->ClearDepth();
 
+                const glm::mat4& lightProjectionView = viewportData.csmLightProjectionView[i];
 
-                shader->SetMat4("u_projectionView", lightProjectionViews[i]);
+                //shader->SetMat4("u_projectionView", lightProjectionViews[i]);
+                shader->SetMat4("u_projectionView", lightProjectionView);
 
                 // Geometry
                 glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-                for (const RenderItem& renderItem : RenderDataManager::GetRenderItems()) {
-                    uint32_t meshIndex = renderItem.meshIndex;
-                    glm::mat4 modelMatrix = renderItem.modelMatrix;
-                    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
-                    Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-                    shader->SetMat4("u_modelMatrix", modelMatrix);
-                    glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, mesh->baseVertex);
-                }
+
+                shader->SetBool("u_useInstanceData", true);
+                MultiDrawIndirect(drawInfoSet.moonLightCascades[j][i]);
+
+                //shader->SetBool("u_useInstanceData", false);
+                //for (const RenderItem& renderItem : RenderDataManager::GetRenderItems()) {
+                //    uint32_t meshIndex = renderItem.meshIndex;
+                //    glm::mat4 modelMatrix = renderItem.modelMatrix;
+                //    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
+                //    Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
+                //    shader->SetMat4("u_modelMatrix", modelMatrix);
+                //    glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, mesh->baseVertex);
+                //}
+
+                shader->SetBool("u_useInstanceData", false);
+                shader->SetMat4("u_modelMatrix", glm::mat4(1.0f));
 
                 // House
-                shader->SetMat4("u_modelMatrix", glm::mat4(1.0f));
                 OpenGLMeshBuffer& houseMeshBuffer = World::GetHouseMeshBuffer().GetGLMeshBuffer();
                 glBindVertexArray(houseMeshBuffer.GetVAO());
                 //glDisable(GL_CULL_FACE);

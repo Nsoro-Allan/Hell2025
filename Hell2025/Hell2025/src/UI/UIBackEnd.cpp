@@ -6,6 +6,9 @@
 #include "../Core/Debug.h"
 #include "../Config/Config.h"
 
+#include "Renderer/Renderer.h"
+#include "HellLogging.h"
+
 namespace UIBackEnd {
 
     Mesh2D g_uiMesh;
@@ -117,29 +120,35 @@ hits the floor.
     void Update() {
         
         if (Debug::GetDebugTextMode() == DebugTextMode::GLOBAL) {
-            std::string text = Debug::GetText();
             //std::string text = "Global debug text\n... apparently it's broken right now.";
+            std::string text = Debug::GetText();
             BlitText(text, "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
         }
 
-        //InventoryTest();
-       
+        else if (Debug::GetDebugTextMode() == DebugTextMode::PROFILING) {
+            float scale = 2.0f;
+            int margin = 35;
 
-        const Resolutions& resolutions = Config::GetResolutions();
-        // BlitText("0123456789/", "AmmoFont", 100, 250, 2.0f);
+            std::string names = "\n" + Renderer::GetZoneNames();
+            std::string timingsGPU = "GPU\n" + Renderer::GetZoneGPUTimings();
+            std::string timingsCPU = "CPU\n" + Renderer::GetZoneCPUTimings();
+            glm::ivec2 namesSize = TextBlitter::GetBlitTextSize(names, "StandardFont", scale);
+            glm::ivec2 timingsGPUSize = TextBlitter::GetBlitTextSize(timingsGPU, "StandardFont", scale);
+            glm::ivec2 timingsCPUSize = TextBlitter::GetBlitTextSize(timingsCPU, "StandardFont", scale);
 
-        //if (AssetManager::LoadingComplete()) {
-        //    BlitTexture("ui_test", glm::ivec2(250, 150), Alignment::TOP_LEFT, glm::vec4(1.0, 0.0, 0.0, 0.5), glm::ivec2(-1, -1));
-        //    BlitText("Might leave in a body bag,", "StandardFont", 250, 150, 2.0f);
-        //    BlitText("Never in cuffs.", "StandardFont", 250, 180, 2.0f);
-        //}       
+            if (names.length() != 0) {
+                timingsGPU += "\nTotal GPU: " + Renderer::GetTotalGPUTime();
+                BlitText(timingsGPU, "StandardFont", 0, 0, Alignment::TOP_LEFT, scale);
+                BlitText(timingsCPU, "StandardFont", timingsGPUSize.x + margin, 0, Alignment::TOP_LEFT, scale);
+                BlitText(names, "StandardFont", timingsGPUSize.x + margin + timingsCPUSize.x + margin, 0, Alignment::TOP_LEFT, scale);
+            }
+        }
 
         if (BackEnd::GetAPI() == API::OPENGL) {
             g_uiMesh.GetGLMesh2D().UpdateVertexBuffer(g_vertices, g_indices);
         }
         else if (BackEnd::GetAPI() == API::VULKAN) {
-            // TO DO   
-            // g_mesh.GetVKMesh2D().UpdateVertexBuffer(g_vertices, g_indices);
+            Logging::ToDo() << "UIBackEnd: Update()";
         }
         g_vertices.clear();
         g_indices.clear();
