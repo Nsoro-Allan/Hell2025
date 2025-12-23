@@ -290,41 +290,26 @@ namespace OpenGLRenderer {
     void RenderMoonLightCascadedShadowMaps() {
         ProfilerOpenGLZoneFunction();
 
-        OpenGLSSBO* lightProjViewSSBO = GetSSBO("CSMLightProjViewMatrices");
-        OpenGLShader* shader = GetShader("ShadowMap");
-        OpenGLShadowMapArray* shadowMapArray = GetShadowMapArray("MoonlightPlayer1");
-
         const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
 
-        if (!lightProjViewSSBO) return;
+        OpenGLShader* shader = GetShader("ShadowMap");
+        OpenGLShadowMapArray* shadowMapArray = GetShadowMapArray("MoonlightCSM");
+
         if (!shader) return;
+        if (!shadowMapArray) return;
 
-        int playerCount = 1;
+        int viewportCount = std::min(4, Game::GetLocalPlayerCount());
 
-        for (int j = 0; j < playerCount; j++) {
+        for (int j = 0; j < viewportCount; j++) {
             Player* player = Game::GetLocalPlayerByIndex(j);
-            if (!player->ViewportIsVisible()) continue;
+            if (!player || !player->ViewportIsVisible()) continue;
 
             const ViewportData& viewportData = RenderDataManager::GetViewportData()[j];
-
-            glm::vec3 lightDir = Game::GetMoonlightDirection();
-            glm::mat4 viewMatrix = viewportData.view;
-
-            float viewportWidth = viewportData.width;
-            float viewportHeight = viewportData.height;
-            float fov = viewportData.fov;
-
-            std::vector<float>& cascadeLevels = GetShadowCascadeLevels();
-
-            const std::vector<glm::mat4>& lightProjectionViews = Util::GetLightProjectionViews(viewMatrix, lightDir, cascadeLevels, viewportWidth, viewportHeight, fov);
-
-            lightProjViewSSBO->Update(sizeof(glm::mat4x4) * lightProjectionViews.size(), &lightProjectionViews[0]);
-            lightProjViewSSBO->Bind(15);
 
             shader->Bind();
             shader->SetBool("u_useInstanceData", false);
 
-            size_t numLayers = lightProjectionViews.size();
+            size_t numLayers = SHADOW_CASCADE_COUNT;
 
             shadowMapArray->Bind();
             shadowMapArray->SetViewport();
@@ -335,14 +320,14 @@ namespace OpenGLRenderer {
 
             for (size_t i = 0; i < numLayers; ++i) {
 
-                int textureLayer = i + (playerCount * j * numLayers);
+                //int textureLayer = i + (viewportCount * j * numLayers);
+                int textureLayer = int(i) + (j * int(numLayers)); // numLayers == SHADOW_CASCADE_COUNT
 
                 shadowMapArray->SetTextureLayer(textureLayer);
                 shadowMapArray->ClearDepth();
 
                 const glm::mat4& lightProjectionView = viewportData.csmLightProjectionView[i];
 
-                //shader->SetMat4("u_projectionView", lightProjectionViews[i]);
                 shader->SetMat4("u_projectionView", lightProjectionView);
 
                 // Geometry
@@ -350,16 +335,6 @@ namespace OpenGLRenderer {
 
                 shader->SetBool("u_useInstanceData", true);
                 MultiDrawIndirect(drawInfoSet.moonLightCascades[j][i]);
-
-                //shader->SetBool("u_useInstanceData", false);
-                //for (const RenderItem& renderItem : RenderDataManager::GetRenderItems()) {
-                //    uint32_t meshIndex = renderItem.meshIndex;
-                //    glm::mat4 modelMatrix = renderItem.modelMatrix;
-                //    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelMatrix)));
-                //    Mesh* mesh = AssetManager::GetMeshByIndex(meshIndex);
-                //    shader->SetMat4("u_modelMatrix", modelMatrix);
-                //    glDrawElementsInstancedBaseVertex(GL_TRIANGLES, mesh->indexCount, GL_UNSIGNED_INT, (GLvoid*)(mesh->baseIndex * sizeof(GLuint)), 1, mesh->baseVertex);
-                //}
 
                 shader->SetBool("u_useInstanceData", false);
                 shader->SetMat4("u_modelMatrix", glm::mat4(1.0f));

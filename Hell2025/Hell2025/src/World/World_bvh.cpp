@@ -172,13 +172,15 @@ namespace World {
 		g_staticSceneInstances.clear();
 
         // Render items
-        for (ChristmasLights& christmasLights : GetChristmasLights())	CreateObjectInstanceDataFromRenderItems(christmasLights.GetRenderItems(), g_staticSceneInstances);
+        for (ChristmasLights& object : GetChristmasLights())	CreateObjectInstanceDataFromRenderItems(object.GetRenderItems(), g_staticSceneInstances);
+        for (Ladder& object : GetLadders())	                    CreateObjectInstanceDataFromRenderItems(object.GetRenderItems(), g_staticSceneInstances);
+        for (Mermaid& object : GetMermaids())				    CreateObjectInstanceDataFromRenderItems(object.GetRenderItems(), g_staticSceneInstances);
 
         // Add any static mesh nodes to the primitive instances vector
         for (Door& object : GetDoors())                     CreateStaticPrimtiveInstances(object.GetMeshNodes());
         for (Fireplace& object : GetFireplaces())           CreateStaticPrimtiveInstances(object.GetMeshNodes());
         for (GenericObject& object : GetGenericObjects())   CreateStaticPrimtiveInstances(object.GetMeshNodes());
-        for (Ladder& object : GetLadders())                 CreateStaticPrimtiveInstances(object.GetMeshNodes());
+        //for (Ladder& object : GetLadders())                 CreateStaticPrimtiveInstances(object.GetMeshNodes()); why didn't this work? some bug
         for (Light& object : GetLights())					CreateStaticPrimtiveInstances(object.GetMeshNodes());
         for (Piano& object : GetPianos())                   CreateStaticPrimtiveInstances(object.GetMeshNodes());
         for (Window& object : GetWindows())                 CreateStaticPrimtiveInstances(object.GetMeshNodes());

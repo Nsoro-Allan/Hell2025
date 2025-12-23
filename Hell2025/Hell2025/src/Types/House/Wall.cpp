@@ -384,6 +384,8 @@ void Wall::CreateWeatherBoards() {
         renderItem.baseColorTextureIndex = material->m_basecolor;
         renderItem.rmaTextureIndex = material->m_rma;
         renderItem.normalMapTextureIndex = material->m_normal;
+        renderItem.castCSMShadows = true;
+        renderItem.castShadows = true;
         Util::UpdateRenderItemAABB(renderItem);
         Util::PackUint64(m_objectId, renderItem.objectIdLowerBit, renderItem.objectIdUpperBit);
     }

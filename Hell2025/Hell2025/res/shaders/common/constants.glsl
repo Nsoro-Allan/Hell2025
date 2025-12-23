@@ -5,6 +5,8 @@
 #define HEIGHTMAP_SCALE_XZ 0.25
 #define TILE_SIZE 24
 
+
+
 //const vec3 WATER_ALBEDO = mix(vec3(0.4, 0.8, 0.6) * 0.1, vec3(0.01, 0.03, 0.04), 0.25);
 
 

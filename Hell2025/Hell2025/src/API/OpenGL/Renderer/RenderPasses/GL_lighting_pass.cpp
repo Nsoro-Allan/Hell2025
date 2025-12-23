@@ -104,9 +104,7 @@ namespace OpenGLRenderer {
         }
 
 
-        OpenGLSSBO* lightProjViewSSBO = GetSSBO("CSMLightProjViewMatrices");
-        OpenGLShadowMapArray* shadowMapArray = GetShadowMapArray("MoonlightPlayer1");
-        lightProjViewSSBO->Bind(15);
+        OpenGLShadowMapArray* shadowMapArray = GetShadowMapArray("MoonlightCSM");
 
         glActiveTexture(GL_TEXTURE10);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowMapArray->GetDepthTexture());

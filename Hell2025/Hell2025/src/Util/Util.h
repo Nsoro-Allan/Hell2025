@@ -154,6 +154,7 @@ namespace Util {
     std::string BlendingModeToString(BlendingMode mode);
     std::string CameraViewToString(CameraView cameraView);
     std::string DebugRenderModeToString(DebugRenderMode mode);
+    std::string DebugTextModeToString(DebugTextMode mode);
     std::string DoorTypeToString(DoorType type);
     std::string DoorMaterialTypeToString(DoorMaterialType type);
     std::string EditorModeToString(EditorMode editorMode);

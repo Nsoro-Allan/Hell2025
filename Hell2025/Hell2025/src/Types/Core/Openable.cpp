@@ -90,7 +90,7 @@ std::string Openable::Interact(const glm::vec3& cameraPosition, const glm::vec3&
     }
 
     if (m_locked && m_lockedAudio != UNDEFINED_STRING) {
-        Audio::PlayAudio(m_lockedAudio, m_audioVolume);
+        Audio::PlayAudio(m_lockedAudio, 0.75f);
 
         if (Door* door = World::GetDoorByObjectId(m_parentObjectId)) {
             if (door->GetDeadLockState()) {

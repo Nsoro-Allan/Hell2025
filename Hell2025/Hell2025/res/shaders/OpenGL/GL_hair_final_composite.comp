@@ -15,8 +15,10 @@ void main() {
         return;
     }    
 
-    // Inputs
+    // Early out if no hair
     vec4 hairComposite = texture(hairCompositeTexture, uv_screenspace);
+    if (hairComposite.a <= 0.0) return;
+
     vec4 lighting = texture(lightingTexture, uv_screenspace);
 
     // Perform alpha compositing (hair over lighting)

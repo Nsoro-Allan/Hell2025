@@ -43,11 +43,11 @@ void main() {
         return;
     }
 
-    vec3 re = RE() * 0.85;
-    vec3 og = OG();
-    
-    vec3 finalColor = mix(re, og, 0.5);
-    finalColor = og;
+    //vec3 re = RE() * 0.85;
+    //vec3 og = OG();
+    //vec3 finalColor = mix(re, og, 0.25);
+
+    vec3 finalColor = OG();
 
     imageStore(LightingImage, pixelCoords, vec4(finalColor, 1));
 }

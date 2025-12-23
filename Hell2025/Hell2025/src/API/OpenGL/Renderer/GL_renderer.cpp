@@ -174,7 +174,6 @@ namespace OpenGLRenderer {
         g_ssbos["RendererData"] = OpenGLSSBO(sizeof(RendererData), GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["InstanceData"] = OpenGLSSBO(sizeof(RenderItem) * MAX_INSTANCE_DATA_COUNT, GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["SkinningTransforms"] = OpenGLSSBO(sizeof(glm::mat4) * MAX_ANIMATED_TRANSFORMS, GL_DYNAMIC_STORAGE_BIT);
-        g_ssbos["CSMLightProjViewMatrices"] = OpenGLSSBO(sizeof(glm::mat4) * MAX_VIEWPORT_COUNT * SHADOW_CASCADE_COUNT, GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["Lights"] = OpenGLSSBO(sizeof(GPULight) * MAX_GPU_LIGHTS, GL_DYNAMIC_STORAGE_BIT);
         g_ssbos["ScreenSpaceBloodDecals"] = OpenGLSSBO(sizeof(ScreenSpaceBloodDecalInstanceData) * MAX_SCREEN_SPACE_BLOOD_DECAL_COUNT, GL_DYNAMIC_STORAGE_BIT);
 
@@ -229,11 +228,11 @@ namespace OpenGLRenderer {
 
         // Moon light shadow maps
         float depthMapResolution = SHADOW_MAP_CSM_SIZE;
-        int layerCount = g_shadowCascadeLevels.size() + 1;
+        int cascadeCount = int(g_shadowCascadeLevels.size()) + 1;
         int playerCount = 2;
-        layerCount *= playerCount;
-        g_shadowMapArrays["MoonlightPlayer1"] = OpenGLShadowMapArray();
-        g_shadowMapArrays["MoonlightPlayer1"].Init(layerCount, depthMapResolution, GL_DEPTH_COMPONENT32F);
+        int layerCount = playerCount * cascadeCount;
+        g_shadowMapArrays["MoonlightCSM"] = OpenGLShadowMapArray();
+        g_shadowMapArrays["MoonlightCSM"].Init(layerCount, depthMapResolution, GL_DEPTH_COMPONENT32F);
 
         InitFog();
         InitGrass();

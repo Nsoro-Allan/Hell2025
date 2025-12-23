@@ -33,6 +33,7 @@ namespace Util {
     std::string BlendingModeToString(BlendingMode mode)                         { return std::string(magic_enum::enum_name(mode)); }
     std::string CameraViewToString(CameraView cameraView)                       { return std::string(magic_enum::enum_name(cameraView)); }
     std::string DebugRenderModeToString(DebugRenderMode mode)                   { return std::string(magic_enum::enum_name(mode)); }
+    std::string DebugTextModeToString(DebugTextMode mode)                       { return std::string(magic_enum::enum_name(mode)); }
     std::string DoorTypeToString(DoorType type)                                 { return std::string(magic_enum::enum_name(type)); }
     std::string DoorMaterialTypeToString(DoorMaterialType type)                 { return std::string(magic_enum::enum_name(type)); }
     std::string EditorModeToString(EditorMode editorMode)                       { return std::string(magic_enum::enum_name(editorMode)); }

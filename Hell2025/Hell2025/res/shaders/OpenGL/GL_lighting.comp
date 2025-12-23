@@ -120,10 +120,13 @@ vec3 ShadowCalculationCSM(vec3 fragPosWorldSpace, vec3 normal, vec3 lightDir, ma
     vec2 texelSize = 1.0 / vec2(textureSize(shadowMapCSM, 0));
     float diskRadius = 2.0; // Radius in texture space (adjust as needed)
 
+    uint SHADOW_CASCADE_COUNT = 5;
+    uint arrayIndex = uint(layer) + (viewportIndex * SHADOW_CASCADE_COUNT);
+
     for (int i = 0; i < samples; ++i) {
         // Scale the disk sample by the texture size to get UV offsets
         vec2 offset = gridSamplingDiskCSM[i].xy * diskRadius * texelSize;
-        float pcfDepth = texture(shadowMapCSM, vec3(clamp(projCoords.xy + offset, 0.0, 1.0), layer)).r;
+        float pcfDepth = texture(shadowMapCSM, vec3(clamp(projCoords.xy + offset, 0.0, 1.0), arrayIndex)).r;
         shadow += (currentDepth - scaledBias) > pcfDepth ? 1.0 : 0.0;
     }
 

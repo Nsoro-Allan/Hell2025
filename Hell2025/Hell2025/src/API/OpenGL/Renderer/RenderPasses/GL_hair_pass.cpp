@@ -30,6 +30,24 @@ namespace OpenGLRenderer {
     void HairPass() {
         ProfilerOpenGLZoneFunction();
 
+        const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
+
+        // Early out if there is no hair to render
+        auto HasHair = [&](const std::vector<DrawIndexedIndirectCommand>(&commands)[4]) {
+            for (int v = 0; v < 4; v++) {
+                Viewport* viewport = ViewportManager::GetViewportByIndex(v);
+                if (!viewport || !viewport->IsVisible()) continue;
+                for (const DrawIndexedIndirectCommand& cmd : commands[v]) {
+                    if (cmd.instanceCount > 0) return true;
+                }
+            }
+            return false;
+        };
+
+        bool hasTop = HasHair(drawInfoSet.hairTopLayer);
+        bool hasBottom = HasHair(drawInfoSet.hairBottomLayer);
+        if (!hasTop && !hasBottom) return;
+
         UpdateHairDebugInput();
 
         OpenGLShader* shader = GetShader("HairFinalComposite");
@@ -47,7 +65,6 @@ namespace OpenGLRenderer {
 
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
 
-        const DrawCommandsSet& drawInfoSet = RenderDataManager::GetDrawInfoSet();
         RendererSettings& renderSettings = Renderer::GetCurrentRendererSettings();
 
         // Render all top then all Bottom layers
@@ -174,7 +191,7 @@ namespace OpenGLRenderer {
             }
             // Composite
             hairLayerCompositeShader->Bind();
-            glBindImageTexture(0, hairFrameBuffer->GetColorAttachmentHandleByName("Lighting"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
+            glBindImageTexture(0, hairFrameBuffer->GetColorAttachmentHandleByName("Lighting"), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16F);
             glBindImageTexture(1, hairFrameBuffer->GetColorAttachmentHandleByName("Composite"), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F);
             int workGroupsX = (hairFrameBuffer->GetWidth() + 7) / 8;
             int workGroupsY = (hairFrameBuffer->GetHeight() + 7) / 8;

@@ -31,11 +31,7 @@ namespace Debug {
     }
     void UpdateDebugText() {
 
-        if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER) return;
-        if (Debug::GetDebugTextMode() == DebugTextMode::NONE)       return;
-        if (Editor::IsOpen())                                       return;
-
-        // Midi notes
+        // Midi notes override
         if (MidiFileManager::IsPlaying()) {
             UIBackEnd::BlitText(MidiFileManager::GetDebugTextTime(), "StandardFont", 0, 0, Alignment::TOP_LEFT, 2.0f);
             UIBackEnd::BlitText(MidiFileManager::GetDebugTextEvents(), "StandardFont", 250, 0, Alignment::TOP_LEFT, 2.0f);
@@ -43,6 +39,10 @@ namespace Debug {
             UIBackEnd::BlitText(MidiFileManager::GetDebugTextTimeDurations(), "StandardFont", 750, 0, Alignment::TOP_LEFT, 2.0f);
             return;
         }
+
+        if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER) return;
+        if (Debug::GetDebugTextMode() == DebugTextMode::NONE)       return;
+        if (Editor::IsOpen())                                       return;
 
         // Regular global debug
         std::string text = "";
@@ -201,6 +201,12 @@ namespace Debug {
         g_debugTextMode = (DebugTextMode)(int(g_debugTextMode) + 1);
         if (g_debugTextMode == DebugTextMode::DEBUG_TEXT_MODE_COUNT) {
             g_debugTextMode = (DebugTextMode)0;
+        }
+        std::cout << "Debug text mode: " << Util::DebugTextModeToString(g_debugTextMode) << "\n";
+
+        if (g_debugTextMode == DebugTextMode::GLOBAL) {
+            std::cout << ".. skipping DebugTextMode::GLOBAL\n";
+            NextDebugTextMode();
         }
     }
 
