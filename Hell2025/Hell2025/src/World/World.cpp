@@ -295,6 +295,17 @@ namespace World {
         AddMermaid(mermaidCreateInfo);
         Logging::Init() << " C R E A T E D   M E R M A I D\n";
 
+
+        // Add shark
+        for (Shark& shark : GetSharks()) {
+            shark.CleanUp();
+        }
+        g_sharks.clear();
+
+        Shark& shark = g_sharks.emplace_back();
+        shark.Init(glm::vec3(5.0f, 29.05f, 40.0f));
+
+
         std::cout << "Mermaid count: " << World::GetMermaids().size();
         for (Mermaid& mermaid : World::GetMermaids()) {
             std::cout << mermaid.GetPosition() << "\n";
@@ -390,10 +401,6 @@ namespace World {
 
         Game::RespawnPlayers();
 
-        // Add shark
-        Shark& shark = g_sharks.emplace_back();
-        shark.Init(glm::vec3(5.0f, 29.05f, 40.0f));
-
         // Respawn roos
         for (Kangaroo& kangaroo : g_kangaroos) {
             kangaroo.Respawn();
@@ -481,11 +488,13 @@ namespace World {
         return g_pickUps.get(objectId);
     }
 
+    Staircase* GetStaircaseByObjectId(uint64_t objectId) {
+        return g_staircases.get(objectId);
+    }
+
     Wall* GetWallByObjectId(uint64_t objectId) {
         return g_walls.get(objectId);
     }
-
-
 
     AnimatedGameObject* GetAnimatedGameObjectByIndex(int32_t index) {
         if (index >= 0 && index < g_animatedGameObjects.size()) {
@@ -522,6 +531,15 @@ namespace World {
             std::cout << "World::GetLightByIndex() failed: index " << index << " out of range of size " << g_lights.size() << "\n";
             return nullptr;
         }
+    }
+
+    Light* GetLightByObjectId(uint64_t objectId) {
+        for (Light& light : g_lights) {
+            if (light.GetObjectId() == objectId) {
+                return &light;
+            }
+        }
+        return nullptr;
     }
 
     Tree* GetTreeByIndex(int32_t index) {
@@ -613,6 +631,10 @@ namespace World {
 
         if (Ladder* ladder = World::GetLadderByObjectId(objectId)) {
             ladder->SetPosition(position);
+        }
+
+        if (Light* light = World::GetLightByObjectId(objectId)) {
+            light->SetPosition(position);
         }
 
         if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {

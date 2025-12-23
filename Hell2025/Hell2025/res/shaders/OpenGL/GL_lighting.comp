@@ -332,7 +332,7 @@ void main() {
             
             vec4 FragPosLightSpace = lightProjectionView * vec4(worldSpacePosition.xyz, 1.0);
             float shadow = SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
-            
+            shadow = 0;
             
             //shadow = 0;
             
@@ -375,8 +375,6 @@ void main() {
             }
 
             directLighting += vec3(spotLighting) * flashlightModifer;
-
-
         }
     }
 
@@ -395,6 +393,8 @@ void main() {
     vec3 moonLighting = GetDirectionalLighting(u_moonlightDir, moonColor, moonLightStrength, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, viewPos);
     vec3 csmShadow = ShadowCalculationCSM(worldSpacePosition.xyz, normal.xyz, u_moonlightDir, viewMatrix);
     
+    //csmShadow = vec3(1,0,0);
+
     //csmShadow = vec3(1,1,1);
     
     moonLighting *= csmShadow;
@@ -442,7 +442,7 @@ void main() {
         spotLightColor - vec3(1.00, 0.7799999713897705, 0.5289999842643738);
 
         
-    spotLightColor = mix(spotLightColor, vec3(1, 0.7799999713897705, 0.5289999842643738), 0.5);    
+        spotLightColor = mix(spotLightColor, vec3(1, 0.7799999713897705, 0.5289999842643738), 0.5);    
         
         //float spotLightRadius = 0.0765;
         float spotLightRadius = 0.165;
@@ -656,5 +656,6 @@ void main() {
  //   outputColor.rgb = indirect;
 
     // Output
+    //outputColor.rgb = (directLighting.rgb);
     imageStore(outputImage, pixelCoords, outputColor);
 }

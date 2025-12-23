@@ -131,47 +131,6 @@ namespace Editor {
             !Input::LeftMouseDown() && GetEditorState() == EditorState::GIZMO_SCALING) {
             SetEditorState(EditorState::IDLE);
         }
-
-        // Translate the selected object
-        //if (GetEditorState() == EditorState::GIZMO_TRANSLATING) {
-        //
-        //    if (GetSelectedObjectType() == ObjectType::GAME_OBJECT) {
-        //        GameObject* gameObject = World::GetGameObjectByIndex(GetSelectedObjectIndex());
-        //        if (gameObject) {
-        //            gameObject->m_transform.position = Gizmo::GetPosition();
-        //        }
-        //    }
-        //
-        //    if (GetSelectedObjectType() == ObjectType::LIGHT) {
-        //        Light* light = World::GetLightByIndex(GetSelectedObjectIndex());
-        //        if (light) {
-        //            light->SetPosition(Gizmo::GetPosition());
-        //        }
-        //    }
-        //
-        //    if (GetSelectedObjectType() == ObjectType::PICK_UP) {
-        //        PickUp* pickUp = World::GetPickUpByIndex(GetSelectedObjectIndex());
-        //        if (pickUp) {
-        //            pickUp->SetPosition(Gizmo::GetPosition());
-        //        }
-        //    }
-        //
-        //    if (GetSelectedObjectType() == ObjectType::TREE) {
-        //        Tree* tree = World::GetTreeByIndex(GetSelectedObjectIndex());
-        //        if (tree) {
-        //            tree->SetPosition(Gizmo::GetPosition());
-        //        }
-        //    }
-        //}
-        // Rotate the selected object
-        //if (GetEditorState() == EditorState::GIZMO_ROTATING) {
-        //    if (GetSelectedObjectType() == ObjectType::GAME_OBJECT) {
-        //        GameObject* gameObject = World::GetGameObjectByIndex(GetSelectedObjectIndex());
-        //        if (gameObject) {
-        //            gameObject->m_transform.rotation = Gizmo::GetEulerRotation() + m_selectedObjectGizmoRotateOffset;
-        //        }
-        //    }
-        //}
     }
 
     void UpdateSelectRect() {

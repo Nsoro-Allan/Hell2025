@@ -175,6 +175,7 @@ namespace World {
     GenericObject* GetGenericObjectById(uint64_t objectId);
     HousePlane* GetHousePlaneByObjectId(uint64_t objectId);
     Ladder* GetLadderByObjectId(uint64_t objectId);
+    Light* GetLightByObjectId(uint64_t objectId); // Does not use slot map
     Staircase* GetStaircaseByObjectId(uint64_t objectId);
 
     Piano* GetPianoByObjectId(uint64_t objectId);

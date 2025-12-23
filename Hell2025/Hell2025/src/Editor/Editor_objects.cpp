@@ -217,6 +217,10 @@ namespace Editor {
                 Gizmo::SetRotation(ladder->GetRotation());
             }
 
+            if (Light* light = World::GetLightByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(light->GetPosition());
+            }
+
             if (GetSelectedObjectType() == ObjectType::PICTURE_FRAME) {
                 PictureFrame* pictureFrame = World::GetPictureFrameByObjectId(GetSelectedObjectId());
                 if (pictureFrame) {

@@ -16,46 +16,47 @@ namespace Editor {
         file.AddChild("Quit",   Shortcut::ESC,      Callbacks::QuitProgram);
 
         EditorUI::FileMenuNode& editor = g_fileMenu.AddMenuNode("Editor", Shortcut::NONE);
-        editor.AddChild("House",        Shortcut::F4,   Callbacks::OpenHouseEditor);
-        editor.AddChild("Map Objects",  Shortcut::F5,   Callbacks::OpenMapObjectEditor);
-        editor.AddChild("Map Height",   Shortcut::F6,   Callbacks::OpenMapHeightEditor);
+        editor.AddChild("House",                Shortcut::F4,   Callbacks::OpenHouseEditor);
+        editor.AddChild("Map Objects",          Shortcut::F5,   Callbacks::OpenMapObjectEditor);
+        editor.AddChild("Map Height",           Shortcut::F6,   Callbacks::OpenMapHeightEditor);
 
         if (GetEditorMode() != EditorMode::MAP_HEIGHT_EDITOR) {
             EditorUI::FileMenuNode& insert = g_fileMenu.AddMenuNode("Insert", Shortcut::NONE);
-            insert.AddChild("Reinsert last",   Shortcut::CTRL_T,   nullptr);
+            insert.AddChild("Reinsert last",    Shortcut::CTRL_T,   nullptr);
 
             EditorUI::FileMenuNode& bathroom = insert.AddChild("Bathroom", Shortcut::NONE);
-            bathroom.AddChild("Basin", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_BASIN);
-            bathroom.AddChild("Cabinet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CABINET);
-            bathroom.AddChild("Toilet", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
-            bathroom.AddChild("Towel", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
+            bathroom.AddChild("Basin",          Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_BASIN);
+            bathroom.AddChild("Cabinet",        Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_CABINET);
+            bathroom.AddChild("Toilet",         Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
+            bathroom.AddChild("Towel",          Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
 
             EditorUI::FileMenuNode& interior = insert.AddChild("Interior", Shortcut::NONE);
-            interior.AddChild("Door",          Shortcut::NONE, Editor::PlaceObject, ObjectType::DOOR);
-            interior.AddChild("Couch",         Shortcut::NONE, Editor::PlaceObject, ObjectType::WINDOW);
-            interior.AddChild("Drawers Small", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_SMALL);
-            interior.AddChild("Drawers Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
+            interior.AddChild("Door",           Shortcut::NONE, Editor::PlaceObject, ObjectType::DOOR);
+            interior.AddChild("Couch",          Shortcut::NONE, Editor::PlaceObject, ObjectType::WINDOW);
+            interior.AddChild("Drawers Small",  Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_SMALL);
+            interior.AddChild("Drawers Large",  Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::DRAWERS_LARGE);
 
-			interior.AddChild("Fireplace (Open)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::DEFAULT);
-			interior.AddChild("Fireplace (WoodStove)", Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::WOOD_STOVE);
+			interior.AddChild("Fireplace (Open)",   Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::DEFAULT);
+			interior.AddChild("Fireplace (Stove)",  Shortcut::NONE, Editor::PlaceFireplace, FireplaceType::WOOD_STOVE);
 
-            interior.AddChild("Window", Shortcut::NONE, Callbacks::BeginAddingWindow);
+            interior.AddChild("Window",         Shortcut::NONE, Callbacks::BeginAddingWindow);
 
             EditorUI::FileMenuNode& lights = insert.AddChild("Lights", Shortcut::NONE);
             lights.AddChild("Christmas Lights", Shortcut::NONE, Editor::SetEditorState, EditorState::PLACE_CHRISTMAS_LIGHTS);
-            lights.AddChild("Light", Shortcut::NONE, Editor::PlaceObject, ObjectType::LIGHT);
+            lights.AddChild("Light",            Shortcut::NONE, Editor::PlaceObject, ObjectType::LIGHT);
 
             EditorUI::FileMenuNode& misc = insert.AddChild("Misc", Shortcut::NONE);
-            misc.AddChild("Ladder", Shortcut::NONE, Editor::PlaceObject, ObjectType::LADDER);
+            misc.AddChild("Ladder",             Shortcut::NONE, Editor::PlaceObject, ObjectType::LADDER);
+            misc.AddChild("Staircase",          Shortcut::NONE, Editor::PlaceObject, ObjectType::STAIRCASE);
 
             EditorUI::FileMenuNode& nature = insert.AddChild("Nature", Shortcut::NONE);
-            nature.AddChild("BlackBerries", Shortcut::NONE,     Callbacks::BeginAddingBlackBerries);
-            nature.AddChild("Tree",         Shortcut::NONE,     Callbacks::BeginAddingTree);
+            nature.AddChild("BlackBerries",     Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_BLACKBERRIES);
+            nature.AddChild("Tree",             Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_TREE);
                         
             EditorUI::FileMenuNode& pickups = insert.AddChild("Pick Ups", Shortcut::NONE);
 
             EditorUI::FileMenuNode& testModels = insert.AddChild("Test Models", Shortcut::NONE);
-            testModels.AddChild("Test Model", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL);
+            testModels.AddChild("Test Model 1", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL);
             testModels.AddChild("Test Model 2", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL2);
             testModels.AddChild("Test Model 3", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL3);
             testModels.AddChild("Test Model 4", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TEST_MODEL4);
@@ -86,9 +87,9 @@ namespace Editor {
 
             if (GetEditorMode() == EditorMode::HOUSE_EDITOR) {
                 EditorUI::FileMenuNode& build = g_fileMenu.AddMenuNode("Build", Shortcut::NONE, nullptr);
-                build.AddChild("Ceiling", Shortcut::NONE, Editor::PlaceHousePlane, HousePlaneType::CEILING);
-                build.AddChild("Floor", Shortcut::NONE, Editor::PlaceHousePlane, HousePlaneType::FLOOR);
-                build.AddChild("Wall", Shortcut::NONE, Editor::SetEditorState, EditorState::PLACE_WALL);
+                build.AddChild("Ceiling",       Shortcut::NONE, Editor::PlaceHousePlane, HousePlaneType::CEILING);
+                build.AddChild("Floor",         Shortcut::NONE, Editor::PlaceHousePlane, HousePlaneType::FLOOR);
+                build.AddChild("Wall",          Shortcut::NONE, Editor::SetEditorState, EditorState::PLACE_WALL);
             }
         }
 

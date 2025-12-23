@@ -53,13 +53,13 @@ void Mermaid::Update(float deltaTime) {
     static bool titties = false;
     if (Input::KeyPressed(HELL_KEY_I)) {
         titties = !titties;
+        if (titties) {
+            m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
+        }
+        else {
+            m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DEFAULT);
+        }
         Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-    }
-    if (titties) {
-        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DO_NOT_RENDER);
-    }
-    else {
-        m_meshNodes.SetBlendingModeByMeshName("BoobTube", BlendingMode::DEFAULT);
     }
 }
 

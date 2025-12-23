@@ -115,6 +115,9 @@ namespace World {
         // Lights
         for (Light& light : GetLights()) {
             RenderDataManager::SubmitRenderItems(light.GetRenderItems());
+            if (Editor::GetSelectedObjectId() == light.GetObjectId()) {
+                RenderDataManager::SubmitOutlineRenderItems(light.GetRenderItems());
+            }
         }
 
         for (BulletCasing& bulletCasing : GetBulletCasings()) {

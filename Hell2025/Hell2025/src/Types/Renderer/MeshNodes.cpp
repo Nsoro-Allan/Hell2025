@@ -341,6 +341,7 @@ void MeshNodes::SetBlendingModeByMeshName(const std::string& meshName, BlendingM
     MeshNode* meshNode = GetMeshNodeByMeshName(meshName);
     if (meshNode) {
         meshNode->blendingMode = blendingMode;
+        ForceDirty();
     }
 }
 

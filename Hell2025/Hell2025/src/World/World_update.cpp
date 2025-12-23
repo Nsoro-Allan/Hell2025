@@ -140,7 +140,6 @@ namespace World {
       //    dobermann->SetAnimationModeToRagdollV2();
       //}
       
-
        
         auto& ragdolls = RagdollManager::GetRagdolls();
         for (auto it = ragdolls.begin(); it != ragdolls.end(); ) {
@@ -219,7 +218,7 @@ namespace World {
         for (Fence& object : GetFences())                           object.Update();
         for (Fireplace& object : GetFireplaces())                   object.Update(deltaTime);
         for (GameObject& object : GetGameObjects())                 object.Update(deltaTime);
-        for (HousePlane& object : GetHousePlanes())                 //object.Update(deltaTime);
+        //for (HousePlane& object : GetHousePlanes())               object.Update(deltaTime);
         for (GenericObject& object : GetGenericObjects())           object.Update(deltaTime);
         for (Kangaroo& object : GetKangaroos())                     object.Update(deltaTime);
         for (Ladder& object : GetLadders())                         object.Update(deltaTime);

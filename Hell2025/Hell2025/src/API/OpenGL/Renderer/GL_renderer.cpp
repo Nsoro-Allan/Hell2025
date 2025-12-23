@@ -229,6 +229,8 @@ namespace OpenGLRenderer {
         // Moon light shadow maps
         float depthMapResolution = SHADOW_MAP_CSM_SIZE;
         int layerCount = g_shadowCascadeLevels.size() + 1;
+        int playerCount = 2;
+        layerCount *= playerCount;
         g_shadowMapArrays["MoonlightPlayer1"] = OpenGLShadowMapArray();
         g_shadowMapArrays["MoonlightPlayer1"].Init(layerCount, depthMapResolution, GL_DEPTH_COMPONENT32F);
 
