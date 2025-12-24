@@ -7,13 +7,11 @@
 #include "Timer.hpp"
 
 #include "Ragdoll/RagdollManager.h"
-
 #include "Core/Game.h"
 
-
-Light::Light(LightCreateInfo createInfo) {   
+Light::Light(uint64_t id, LightCreateInfo& createInfo) {
     m_createInfo = createInfo;
-	m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
+	m_objectId = id;
     ConfigureMeshNodes();
 }
 

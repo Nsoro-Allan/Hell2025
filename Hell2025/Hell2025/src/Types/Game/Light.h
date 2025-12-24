@@ -27,7 +27,12 @@ struct LightFlicker {
 
 struct Light {
     Light() = default;
-    Light(LightCreateInfo createInfo);
+    Light(uint64_t id, LightCreateInfo& createInfo);
+    Light(const Light&) = delete;
+    Light& operator=(const Light&) = delete;
+    Light(Light&&) noexcept = default;
+    Light& operator=(Light&&) noexcept = default;
+    ~Light() = default;
 
     void Update(float deltaTime);
     void SetColor(const glm::vec3& color);

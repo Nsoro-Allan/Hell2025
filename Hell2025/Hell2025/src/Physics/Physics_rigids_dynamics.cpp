@@ -77,6 +77,7 @@ namespace Physics {
         // Create rigid dynamic
         PxTransform pxTransform = PxTransform(GlmMat4ToPxMat44(glm::mat4(1.0f)));
         PxRigidDynamic* pxRigidDynamic = pxPhysics->createRigidDynamic(pxTransform);
+        pxRigidDynamic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, kinematic);
 
         std::vector<PxShape*> pxShapes;
         float volume = 0.0f;

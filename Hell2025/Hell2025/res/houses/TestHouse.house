@@ -1371,35 +1371,6 @@
       "Type": "CEILING"
     },
     {
-      "EditorName": "Floor 11",
-      "Material": "FloorBoards",
-      "P0": [
-        1.149999976158142,
-        2.799999952316284,
-        4.550000190734863
-      ],
-      "P1": [
-        1.149999976158142,
-        2.799999952316284,
-        6.0
-      ],
-      "P2": [
-        4.200000762939453,
-        0.005342841148376465,
-        6.0
-      ],
-      "P3": [
-        4.199999809265137,
-        0.0,
-        4.550000190734863
-      ],
-      "TextureOffsetU": 0.0,
-      "TextureOffsetV": 0.0,
-      "TextureRotation": 0.0,
-      "TextureScale": 1.0,
-      "Type": "FLOOR"
-    },
-    {
       "EditorName": "Floor 12",
       "Material": "FloorBoards",
       "P0": [
@@ -1429,7 +1400,22 @@
       "Type": "FLOOR"
     }
   ],
-  "Staircases": [],
+  "Staircases": [
+    {
+      "EditorName": "UNDEFINED_STRING",
+      "Position": [
+        2.6159114837646484,
+        0.0,
+        1.1576446294784546
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "StepCount": 1
+    }
+  ],
   "Trees": [],
   "Walls": [
     {

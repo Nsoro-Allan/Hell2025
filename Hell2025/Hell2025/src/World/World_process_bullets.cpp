@@ -15,6 +15,11 @@ namespace World {
 
     void ProcessBullets() {
 
+        if (Input::KeyPressed(HELL_KEY_NUMPAD_5)) {
+            std::cout << "Light count: " << World::GetLights().size() << "\n";
+        }
+
+
         std::vector<Bullet>& bullets = GetBullets();
         std::vector<Bullet> newBullets;
         bool glassWasHit = false;
@@ -181,6 +186,19 @@ namespace World {
                 if (physXRayResult.userData.objectType == ObjectType::RAGDOLL_PLAYER) {
                     Player* player = Game::GetPlayerByPlayerId(objectId);
                     if (player) {
+
+                        // Head shot hack
+                        if (Ragdoll* ragdoll = player->GetRagdoll()) {
+                            int max = std::min(ragdoll->m_rigidDynamicIds.size(), ragdoll->m_correspondingBoneNames.size());
+                            for (int i = 0; i < max; i++) {
+                                if (ragdoll->m_rigidDynamicIds[i] == physXRayResult.userData.physicsId) {
+                                    if (ragdoll->m_correspondingBoneNames[i] == "CC_Base_Head") {
+                                        player->Kill();
+                                    }
+                                }
+                            }
+                        }
+
                         player->GiveDamage(bullet.GetDamage(), bullet.GetOwnerObjectId());
 
                         // REMOVE ME!!!! you are already doing this below. figure out better force system

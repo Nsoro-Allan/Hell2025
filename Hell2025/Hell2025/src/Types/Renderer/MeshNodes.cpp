@@ -647,7 +647,9 @@ void MeshNodes::WakeAllPhysics() {
 void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
     for (MeshNode& meshNode : m_meshNodes) {
         if (meshNode.rigidDynamicId != 0) {
-            Physics::AddFoceToRigidDynamic(meshNode.rigidDynamicId, force);
+            if (!Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
+                 Physics::AddFoceToRigidDynamic(meshNode.rigidDynamicId, force);
+            }
         }
     }
 }

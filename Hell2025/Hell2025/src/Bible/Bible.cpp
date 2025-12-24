@@ -56,6 +56,7 @@ namespace Bible {
             case GenericObjectType::BATHROOM_CABINET:           return ConfigureMeshNodesBathroomCabinet(id, meshNodes);
             case GenericObjectType::DRAWERS_SMALL:              return ConfigureMeshNodesDrawersSmall(id, meshNodes);
             case GenericObjectType::DRAWERS_LARGE:              return ConfigureMeshNodesDrawersLarge(id, meshNodes);
+            case GenericObjectType::MERMAID_ROCK:               return ConfigureMeshNodesMermaidRock(id, meshNodes);
             case GenericObjectType::TOILET:                     return ConfigureMeshNodesToilet(id, meshNodes);
             case GenericObjectType::COUCH:                      return ConfigureMeshNodesCouch(id, meshNodes);
             case GenericObjectType::PLANT_BLACKBERRIES:         return ConfigureMeshNodesPlantBlackBerries(id, meshNodes);

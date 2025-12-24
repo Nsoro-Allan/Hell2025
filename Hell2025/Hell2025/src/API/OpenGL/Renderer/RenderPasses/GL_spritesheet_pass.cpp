@@ -50,7 +50,7 @@ namespace OpenGLRenderer {
                 shader->SetVec4("u_position", renderItem.position);
                 shader->SetVec4("u_rotation", renderItem.rotation);
                 shader->SetVec4("u_scale", renderItem.scale);
-                shader->SetInt("u_isBillboard", false); // check this shit, on the muzzleflash createinfo coz u have wrong uniform name here!!!!!!!
+                shader->SetInt("u_billboard", false); // check this shit, on the muzzleflash createinfo coz u have wrong uniform name here!!!!!!!
                 shader->SetFloat("u_uOffset", renderItem.uOffset);
                 shader->SetFloat("u_vOffset", renderItem.vOffset);
                 shader->SetVec4("u_worldBoundsMin", renderItem.aabbMin);

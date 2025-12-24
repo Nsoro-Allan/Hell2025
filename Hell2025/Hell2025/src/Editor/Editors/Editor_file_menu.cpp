@@ -56,8 +56,9 @@ namespace Editor {
             misc.AddChild("Staircase",          Shortcut::NONE, Editor::PlaceObject, ObjectType::STAIRCASE);
 
             EditorUI::FileMenuNode& nature = insert.AddChild("Nature", Shortcut::NONE);
-            nature.AddChild("BlackBerries",     Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_BLACKBERRIES);
-            nature.AddChild("Tree",             Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_TREE);
+            nature.AddChild("Mermaid Visitor Rock",     Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::MERMAID_ROCK);
+            nature.AddChild("BlackBerries",             Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_BLACKBERRIES);
+            nature.AddChild("Tree",                     Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::PLANT_TREE);
                         
             EditorUI::FileMenuNode& pickups = insert.AddChild("Pick Ups", Shortcut::NONE);
 

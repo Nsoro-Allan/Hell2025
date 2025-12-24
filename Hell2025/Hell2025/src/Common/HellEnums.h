@@ -520,6 +520,8 @@ enum struct GenericObjectType {
     BATHROOM_BASIN,
     BATHROOM_CABINET,
     BATHROOM_TOWEL_RACK,
+    
+    MERMAID_ROCK,
 
     PLANT_BLACKBERRIES,
     PLANT_TREE,

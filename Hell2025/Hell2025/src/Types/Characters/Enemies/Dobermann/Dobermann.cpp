@@ -257,7 +257,8 @@ void Dobermann::CreateCharacterController(const glm::vec3& position) {
     PhysicsFilterData physicsFilterData;
     physicsFilterData.raycastGroup = RaycastGroup::RAYCAST_ENABLED;
     physicsFilterData.collisionGroup = CollisionGroup::CHARACTER_CONTROLLER;
-    physicsFilterData.collidesWith = CollisionGroup(ENVIROMENT_OBSTACLE | CHARACTER_CONTROLLER);
+    //physicsFilterData.collidesWith = CollisionGroup(ENVIROMENT_OBSTACLE | CHARACTER_CONTROLLER);
+    physicsFilterData.collidesWith = CollisionGroup(ENVIROMENT_OBSTACLE);
 
     m_characterControllerId = Physics::CreateCharacterController(m_objectId, position, capsuleHeight, capsuleRadius, physicsFilterData);
 }

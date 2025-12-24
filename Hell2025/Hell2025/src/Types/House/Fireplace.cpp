@@ -156,9 +156,10 @@ void Fireplace::UpdateWorldMatrix() {
     lightCreateInfo.type = LightType::FIREPLACE_FIRE;
     lightCreateInfo.saveToFile = false;
     lightCreateInfo.radius = 2.75f;
-    uint64_t lightId = World::AddLight(lightCreateInfo, SpawnOffset());
 
-    if (Light* light = World::GetLightByObjectId(lightId)) {
+    m_lightId = World::AddLight(lightCreateInfo, SpawnOffset());
+
+    if (Light* light = World::GetLightByObjectId(m_lightId)) {
         light->m_doFlicker = true;
         std::cout << "SUCCUESFULLY SET LIGHT TO FLICKKKKKKKKER\n";
     }
@@ -224,4 +225,6 @@ void Fireplace::Update(float deltaTime) {
 
 void Fireplace::CleanUp() {
     m_meshNodes.CleanUp();
+
+    World::RemoveObject(m_lightId);
 }

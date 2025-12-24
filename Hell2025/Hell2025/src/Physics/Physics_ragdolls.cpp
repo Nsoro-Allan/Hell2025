@@ -213,6 +213,26 @@ namespace Physics {
                 ragdoll.m_rigidDynamicIds.push_back(rigidDynmamicId);
                 ragdoll.m_correspondingBoneNames.push_back(rigidComponent.correspondingJointName);
 
+                std::cout << rigidComponent.correspondingJointName << "\n";
+
+                //if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(rigidDynmamicId)) {
+                //    if (PxRigidDynamic* pxRigidDynamic = rigidDynamic->GetPxRigidDynamic()) {
+                //        pxRigidDynamic->setName(rigidComponent.correspondingJointName.c_str());
+                //        std::cout << "Set rigid name to " << pxRigidDynamic->getName() << '\n';
+                //    }
+                //}
+                
+             // if (rigidComponent.correspondingJointName == "CC_Base_Head") {
+             //
+             //     
+             //     PhysicsUserData userData;
+             //     //userData.physicsId = rigidDynmamicId;
+             //     userData.objectId = 666; // HELLA SKETCHY
+             //     //userData.physicsType = PhysicsType::RIGID_DYNAMIC;
+             //     //userData.objectType = UniqueID::GetType(meshNode->parentObjectId);
+             //     Physics::SetRigidDynamicUserData(rigidDynmamicId, userData);
+             // }
+                
                 rigidComponentIds.push_back(rigidComponent.ID);
             }
             else if (rigidComponent.shapeType == "Box") {

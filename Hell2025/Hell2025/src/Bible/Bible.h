@@ -38,6 +38,7 @@ namespace Bible {
     void ConfigureMeshNodesCouch(uint64_t, MeshNodes& meshNodes);
     void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes);
     void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes& meshNodes);
     void ConfigureMeshNodesPlantBlackBerries(uint64_t id, MeshNodes& meshNodes);
     void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes& meshNodes);
     void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes);

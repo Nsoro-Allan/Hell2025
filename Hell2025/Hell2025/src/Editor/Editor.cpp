@@ -176,6 +176,14 @@ namespace Editor {
             return;
         }
 
+       // if (Input::KeyPressed(HELL_KEY_T)) {
+       //     PlaceGenericObject(GenericObjectType::PLANT_TREE);
+       // }
+       // if (Input::KeyPressed(HELL_KEY_B)) {
+       //     PlaceGenericObject(GenericObjectType::PLANT_BLACKBERRIES);
+       // }
+       //
+
         g_editorStateWasIdleLastFrame = (g_editorState == EditorState::IDLE);
 
         UpdateCamera();    // you swapped these two, maybe it was better before?

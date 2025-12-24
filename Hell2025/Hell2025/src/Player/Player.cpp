@@ -488,6 +488,7 @@ void Player::GiveDamage(int damage, uint64_t enemyId) {
 
 void Player::Kill() {
     if (m_alive) {
+        m_flashlightOn = false;
         m_deathCount++;
         m_alive = false;
         m_characterModelAnimatedGameObject.SetAnimationModeToRagdoll();

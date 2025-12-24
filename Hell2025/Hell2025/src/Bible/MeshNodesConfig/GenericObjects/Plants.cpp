@@ -30,9 +30,39 @@ namespace Bible {
     void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes& meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
+        MeshNodeCreateInfo& tree = meshNodeCreateInfoSet.emplace_back();
+        tree.meshName = "Tree";
+        tree.materialName = "Tree";
+        tree.rigidDynamic.createObject = true;
+        tree.rigidDynamic.kinematic = true;
+        tree.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+        tree.rigidDynamic.convexMeshModelName = "CollisionMesh_TreeLarge_0";
+        tree.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        tree.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        tree.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+
         meshNodes.Init(id, "TreeLarge_0", meshNodeCreateInfoSet);
 
         meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_0");
+        meshNodes.CastCSMShadows();
+    }
+
+    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes& meshNodes) {
+        std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
+
+        MeshNodeCreateInfo& tree = meshNodeCreateInfoSet.emplace_back();
+        tree.meshName = "Rock2";
+        tree.materialName = "Rock";
+        tree.rigidDynamic.createObject = true;
+        tree.rigidDynamic.kinematic = true;
+        tree.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+        tree.rigidDynamic.convexMeshModelName = "CollisionMesh_Rock2";
+        tree.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        tree.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        tree.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+
+        meshNodes.Init(id, "Rock2", meshNodeCreateInfoSet);
+
         meshNodes.CastCSMShadows();
     }
 }

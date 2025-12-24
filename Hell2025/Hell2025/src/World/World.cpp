@@ -326,6 +326,7 @@ namespace World {
         for (PickUpCreateInfo& createInfo : createInfoCollection.pickUps)                   AddPickUp(createInfo, spawnOffset);
         for (PictureFrameCreateInfo& createInfo : createInfoCollection.pictureFrames)       AddPictureFrame(createInfo, spawnOffset);
         for (HousePlaneCreateInfo& createInfo : createInfoCollection.housePlanes)           AddHousePlane(createInfo, spawnOffset);
+        for (StaircaseCreateInfo& createInfo : createInfoCollection.staircases)             AddStaircase(createInfo, spawnOffset);
         for (TreeCreateInfo& createInfo : createInfoCollection.trees)                       AddTree(createInfo, spawnOffset);
         for (WallCreateInfo& createInfo : createInfoCollection.walls)                       AddWall(createInfo, spawnOffset);
         for (WindowCreateInfo& createInfo : createInfoCollection.windows)                   AddWindow(createInfo, spawnOffset);
@@ -339,10 +340,11 @@ namespace World {
         for (Fireplace& object       : World::GetFireplaces())       createInfoCollection.fireplaces.push_back(object.GetCreateInfo());
         for (GenericObject& object   : World::GetGenericObjects())   createInfoCollection.genericObjects.push_back(object.GetCreateInfo());
         for (Ladder& object          : World::GetLadders())          createInfoCollection.ladders.push_back(object.GetCreateInfo());
-        for (Light& object           : World::GetLights())           createInfoCollection.lights.push_back(object.GetCreateInfo());
+        //for (Light& object           : World::GetLights())           createInfoCollection.lights.push_back(object.GetCreateInfo());
         for (Piano& object           : World::GetPianos())           createInfoCollection.pianos.push_back(object.GetCreateInfo());
-        for (PickUp& object          : World::GetPickUps())          createInfoCollection.pickUps.push_back(object.GetCreateInfo());
+
         for (PictureFrame& object    : World::GetPictureFrames())    createInfoCollection.pictureFrames.push_back(object.GetCreateInfo());
+        for (Staircase& object       : World::GetStaircases())       createInfoCollection.staircases.push_back(object.GetCreateInfo());
         for (Tree& object            : World::GetTrees())            createInfoCollection.trees.push_back(object.GetCreateInfo());
         for (Wall& object            : World::GetWalls())            createInfoCollection.walls.push_back(object.GetCreateInfo());
         for (Window& object          : World::GetWindows())          createInfoCollection.windows.push_back(object.GetCreateInfo());
@@ -351,6 +353,18 @@ namespace World {
         for (HousePlane& housePlane : World::GetHousePlanes()) {
             if (housePlane.GetParentDoorId() == 0) {
                 createInfoCollection.housePlanes.push_back(housePlane.GetCreateInfo());
+            }
+        }
+
+        for (PickUp& object : World::GetPickUps()) {
+            if (object.GetCreateInfo().saveToFile) {
+                createInfoCollection.pickUps.push_back(object.GetCreateInfo());
+            }
+        }
+
+        for (Light& object : World::GetLights()) {
+            if (object.GetCreateInfo().saveToFile) {
+                createInfoCollection.lights.push_back(object.GetCreateInfo());
             }
         }
 
@@ -1049,11 +1063,14 @@ namespace World {
     }
 
     uint64_t AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
-        createInfo.position += spawnOffset.translation;
-        g_lights.push_back(Light(createInfo));
+        uint64_t id = UniqueID::GetNextObjectId(ObjectType::LIGHT);
 
-        // clean me up
-        return g_lights[g_lights.size() - 1].GetObjectId();
+        createInfo.position += spawnOffset.translation;
+        g_lights.emplace_back(Light(id, createInfo));
+
+        std::cout << "CREATED LIGHT " << id << "\n";
+
+        return id;
     }
 
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {
@@ -1083,6 +1100,7 @@ namespace World {
     void AddTree(TreeCreateInfo createInfo, SpawnOffset spawnOffset) {
         Logging::Warning() << "World::AddTree(...) failed cause you removed the that did it, to stop some whack crash";
         createInfo.position += spawnOffset.translation;
+
         if (createInfo.editorName == UNDEFINED_STRING) {
             createInfo.editorName = Editor::GetNextAvailableTreeName(createInfo.type);
         }
