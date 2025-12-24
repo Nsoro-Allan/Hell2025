@@ -23,6 +23,7 @@ struct Shark {
     void PlayAndLoopAnimation(const std::string& animationName, float speed);
     void SetMovementState(SharkMovementState state);
     void StraightenSpine(float deltaTime, float straightSpeed);
+    void DrawDebug();
     
     std::string GetDebugInfoAsString();
 
@@ -85,6 +86,9 @@ private:
     int32_t m_nextPathPointIndex = 0;
     glm::vec3 m_targetPosition = glm::vec3(0);
     std::vector<glm::vec3> m_path;
+
+
+    float m_pathBezierT = 0.0f;
 
     //
 

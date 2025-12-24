@@ -6,6 +6,14 @@
 #include "World/World.h"
 #include "UniqueId.h"
 
+inline glm::vec3 NormalizeXZOr(const glm::vec3& v, const glm::vec3& fallback) {
+    glm::vec3 out = v;
+    out.y = 0.0f;
+    float lenSq = glm::dot(out, out);
+    if (lenSq > 0.000001f) return out / std::sqrt(lenSq);
+    return fallback;
+}
+
 std::vector<glm::vec3> GetCirclePoints(const glm::vec3& center, int segments, float radius) {
     std::vector<glm::vec3> pts;
     pts.reserve(segments);
@@ -138,11 +146,162 @@ void Shark::Init(glm::vec3 initialPosition) {
 
 }
 
-void Shark::Update(float deltaTime) {
-    if (false) {
-        for (glm::vec3 point : m_path) {
-            Renderer::DrawPoint(point, RED);
+static inline glm::vec3 CatmullRomUniform(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float t) {
+    float t2 = t * t;
+    float t3 = t2 * t;
+    return 0.5f * ((2.0f * p1) +
+        (-p0 + p2) * t +
+        (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+        (-p0 + 3.0f * p1 - 3.0f * p2 + p3) * t3);
+}
+
+std::vector<glm::vec3> SmoothPath(std::vector<glm::vec3>& path, float spacing) {
+    std::vector<glm::vec3> out;
+    const int n = (int)path.size();
+    if (n == 0) return out;
+    if (n == 1) { out.push_back(path[0]); return out; }
+    if (!(spacing > 0.0f)) return path;
+
+    auto SafeDist = [](const glm::vec3& a, const glm::vec3& b) -> float {
+        return glm::length(b - a);
+        };
+
+    std::vector<glm::vec3> dense;
+    dense.reserve(n * 32);
+
+    const float desiredStep = std::max(0.001f, spacing * 0.25f);
+    for (int i = 0; i < n; ++i) {
+        const glm::vec3& p0 = path[(i - 1 + n) % n];
+        const glm::vec3& p1 = path[i];
+        const glm::vec3& p2 = path[(i + 1) % n];
+        const glm::vec3& p3 = path[(i + 2) % n];
+
+        float chord = SafeDist(p1, p2);
+        int steps = (int)std::ceil(std::max(2.0f, chord / desiredStep));
+        steps = std::clamp(steps, 2, 128);
+
+        if (i == 0) dense.push_back(p1);
+        for (int s = 1; s <= steps; ++s) {
+            float t = (float)s / (float)steps;
+            glm::vec3 pt = CatmullRomUniform(p0, p1, p2, p3, t);
+            dense.push_back(pt);
         }
+    }
+
+    {
+        std::vector<glm::vec3> cleaned;
+        cleaned.reserve(dense.size());
+        cleaned.push_back(dense[0]);
+        for (size_t i = 1; i < dense.size(); ++i) {
+            if (SafeDist(cleaned.back(), dense[i]) > 1e-6f) cleaned.push_back(dense[i]);
+        }
+        dense.swap(cleaned);
+    }
+
+    const int m = (int)dense.size();
+    if (m < 2) return dense;
+
+    float totalLen = 0.0f;
+    for (int i = 0; i < m - 1; ++i) totalLen += SafeDist(dense[i], dense[i + 1]);
+    totalLen += SafeDist(dense[m - 1], dense[0]);
+    if (!(totalLen > 1e-6f)) return dense;
+
+    float ratio = totalLen / spacing;
+    int outCount = (int)std::ceil(ratio - 1e-5f);
+    outCount = std::max(outCount, 3);
+
+    out.reserve(outCount);
+
+    int segIndex = 0;
+    glm::vec3 a = dense[0];
+    glm::vec3 b = dense[1];
+    float segLen = SafeDist(a, b);
+    float travelled = 0.0f;
+
+    auto AdvanceSegment = [&]() {
+        ++segIndex;
+        if (segIndex < m - 1) {
+            a = dense[segIndex];
+            b = dense[segIndex + 1];
+        }
+        else {
+            a = dense[m - 1];
+            b = dense[0];
+        }
+        segLen = SafeDist(a, b);
+        };
+
+    for (int k = 0; k < outCount; ++k) {
+        float nextTarget = (float)k * spacing;
+
+        while (travelled + segLen < nextTarget) {
+            travelled += segLen;
+            AdvanceSegment();
+
+            if (segLen <= 1e-8f) {
+                int guard = 0;
+                while (segLen <= 1e-8f && guard++ < m + 4) {
+                    travelled += segLen;
+                    AdvanceSegment();
+                }
+                if (segLen <= 1e-8f) break;
+            }
+        }
+
+        float remain = nextTarget - travelled;
+        float t = (segLen > 1e-8f) ? (remain / segLen) : 0.0f;
+        t = std::clamp(t, 0.0f, 1.0f);
+        out.push_back(a + (b - a) * t);
+    }
+
+    return out;
+}
+
+
+void Shark::DrawDebug() {
+    for (const glm::vec3& point : m_path) {
+        Renderer::DrawPoint(point, RED);
+    }
+
+    const glm::vec3& p1 = m_spinePositions[0];
+    Renderer::DrawPoint(p1, YELLOW);
+
+    // Forward vector
+    glm::vec3 p2 = p1 + m_forward;
+    Renderer::DrawLine(p1, p2, YELLOW);
+    Renderer::DrawPoint(p2, YELLOW);
+
+    // Dir to target
+    glm::vec3 a = p1 * glm::vec3(1.0f, 0.0f, 1.0f);
+    glm::vec3 b = m_targetPosition * glm::vec3(1.0f, 0.0f, 1.0f);
+    glm::vec3 dirToTarget = glm::normalize(b - a);
+    glm::vec3 p3 = p1 + dirToTarget;;
+    Renderer::DrawLine(p1, p3, GREEN);
+    Renderer::DrawPoint(p3, GREEN);
+
+    // Target XZ
+    glm::vec3 p4 = m_targetPosition;
+    p4.y = m_path[0].y;// p1.y;
+    Renderer::DrawPoint(p4, WHITE);
+}
+
+void Shark::Update(float deltaTime) {
+
+
+
+    if (Input::KeyPressed(HELL_KEY_PERIOD)) {
+        float spacing = 1.0f;
+        m_path = SmoothPath(m_path, spacing);
+    }
+
+    if (Input::KeyPressed(HELL_KEY_COMMA)) {
+        glm::vec3 center(10.0f, 30.0f, 58.0f);
+        float radius = 10;
+        int segments = 9;
+        m_path = GetCirclePoints(center, segments, radius);
+        m_path.erase(m_path.begin() + 2);
+        m_path.erase(m_path.begin() + 2);
+        m_path.erase(m_path.begin() + 2);
     }
 
     // Did the player enter the water again while the shark is still angry from being like shot before
@@ -224,8 +383,8 @@ void Shark::Update(float deltaTime) {
         // Path following
         else if (m_movementState == SharkMovementState::FOLLOWING_PATH ||
                  m_movementState == SharkMovementState::FOLLOWING_PATH_ANGRY) {
-            CalculateForwardVectorFromTarget(deltaTime);
             CalculateTargetFromPath();
+            CalculateForwardVectorFromTarget(deltaTime);
 
             for (int i = 0; i < m_logicSubStepCount; i++) {
                 MoveShark(deltaTime);
@@ -265,6 +424,8 @@ void Shark::Update(float deltaTime) {
             animatedGameObject->PauseAllAnimationLayers();
         }
     }
+
+    //DrawDebug();
 }
 
 void Shark::CleanUp() {
@@ -373,23 +534,82 @@ void Shark::CalculateTargetFromPlayer() {
     }
 }
 
-void Shark::CalculateTargetFromPath() {
-    AnimatedGameObject* animatedGameObject = GetAnimatedGameObject();
-    if (m_nextPathPointIndex >= m_path.size()) {
-        m_nextPathPointIndex = 0;
-    }
-    glm::vec3 nextPathPoint = m_path[m_nextPathPointIndex];
-    // Are you actually at the next point?
-    float nextPointThreshold = 1.0f;
-    if (GetDistanceToTarget2D() < nextPointThreshold) {
-        m_nextPathPointIndex++;
-        nextPathPoint = m_path[m_nextPathPointIndex];
-    }
-    glm::vec3 dirToNextPathPoint = glm::normalize(GetHeadPosition2D() - nextPathPoint);
-    m_targetPosition = nextPathPoint;
+// Forward-only (wrap) scan starting at startIndex. Returns an index into path.
+// Returns startIndex if nothing qualifies as "in front" (so it never go backwards).
+int GetClosestPointNotBehindSharkIndex_ForwardOnly(const std::vector<glm::vec3>& path,
+    int startIndex,
+    const glm::vec3& currentPosition,
+    const glm::vec3& currentForward,
+    float dotThreshold) {
+    if (path.empty()) return 0;
 
-    //std::cout << "m_nextPathPointIndex: " << m_nextPathPointIndex << "\n";
-    //std::cout << "m_path.size(): " << m_path.size() << "\n";
+    const int pathSize = (int)path.size();
+    if (startIndex < 0) startIndex = 0;
+    if (startIndex >= pathSize) startIndex = 0;
+
+    glm::vec3 posXZ = currentPosition;
+    posXZ.y = 0.0f;
+
+    glm::vec3 forwardXZ = NormalizeXZOr(currentForward, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    int bestIndex = -1;
+    float bestDistSq = 0.0f;
+
+    for (int step = 0; step < pathSize; step++) {
+        int i = (startIndex + step) % pathSize;
+
+        glm::vec3 p = path[i];
+        p.y = 0.0f;
+
+        glm::vec3 toPoint = p - posXZ;
+        toPoint.y = 0.0f;
+
+        float distSq = glm::dot(toPoint, toPoint);
+        if (distSq < 0.000001f) {
+            return i;
+        }
+
+        float invLen = 1.0f / std::sqrt(distSq);
+        glm::vec3 toDir = toPoint * invLen;
+
+        float d = glm::dot(forwardXZ, toDir);
+        if (d <= dotThreshold) continue;
+
+        if (bestIndex == -1 || distSq < bestDistSq) {
+            bestIndex = i;
+            bestDistSq = distSq;
+        }
+    }
+
+    if (bestIndex == -1) return startIndex;
+    return bestIndex;
+}
+
+void Shark::CalculateTargetFromPath() {
+    if (m_path.empty()) return;
+
+    const int pathSize = (int)m_path.size();
+    if (m_nextPathPointIndex >= pathSize) m_nextPathPointIndex = 0;
+    if (m_nextPathPointIndex < 0) m_nextPathPointIndex = 0;
+
+    glm::vec3 headPos = GetHeadPosition2D();
+    headPos.y = 0.0f;
+
+    glm::vec3 forwardXZ = m_forward;
+    forwardXZ.y = 0.0f;
+
+    const float inFrontDotThreshold = 0.25f;
+
+    m_nextPathPointIndex = GetClosestPointNotBehindSharkIndex_ForwardOnly(
+        m_path,
+        m_nextPathPointIndex,
+        headPos,
+        forwardXZ,
+        inFrontDotThreshold
+    );
+
+    m_targetPosition = m_path[m_nextPathPointIndex];
+    m_targetPosition.y = 0.0f;
 }
 
 void Shark::MoveShark(float deltaTime) {
@@ -406,26 +626,134 @@ void Shark::MoveShark(float deltaTime) {
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+struct BezierSegment {
+    glm::vec3 p0;
+    glm::vec3 p1;
+    glm::vec3 p2;
+    glm::vec3 p3;
+};
+
+static inline glm::vec3 BezierPoint(const BezierSegment& s, float t) {
+    float u = 1.0f - t;
+    float tt = t * t;
+    float uu = u * u;
+    float uuu = uu * u;
+    float ttt = tt * t;
+    return (uuu * s.p0) + (3.0f * uu * t * s.p1) + (3.0f * u * tt * s.p2) + (ttt * s.p3);
+}
+
+static inline glm::vec3 BezierTangent(const BezierSegment& s, float t) {
+    float u = 1.0f - t;
+    return 3.0f * (u * u) * (s.p1 - s.p0)
+        + 6.0f * (u * t) * (s.p2 - s.p1)
+        + 3.0f * (t * t) * (s.p3 - s.p2);
+}
+
+// Builds a cubic Bezier for segment i: path[i] -> path[i+1], closed loop.
+// Tension in [0..1]. 0.5 is a solid default.
+static inline BezierSegment BuildBezierSegment_ClosedLoop(const std::vector<glm::vec3>& path, int i, float tension) {
+    const int n = (int)path.size();
+    int i0 = (i - 1 + n) % n;
+    int i1 = (i + 0) % n;
+    int i2 = (i + 1) % n;
+    int i3 = (i + 2) % n;
+
+    glm::vec3 p0 = path[i1];
+    glm::vec3 p3 = path[i2];
+
+    glm::vec3 t0 = (path[i2] - path[i0]) * (tension * 0.5f);
+    glm::vec3 t1 = (path[i3] - path[i1]) * (tension * 0.5f);
+
+    BezierSegment s;
+    s.p0 = p0;
+    s.p3 = p3;
+
+    // Convert Hermite-style endpoints+tangents to Bezier controls.
+    s.p1 = p0 + t0 / 3.0f;
+    s.p2 = p3 - t1 / 3.0f;
+    return s;
+}
+
+// Cheap length approximation (good enough for stepping t by distance).
+static inline float ApproxBezierLength(const BezierSegment& s) {
+    const int samples = 10;
+    float len = 0.0f;
+    glm::vec3 prev = BezierPoint(s, 0.0f);
+    for (int k = 1; k <= samples; k++) {
+        float t = (float)k / (float)samples;
+        glm::vec3 p = BezierPoint(s, t);
+        len += glm::length(p - prev);
+        prev = p;
+    }
+    return len;
+}
+
+
+
 void Shark::CalculateForwardVectorFromTarget(float deltaTime) {
-    // Calculate angular difference from forward to target
-    glm::vec3 directionToTarget = glm::normalize(GetTargetPosition2D() - GetHeadPosition2D());
-    float dotProduct = glm::clamp(glm::dot(m_forward, directionToTarget), -1.0f, 1.0f);
-    float angleDifference = glm::degrees(std::acos(dotProduct));
-    if (m_forward.x * directionToTarget.z - m_forward.z * directionToTarget.x < 0.0f) {
-        angleDifference = -angleDifference;
-    }
-    // Clamp it to a max of 4.5 degrees rotation
-    float maxRotation = 4.5f;
-    angleDifference = glm::clamp(angleDifference, -maxRotation, maxRotation);
-    // Calculate new forward vector based on that angle
-    if (TargetIsOnLeft(m_targetPosition)) {
-        float blendFactor = glm::clamp(glm::abs(-angleDifference) / 90.0f, 0.0f, 1.0f);
-        m_forward = glm::normalize(glm::mix(m_forward, m_left, blendFactor));
-    }
-    else {
-        float blendFactor = glm::clamp(glm::abs(angleDifference) / 90.0f, 0.0f, 1.0f);
-        m_forward = glm::normalize(glm::mix(m_forward, m_right, blendFactor));
-    }
+    //// Calculate angular difference from forward to target
+    //glm::vec3 directionToTarget = glm::normalize(GetTargetPosition2D() - GetHeadPosition2D());
+    //float dotProduct = glm::clamp(glm::dot(m_forward, directionToTarget), -1.0f, 1.0f);
+    //float angleDifference = glm::degrees(std::acos(dotProduct));
+    //if (m_forward.x * directionToTarget.z - m_forward.z * directionToTarget.x < 0.0f) {
+    //    angleDifference = -angleDifference;
+    //}
+    //// Clamp it to a max of 4.5 degrees rotation
+    //float maxRotation = 4.5f;
+    //angleDifference = glm::clamp(angleDifference, -maxRotation, maxRotation);
+    //// Calculate new forward vector based on that angle
+    //if (TargetIsOnLeft(m_targetPosition)) {
+    //    float blendFactor = glm::clamp(glm::abs(-angleDifference) / 90.0f, 0.0f, 1.0f);
+    //    m_forward = glm::normalize(glm::mix(m_forward, m_left, blendFactor));
+    //}
+    //else {
+    //    float blendFactor = glm::clamp(glm::abs(angleDifference) / 90.0f, 0.0f, 1.0f);
+    //    m_forward = glm::normalize(glm::mix(m_forward, m_right, blendFactor));
+    //}
+
+    glm::vec3 headPos = GetHeadPosition2D();
+    glm::vec3 targetPos = GetTargetPosition2D();
+
+    glm::vec3 forwardXZ = NormalizeXZOr(m_forward, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::vec3 desiredXZ = NormalizeXZOr(targetPos - headPos, forwardXZ);
+
+    float dotValue = glm::clamp(glm::dot(forwardXZ, desiredXZ), -1.0f, 1.0f);
+    float crossY = forwardXZ.x * desiredXZ.z - forwardXZ.z * desiredXZ.x;
+
+    // Signed angle from forward
+    float signedAngle = std::atan2(crossY, dotValue);
+
+    // Turn rate: degrees per second
+    float turnRateDegreesPerSecond = 225.0f;
+    float maxStep = glm::radians(turnRateDegreesPerSecond) * deltaTime;
+
+    if (signedAngle > maxStep) signedAngle = maxStep;
+    if (signedAngle < -maxStep) signedAngle = -maxStep;
+
+    float c = std::cos(signedAngle);
+    float s = std::sin(signedAngle);
+
+    glm::vec3 newForward;
+    newForward.x = forwardXZ.x * c - forwardXZ.z * s;
+    newForward.z = forwardXZ.x * s + forwardXZ.z * c;
+    newForward.y = 0.0f;
+
+    m_forward = NormalizeXZOr(newForward, forwardXZ);
+
+    // Keep these coherent
+    const glm::vec3 up(0.0f, 1.0f, 0.0f);
+    m_right = NormalizeXZOr(glm::cross(up, m_forward), glm::vec3(1.0f, 0.0f, 0.0f));
+    m_left = -m_right;
 }
 
 void Shark::CalculateForwardVectorFromArrowKeys(float deltaTime) {
