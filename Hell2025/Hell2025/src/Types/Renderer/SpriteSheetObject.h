@@ -3,6 +3,7 @@
 #include "CreateInfo.h"
 #include "Types/Renderer/SpriteSheetTexture.h"
 #include <string>
+#include "Math/AABB.h"
 
 struct SpriteSheetObject {
 public:
@@ -20,6 +21,7 @@ public:
     void SetSpeed(float speed);
     void EnableRendering();
     void DisableRendering();
+    void SetAABBBounds(const AABB& aabb);
 
     const bool IsRenderingEnabled()                 { return m_renderingEnabled; }
     const bool IsBillboard()                        { return m_billboard; }
@@ -54,4 +56,5 @@ private:
     float m_vOffset = 0.0f;
     SpriteSheetTexture* m_spriteSheetTexture;
     SpriteSheetRenderItem m_renderItem;
+    AABB m_worldBounds;
 };

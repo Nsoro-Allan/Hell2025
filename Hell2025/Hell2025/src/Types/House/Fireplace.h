@@ -2,6 +2,7 @@
 #include "HellTypes.h"
 #include "CreateInfo.h"
 #include "Types/Renderer/MeshNodes.h"
+#include "Types/Renderer/SpriteSheetObject.h"
 
 struct Fireplace {
     Fireplace() = default;
@@ -18,6 +19,8 @@ struct Fireplace {
     void SetPosition(const glm::vec3& position);
     void SetRotation(const glm::vec3& rotation);
 
+    bool m_useFireClipHeight = false; // Remove me
+
     uint64_t GetObjectId()                                      { return m_id; }
     AABB GetWallsAABB()                                         { return m_wallsAabb; }
 	MeshNodes& GetMeshNodes()                                   { return m_meshNodes; }
@@ -31,8 +34,10 @@ struct Fireplace {
     float GetWallWidth() const                                  { return m_wallWidth; }
     const glm::vec3 GetWorldForward() const                     { return m_worldForward; }
     const glm::vec3 GetWorldRight() const                       { return m_worldRight; }
+    const SpriteSheetRenderItem GetFireSpriteSheetRenderItem()  { return m_fireSpriteSheetObject.GetRenderItem(); }
 
 private:
+    void ConfigureFire();
     void UpdateWorldMatrix();
     uint64_t m_id = 0;
     FireplaceCreateInfo m_createInfo;
@@ -44,4 +49,9 @@ private:
     AABB m_wallsAabb;
     float m_wallDepth = 0.0f;
     float m_wallWidth = 0.0f;
+
+    SpriteSheetObject m_fireSpriteSheetObject;
+    glm::vec3 m_firePosition = glm::vec3(0.0f);
+
+    uint64_t m_lightId = 0;
 };

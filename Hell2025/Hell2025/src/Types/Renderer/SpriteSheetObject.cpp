@@ -18,6 +18,9 @@ void SpriteSheetObject::Init(const SpriteSheetObjectCreateInfo& createInfo) {
     m_spriteSheetTexture = AssetManager::GetSpriteSheetTextureByName(m_textureName);
     m_uOffset = createInfo.uvOffset.x;
     m_vOffset = createInfo.uvOffset.y;
+
+    // FIX  ME
+    m_worldBounds = AABB(glm::vec3(-9999999), glm::vec3(9999999));
 }
 
 void SpriteSheetObject::Update(float deltaTime) {
@@ -61,6 +64,8 @@ void SpriteSheetObject::Update(float deltaTime) {
         m_renderItem.scale = glm::vec4(m_scale, 0.0);
         m_renderItem.uOffset = m_uOffset;
         m_renderItem.vOffset = m_vOffset;
+        m_renderItem.aabbMin = glm::vec4(m_worldBounds.GetBoundsMin(), 1.0);
+        m_renderItem.aabbMax = glm::vec4(m_worldBounds.GetBoundsMax(), 0.0);
     }
 }
 
@@ -98,4 +103,8 @@ void SpriteSheetObject::EnableRendering() {
 
 void SpriteSheetObject::DisableRendering() {
     m_renderingEnabled = false;
+}
+
+void SpriteSheetObject::SetAABBBounds(const AABB& aabb) {
+    m_worldBounds = aabb;
 }

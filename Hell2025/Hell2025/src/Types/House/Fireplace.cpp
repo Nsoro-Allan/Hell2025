@@ -3,6 +3,7 @@
 #include "Input/Input.h"
 #include "Renderer/Renderer.h"
 #include "Util/Util.h"
+#include "World/World.h"
 
 Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_id = id;
@@ -18,17 +19,16 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 
     std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
-
     if (m_createInfo.type == FireplaceType::DEFAULT) {
 
         MeshNodeCreateInfo& walls = meshNodeCreateInfoSet.emplace_back();
         walls.meshName = "Fireplace_Body_Lower.002";
-        walls.rigidDynamic.createObject = true;
-        walls.rigidDynamic.kinematic = true;
-        walls.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
-        walls.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
-        walls.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
-        walls.addtoNavMesh = true;
+        //walls.rigidDynamic.createObject = true;
+        //walls.rigidDynamic.kinematic = true;
+        //walls.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
+        //walls.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
+        //walls.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
+        //walls.addtoNavMesh = true;
 
         m_meshNodes.Init(id, "Fireplace", meshNodeCreateInfoSet);
 
@@ -56,6 +56,7 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
         m_meshNodes.SetMaterialByMeshName("Fireplace_Wood_Log5_low", "T_Firewood");
         m_meshNodes.SetMaterialByMeshName("Fireplace_Coal1_low", "T_Firewood");
         m_meshNodes.SetMaterialByMeshName("Fireplace_Coal2_low", "T_Firewood");
+        m_meshNodes.SetBlendingModeByMeshName("FireBounds", BlendingMode::DO_NOT_RENDER);
 
         m_meshNodes.SetMaterialByMeshName("Fireplace_Walls_Chipped", "T_WallsChippedEdges");
         m_meshNodes.SetBlendingModeByMeshName("Fireplace_Walls_Chipped", BlendingMode::ALPHA_DISCARD);
@@ -107,6 +108,8 @@ Fireplace::Fireplace(uint64_t id, const FireplaceCreateInfo& createInfo, const S
 		m_meshNodes.SetMaterialByMeshName("FireplaceBrick_WallExtended", "FireplaceB_BrickWall1");
 
 		m_meshNodes.SetBlendingModeByMeshName("FireplaceBrick_StoveGlass", BlendingMode::GLASS);
+
+        m_useFireClipHeight = true;
 	}
 
     m_wallWidth = 0.766488f * 2.0f;
@@ -126,8 +129,61 @@ void Fireplace::UpdateWorldMatrix() {
 
     m_worldForward = m_worldMatrix * glm::vec4(localForward, 0.0f);
     m_worldRight = m_worldMatrix * glm::vec4(localRight, 0.0f);
+
+    // Fire
+    m_firePosition = m_transform.position;
+    m_firePosition.y += 0.3f;
+    m_firePosition += m_worldForward * 0.475f;
+
+    ConfigureFire();
+
+    // Remove the old light if there was one
+    if (m_lightId != 0) {
+        World::RemoveObject(m_lightId);
+    }
+
+
+   //struct LightCreateInfo {
+   //    glm::vec3 position = glm::vec3(0.0f);
+   //    glm::vec3 color = glm::vec3(1, 0.7799999713897705, 0.5289999842643738);
+   //    float radius = 6.0f;
+   //    float strength = 1.0f;
+   //    bool saveToFile = true;
+   //
+
+    LightCreateInfo lightCreateInfo;
+    lightCreateInfo.position = m_firePosition;
+    lightCreateInfo.type = LightType::FIREPLACE_FIRE;
+    lightCreateInfo.saveToFile = false;
+    lightCreateInfo.radius = 2.75f;
+    uint64_t lightId = World::AddLight(lightCreateInfo, SpawnOffset());
+
+    if (Light* light = World::GetLightByObjectId(lightId)) {
+        light->m_doFlicker = true;
+        std::cout << "SUCCUESFULLY SET LIGHT TO FLICKKKKKKKKER\n";
+    }
+
+    //Light* light = World::GetLightByObjectId(lightId);
+    //if (light) {
+    //    light->m_doFlicker = true;
+    //}
 }
 
+void Fireplace::ConfigureFire() {
+    SpriteSheetObjectCreateInfo createInfo;
+    createInfo.position = m_firePosition;
+    createInfo.rotation = glm::vec3(0.0f, HELL_PI * 0.5f, 0.0f);
+    createInfo.scale = glm::vec3(1.0f);
+    createInfo.uvOffset = glm::vec2(0.0f, 0.75f);
+    createInfo.loop = true;
+    createInfo.billboard = true;
+    createInfo.renderingEnabled = true;
+    createInfo.animationSpeed = 30.0f;
+    createInfo.textureName = "FireplaceFire_8x8";
+
+    m_fireSpriteSheetObject = SpriteSheetObject(createInfo);
+
+}
 void Fireplace::SetPosition(const glm::vec3& position) {
     m_createInfo.position = position;
     m_transform.position = position;
@@ -142,6 +198,18 @@ void Fireplace::SetRotation(const glm::vec3& rotation) {
 
 void Fireplace::Update(float deltaTime) {
     m_meshNodes.Update(m_worldMatrix);
+    m_fireSpriteSheetObject.Update(deltaTime);
+
+    //Renderer::DrawPoint(m_firePosition, RED);
+
+    //if (const AABB* aabb = m_meshNodes.GetWorldSpaceAabbByMeshName("FireBounds")) {
+    //    AABB aabbb(aabb->GetBoundsMin(), aabb->GetBoundsMax());
+    //    Renderer::DrawAABB(aabbb, YELLOW);
+    //}
+    //
+    //if (const AABB* aabb = m_meshNodes.GetWorldSpaceAabbByMeshName("FireBounds")) {
+    //    m_fireSpriteSheetObject.SetAABBBounds(*aabb);
+    //}
 
     //Renderer::DrawAABB(m_wallsAabb, WHITE, m_worldMatrix);
 

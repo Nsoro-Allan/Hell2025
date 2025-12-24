@@ -1048,9 +1048,12 @@ namespace World {
         g_gameObjects.push_back(GameObject(createInfo));
     }
 
-    void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
+    uint64_t AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset) {
         createInfo.position += spawnOffset.translation;
         g_lights.push_back(Light(createInfo));
+
+        // clean me up
+        return g_lights[g_lights.size() - 1].GetObjectId();
     }
 
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset) {

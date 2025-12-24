@@ -103,7 +103,7 @@ namespace World {
     void AddGameObject(GameObjectCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddHousePlane(HousePlaneCreateInfo createInfo, SpawnOffset spawnOffset);
     void AddKangaroo(const KangarooCreateInfo& createInfo);
-    void AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
+    uint64_t AddLight(LightCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddMermaid(MermaidCreateInfo createInfo, SpawnOffset spawnOffset = SpawnOffset());
     void AddScreenSpaceBloodDecal(ScreenSpaceBloodDecalCreateInfo createInfo);
     void AddPiano(PianoCreateInfo createInfo, SpawnOffset spawnOffset);

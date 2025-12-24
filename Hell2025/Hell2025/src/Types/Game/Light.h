@@ -5,6 +5,26 @@
 #include "CreateInfo.h"
 #include "HellTypes.h"
 
+
+struct LightFlicker {
+    float m_baseIntensity = 1.0f;
+    float m_amplitude = 0.25f; // 0..1
+    float m_responseHz = 12.0f; // smoothing speed
+    float m_slowFrequencyHz = 2.0f;
+    float m_midFrequencyHz = 6.5f;
+    float m_fastFrequencyHz = 11.0f;
+    float m_slowWeight = 0.60f;
+    float m_midWeight = 0.30f;
+    float m_fastWeight = 0.10f;
+    float m_shapePower = 1.8f; // The higher this value, the lower the peaks
+    glm::vec3 m_lowColor = glm::vec3(1.00f, 0.35f, 0.10f);
+    glm::vec3 m_highColor = glm::vec3(1.00f, 0.75f, 0.35f);
+    glm::vec3 m_currentColor = glm::vec3(1.0f);
+    float m_currentFlicker = 0.8f; // internal state in [0,1]
+
+    void Update(float deltaTime, float timeSeconds);
+};
+
 struct Light {
     Light() = default;
     Light(LightCreateInfo createInfo);
@@ -30,6 +50,9 @@ struct Light {
     const uint64_t GetObjectId() const                      { return m_objectId; }
     const LightCreateInfo& GetCreateInfo() const            { return m_createInfo; };
     const std::vector<RenderItem>& GetRenderItems() const   { return m_meshNodes.GetRenderItems(); }
+
+    bool m_doFlicker = false;
+    LightFlicker m_lightFlicker;
 
 private:
     void UpdateDirtyState();

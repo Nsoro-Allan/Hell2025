@@ -105,6 +105,8 @@ struct SpriteSheetRenderItem {
     glm::vec4 position;
     glm::vec4 rotation;
     glm::vec4 scale;
+    glm::vec4 aabbMin;
+    glm::vec4 aabbMax;
 
     float uOffset;
     float vOffset;

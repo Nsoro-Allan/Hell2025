@@ -288,6 +288,7 @@ enum DebugRenderMode {
 enum struct LightType {
     LAMP_POST = 0,
     HANGING_LIGHT,
+    FIREPLACE_FIRE,
     UNDEFINED
 };
 
