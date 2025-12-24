@@ -81,8 +81,8 @@ void main() {
     // Above water skybox
     // NOTE: exact float equality checks can be flakyor.
     if (waterWorldPos != vec3(0.0)) {
-        vec3 color = refactoredFinalLighting.rgb + (waterColor * waterColor * 10.0);
-        color = refactoredFinalLighting.rgb + (waterColor * 1.0);
+        vec3 color = refactoredFinalLighting.rgb + (waterColor * waterColor * 5.75) + (waterColor * 0.25);
+        //color = refactoredFinalLighting.rgb + waterColor;
         imageStore(LightingImage, pixelCoords, vec4(color, 1.0));
         return;
     }

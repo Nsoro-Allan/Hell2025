@@ -49,18 +49,21 @@ namespace Bible {
 
     void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes) {
         switch (type) {
-            case GenericObjectType::BATHROOM_BASIN:     return ConfigureMeshNodesBathroomBasin(id, meshNodes);
-            case GenericObjectType::BATHROOM_CABINET:   return ConfigureMeshNodesBathroomCabinet(id, meshNodes);
-            case GenericObjectType::DRAWERS_SMALL:      return ConfigureMeshNodesDrawersSmall(id, meshNodes);
-            case GenericObjectType::DRAWERS_LARGE:      return ConfigureMeshNodesDrawersLarge(id, meshNodes);
-            case GenericObjectType::TOILET:             return ConfigureMeshNodesToilet(id, meshNodes);
-            case GenericObjectType::COUCH:              return ConfigureMeshNodesCouch(id, meshNodes);
-            case GenericObjectType::PLANT_BLACKBERRIES: return ConfigureMeshNodesPlantBlackBerries(id, meshNodes);
-            case GenericObjectType::PLANT_TREE:         return ConfigureMeshNodesPlantTree(id, meshNodes);
-            case GenericObjectType::TEST_MODEL:         return ConfigureTestModel(id, meshNodes);
-            case GenericObjectType::TEST_MODEL2:        return ConfigureTestModel2(id, meshNodes);
-            case GenericObjectType::TEST_MODEL3:        return ConfigureTestModel3(id, meshNodes);
-            case GenericObjectType::TEST_MODEL4:        return ConfigureTestModel4(id, meshNodes);
+            case GenericObjectType::CHRISTMAS_PRESENT_SMALL:    return ConfigureMeshNodesChristmasPresentSmall(id, meshNodes);
+            case GenericObjectType::CHRISTMAS_PRESENT_LARGE:    return ConfigureMeshNodesChristmasPresentLarge(id, meshNodes);
+            case GenericObjectType::CHRISTMAS_TREE:             return ConfigureMeshNodesChristmasTree(id, meshNodes);
+            case GenericObjectType::BATHROOM_BASIN:             return ConfigureMeshNodesBathroomBasin(id, meshNodes);
+            case GenericObjectType::BATHROOM_CABINET:           return ConfigureMeshNodesBathroomCabinet(id, meshNodes);
+            case GenericObjectType::DRAWERS_SMALL:              return ConfigureMeshNodesDrawersSmall(id, meshNodes);
+            case GenericObjectType::DRAWERS_LARGE:              return ConfigureMeshNodesDrawersLarge(id, meshNodes);
+            case GenericObjectType::TOILET:                     return ConfigureMeshNodesToilet(id, meshNodes);
+            case GenericObjectType::COUCH:                      return ConfigureMeshNodesCouch(id, meshNodes);
+            case GenericObjectType::PLANT_BLACKBERRIES:         return ConfigureMeshNodesPlantBlackBerries(id, meshNodes);
+            case GenericObjectType::PLANT_TREE:                 return ConfigureMeshNodesPlantTree(id, meshNodes);
+            case GenericObjectType::TEST_MODEL:                 return ConfigureTestModel(id, meshNodes);
+            case GenericObjectType::TEST_MODEL2:                return ConfigureTestModel2(id, meshNodes);
+            case GenericObjectType::TEST_MODEL3:                return ConfigureTestModel3(id, meshNodes);
+            case GenericObjectType::TEST_MODEL4:                return ConfigureTestModel4(id, meshNodes);
 
             default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed: non-implemented GenericObjectType: '" << Util::GenericObjectTypeToString(type) << "'";
         }

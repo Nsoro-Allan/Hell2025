@@ -301,7 +301,7 @@ void main() {
             spotLightStregth = 3.5;
             
             if (worldSpacePosition.y < u_oceanHeight - 0.1) {
-                spotLightStregth *= 1.5;
+                spotLightStregth *= 2.0;
             }
 
             // Prevent flashlight being drawn on the back of your head when viewed by another player

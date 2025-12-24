@@ -22,6 +22,7 @@ Staircase::Staircase(uint64_t id, StaircaseCreateInfo& createInfo, SpawnOffset& 
     stairs.addtoNavMesh = true;
 
     m_meshNodes.Init(id, "Stairs", meshNodeCreateInfoSet);
+    m_meshNodes.SetMeshMaterials("Stairs");
 
     RecomputeModelMatrix();
 }

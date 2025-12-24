@@ -361,7 +361,6 @@ void Wall::CreateWeatherBoards() {
     float desiredTotalWallHeight = 2.8f;
     int weatherBoardCount = (int)(desiredTotalWallHeight / individialBoardHeight);
     float actualFinalWallHeight = weatherBoardCount * individialBoardHeight;
-    float weathboardStopScale = actualFinalWallHeight / WEATHERBOARD_STOP_MESH_HEGIHT;
 
     m_weatherBoardstopRenderItems.clear();
 
@@ -371,11 +370,11 @@ void Wall::CreateWeatherBoards() {
 
         Transform transform;
         transform.position = start;
-        transform.scale.y = weathboardStopScale;
+        transform.scale.y = actualFinalWallHeight;
         transform.rotation.y = Util::EulerYRotationBetweenTwoPoints(start, end);
 
         Material* material = AssetManager::GetMaterialByName("WeatherBoards0");
-        Model* model = AssetManager::GetModelByName("WeatherboardStop");
+        Model* model = AssetManager::GetModelByName("WeatherBoardStop");
 
         RenderItem& renderItem = m_weatherBoardstopRenderItems.emplace_back();
         renderItem.modelMatrix = transform.to_mat4();

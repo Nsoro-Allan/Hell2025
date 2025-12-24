@@ -30,6 +30,12 @@ namespace Editor {
             bathroom.AddChild("Toilet",         Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::TOILET);
             bathroom.AddChild("Towel",          Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::BATHROOM_TOWEL_RACK);
 
+            EditorUI::FileMenuNode& christmas = insert.AddChild("Christmas", Shortcut::NONE);
+            christmas.AddChild("Lights",        Shortcut::NONE, Editor::SetEditorState, EditorState::PLACE_CHRISTMAS_LIGHTS);
+            christmas.AddChild("Present Small", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::CHRISTMAS_PRESENT_SMALL);
+            christmas.AddChild("Present Large", Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::CHRISTMAS_PRESENT_LARGE);
+            christmas.AddChild("Tree",          Shortcut::NONE, Editor::PlaceGenericObject, GenericObjectType::CHRISTMAS_TREE);
+
             EditorUI::FileMenuNode& interior = insert.AddChild("Interior", Shortcut::NONE);
             interior.AddChild("Door",           Shortcut::NONE, Editor::PlaceObject, ObjectType::DOOR);
             interior.AddChild("Couch",          Shortcut::NONE, Editor::PlaceObject, ObjectType::WINDOW);

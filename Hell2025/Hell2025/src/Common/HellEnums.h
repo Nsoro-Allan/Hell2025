@@ -508,6 +508,10 @@ enum struct FireplaceType {
 };
 
 enum struct GenericObjectType {
+    CHRISTMAS_TREE,
+    CHRISTMAS_PRESENT_SMALL,
+    CHRISTMAS_PRESENT_LARGE,
+
     DRAWERS_SMALL,
     DRAWERS_LARGE,
     TOILET,

@@ -645,6 +645,10 @@ namespace World {
             pictureFrame->SetPosition(position);
         }
 
+        if (Staircase* staircase = World::GetStaircaseByObjectId(objectId)) {
+            staircase->SetPosition(position);
+        }
+
         if (Tree* tree = World::GetTreeByObjectId(objectId)) {
             tree->SetPosition(position);
         }
@@ -667,17 +671,20 @@ namespace World {
     }
 
     void SetObjectRotation(uint64_t objectId, glm::vec3 rotation) {
-        if (Fireplace* fireplace = World::GetFireplaceById(objectId)) {
-            fireplace->SetRotation(rotation);
+        if (Fireplace* object = World::GetFireplaceById(objectId)) {
+            object->SetRotation(rotation);
         }
-        if (GenericObject* genericObject = World::GetGenericObjectById(objectId)) {
-            genericObject->SetRotation(rotation);
+        if (GenericObject* object = World::GetGenericObjectById(objectId)) {
+            object->SetRotation(rotation);
         }
-        if (Ladder* ladder= World::GetLadderByObjectId(objectId)) {
-            ladder->SetRotation(rotation);
+        if (Ladder* object = World::GetLadderByObjectId(objectId)) {
+            object->SetRotation(rotation);
         }
-        if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
-            pickUp->SetRotation(rotation);
+        if (PickUp* object = World::GetPickUpByObjectId(objectId)) {
+            object->SetRotation(rotation);
+        }
+        if (Staircase* object = World::GetStaircaseByObjectId(objectId)) {
+            object->SetRotation(rotation);
         }
     }
 
@@ -715,6 +722,11 @@ namespace World {
         if (g_housePlanes.contains(objectId)) {
             g_housePlanes.get(objectId)->CleanUp();
             g_housePlanes.erase(objectId);
+            return true;
+        }
+        if (g_staircases.contains(objectId)) {
+            g_staircases.get(objectId)->CleanUp();
+            g_staircases.erase(objectId);
             return true;
         }
         if (g_trimSets.contains(objectId)) {

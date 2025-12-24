@@ -48,7 +48,7 @@ void main() {
 
     // World ray under water fog
     vec3 horizonColor = vec3(0.6, 0.2, 0.6);
-    vec3 downColor = vec3(0.0);
+    vec3 downColor = vec3(0.4);
 
     vec3 rayDir = GetWorldRay(gl_FragCoord.xy, ViewportIndex);
     float amount = 0.0125;

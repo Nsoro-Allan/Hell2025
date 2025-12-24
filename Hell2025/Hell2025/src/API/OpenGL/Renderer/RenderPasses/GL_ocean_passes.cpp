@@ -232,10 +232,6 @@ namespace OpenGLRenderer {
     void OceanUnderwaterCompositePass() {
         ProfilerOpenGLZoneFunction();
 
-        if (!World::HasOcean()) {
-            return;
-        }
-
         OpenGLShader* gaussianBlurShader = GetShader("GaussianBlur");
         OpenGLShader* underwaterMaskPreProcessShader = GetShader("OceanUnderwaterMaskPreProcess");
         OpenGLShader* underwaterCompositeShader = GetShader("OceanUnderwaterComposite");
@@ -268,6 +264,11 @@ namespace OpenGLRenderer {
         glBindTextureUnit(1, miscFullSizeFrameBuffer->GetColorAttachmentHandleByName("GaussianFinalLightingIntermediate"));
         glDispatchCompute((miscFullSizeFrameBuffer->GetWidth() + 7) / 8, (miscFullSizeFrameBuffer->GetHeight() + 7) / 8, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+        // Early out. Gaussian blur must still run coz it's used for stained glass
+        if (!World::HasOcean()) {
+            return;
+        }
 
         // Underwater mask pre-process
         underwaterMaskPreProcessShader->Bind();

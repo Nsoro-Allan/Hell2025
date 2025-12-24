@@ -447,7 +447,7 @@ namespace OpenGLRenderer {
         StainedGlassPass();
         WinstonPass();
         SpriteSheetPass(); // Muzzle flash, etc
-        InventoryGaussianPass();      
+        InventoryGaussianPass();
         PostProcessingPass();  
         DebugViewPass();
         DebugPass();

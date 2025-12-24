@@ -113,7 +113,8 @@ void main() {
            float shadow = 0;//SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, WorldPos.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
    
            spotLighting *= vec3(1 - shadow);
-           spotLighting *= cookie *  spotLightColor;
+           spotLighting *= spotLightColor;
+           spotLighting *= cookie;
            directLighting += vec3(spotLighting) * flashlightModifer;
        }
    }

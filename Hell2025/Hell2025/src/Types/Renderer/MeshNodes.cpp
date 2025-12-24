@@ -1,6 +1,7 @@
 #include "MeshNodes.h"
 #include "AssetManagement/AssetManager.h"
 #include "HellLogging.h"
+#include "Editor/Editor.h"
 #include "Input/Input.h"
 #include "Managers/MirrorManager.h"
 #include "Managers/OpenableManager.h"
@@ -89,6 +90,7 @@ void MeshNodes::Init(uint64_t parentId, const std::string& modelName, const std:
         meshNode->emissiveColor = createInfo.emissiveColor;
         meshNode->tintColor = createInfo.tintColor;
         meshNode->addToNavMesh = createInfo.addtoNavMesh;
+        meshNode->scaleMatrix = glm::scale(glm::mat4(1.0f), createInfo.scale);
 
         int nodeIndex = m_localIndexMap[createInfo.meshName];
 
@@ -421,22 +423,15 @@ void MeshNodes::UpdateHierarchy() {
     for (MeshNode& meshNode : m_meshNodes) {
         MeshNode* parentMeshNode = GetMeshNodeByLocalIndex(meshNode.localParentIndex);
         if (parentMeshNode) {
-            meshNode.localMatrix = parentMeshNode->localMatrix * meshNode.localTransform * meshNode.transform.to_mat4();
+            meshNode.localMatrix = parentMeshNode->localMatrix * meshNode.localTransform * meshNode.transform.to_mat4() * meshNode.scaleMatrix;
         }
         else {
-            meshNode.localMatrix = meshNode.localTransform * meshNode.transform.to_mat4();
+            meshNode.localMatrix = meshNode.localTransform * meshNode.transform.to_mat4() * meshNode.scaleMatrix;
 
             // Overwrite with non-kinematic rigid transform if this node has one
-            if (!m_firstFrame && meshNode.rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
-                if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {
-            
-                    meshNode.localMatrix = rigidDynamic->GetWorldTransform();
-            
-                    //meshNode.worldMatrix = rigidDynamic->GetWorldTransform();
-                    //meshNode.worldspaceAabb = rigidDynamic->GetAABB();
-                    //
-                    //Renderer::DrawPoint(rigidDynamic->GetWorldTransform()[3], YELLOW);
-                    //Renderer::DrawPoint(meshNode.worldMatrix[3], BLUE);
+            if (!m_firstFrame && meshNode.rigidDynamicId != 0 && !Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId) && Editor::IsClosed()) {
+                if (RigidDynamic* rigidDynamic = Physics::GetRigidDynamicById(meshNode.rigidDynamicId)) {            
+                    meshNode.localMatrix = rigidDynamic->GetWorldTransform() * meshNode.scaleMatrix;
                 }
             }
         }
@@ -500,12 +495,18 @@ void MeshNodes::Update(const glm::mat4& worldMatrix) {
     for (size_t i = 0; i < m_meshNodes.size(); i++) {
         MeshNode& meshNode = m_meshNodes[i];
 
-        if (!m_firstFrame && MeshNodeIsNonKinematicRigidDynamic((int32_t)i)) {
-            meshNode.worldMatrix = meshNode.localMatrix; // Local matrix is world in this case
+        const bool physicsDrivesThis =
+            (!m_firstFrame) &&
+            (Editor::IsClosed()) &&
+            (MeshNodeIsNonKinematicRigidDynamic((int32_t)i));
+
+        if (physicsDrivesThis) {
+            meshNode.worldMatrix = meshNode.localMatrix; // localMatrix already IS world (from rigid)
         }
         else {
             meshNode.worldMatrix = worldMatrix * meshNode.localMatrix;
         }
+
         meshNode.inverseWorldMatrix = glm::inverse(meshNode.worldMatrix);
     }
 
@@ -659,7 +660,7 @@ void MeshNodes::CastCSMShadows() {
 
 void MeshNodes::InitPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.rigidDynamicId != 0) {
+        if (meshNode.rigidDynamicId != 0 && Editor::IsClosed()) {
             Physics::SetRigidDynamicGlobalPose(meshNode.rigidDynamicId, meshNode.worldMatrix);
 		}
 	}
@@ -668,7 +669,7 @@ void MeshNodes::InitPhysicsTransforms() {
 
 void MeshNodes::UpdateKinematicPhysicsTransforms() {
 	for (MeshNode& meshNode : m_meshNodes) {
-        if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0) {
+        if (meshNode.rigidDynamicId != 0 && meshNode.openableId != 0 && Editor::IsClosed()) {
             if (Physics::RigidDynamicIsKinematic(meshNode.rigidDynamicId)) {
                 if (meshNode.movedThisFrame) {
                     Physics::SetRigidDynamicKinematicTarget(meshNode.rigidDynamicId, meshNode.worldMatrix);

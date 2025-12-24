@@ -228,6 +228,7 @@ namespace World {
         for (PowerPoleSet& object : GetPowerPoleSets())             object.Update();
         for (Road& object : GetRoads())                             object.Update();
         for (Shark& object : GetSharks())                           object.Update(deltaTime);
+        for (Staircase& object : GetStaircases())                   object.Update(deltaTime);
         for (Tree& object : GetTrees())                             object.Update(deltaTime);
         for (TrimSet& object : GetTrimSets())                       object.Update();
         for (Window& object : GetWindows())                         object.Update(deltaTime);

@@ -113,7 +113,7 @@ void main() {
     vec3 normal = normalize(mix(bestGuessNormal_band0, bestGuessNormal_band1, 0.5));
 
     if (!gl_FrontFacing) {
-        normal *= -1.0;
+        //normal *= -1.0;
     }
 
     if (u_mode == 1) {
@@ -136,6 +136,10 @@ void main() {
     vec3 N = normalize(normal);
     vec3 V_view = normalize(u_viewPos - WorldPos);
 
+    if (dot(N, V_view) < 0.0) {
+        V_view = -V_view;
+    }
+
     const float metallic = 0.0;
     const float roughness = 0.1;
     const vec3 F0 = vec3(0.02);
@@ -150,12 +154,21 @@ void main() {
     float maxR = 0.50;
     vec3 radius = vec3(mix(minR, maxR, hNorm));
 
+    
     vec3 surfaceLighting = vec3(0.0);
 
     // Moon light (direct spec + IBL + SSS)
     {
         vec3 moonColor = vec3(1.0, 0.9, 0.9);
         vec3 L = vec3(-0.9284767, 0.3713907, 0.0); // pre-normalized
+
+        if (!gl_FrontFacing) {
+            L.x *= -1;
+        }
+
+        //if (!gl_FrontFacing) {
+        //    L.y *= -1;
+        //}
 
         float NoL = clamp(dot(N, L), 0.0, 1.0);
 
@@ -172,10 +185,16 @@ void main() {
 
         vec3 irradiance = moonColor * 1.0;
         vec3 diffuse_IBL = irradiance * WATER_ALBEDO * 0.075;
-
+        
+        if (!gl_FrontFacing) {
+            diffuse_IBL *= 1;
+            specular_IBL *= 2;
+        }
+            
         surfaceLighting += Lo_direct;
         surfaceLighting += diffuse_IBL;
         surfaceLighting += specular_IBL;
+
 
         // SSS
         vec3 sss_albedo = WATER_ALBEDO;

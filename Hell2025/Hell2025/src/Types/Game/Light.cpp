@@ -8,6 +8,49 @@
 
 #include "Ragdoll/RagdollManager.h"
 
+#include "Core/Game.h"
+
+struct LightFlicker {
+    float m_baseIntensity = 1.0f;
+    float m_amplitude = 0.25f; // 0..1
+    float m_responseHz = 12.0f; // smoothing speed
+    float m_slowFrequencyHz = 2.0f;
+    float m_midFrequencyHz = 6.5f;
+    float m_fastFrequencyHz = 11.0f;
+    float m_slowWeight = 0.60f;
+    float m_midWeight = 0.30f;
+    float m_fastWeight = 0.10f;
+    float m_shapePower = 1.8f; // The higher this value, the lower the peaks
+    glm::vec3 m_lowColor = glm::vec3(1.00f, 0.35f, 0.10f);
+    glm::vec3 m_highColor = glm::vec3(1.00f, 0.75f, 0.35f);
+    glm::vec3 m_currentColor = glm::vec3(1.0f);
+    float m_currentFlicker = 0.8f; // internal state in [0,1]
+
+    void Update(float deltaTime, float timeSeconds) {
+        float tSlow = timeSeconds * m_slowFrequencyHz;
+        float tMid = timeSeconds * m_midFrequencyHz + 12.3f;
+        float tFast = timeSeconds * m_fastFrequencyHz + 41.7f;
+
+        int32_t seed = 0; // Random gen this if u want
+        float nSlow = Util::FractalNoise1D(tSlow, seed + 1);
+        float nMid = Util::FractalNoise1D(tMid, seed + 2);
+        float nFast = Util::FractalNoise1D(tFast, seed + 3);
+
+        float rawFlicker01 = nSlow * m_slowWeight + nMid * m_midWeight + nFast * m_fastWeight;
+        rawFlicker01 = glm::clamp(rawFlicker01, 0.0f, 1.0f);
+
+        float shapedFlicker01 = std::pow(rawFlicker01, m_shapePower);
+
+        float alpha = 1.0f - std::exp(-deltaTime * m_responseHz);
+        m_currentFlicker = glm::mix(m_currentFlicker, shapedFlicker01, alpha);
+        m_currentFlicker = glm::clamp(m_currentFlicker, 0.0f, 1.0f);
+
+        float intensityScale = (1.0f - m_amplitude) + m_amplitude * m_currentFlicker;
+
+        m_currentColor = glm::mix(m_lowColor, m_highColor, m_currentFlicker);
+    }
+};
+
 Light::Light(LightCreateInfo createInfo) {   
     m_createInfo = createInfo;
 	m_objectId = UniqueID::GetNextObjectId(ObjectType::LIGHT);
@@ -69,17 +112,24 @@ void Light::ConfigureMeshNodes() {
 }
 
 void Light::UpdateDirtyState() {
+
+    //float deltaTime = Game::GetDeltaTime();
+    //static float time = 0;
+    //time += Game::GetDeltaTime();
+    //float intensityT = 0;
+    //
+    //static FireLightFlicker fireLightFlicker;
+    //fireLightFlicker.Update(deltaTime, time, m_createInfo.color);
+    //SetColor(m_createInfo.color);
+
     if (m_forcedDirty) {
         m_forcedDirty = false;
         m_dirty = true;
         return;
     }
 
-    //std::string name = "Light " + std::to_string(m_objectId) + " UpdateDirtyState()";
-    //Timer timer(name);
-
     m_dirty = false;
-    bool printDebug = true;
+    bool printDebug = false;
 
     for (Door& object : World::GetDoors()) {
         if (object.IsDirty()) {

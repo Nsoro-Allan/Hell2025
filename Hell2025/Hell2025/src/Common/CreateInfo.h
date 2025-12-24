@@ -81,6 +81,7 @@ struct MeshNodeCreateInfo {
     bool addtoNavMesh = false;
     glm::vec3 emissiveColor = glm::vec3(1.0f);
     glm::vec3 tintColor = glm::vec3(1.0f);
+    glm::vec3 scale = glm::vec3(1.0f);
 };
 
 struct GenericObjectCreateInfo {

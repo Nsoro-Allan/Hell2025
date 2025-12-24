@@ -21,6 +21,7 @@ namespace Editor {
     void PlaceWindow(const glm::vec3& hitPosition);
     void PlaceLadder(const glm::vec3& hitPosition);
     void PlaceLight(const glm::vec3& hitPosition);
+    void PlaceStaircase(const glm::vec3& hitPosition);
 
     void UpdateObjectPlacement() {
         Viewport* viewport = ViewportManager::GetViewportByIndex(GetHoveredViewportIndex());
@@ -82,6 +83,9 @@ namespace Editor {
                 if (GetPlacementObjectType() == ObjectType::LIGHT) {
                     PlaceLight(hitPosition);
                 }
+                if (GetPlacementObjectType() == ObjectType::STAIRCASE) {
+                    PlaceStaircase(hitPosition);
+                }
             }
         }
 
@@ -132,7 +136,7 @@ namespace Editor {
             // Draw line
             if (g_placementObjectId != 0) {
                 if (ChristmasLights* christmasLights = World::GetChristmasLightsByObjectId(g_placementObjectId)) {
-                    
+
                     //float sag = christmasLights->GetCreateInfo().sagHeights;
                     glm::vec3 begin = lastPoint;
                     glm::vec3 end = hitPosition;
@@ -151,7 +155,7 @@ namespace Editor {
                         std::vector<glm::vec3> sagPoints = Util::GenerateSagPoints(begin, end, numSagPoints, currentSag);
                         for (int i = 0; i < sagPoints.size() - 1; i++) {
                             const glm::vec3 p1 = sagPoints[i];
-                            const glm::vec3 p2 = sagPoints[i+1];
+                            const glm::vec3 p2 = sagPoints[i + 1];
                             Renderer::DrawLine(p1, p2, BLACK);
                         }
                     }
@@ -210,7 +214,7 @@ namespace Editor {
     }
 
     void PlaceHousePlane(HousePlaneType housePlaneType, const glm::vec3& hitPosition, const glm::vec3& hitNormal) {
-        HousePlaneCreateInfo createInfo; 
+        HousePlaneCreateInfo createInfo;
 
         if (housePlaneType == HousePlaneType::FLOOR) {
             createInfo.p0 = hitPosition + glm::vec3(-1.0f, 0.0f, -1.0f);
@@ -228,7 +232,7 @@ namespace Editor {
 
         createInfo.type = housePlaneType;
 
-        World::AddHousePlane(createInfo, SpawnOffset()); 
+        World::AddHousePlane(createInfo, SpawnOffset());
         World::UpdateHouseMeshBuffer();
         ExitObjectPlacement();
     }
@@ -276,6 +280,14 @@ namespace Editor {
         createInfo.position = hitPosition;
         createInfo.rotation = glm::vec3(0.0f);
         World::AddWindow(createInfo, SpawnOffset());
+        ExitObjectPlacement();
+    }
+
+    void PlaceStaircase(const glm::vec3& hitPosition) {
+        StaircaseCreateInfo createInfo;
+        createInfo.position = hitPosition;
+        createInfo.rotation = glm::vec3(0.0f);
+        World::AddStaircase(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }
 

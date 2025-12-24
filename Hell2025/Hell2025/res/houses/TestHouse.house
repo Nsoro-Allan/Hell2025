@@ -475,6 +475,272 @@
         1.0
       ],
       "Type": "DRAWERS_LARGE"
+    },
+    {
+      "EditorName": "Generic Object",
+      "Position": [
+        0.9667195081710815,
+        -0.0883636474609375,
+        2.192356586456299
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_TREE"
+    },
+    {
+      "EditorName": "Generic Object 3",
+      "Position": [
+        0.9297758936882019,
+        0.4494781494140625,
+        1.5715420246124268
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 5",
+      "Position": [
+        1.35550856590271,
+        0.6868619918823242,
+        1.9989268779754639
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 6",
+      "Position": [
+        1.2261312007904053,
+        0.6878250241279602,
+        1.62321138381958
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 7",
+      "Position": [
+        1.4218144416809082,
+        0.9338653087615967,
+        1.7337194681167603
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 8",
+      "Position": [
+        0.8056273460388184,
+        0.695730447769165,
+        1.9131865501403809
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 9",
+      "Position": [
+        0.6272875666618347,
+        0.48532402515411377,
+        1.7851476669311523
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 10",
+      "Position": [
+        1.0519537925720215,
+        0.9439055919647217,
+        1.942909836769104
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 11",
+      "Position": [
+        1.2880593538284302,
+        0.6986175775527954,
+        2.36169695854187
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 12",
+      "Position": [
+        0.574503481388092,
+        0.9877716302871704,
+        1.7345266342163086
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 13",
+      "Position": [
+        0.8373346328735352,
+        0.9954863786697388,
+        1.7240495681762695
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 14",
+      "Position": [
+        0.8740925788879395,
+        1.320587158203125,
+        1.7490994930267334
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 15",
+      "Position": [
+        1.360710620880127,
+        1.4006774425506592,
+        1.6954046487808228
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
+    },
+    {
+      "EditorName": "Generic Object 16",
+      "Position": [
+        0.5703454613685608,
+        1.305657982826233,
+        1.663466453552246
+      ],
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "Scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "Type": "CHRISTMAS_PRESENT_SMALL"
     }
   ],
   "Fireplaces": [

@@ -202,6 +202,11 @@ namespace Editor {
                 Gizmo::SetRotation(fireplace->GetRotation());
             }
 
+            if (Staircase* staircase = World::GetStaircaseByObjectId(GetSelectedObjectId())) {
+                Gizmo::SetPosition(staircase->GetPosition());
+                Gizmo::SetRotation(staircase->GetRotation());
+            }
+
             if (GetSelectedObjectType() == ObjectType::HOUSE_PLANE) {
                 HousePlane* plane = World::GetHousePlaneByObjectId(GetSelectedObjectId());
                 if (plane) {

@@ -201,9 +201,14 @@ namespace World {
 
                 // This is probably sketchy...
                 if (PickUp* pickUp = World::GetPickUpByObjectId(objectId)) {
-                    float strength = 1000.0f;
+                    float strength = 250.0f;
                     glm::vec3 force = bullet.GetDirection() * strength;
                     pickUp->GetMeshNodes().AddForceToPhsyics(force);
+                }
+                if (GenericObject* object = World::GetGenericObjectById(objectId)) {
+                    float strength = 250.0f;
+                    glm::vec3 force = bullet.GetDirection() * strength;
+                    object->GetMeshNodes().AddForceToPhsyics(force);
                 }
 
                 // TEST FOR CHAIN

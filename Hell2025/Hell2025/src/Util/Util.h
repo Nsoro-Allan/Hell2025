@@ -63,6 +63,7 @@ namespace Util {
     float ChristmasLerp(float start, float end, float t);
     std::vector<glm::vec3> GenerateSagPoints(const glm::vec3& start, const glm::vec3& end, int numPoints, float sagAmount);
     std::vector<glm::vec3> GenerateCirclePoints(const glm::vec3& center, const glm::vec3& forward, float radius, int numPoints);
+    float FractalNoise1D(float x, int32_t seed);
 
     inline float DegToRad(float degrees) { return degrees * (HELL_PI / 180.0f); }
 
