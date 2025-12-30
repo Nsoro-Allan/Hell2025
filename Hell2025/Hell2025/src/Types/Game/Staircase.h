@@ -18,18 +18,19 @@ struct Staircase {
     void RenderDebug();
     void CleanUp();
 
-    MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
-    const StaircaseCreateInfo& GetCreateInfo() const       { return m_createInfo; }
+    //MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
+    const StaircaseCreateInfo& GetCreateInfo() const    { return m_createInfo; }
     const uint64_t GetObjectId() const                  { return m_objectId; }
     const glm::vec3& GetPosition() const                { return m_position; }
     const glm::vec3& GetRotation() const                { return m_rotation; }
-    const std::vector<RenderItem>& GetRenderItems()     { return m_meshNodes.GetRenderItems(); }
+    const std::vector<RenderItem>& GetRenderItems()     { return m_renderItems; }
 
 private:
     void RecomputeModelMatrix();
 
     StaircaseCreateInfo m_createInfo;
-    MeshNodes m_meshNodes;
+    std::vector<MeshNodes> m_meshNodesList;
+    std::vector<RenderItem> m_renderItems;
     uint64_t m_objectId = 0;
     glm::vec3 m_position = glm::vec3(0.0f);
     glm::vec3 m_rotation = glm::vec3(0.0f);

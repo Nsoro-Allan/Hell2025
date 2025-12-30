@@ -44,7 +44,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
         }
     }
 
-   
+
     // Issue bite to player in range (PLAYER 1 ONLY)
     if (m_huntingState == SharkHuntingState::BITING_PLAYER && !m_hasBitPlayer) {
 
@@ -56,7 +56,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
             float heightDistance = glm::abs(m_targetPosition.y - GetSpinePosition(0).y);
             float heightAbove = m_targetPosition.y > GetSpinePosition(0).y ? heightDistance : 0.0f;
             float heightBelow = m_targetPosition.y < GetSpinePosition(0).y ? heightDistance : 0.0f;
-                        
+
             bool playerBitten = false;
             m_playerSafe = true;
 
@@ -74,7 +74,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
 
             glm::vec3 dirToPlayer = glm::normalize(playerPos - GetHeadPosition2D());
             float dotToPlayer = glm::dot(GetForwardVector(), dirToPlayer);
-            
+
             m_playerSafe = true;
 
             float safeHeadDistance = 1.20;
@@ -122,7 +122,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
             }
 
             m_logicSubStepCount = 6;
-           
+
             //if (m_drawDebug) {
             //    std::cout << "\n";
             //    std::cout << "GetAnimationFrameNumber(): " << GetAnimationFrameNumber() << "\n";
@@ -140,7 +140,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
                 //std::cout << "distanceFromHead2D:  " << distanceFromHead2D << "\n";
                 //std::cout << "dotToPlayer:  " << dotToPlayer << "\n";
                 //std::cout << "perpendicularDistance:  " << perpendicularDistance << "\n";
-             
+
                 m_hasBitPlayer = true;
                 player->Kill();
                 //Game::g_sharkKills++; 
@@ -151,7 +151,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
                 m_movementState = SharkMovementState::FOLLOWING_PATH_ANGRY;
             }
         }
-        
+
     }
     // Is bite is over?
     if (m_huntingState == SharkHuntingState::BITING_PLAYER) {

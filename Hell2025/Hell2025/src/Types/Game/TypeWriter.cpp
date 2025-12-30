@@ -36,3 +36,9 @@ void TypeWriter::DisplayText(const std::string& text, float duration) {
     m_duration = duration;
     m_currentTime = 0.0f;
 }
+
+void TypeWriter::ClearText() {
+    m_text = "";
+    m_duration = 0;
+    m_currentTime = 0;
+}

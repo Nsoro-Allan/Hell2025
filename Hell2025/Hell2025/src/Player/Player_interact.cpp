@@ -122,18 +122,29 @@ void Player::UpdateInteract() {
         // Pickups
         if (PickUp* pickUp = World::GetPickUpByObjectId(m_interactObjectId)) {
 
-            if (pickUp->GetType() == PickUpType::WEAPON) {
-                m_inventory.GiveWeapon(pickUp->GetName());
-            }
-            if (pickUp->GetType() == PickUpType::AMMO) {
-                m_inventory.GiveAmmo(pickUp->GetName(), Bible::GetAmmoPickUpAmount(pickUp->GetName()));
-            }
-            if (pickUp->GetType() == PickUpType::UNDEFINED) {
-                Logging::Warning() << "Player " << m_viewportIndex << " tried to pick up a PickUp with name '" << pickUp->GetName() << "' but type '" << Util::PickUpTypeToString(pickUp->GetType()) << "'";
-            }
+            if (!pickUp->IsDespawned()) {
 
-            World::RemoveObject(m_interactObjectId);
-            Audio::PlayAudio("ItemPickUp.wav", 1.0f);
+                if (pickUp->GetType() == PickUpType::WEAPON) {
+                    m_inventory.GiveWeapon(pickUp->GetName());
+                }
+                if (pickUp->GetType() == PickUpType::AMMO) {
+                    m_inventory.GiveAmmo(pickUp->GetName(), Bible::GetAmmoPickUpAmount(pickUp->GetName()));
+                }
+                if (pickUp->GetType() == PickUpType::UNDEFINED) {
+                    Logging::Warning() << "Player " << m_viewportIndex << " tried to pick up a PickUp with name '" << pickUp->GetName() << "' but type '" << Util::PickUpTypeToString(pickUp->GetType()) << "'";
+                }
+
+                if (pickUp->GetCreateInfo().respawn) {
+                    pickUp->Despawn();
+                    for (Light& light : World::GetLights()) {
+                        light.ForceDirty();
+                    }
+                }
+                else {
+                    World::RemoveObject(m_interactObjectId);
+                }
+                Audio::PlayAudio("ItemPickUp.wav", 1.0f);
+            }
         }
     }
 

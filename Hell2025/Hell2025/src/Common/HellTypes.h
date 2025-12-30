@@ -332,7 +332,7 @@ struct ViewportData {
     glm::vec4 colorTint;
 
     float colorContrast;
-    float padding0;
+    int isInShop;
     float padding1;
     float padding2;
 };

@@ -43,7 +43,7 @@ struct ViewportData {
     vec4 colorTint;
     
     float colorContrast;
-    float padding0;
+    int isInShop; //true or false
     float padding1;
     float padding2;
 };

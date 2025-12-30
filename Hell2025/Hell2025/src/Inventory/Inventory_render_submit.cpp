@@ -517,7 +517,16 @@ void Inventory::BlitItemButtons(glm::ivec2 origin) {
     InventoryItemInfo* itemInfo = GetSelectedItemInfo();
     if (!itemInfo) return;
 
+
+
     glm::ivec2 buttonLocation = origin;
+
+    if (m_state == InventoryState::SHOP) {
+        RenderButton(buttonLocation, "E", "Buy");
+        buttonLocation.y += m_style.itemButtonLineHeight;
+        return;
+    }
+
 
     if (itemInfo->m_equipable) {
         RenderButton(buttonLocation, "E", "Equip");

@@ -126,6 +126,25 @@ void PickUp::Update(float deltaTime) {
     }
 
     m_firstFrame = false;
+
+    m_respawnCounter += deltaTime;
+
+    if (m_despawned) {
+        std::cout << "m_respawnCounter: " << m_respawnCounter << "\n";
+    }
+
+    if (m_despawned && m_respawnCounter >= 0.0f) {
+        m_despawned = false;
+        m_meshNodes.ForceDirty();
+    }
+
+}
+
+void PickUp::Despawn() {
+    m_respawnCounter = -8.0f;
+    m_despawned = true;
+    //SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    //std::cout << "DESPAWNDED\n";
 }
 
 void PickUp::CleanUp() {

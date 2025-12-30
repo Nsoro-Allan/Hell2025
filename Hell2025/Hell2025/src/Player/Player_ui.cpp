@@ -90,7 +90,7 @@ void Player::UpdateUI(float deltaTime) {
 //
     
 
-    if (IsAlive()) {
+    if (IsAlive() && !IsInShop()) {
         // Cross hair texture
         std::string crosshairTexture = "CrosshairDot";
         if (m_interactFound) {
@@ -157,6 +157,31 @@ void Player::UpdateUI(float deltaTime) {
                 }
             }
         }
+
+        if (Debug::GetDebugTextMode() == DebugTextMode::NONE) {
+            std::string text = "Health: " + std::to_string(m_health) + "\n";
+            text += "Cash: " + std::to_string(m_cash) + "\n";
+            text += "Kills: " + std::to_string(m_killCount) + "\n";
+
+            
+            
+            //if (World::GetSharks().size()) {
+            //    Shark& shark = World::GetSharks()[0];
+            //                 
+            //    text += "Shark hunting state: " + Util::SharkHuntingStateToString(shark.GetHuntingState()) + "\n";
+            //    text += "Shark movement state: " + Util::SharkMovementStateToString(shark.GetMovementState()) + "\n";
+            //}
+
+            
+            UIBackEnd::BlitText(text, "StandardFont", xLeft, yTop, Alignment::TOP_LEFT, 2.0f);
+
+
+
+        }
+
+
+
+
 
         if (Debug::GetDebugTextMode() == DebugTextMode::PER_PLAYER || Debug::GetDebugRenderMode() == DebugRenderMode::BVH_CPU_PLAYER_RAYS) {
 

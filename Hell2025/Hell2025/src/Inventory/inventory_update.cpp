@@ -46,6 +46,52 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
         m_examineRotationY = 0.0f;
         m_examineZoom = 0.0f;
     }
+
+    int cash = player->GetCash();
+    int akPrice = 100;
+    int spasPrice = 200;
+    int goldenGlockPrice = 300;
+    if (player->PressedInteract()) {
+
+        if (GetSelectedItemName() == "AKS74U") {
+            if (cash >= akPrice) {
+                player->m_inventory.GiveWeapon("AKS74U");
+                player->m_inventory.GiveAmmo("AKS74U", 300);
+                player->SubtractCash(akPrice);
+                player->LeaveShop();
+            }
+            else {
+                player->m_typeWriter.DisplayText("Hold your seahorses");
+            }
+            InputMulti::ClearKeyStates();
+        }
+
+        if (GetSelectedItemName() == "SPAS") {
+            if (cash >= spasPrice) {
+                player->m_inventory.GiveWeapon("SPAS");
+                player->m_inventory.GiveAmmo("SPAS", 8);
+                player->SubtractCash(spasPrice);
+                player->LeaveShop();
+            }
+            else {
+                player->m_typeWriter.DisplayText("Hold your seahorses");
+            }
+            InputMulti::ClearKeyStates();
+        }
+
+        if (GetSelectedItemName() == "GoldenGlock") {
+            if (cash >= goldenGlockPrice) {
+                player->m_inventory.GiveWeapon("GoldenGlock");
+                player->m_inventory.GiveAmmo("GoldenGlock", 200);
+                player->SubtractCash(goldenGlockPrice);
+                player->LeaveShop();
+            }
+            else {
+                player->m_typeWriter.DisplayText("Hold your seahorses");
+            }
+            InputMulti::ClearKeyStates();
+        }
+    }
 }
 
 void Inventory::InitMeshNodesFromSelectedItem() {

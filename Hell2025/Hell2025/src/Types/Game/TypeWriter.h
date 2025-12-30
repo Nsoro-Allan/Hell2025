@@ -5,6 +5,7 @@ struct TypeWriter {
     void Update(float deltaTime);
     void SetLocation(const glm::ivec2& location);
     void DisplayText(const std::string& text, float duration = 3.0f);
+    void ClearText();
     
     const glm::ivec2& GetLocation() const   { return m_location; }
     const std::string& GetText() const      { return m_text; }

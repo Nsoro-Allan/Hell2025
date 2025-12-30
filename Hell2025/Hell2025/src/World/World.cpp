@@ -303,7 +303,7 @@ namespace World {
         g_sharks.clear();
 
         Shark& shark = g_sharks.emplace_back();
-        shark.Init(glm::vec3(5.0f, 29.05f, 40.0f));
+        shark.Init(glm::vec3(5.0f, 28.85f, 40.0f));
 
 
         std::cout << "Mermaid count: " << World::GetMermaids().size();
@@ -854,8 +854,9 @@ namespace World {
         for (HousePlane& housePlane : g_housePlanes)                    housePlane.CleanUp();
         for (Piano& piano : g_pianos)                                   piano.CleanUp();
         for (PickUp& pickUp : g_pickUps)                                pickUp.CleanUp();
-        for (PowerPoleSet& powerPoleSet: g_powerPoleSets)               powerPoleSet.CleanUp();
+        for (PowerPoleSet& powerPoleSet : g_powerPoleSets)               powerPoleSet.CleanUp();
         for (Shark& shark : g_sharks)                                   shark.CleanUp();
+        for (Staircase& staircase: g_staircases)                        staircase.CleanUp();
         for (SpawnPoint& spawnPoint : g_spawnCampaignPoints)            spawnPoint.CleanUp();
         for (SpawnPoint& spawnPoint : g_spawnDeathmatchPoints)          spawnPoint.CleanUp();
         for (Tree& tree : g_trees)                                      tree.CleanUp();
@@ -892,6 +893,7 @@ namespace World {
         g_trimSets.clear();
         g_walls.clear();
         g_windows.clear();
+        g_staircases.clear();
     }
 
     void UpdateClippingCubes() {
@@ -1124,6 +1126,17 @@ namespace World {
             int rand = Util::RandomInt(0, g_fallbackSpawnPoints.size() - 1); g_fallbackSpawnPoints[rand];
             spawnPoint = g_fallbackSpawnPoints[rand];
         }
+
+        g_spawnCampaignPoints.clear();
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(43.9485, 32.6516, 36.7408), glm::vec3(-0.294, -5.002, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(40.3495, 32.6486, 34.1408), glm::vec3(-0.168, -9.482, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(42.6229, 32.6482, 41.4889), glm::vec3(-0.282, -11.772, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(34.7497, 35.452, 37.4222), glm::vec3(-0.206, -15.736, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(34.9035, 32.6505, 39.5006), glm::vec3(-0.146, -14.242, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(34.8531, 32.6496, 33.6023), glm::vec3(-0.258, -15.138, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(33.3506, 32.6481, 41.131), glm::vec3(-0.166, -18.282, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(57.3242, 33.5911, 48.8959), glm::vec3(-0.134, -18.1, 0)));
+        g_spawnCampaignPoints.push_back(SpawnPoint(glm::vec3(40.095, 32.4311, 31.6613), glm::vec3(-0.11, -14.256, 0)));
 
         // Check you didn't just spawn on another player
         for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {

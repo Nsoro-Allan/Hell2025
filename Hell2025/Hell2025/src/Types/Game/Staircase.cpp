@@ -1,5 +1,6 @@
 #include "Staircase.h"
 #include "Renderer/Renderer.h"
+#include "HellLogging.h"
 
 Staircase::Staircase(uint64_t id, StaircaseCreateInfo& createInfo, SpawnOffset& spawnOffset) {
     m_objectId = id;
@@ -15,14 +16,19 @@ Staircase::Staircase(uint64_t id, StaircaseCreateInfo& createInfo, SpawnOffset& 
     stairs.materialName = "Stairs";
     stairs.rigidDynamic.createObject = true;
     stairs.rigidDynamic.kinematic = true;
-    stairs.rigidDynamic.shapeType = PhysicsShapeType::BOX;
+    stairs.rigidDynamic.shapeType = PhysicsShapeType::CONVEX_MESH;
+    stairs.rigidDynamic.convexMeshModelName = "CollisionMesh_Stairs";
     stairs.rigidDynamic.filterData.raycastGroup = RAYCAST_DISABLED;
     stairs.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
     stairs.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
     stairs.addtoNavMesh = true;
 
-    m_meshNodes.Init(id, "Stairs", meshNodeCreateInfoSet);
-    m_meshNodes.SetMeshMaterials("Stairs");
+    int stepCount = 7;
+    for (int i = 0; i < stepCount; i++) {
+        MeshNodes& meshNodes = m_meshNodesList.emplace_back();
+        meshNodes.Init(id, "Stairs", meshNodeCreateInfoSet);
+        meshNodes.SetMeshMaterials("Stairs");
+    }
 
     RecomputeModelMatrix();
 }
@@ -40,8 +46,20 @@ void Staircase::SetRotation(const glm::vec3& rotation) {
 }
 
 void Staircase::Update(float deltaTime) {
-    m_meshNodes.Update(m_modelMatrix);
-    RenderDebug();
+    m_renderItems.clear();
+
+    for (int i = 0; i < m_meshNodesList.size(); i++) {
+      
+        Transform transform;
+        transform.position.y = 0.4375f * i;
+        transform.position.z = 0.45f * i;              
+
+        m_meshNodesList[i].Update(m_modelMatrix * transform.to_mat4());
+        const std::vector<RenderItem>& renderItems = m_meshNodesList[i].GetRenderItems();
+        m_renderItems.insert(m_renderItems.end(), renderItems.begin(), renderItems.end());
+    }
+
+    //RenderDebug();
 }
 
 void Staircase::RenderDebug() {
@@ -53,7 +71,9 @@ void Staircase::RenderDebug() {
 }
 
 void Staircase::CleanUp() {
-    m_meshNodes.CleanUp();
+    for (int i = 0; i < m_meshNodesList.size(); i++) {
+        m_meshNodesList[i].CleanUp();
+    }
 }
 
 void Staircase::RecomputeModelMatrix() {

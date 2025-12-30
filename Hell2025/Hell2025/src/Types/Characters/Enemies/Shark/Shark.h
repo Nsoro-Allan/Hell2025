@@ -14,7 +14,7 @@ struct Shark {
     void SetPosition(glm::vec3 position);
     void CleanUp();
     void DrawSpinePoints();
-    void HuntPlayer(uint64_t playerId); 
+    void HuntPlayer(uint64_t playerId);
     void GiveDamage(uint64_t playerId, int damageAmount);
     void Kill();
     void Respawn();
@@ -23,8 +23,9 @@ struct Shark {
     void PlayAndLoopAnimation(const std::string& animationName, float speed);
     void SetMovementState(SharkMovementState state);
     void StraightenSpine(float deltaTime, float straightSpeed);
-    
+
     std::string GetDebugInfoAsString();
+    void DrawDebug();
 
     AnimatedGameObject* GetAnimatedGameObject();
     Ragdoll* GetRadoll();
@@ -33,9 +34,12 @@ struct Shark {
     std::string m_spineBoneNames[SHARK_SPINE_SEGMENT_COUNT];
     float m_spineSegmentLengths[SHARK_SPINE_SEGMENT_COUNT - 1];
 
-    const bool IsDead() const           { return !m_alive; }
-    const bool IsAlive() const          { return m_alive; }
+    const bool IsDead() const { return !m_alive; }
+    const bool IsAlive() const { return m_alive; }
     const uint64_t& GetObjectId() const { return m_objectId; };
+
+    SharkHuntingState GetHuntingState() { return m_huntingState; }
+    SharkMovementState GetMovementState() { return m_movementState; }
 
 private:
     void CalculateTargetFromPath();
@@ -63,6 +67,7 @@ private:
     glm::vec3 GetSpinePosition(int index);
     glm::vec3 GetEvadePoint3D();
     glm::vec3 GetEvadePoint2D();
+
 
     uint64_t m_objectId = 0;
     uint64_t g_animatedGameObjectObjectId = 0; 

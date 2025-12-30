@@ -107,31 +107,34 @@ void Player::GiveDefaultLoadout() {
 
     // Dev load out
     m_inventory.GiveWeapon("Glock");
-    m_inventory.GiveWeapon("GoldenGlock");
-    m_inventory.GiveWeapon("Tokarev");
-    m_inventory.GiveWeapon("Remington870");
-    m_inventory.GiveWeapon("SPAS");
-    m_inventory.GiveWeapon("AKS74U");
+    //m_inventory.GiveWeapon("GoldenGlock");
+    //m_inventory.GiveWeapon("Tokarev");
+    //m_inventory.GiveWeapon("Remington870");
+    //m_inventory.GiveWeapon("SPAS");
+    //m_inventory.GiveWeapon("AKS74U");
 
-    m_inventory.GiveAmmo("12GaugeBuckShot", 80);
+    //m_inventory.GiveAmmo("12GaugeBuckShot", 80);
     m_inventory.GiveAmmo("Glock", 200);
-    m_inventory.GiveAmmo("Tokarev", 200);
-    m_inventory.GiveAmmo("AKS74U", 200);
+    //m_inventory.GiveAmmo("Tokarev", 200);
+    //m_inventory.GiveAmmo("AKS74U", 200);
 
     //m_inventory.AddInventoryItem("BlackSkull");
-    m_inventory.AddInventoryItem("SmallKey");
-    m_inventory.AddInventoryItem("SmallKeySilver");
-    m_inventory.AddInventoryItem("Pills");
-    m_inventory.AddInventoryItem("ShotgunAmmo");
+    //m_inventory.AddInventoryItem("SmallKey");
+    //m_inventory.AddInventoryItem("SmallKeySilver");
+    //m_inventory.AddInventoryItem("Pills");
+    //m_inventory.AddInventoryItem("ShotgunAmmo");
 
     //GiveSilencer("Glock");
     //GiveSight("GoldenGlock");    
 
     // hack fill the shop
+    m_shopInventory.GiveWeapon("GoldenGlock");
     m_shopInventory.AddInventoryItem("AKS74U");
-    m_shopInventory.AddInventoryItem("SmallKey");
-    m_shopInventory.AddInventoryItem("SmallKeySilver");
-    m_shopInventory.AddInventoryItem("Pills");
+    m_shopInventory.AddInventoryItem("SPAS"); 
+    //m_shopInventory.AddInventoryItem("SmallKey");
+    //m_shopInventory.AddInventoryItem("SmallKeySilver");
+    //m_shopInventory.AddInventoryItem("Pills");
+
 }
 
 void Player::NextWeapon() {
@@ -217,7 +220,9 @@ void Player::GiveWeapon(const std::string& name) {
     if (state && weaponInfo) {
         state->has = true;
         state->ammoInMag = weaponInfo->magSize;
-
+    }
+    else {
+        std::cout << "FAILED TO GIVE PLAYER: " << name << "\n";
     }
 }
 

@@ -104,7 +104,8 @@ namespace RenderDataManager {
             if (!viewport->IsVisible()) continue;
 
             g_viewportData[i].colorTint = WHITE;
-            g_viewportData[i].colorContrast = 1.0f;
+            g_viewportData[i].colorContrast = 1.0f; 
+            g_viewportData[i].isInShop = false;
 
             glm::mat4 viewMatrix = glm::mat4(1);
             if (Editor::IsOpen()) {
@@ -129,6 +130,8 @@ namespace RenderDataManager {
                     else {
                         viewMatrix = Game::GetLocalPlayerCameraByIndex(i)->GetViewMatrix();
                     }
+
+                    g_viewportData[i].isInShop = player->IsInShop();
                 }
             }
             glm::mat4 inverseView = glm::inverse(viewMatrix);

@@ -84,6 +84,9 @@ public:
     const uint32_t GetAnimationFrameNumber(const std::string& animationLayerName);
     const uint32_t GetBoneIndex(const std::string& boneName);
     const uint32_t GetVerteXCount();
+
+    // Sketchy, only used by shark currently
+    const glm::vec3& GetPosition() const                            { return m_transform.position;  }
         
     SkinnedModel* GetSkinnedModel()                                 { return m_skinnedModel; }
     bool RenderingEnabled()                                         { return m_renderingEnabled; }

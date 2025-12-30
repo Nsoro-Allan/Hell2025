@@ -39,9 +39,11 @@ namespace World {
         }
 
         for (PickUp& pickUp : GetPickUps()) {
-            RenderDataManager::SubmitRenderItems(pickUp.GetRenderItems());
-            if (Editor::GetSelectedObjectId() == pickUp.GetObjectId()) {
-                RenderDataManager::SubmitOutlineRenderItems(pickUp.GetRenderItems());
+            if (!pickUp.IsDespawned()) {
+                RenderDataManager::SubmitRenderItems(pickUp.GetRenderItems());
+                if (Editor::GetSelectedObjectId() == pickUp.GetObjectId()) {
+                    RenderDataManager::SubmitOutlineRenderItems(pickUp.GetRenderItems());
+                }
             }
         }
 

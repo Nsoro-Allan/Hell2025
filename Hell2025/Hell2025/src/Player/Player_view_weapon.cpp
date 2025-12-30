@@ -90,6 +90,7 @@ void Player::UpdateViewWeapon(float deltaTime) {
 bool Player::ShouldRenderViewWeapon() {
     if (InventoryIsOpen() && GetInvetoryState() == InventoryState::EXAMINE_ITEM) return false;
     if (InventoryIsOpen() && GetInvetoryState() == InventoryState::EXAMINE_ITEM) return false;
+    if (IsInShop())                                                              return false;
 
     return true;
 }

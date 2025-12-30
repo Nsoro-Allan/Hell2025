@@ -375,7 +375,7 @@ namespace BackEnd {
         //    BackEnd::ToggleBindlessTextures();
         //    Renderer::HotloadShaders();
         //}
-        if (Input::KeyPressed(HELL_KEY_ESCAPE)) {
+        if (Input::KeyPressed(HELL_KEY_ESCAPE) && Input::KeyDown(HELL_KEY_1)) {
             BackEnd::ForceCloseWindow();
         }
         if (Input::KeyPressed(HELL_KEY_G)) {

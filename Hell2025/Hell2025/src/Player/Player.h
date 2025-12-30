@@ -44,10 +44,11 @@ struct Player {
     float GetViewportContrast();
     float m_timeSinceDeath = 0.0f;
     bool RespawnAllowed();
+    
+    int m_killCount = 0;
 
     void SubmitRenderItems();
     void SubmitAttachmentRenderItem(const std::string& weaponAttachmentName);
-
 
     void UpdateCursorRays();
     void UpdateInteract();
@@ -72,6 +73,12 @@ struct Player {
     void HideAKS74UMesh();
     // Remove me when you can
 
+    bool IsFacingClosestMermaid();
+    float DotToClosestToMermaid();
+    void GiveCash(int amount);
+    void SubtractCash(int amount);
+
+
     void Kill();
     Ragdoll* GetRagdoll();
     glm::mat4 m_deathCamViewMatrix = glm::mat4(1.0f);
@@ -85,6 +92,7 @@ struct Player {
     void UpdateLadderIds();
     void UpdateLadderMovement(float deltaTime);
     bool IsOverlappingLadder();
+    int GetCash() { return m_cash; }
 
     // Weapon shit
     int GetCurrentWeaponMagAmmo();
@@ -187,6 +195,8 @@ struct Player {
     bool PressedToggleInventory();
     bool PressedInventoryExamine();
 
+    void DebugWipeShit();
+
     const InventoryState& GetInvetoryState() { return m_inventory.GetInventoryState(); }
     Inventory& GetInventory() { return m_inventory; }
 
@@ -223,10 +233,12 @@ struct Player {
     const glm::vec3& GetInteractHitPosition()   { return m_interactHitPosition; }
     const std::string& GetName() const          { return m_name; }
 
-private:
-    std::string m_name = "PLAYER_NAME";
+
     Inventory m_inventory;
     Inventory m_shopInventory;
+
+private:
+    std::string m_name = "PLAYER_NAME";
 
     // Interact
     PhysXRayResult m_physXRayResult;
@@ -416,6 +428,7 @@ private:
 
 
         float m_yVelocity = 0;
+        int m_cash = 0;
 
         float m_weaponSwayX = 0;
         float m_weaponSwayY = 0;

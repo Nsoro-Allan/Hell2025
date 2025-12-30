@@ -11,11 +11,30 @@
 #include "Ocean/Ocean.h"
 #include "Viewport/ViewportManager.h"
 #include "UniqueID.h"
+#include "Input/InputMulti.h"
 
 // Get me out of here
 #include "Renderer/Renderer.h"
 #include "World/World.h"
 // Get me out of here
+
+void Player::DebugWipeShit() {
+    m_killCount = 0;
+    m_cash = 0;
+    m_health = 100;
+
+    if (m_viewportIndex == 0) {
+        m_killCount = 55;
+        m_cash = 21;
+    }
+    if (m_viewportIndex == 1) {
+        m_killCount =82;
+        m_cash = 448;
+    }
+
+
+    GiveDefaultLoadout();
+}
 
 void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex) {
     m_playerId = UniqueID::GetNextObjectId(ObjectType::PLAYER);
@@ -25,10 +44,11 @@ void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex)
     m_viewportIndex = viewportIndex;
 
     m_inventory.SetLocalPlayerIndex(m_viewportIndex);
+    m_shopInventory.SetLocalPlayerIndex(m_viewportIndex);
 
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     viewWeapon->SetExclusiveViewportIndex(viewportIndex);
-
+    
     AnimatedGameObject* characterModel = GetCharacterModelAnimatedGameObject();
 
     SpriteSheetObjectCreateInfo createInfo;
@@ -54,15 +74,33 @@ void Player::EnterShop() {
     m_shopInventory.OpenAsShop();
     m_inventory.CloseInventory();
 
+    static std::vector<std::string> mermaidGreetings;
+    if (mermaidGreetings.empty()) {
+        mermaidGreetings.push_back("Lost boys welcome, but gotta pay the toll.");
+        mermaidGreetings.push_back("Come spend your clams with the queen, Sugar.");
+        mermaidGreetings.push_back("Drop your dabloons Honey, this aint a charity.");
+        mermaidGreetings.push_back("I aint got all day, spill the loot.");
+        mermaidGreetings.push_back("Careful, Sweetheart. I charge by the minute.");
+        mermaidGreetings.push_back("Stop staring. Start paying.");
+        mermaidGreetings.push_back("A private performance perhaps?");
+    }
+    int rand = Util::RandomInt(0, mermaidGreetings.size() - 1);
+    std::string mermaidGreeting = mermaidGreetings[rand];
+    m_typeWriter.DisplayText(mermaidGreeting);
+
+
 
     m_flashlightOn = true;
     Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+
+    InputMulti::ClearKeyStates();
 }
 
 void Player::LeaveShop() {
     m_isInShop = false;
     m_inventory.CloseInventory();
     m_shopInventory.CloseInventory();
+    m_typeWriter.ClearText();
 }
 
 static float WrapPi(float a) {
@@ -78,8 +116,15 @@ static float LerpAngle(float a, float b, float t) {
 }
 
 void Player::UpdateShop(float deltaTime) {
-    glm::vec3 targetPosition = glm::vec3(28.1445, 29.15f, 52.785);
-    glm::vec3 targetCamEuler = glm::vec3(0.00199978, -1.688, 0.0f);
+    glm::vec3 targetPosition = glm::vec3(13.06f, 28.68f, 36.78);
+    glm::vec3 targetCamEuler = glm::vec3(-0.08f, -1.65f, 0.0f);
+
+    if (Game::GetSplitscreenMode() == SplitscreenMode::TWO_PLAYER) {
+        targetPosition = glm::vec3(12.93f, 28.61f, 36.80);
+        targetCamEuler = glm::vec3(-0.00f, -2.05f, 0.0f);
+    }
+
+
     glm::vec3 currentPosition = GetFootPosition();
     glm::vec3 currentCamEuler = m_camera.GetEulerRotation();
 
@@ -138,9 +183,9 @@ void Player::Update(float deltaTime) {
     }
 
     // Shop hack test
-    if (m_viewportIndex == 0 && Input::KeyPressed(HELL_KEY_U)) {
-        EnterShop();
-    }
+    //if (m_viewportIndex == 0 && Input::KeyPressed(HELL_KEY_U)) {
+    //    EnterShop();
+    //}
 
     if (IsInShop()) {
         UpdateShop(deltaTime);
@@ -171,8 +216,8 @@ void Player::Update(float deltaTime) {
 
     // Running
     m_running = PressingRun() && !m_crouching;
-
     m_runningSpeed = 20;
+    m_running = false;
 
     // Respawn
     if (IsAwaitingSpawn()) Respawn();
@@ -207,6 +252,11 @@ void Player::Update(float deltaTime) {
     UpdatePlayingPiano(deltaTime);
     UpdateCharacterModelHacks();
     UpdateMelleBulletWave(deltaTime);
+
+    float minimumMermaidInteractYHeight = 28.0f;
+    if (PressedInteract() && GetFootPosition().y > minimumMermaidInteractYHeight && IsFacingClosestMermaid() && !IsInShop()) {
+        EnterShop();
+    }
 
 
     if (World::HasOcean()) {
@@ -267,11 +317,19 @@ void Player::Update(float deltaTime) {
 
     Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
     if (viewport->IsVisible()) {
+
+        //std::cout << "Facing: " << IsFacingClosestMermaid() << " " << "Dot: " << DotToClosestToMermaid() << "\n";
+
         if (Input::KeyPressed(HELL_KEY_8)) {
             //std::cout << "\nPlayer " << m_viewportIndex << " inventory:\n";
             //m_inventory.PrintGridOccupiedStateToConsole();
 
-            std::cout << "glm::(" << GetCameraPosition().x << ", " << GetCameraPosition().z << "\n";
+            //std::cout << "glm::(" << GetCameraPosition().x << ", " << GetCameraPosition().z << "\n";
+
+
+            std::cout << "POS:" << GetCameraPosition() << " ROT: " << GetCameraRotation() << "\n";
+
+
         }
     }
 }
@@ -286,13 +344,16 @@ void Player::Respawn() {
 
     Logging::Debug() << "Spawning player " << m_viewportIndex;
     SpawnPoint spawnPoint = World::GetRandomCampaignSpawnPoint();
-    //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
-    SetFootPosition(spawnPoint.GetPosition());
 
-    if (m_viewportIndex == 0) {
-        SetFootPosition(glm::vec3(36.18, 31, 37.26));
-        m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
-    }
+
+    //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
+    SetFootPosition(spawnPoint.GetPosition() - glm::vec3(0.0f, 1.60, 0.0f));
+    m_camera.SetEulerRotation(spawnPoint.GetCamEuler());
+
+    //if (m_viewportIndex == 0) {
+    //    SetFootPosition(glm::vec3(36.18, 31, 37.26));
+    //    m_camera.SetEulerRotation(glm::vec3(-0.15, -0.02, 0));
+    //}
 
     //GetCamera().SetEulerRotation(spawnPoint.m_camEuler);
 
@@ -323,6 +384,10 @@ void Player::Respawn() {
     m_camera.Update();
     m_flashlightDirection = m_camera.GetForward();
 
+    if (IsInShop()) {
+        m_flashlightDirection += glm::vec3(0.0f, -0.1f, 0.0f);
+        m_flashlightDirection = glm::normalize(m_flashlightDirection);
+    }
 
     // Are you inside? Turn flash light on
     float maxRayDistance = 2000;
@@ -486,6 +551,44 @@ void Player::GiveDamage(int damage, uint64_t enemyId) {
     }
 }
 
+float Player::DotToClosestToMermaid() {
+    if (World::GetMermaids().empty()) return 0;
+
+    Mermaid& mermaid = World::GetMermaids()[0];
+    return glm::dot(mermaid.GetWorldForward(), GetCameraForward());
+}
+
+void Player::GiveCash(int amount) {
+    m_cash += amount;
+}
+
+void Player::SubtractCash(int amount) {
+    m_cash -= amount;
+}
+
+bool Player::IsFacingClosestMermaid() {
+    if (World::GetMermaids().empty()) return false;
+
+    Mermaid& mermaid = World::GetMermaids()[0];
+
+    const glm::vec3& cameraPositon = GetCameraPosition();
+    const glm::vec3& cameraForward = GetCameraForward();
+
+    glm::vec3 toCamera = cameraPositon - mermaid.GetPosition();
+    glm::vec3 toMermaid = mermaid.GetPosition() - cameraPositon;
+
+    bool cameraOnFrontSide = glm::dot(mermaid.GetWorldForward(), toMermaid) > 0.0f;
+    bool mermaidInFrontOfCamera = glm::dot(cameraForward, toMermaid) > 0.0f;
+
+    // HACCCCCCCCCK because cameraOnFrontSide doesn't evaluate to what you think it does
+    float distanceToMermaid = glm::distance(cameraPositon, mermaid.GetPosition());
+    if (distanceToMermaid > 2.0f) {
+        return false;
+    }
+
+    return !(cameraOnFrontSide && mermaidInFrontOfCamera);
+}
+
 void Player::Kill() {
     if (m_alive) {
         m_flashlightOn = false;
@@ -493,8 +596,20 @@ void Player::Kill() {
         m_alive = false;
         m_characterModelAnimatedGameObject.SetAnimationModeToRagdoll();
         m_inventory.CloseInventory();
+        m_shopInventory.CloseInventory();
         Audio::PlayAudio("Death0.wav", 1.0f);
         DropWeapons();
+        m_cash /= 2;
+
+        // HACK
+        for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
+            if (i != m_viewportIndex) {
+                if (Player* player = Game::GetLocalPlayerByIndex(i)) {
+                    player->GiveCash(100);
+                    player->m_killCount++;
+                }
+            }
+        }
     }
 }
 

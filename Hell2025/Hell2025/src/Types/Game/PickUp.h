@@ -17,9 +17,12 @@ struct PickUp {
     void SetRotation(const glm::vec3& rotation);
     void Update(float deltaTime);
     void CleanUp();
+    void Despawn();
 
     void SetDisabledPhysicsAtSpawnState(bool state);
     void SetRespawnState(bool state);
+
+    const bool IsDespawned() const {return m_despawned;}
 
     MeshNodes& GetMeshNodes()                           { return m_meshNodes; }
     const bool IsDirty() const                          { return m_meshNodes.IsDirty(); }
@@ -41,4 +44,6 @@ private:
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
     MeshNodes m_meshNodes;
     bool m_firstFrame = true;
+    float m_respawnCounter = 0;
+    bool m_despawned = false;
 };
