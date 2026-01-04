@@ -90,17 +90,15 @@ struct AudioFiles {
 };
 
 struct WeaponInfo {
-    std::string name;
-    std::string modelName;
-    std::string pickupName;
+    std::string ammoInfoName = UNDEFINED_STRING;
+    std::string itemInfoName = UNDEFINED_STRING;
+    std::string modelName = UNDEFINED_STRING;
+    std::string muzzleFlashBoneName = UNDEFINED_STRING;
+    std::string casingEjectionBoneName = UNDEFINED_STRING;
+    std::string pistolSlideBoneName = UNDEFINED_STRING;
     AnimationNames animationNames;
     AnimationSpeeds animationSpeeds;
     AudioFiles audioFiles;
-    const char* muzzleFlashBoneName = UNDEFINED_STRING;
-    const char* casingEjectionBoneName = UNDEFINED_STRING;
-    std::string pistolSlideBoneName = UNDEFINED_STRING;
-    const char* ammoType = UNDEFINED_STRING;
-    const char* casingType = UNDEFINED_STRING;
     glm::vec3 muzzleFlashOffset = glm::vec3(0);
     glm::vec3 casingEjectionOffset = glm::vec3(0);
     WeaponType type;
@@ -123,7 +121,6 @@ struct WeaponInfo {
     bool hasADS = false;
     std::string sightName = UNDEFINED_STRING;
     std::string silencerName = UNDEFINED_STRING;
-    bool isGold = false;
 };
 
 struct WeaponAttachmentInfo {

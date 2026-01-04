@@ -7,173 +7,219 @@ namespace Bible {
 
     void InitInventoryItemInfo() {
 
-        InventoryItemInfo& aks74u = CreateInventoryItemInfo("AKS74U");
-        aks74u.m_itemType = InventoryItemType::WEAPON;
-        aks74u.m_cellSize = 2;
-        aks74u.m_combineable = false;
-        aks74u.m_discardable = true;
-        aks74u.m_equipable = true;
-        aks74u.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        aks74u.m_examineModelScale = glm::vec3(2.75f);
-        aks74u.m_maxExamineZoom = 1.75f;
-        aks74u.m_itemHeading = "AKS-74U";
-        aks74u.m_description = R"(Pew pew pew.)";
+        ItemInfo& aks74u = CreateInventoryItemInfo("AKS74U");
+        aks74u.m_type = ItemType::WEAPON;
+        aks74u.m_mass = 2.7f;
+        aks74u.m_modelName = "AKS74U";
+        aks74u.m_collisionModelName = "CollisionMesh_AKS74U";
+        aks74u.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        aks74u.m_inventoryInfo.cellSize = 2;
+        aks74u.m_inventoryInfo.combineable = false;
+        aks74u.m_inventoryInfo.discardable = true;
+        aks74u.m_inventoryInfo.equipable = true;
+        aks74u.m_examineInfo.translation = glm::vec3(0.0f, 0.0f, 0.0f);
+        aks74u.m_examineInfo.scale = glm::vec3(2.75f);
+        aks74u.m_examineInfo.maxZoom = 1.75f;
+        aks74u.m_inventoryInfo.heading = "AKS-74U";
+        aks74u.m_inventoryInfo.description = R"(Pew pew pew.)";
 
-        InventoryItemInfo& glock = CreateInventoryItemInfo("Glock");
-        glock.m_itemType = InventoryItemType::WEAPON;
-        glock.m_cellSize = 1;
-        glock.m_combineable = true;
-        glock.m_discardable = true;
-        glock.m_equipable = true;
-        glock.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        glock.m_examineModelScale = glm::vec3(4.5f);
-        glock.m_maxExamineZoom = 1.85f;
-        glock.m_itemHeading = "GLOCK 22";
-        glock.m_description = R"(Australian police issue. Matte and boxy, a cold
+        ItemInfo& glock = CreateInventoryItemInfo("Glock");
+        glock.m_type = ItemType::WEAPON;
+        glock.m_mass = 2.0f;
+        glock.m_modelName = "Weapon_Glock";
+        glock.m_collisionModelName = "CollisionMesh_Glock";
+        glock.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        glock.m_inventoryInfo.cellSize = 1;
+        glock.m_inventoryInfo.combineable = true;
+        glock.m_inventoryInfo.discardable = true;
+        glock.m_inventoryInfo.equipable = true;
+        glock.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        glock.m_examineInfo.scale = glm::vec3(4.5f);
+        glock.m_examineInfo.maxZoom = 1.85f;
+        glock.m_inventoryInfo.heading = "GLOCK 22";
+        glock.m_inventoryInfo.description = R"(Australian police issue. Matte and boxy, a cold
 little companion. It does the paperwork duty 
 without drama. Dependable at short range, 
 underwhelming at a distance. A proper piece 
 of shit.)";
 
-        InventoryItemInfo& goldenGlock = CreateInventoryItemInfo("GoldenGlock");
-        goldenGlock.m_itemType = InventoryItemType::WEAPON;
-        goldenGlock.m_cellSize = 1;
-        goldenGlock.m_combineable = true;
-        goldenGlock.m_discardable = true;
-        goldenGlock.m_equipable = true;
-        goldenGlock.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        goldenGlock.m_examineModelScale = glm::vec3(4.5f);
-        goldenGlock.m_maxExamineZoom = 1.85f;
-        goldenGlock.m_itemHeading = "GOLDEN GLOCK 22";
-        goldenGlock.m_description = R"(Shaken naked, not stirred. Pierce Brosnan's 
+        ItemInfo& goldenGlock = CreateInventoryItemInfo("GoldenGlock");
+        goldenGlock.m_type = ItemType::WEAPON;
+        goldenGlock.m_mass = 2.0f;
+        goldenGlock.m_modelName = "Weapon_GoldenGlock";
+        goldenGlock.m_collisionModelName = "CollisionMesh_GoldenGlock";
+        goldenGlock.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        goldenGlock.m_inventoryInfo.cellSize = 1;
+        goldenGlock.m_inventoryInfo.combineable = true;
+        goldenGlock.m_inventoryInfo.discardable = true;
+        goldenGlock.m_inventoryInfo.equipable = true;
+        goldenGlock.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        goldenGlock.m_examineInfo.scale = glm::vec3(4.5f);
+        goldenGlock.m_examineInfo.maxZoom = 1.85f;
+        goldenGlock.m_inventoryInfo.heading = "GOLDEN GLOCK 22";
+        goldenGlock.m_inventoryInfo.description = R"(Shaken naked, not stirred. Pierce Brosnan's 
 wet dream, wedding gift dipped in drip and 
 glitter. Natalia gonna be in the good books 
 for this one.)";
 
-        InventoryItemInfo& tokarev = CreateInventoryItemInfo("Tokarev");
-        tokarev.m_itemType = InventoryItemType::WEAPON;
-        tokarev.m_cellSize = 1;
-        tokarev.m_combineable = false;
-        tokarev.m_discardable = true;
-        tokarev.m_equipable = true;
-        tokarev.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        tokarev.m_examineModelScale = glm::vec3(4.5f);
-        tokarev.m_maxExamineZoom = 1.85f;
-        tokarev.m_itemHeading = "TOKAREV";
-        tokarev.m_description = R"(Soviet semi-automatic pistol developed in the
+        ItemInfo& tokarev = CreateInventoryItemInfo("Tokarev");
+        tokarev.m_type = ItemType::WEAPON;
+        tokarev.m_mass = 2.0f;
+        tokarev.m_modelName = "Weapon_Tokarev";
+        tokarev.m_collisionModelName = "CollisionMesh_Tokarev";
+        tokarev.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        tokarev.m_inventoryInfo.cellSize = 1;
+        tokarev.m_inventoryInfo.combineable = false;
+        tokarev.m_inventoryInfo.discardable = true;
+        tokarev.m_inventoryInfo.equipable = true;
+        tokarev.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        tokarev.m_examineInfo.scale = glm::vec3(4.5f);
+        tokarev.m_examineInfo.maxZoom = 1.85f;
+        tokarev.m_inventoryInfo.heading = "TOKAREV";
+        tokarev.m_inventoryInfo.description = R"(Soviet semi-automatic pistol developed in the
 1920s. This baby runs hot and she got no frills, 
 just prints pretty little holes. Straight out 
 of Ourumov's briefcase.)";
 
-        InventoryItemInfo& knife = CreateInventoryItemInfo("Knife");
-        knife.m_itemType = InventoryItemType::WEAPON;
-        knife.m_cellSize = 1;
-        knife.m_combineable = true;
-        knife.m_discardable = false;
-        knife.m_equipable = true;
-        knife.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
-        knife.m_examineModelScale = glm::vec3(3.5f);
-        knife.m_maxExamineZoom = 1.75f;
-        knife.m_itemHeading = "KNIFE";
-        knife.m_description = R"(From fish to pharynx, this rusty little dagger 
+        ItemInfo& knife = CreateInventoryItemInfo("Knife");
+        knife.m_type = ItemType::WEAPON;
+        knife.m_mass = 2.0f;
+        knife.m_modelName = "Weapon_Knife";
+        knife.m_collisionModelName = "CollisionMesh_Knife";
+        knife.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        knife.m_inventoryInfo.cellSize = 1;
+        knife.m_inventoryInfo.combineable = true;
+        knife.m_inventoryInfo.discardable = false;
+        knife.m_inventoryInfo.equipable = true;
+        knife.m_examineInfo.rotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        knife.m_examineInfo.scale = glm::vec3(3.5f);
+        knife.m_examineInfo.maxZoom = 1.75f;
+        knife.m_inventoryInfo.heading = "KNIFE";
+        knife.m_inventoryInfo.description = R"(From fish to pharynx, this rusty little dagger 
 takes the same short and messy path. Might
 wanna bring a cloth.)";
 
-        InventoryItemInfo& remington870 = CreateInventoryItemInfo("Remington870");
-        remington870.m_itemType = InventoryItemType::WEAPON;
-        remington870.m_cellSize = 3;
-        remington870.m_combineable = false;
-        remington870.m_discardable = true;
-        remington870.m_equipable = true;
-        remington870.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        remington870.m_examineModelScale = glm::vec3(2.125f);
-        remington870.m_maxExamineZoom = 1.75f;
-        remington870.m_itemHeading = "REMINGTON 870";
-        remington870.m_description = R"(American pump-action built like a fence post. 
+        ItemInfo& remington870 = CreateInventoryItemInfo("Remington870");
+        remington870.m_type = ItemType::WEAPON;
+        remington870.m_mass = 3.2f;
+        remington870.m_modelName = "Weapon_Remington870";
+        remington870.m_collisionModelName = "CollisionMesh_Remington870";
+        remington870.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        remington870.m_inventoryInfo.cellSize = 3;
+        remington870.m_inventoryInfo.combineable = false;
+        remington870.m_inventoryInfo.discardable = true;
+        remington870.m_inventoryInfo.equipable = true;
+        remington870.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        remington870.m_examineInfo.scale = glm::vec3(2.125f);
+        remington870.m_examineInfo.maxZoom = 1.75f;
+        remington870.m_inventoryInfo.heading = "REMINGTON 870";
+        remington870.m_inventoryInfo.description = R"(American pump-action built like a fence post. 
 This twelve-gauge thunder will clear every 
 damn room and barn in time for Judgment 
 Day supper.)";
 
-        InventoryItemInfo& spas = CreateInventoryItemInfo("SPAS");
-        spas.m_itemType = InventoryItemType::WEAPON;
-        spas.m_cellSize = 3;
-        spas.m_combineable = false;
-        spas.m_discardable = true;
-        spas.m_equipable = true;
-        spas.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        spas.m_examineModelScale = glm::vec3(2.95f);
-        spas.m_maxExamineZoom = 1.75f;
-        spas.m_itemHeading = "SPAS";
-        spas.m_description = R"(Dual modal, Italian menace. If killing is a sport, 
+        ItemInfo& spas = CreateInventoryItemInfo("SPAS");
+        spas.m_type = ItemType::WEAPON;
+        spas.m_mass = 3.2f;
+        spas.m_modelName = "Weapon_SPAS";
+        spas.m_collisionModelName = "CollisionMesh_SPAS";
+        spas.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        spas.m_inventoryInfo.cellSize = 3;
+        spas.m_inventoryInfo.combineable = false;
+        spas.m_inventoryInfo.discardable = true;
+        spas.m_inventoryInfo.equipable = true;
+        spas.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        spas.m_examineInfo.scale = glm::vec3(2.95f);
+        spas.m_examineInfo.maxZoom = 1.75f;
+        spas.m_inventoryInfo.heading = "SPAS";
+        spas.m_inventoryInfo.description = R"(Dual modal, Italian menace. If killing is a sport, 
 then Franchi's Special Purpose Automatic 
 Shotgun will put you on the podium with the 
 cadence of a fucking riot.)";
 
-        InventoryItemInfo& shotgunSlugBox = CreateInventoryItemInfo("12GaugeBuckShot");
-        shotgunSlugBox.m_itemType = InventoryItemType::WEAPON;
-        shotgunSlugBox.m_cellSize = 3;
-        shotgunSlugBox.m_discardable = true;
-        shotgunSlugBox.m_equipable = false;
-        shotgunSlugBox.m_examineModelRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        shotgunSlugBox.m_examineModelScale = glm::vec3(2.5f);
-        shotgunSlugBox.m_maxExamineZoom = 1.75f;
-        shotgunSlugBox.m_itemHeading = "12 Gauge Ammo";
-        shotgunSlugBox.m_description = R"(Neque porro quisquam est qui dolorem 
+        ItemInfo& shotgunSlugBox = CreateInventoryItemInfo("12GaugeBuckShot");
+        shotgunSlugBox.m_type = ItemType::AMMO;
+        shotgunSlugBox.m_mass = 0.5f;
+        shotgunSlugBox.m_modelName = "Ammo_ShotgunBox";
+        shotgunSlugBox.m_collisionModelName = UNDEFINED_STRING;
+        shotgunSlugBox.m_physicsShapeType = PhysicsShapeType::BOX;
+        shotgunSlugBox.m_inventoryInfo.cellSize = 3;
+        shotgunSlugBox.m_inventoryInfo.discardable = true;
+        shotgunSlugBox.m_inventoryInfo.equipable = false;
+        shotgunSlugBox.m_examineInfo.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+        shotgunSlugBox.m_examineInfo.scale = glm::vec3(2.5f);
+        shotgunSlugBox.m_examineInfo.maxZoom = 1.75f;
+        shotgunSlugBox.m_inventoryInfo.heading = "12 Gauge Ammo";
+        shotgunSlugBox.m_inventoryInfo.description = R"(Neque porro quisquam est qui dolorem 
 ipsum quia dolor sit amet, consectetur, 
 adipisci velit...)";
 
+        ItemInfo& blackSkull = CreateInventoryItemInfo("BlackSkull");
+        blackSkull.m_type = ItemType::USELESS;
+        blackSkull.m_mass = 2.0f;
+        blackSkull.m_modelName = "Item_BlackSkull";
+        blackSkull.m_collisionModelName = "CollisionMesh_BlackSkull";
+        blackSkull.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        blackSkull.m_inventoryInfo.cellSize = 1;
+        blackSkull.m_inventoryInfo.combineable = false;
+        blackSkull.m_inventoryInfo.discardable = true;
+        blackSkull.m_inventoryInfo.equipable = false;
+        blackSkull.m_examineInfo.translation = glm::vec3(0.0f, 0.2f, 0.0f);
+        blackSkull.m_examineInfo.rotation = glm::vec3(1.1f, 0.0f, 0.0f);
+        blackSkull.m_examineInfo.scale = glm::vec3(4.5f);
+        blackSkull.m_examineInfo.maxZoom = 1.75f;
+        blackSkull.m_inventoryInfo.heading = "BLACK SKULL";
+        blackSkull.m_inventoryInfo.description = R"(Worth little to you, worth everything to them.)";
 
-
-        InventoryItemInfo& blackSkull = CreateInventoryItemInfo("BlackSkull");
-        blackSkull.m_itemType = InventoryItemType::UESLESS;
-        blackSkull.m_cellSize = 1;
-        blackSkull.m_combineable = false;
-        blackSkull.m_discardable = true;
-        blackSkull.m_equipable = false;
-        blackSkull.m_examineModelTranslation = glm::vec3(0.0f, 0.2f, 0.0f);
-        blackSkull.m_examineModelRotation = glm::vec3(1.1f, 0.0f, 0.0f);
-        blackSkull.m_examineModelScale = glm::vec3(4.5f);
-        blackSkull.m_maxExamineZoom = 1.75f;
-        blackSkull.m_itemHeading = "BLACK SKULL";
-        blackSkull.m_description = R"(Worth little to you, worth everything to them.)";
-
-        InventoryItemInfo& smallKey = CreateInventoryItemInfo("SmallKey");
-        smallKey.m_itemType = InventoryItemType::KEY;
-        smallKey.m_cellSize = 1;
-        smallKey.m_combineable = false;
-        smallKey.m_discardable = true;
-        smallKey.m_equipable = false;
-        smallKey.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
-        smallKey.m_examineModelScale = glm::vec3(8.5f);
-        smallKey.m_maxExamineZoom = 1.75f;
-        smallKey.m_itemHeading = "SMALL KEY";
-        smallKey.m_description = R"(Smells of dust and secrets. One turn, one less 
+        ItemInfo& smallKey = CreateInventoryItemInfo("SmallKey");
+        smallKey.m_type = ItemType::KEY;
+        smallKey.m_mass = 0.5f;
+        smallKey.m_modelName = "Item_SmallKey";
+        smallKey.m_collisionModelName = UNDEFINED_STRING;
+        smallKey.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        smallKey.m_inventoryInfo.cellSize = 1;
+        smallKey.m_inventoryInfo.combineable = false;
+        smallKey.m_inventoryInfo.discardable = true;
+        smallKey.m_inventoryInfo.equipable = false;
+        smallKey.m_examineInfo.rotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        smallKey.m_examineInfo.scale = glm::vec3(8.5f);
+        smallKey.m_examineInfo.maxZoom = 1.75f;
+        smallKey.m_inventoryInfo.heading = "SMALL KEY";
+        smallKey.m_inventoryInfo.description = R"(Smells of dust and secrets. One turn, one less 
 mystery.)";
 
-        InventoryItemInfo& smallKeySilver = CreateInventoryItemInfo("SmallKeySilver");
-        smallKeySilver.m_itemType = InventoryItemType::KEY;
-        smallKeySilver.m_cellSize = 1;
-        smallKeySilver.m_combineable = false;
-        smallKeySilver.m_discardable = true;
-        smallKeySilver.m_equipable = false;
-        smallKeySilver.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
-        smallKeySilver.m_examineModelScale = glm::vec3(8.5f);
-        smallKeySilver.m_maxExamineZoom = 1.75f;
-        smallKeySilver.m_itemHeading = "SMALL KEY SILVER";
-        smallKeySilver.m_description = R"(Someone carried this close for a long time. 
+        ItemInfo& smallKeySilver = CreateInventoryItemInfo("SmallKeySilver");
+        smallKeySilver.m_type = ItemType::KEY;
+        smallKeySilver.m_mass = 0.5f;
+        smallKeySilver.m_modelName = "Item_SmallKey";
+        smallKeySilver.m_collisionModelName = UNDEFINED_STRING;
+        smallKeySilver.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        smallKeySilver.m_inventoryInfo.cellSize = 1;
+        smallKeySilver.m_inventoryInfo.combineable = false;
+        smallKeySilver.m_inventoryInfo.discardable = true;
+        smallKeySilver.m_inventoryInfo.equipable = false;
+        smallKeySilver.m_examineInfo.rotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        smallKeySilver.m_examineInfo.scale = glm::vec3(8.5f);
+        smallKeySilver.m_examineInfo.maxZoom = 1.75f;
+        smallKeySilver.m_inventoryInfo.heading = "SMALL KEY SILVER";
+        smallKeySilver.m_inventoryInfo.description = R"(Someone carried this close for a long time. 
 Probably for a reason.)";
 
-        InventoryItemInfo& pills = CreateInventoryItemInfo("Pills");
-        pills.m_itemType = InventoryItemType::KEY;
-        pills.m_cellSize = 1;
-        pills.m_combineable = false;
-        pills.m_discardable = true;
-        pills.m_equipable = false;
-        pills.m_examineModelRotation = glm::vec3(0.0f, -0.2f, -0.6f);
-        pills.m_examineModelScale = glm::vec3(8.5f);
-        pills.m_maxExamineZoom = 1.75f;
-        pills.m_itemHeading = "RELIEF PIILS";
-        pills.m_description = R"(Not a cure, but enough to keep you standing.)";
+        ItemInfo& pills = CreateInventoryItemInfo("Pills");
+        pills.m_type = ItemType::HEAL;
+        pills.m_mass = 0.5f;
+        pills.m_modelName = UNDEFINED_STRING; // TODO!!!
+        pills.m_collisionModelName = UNDEFINED_STRING;
+        pills.m_physicsShapeType = PhysicsShapeType::CONVEX_MESH;
+        pills.m_inventoryInfo.cellSize = 1;
+        pills.m_inventoryInfo.combineable = false;
+        pills.m_inventoryInfo.discardable = true;
+        pills.m_inventoryInfo.equipable = false;
+        pills.m_examineInfo.rotation = glm::vec3(0.0f, -0.2f, -0.6f);
+        pills.m_examineInfo.scale = glm::vec3(8.5f);
+        pills.m_examineInfo.maxZoom = 1.75f;
+        pills.m_inventoryInfo.heading = "RELIEF PIILS";
+        pills.m_inventoryInfo.description = R"(Not a cure, but enough to keep you standing.)";
 
         // The kind of key someone swore they destroyed.
         // A spare for something important. Or something you were never meant to open.

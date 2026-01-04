@@ -32,11 +32,6 @@ namespace World {
 
     void Update(float deltaTime) {
 
-        if (Input::KeyPressed(HELL_KEY_NUMPAD_ADD)) {
-            Game::GetLocalPlayerByIndex(0)->DebugWipeShit();
-            Game::GetLocalPlayerByIndex(1)->DebugWipeShit();
-        }
-
         // FAILED DOOR CHAIN LINK SHIT
         if (false) {
             static Hell::SlotMap<DoorChain> doorchains;

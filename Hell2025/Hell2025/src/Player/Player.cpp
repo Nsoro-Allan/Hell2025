@@ -2,8 +2,10 @@
 #include "HellConstants.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include "Audio/Audio.h"
 #include "BackEnd/BackEnd.h"
+#include "Bible/Bible.h"
 #include "Core/Game.h"
 #include "Editor/Editor.h"
 #include "HellLogging.h"
@@ -17,24 +19,6 @@
 #include "Renderer/Renderer.h"
 #include "World/World.h"
 // Get me out of here
-
-void Player::DebugWipeShit() {
-    m_killCount = 0;
-    m_cash = 0;
-    m_health = 100;
-
-    if (m_viewportIndex == 0) {
-        m_killCount = 55;
-        m_cash = 21;
-    }
-    if (m_viewportIndex == 1) {
-        m_killCount =82;
-        m_cash = 448;
-    }
-
-
-    GiveDefaultLoadout();
-}
 
 void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex) {
     m_playerId = UniqueID::GetNextObjectId(ObjectType::PLAYER);
@@ -74,21 +58,8 @@ void Player::EnterShop() {
     m_shopInventory.OpenAsShop();
     m_inventory.CloseInventory();
 
-    static std::vector<std::string> mermaidGreetings;
-    if (mermaidGreetings.empty()) {
-        mermaidGreetings.push_back("Lost boys welcome, but gotta pay the toll.");
-        mermaidGreetings.push_back("Come spend your clams with the queen, Sugar.");
-        mermaidGreetings.push_back("Drop your dabloons Honey, this aint a charity.");
-        mermaidGreetings.push_back("I aint got all day, spill the loot.");
-        mermaidGreetings.push_back("Careful, Sweetheart. I charge by the minute.");
-        mermaidGreetings.push_back("Stop staring. Start paying.");
-        mermaidGreetings.push_back("A private performance perhaps?");
-    }
-    int rand = Util::RandomInt(0, mermaidGreetings.size() - 1);
-    std::string mermaidGreeting = mermaidGreetings[rand];
-    m_typeWriter.DisplayText(mermaidGreeting);
-
-
+    const std::string& text = Bible::RandomMermaidGreeting();
+    m_typeWriter.DisplayText(text);
 
     m_flashlightOn = true;
     Audio::PlayAudio(AUDIO_SELECT, 1.00f);

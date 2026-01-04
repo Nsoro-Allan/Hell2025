@@ -2,6 +2,7 @@
 #include "HellConstants.h"
 #include "HellEnums.h"
 #include "HellTypes.h"
+#include "Types/Core/ItemInfo.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Weapon/WeaponCommon.h"
 
@@ -13,7 +14,6 @@ struct InventoryItem {
     glm::ivec2 m_gridLocation = glm::ivec2(-1, -1);
     std::vector<std::string> m_attachments;
     bool m_rotatedInGrid = false;
-    InventoryItemType type = InventoryItemType::UNDEFINED;
 };
 
 struct InventoryStyle {
@@ -105,8 +105,8 @@ private:
     void UpdateExamineScreen(float deltaTime);
 
     // Getters
-    InventoryItemInfo* GetSelectedItemInfo();
     InventoryItem* GetItemAtIndex(int index);
+    ItemInfo* GetSelectedItemInfo();
     glm::ivec2 GetSelectedItemHeadingSize();
     glm::ivec2 GetSelectedItemDescriptionSize();
     glm::ivec2 GetItemGridSize();

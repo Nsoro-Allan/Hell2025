@@ -975,8 +975,8 @@ namespace World {
     }
 
     uint64_t AddPickUp(PickUpCreateInfo createInfo, SpawnOffset spawnOffset) {
-        if (!Bible::GetPickUpInfoByName(createInfo.name)) {
-            Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' not found in bible";
+        if (!Bible::GetItemInfoByName(createInfo.name)) {
+            Logging::Warning() << "World::AddPickUp(..) failed: '" << createInfo.name << "' ItemInfo not found in bible";
             return 0;
         }
 

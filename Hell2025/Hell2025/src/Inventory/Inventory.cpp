@@ -40,11 +40,11 @@ void Inventory::CloseInventory() {
 }
 
 void Inventory::AddInventoryItem(const std::string& name) {
-    InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(name);
+    ItemInfo* itemInfo = Bible::GetItemInfoByName(name);
     if (!itemInfo) return;
 
     // Find the next free location
-    glm::ivec2 nextFreeLocation = GetNextFreeLocation(itemInfo->m_cellSize);
+    glm::ivec2 nextFreeLocation = GetNextFreeLocation(itemInfo->m_inventoryInfo.cellSize);
     
     // Oh there wasn't one?
     if (nextFreeLocation == glm::ivec2(-1, -1)) {
@@ -159,14 +159,14 @@ InventoryItem* Inventory::GetItemAtIndex(int index) {
     else return &m_items[index];
 }
 
-InventoryItemInfo* Inventory::GetSelectedItemInfo() {
+ItemInfo* Inventory::GetSelectedItemInfo() {
     int selectedItemIndex = GetSelectedItemIndex();
     if (selectedItemIndex == -1) return nullptr; // nothing at this slot
 
     InventoryItem* selectedItem = GetItemAtIndex(selectedItemIndex);
     if (!selectedItem) return nullptr; // This should never happen
 
-    return Bible::GetInventoryItemInfoByName(selectedItem->m_name);
+    return Bible::GetItemInfoByName(selectedItem->m_name);
 }
 
 const std::string& Inventory::GetItemNameAtLocation(int x, int y) {
@@ -189,19 +189,19 @@ const std::string& Inventory::GetItemNameAtLocation(int x, int y) {
 const std::string& Inventory::GetSelectedItemHeading() {
     static std::string noItem = "";
 
-    InventoryItemInfo* itemInfo = GetSelectedItemInfo();
+    ItemInfo* itemInfo = GetSelectedItemInfo();
     if (!itemInfo) return noItem;
 
-    return itemInfo->m_itemHeading;
+    return itemInfo->m_inventoryInfo.description;
 }
 
 const std::string& Inventory::GetSelectedItemDescription() {
     static std::string noItem = "";
 
-    InventoryItemInfo* itemInfo = GetSelectedItemInfo();
+    ItemInfo* itemInfo = GetSelectedItemInfo();
     if (!itemInfo) return noItem;
 
-    return itemInfo->m_description;
+    return itemInfo->m_inventoryInfo.description;
 }
 
 int Inventory::GetItemSizeAtLocation(int x, int y) {
@@ -236,18 +236,18 @@ void Inventory::UpdateOccupiedSlotsArray() {
     // Mark occupied cells
     for (int i = 0; i < (int)m_items.size(); i++) {
         InventoryItem& item = m_items[i];
-        InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(item.m_name);
+        ItemInfo* itemInfo = Bible::GetItemInfoByName(item.m_name);
         if (!itemInfo) continue;
 
-        int w = itemInfo->m_cellSize; // horizontal width by default
+        int w = itemInfo->GetCellSize(); // horizontal width by default
         int h = 1;
         int originX = item.m_gridLocation.x;
         int originY = item.m_gridLocation.y;
 
         if (item.m_rotatedInGrid) {
             // vertical footprint; anchor is BOTTOM cell
-            std::swap(w, h);                          // w=1, h=size
-            originY -= (itemInfo->m_cellSize - 1);    // move origin to the TOP cell
+            std::swap(w, h);                              // w=1, h=size
+            originY -= (itemInfo->GetCellSize()  - 1);    // move origin to the TOP cell
         }
 
         for (int dx = 0; dx < w; ++dx) {
@@ -349,7 +349,7 @@ void Inventory::GiveWeapon(const std::string& name) {
             // If you do already have it
             else {
                 if (WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(name)) {
-                    GiveAmmo(weaponInfo->ammoType, Bible::GetWeaponMagSize(name));
+                    GiveAmmo(weaponInfo->ammoInfoName, Bible::GetWeaponMagSize(name));
                 }
             }
             return;

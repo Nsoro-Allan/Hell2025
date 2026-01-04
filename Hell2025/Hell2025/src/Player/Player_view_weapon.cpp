@@ -39,7 +39,7 @@ void Player::UpdateViewWeapon(float deltaTime) {
     float movementY = -yOffset * SWAY_AMOUNT;
 
 
-    if (GetCurrentWeaponInfo()->name == "AKS74U") {
+    if (GetCurrentWeaponInfo()->itemInfoName == "AKS74U") {
         xMax = 10.0f;
     }
 
@@ -75,7 +75,7 @@ void Player::UpdateViewWeapon(float deltaTime) {
     
     // HACK!!!!!!!!!!!!!
     glm::mat4 hackMatrix = glm::mat4(1.0f);
-    if (GetCurrentWeaponInfo()->name == "AKS74U") {
+    if (GetCurrentWeaponInfo()->itemInfoName == "AKS74U") {
         Transform hackTransform;
         hackTransform.rotation.x += HELL_PI * 0.5f;
         hackTransform.rotation.z += HELL_PI;

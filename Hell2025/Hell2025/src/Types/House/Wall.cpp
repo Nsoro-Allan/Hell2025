@@ -5,6 +5,7 @@
 #include "Renderer/RenderDataManager.h"
 #include "Renderer/Renderer.h"
 #include "World/World.h"
+#include "HellLogging.h"
 
 Wall::Wall(uint64_t id, const WallCreateInfo& createInfo, const SpawnOffset& spawnOffset) {
     m_objectId = id;
@@ -357,6 +358,14 @@ BoardVertexData Wall::CreateBoardVertexData(glm::vec3 begin, glm::vec3 end, glm:
 #define WEATHERBOARD_STOP_MESH_HEGIHT 2.6f
 
 void Wall::CreateWeatherBoards() {
+    Material* material = AssetManager::GetMaterialByName("WeatherBoards0");
+    Model* model = AssetManager::GetModelByName("WeatherboardStop");
+
+    if (!model) {
+        Logging::Error() << "Wall::CreateWeatherBoards() failed to load model 'WeatherboardStop'";
+        return;
+    }
+
     float individialBoardHeight = 0.13f;
     float desiredTotalWallHeight = 5.6f;
     int weatherBoardCount = (int)(desiredTotalWallHeight / individialBoardHeight);
@@ -372,9 +381,6 @@ void Wall::CreateWeatherBoards() {
         transform.position = start;
         transform.scale.y = actualFinalWallHeight;
         transform.rotation.y = Util::EulerYRotationBetweenTwoPoints(start, end);
-
-        Material* material = AssetManager::GetMaterialByName("WeatherBoards0");
-        Model* model = AssetManager::GetModelByName("WeatherBoardStop");
 
         RenderItem& renderItem = m_weatherBoardstopRenderItems.emplace_back();
         renderItem.modelMatrix = transform.to_mat4();

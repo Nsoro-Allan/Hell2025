@@ -124,13 +124,13 @@ void Player::UpdateInteract() {
 
             if (!pickUp->IsDespawned()) {
 
-                if (pickUp->GetType() == PickUpType::WEAPON) {
+                if (pickUp->GetType() == ItemType::WEAPON) {
                     m_inventory.GiveWeapon(pickUp->GetName());
                 }
-                if (pickUp->GetType() == PickUpType::AMMO) {
+                if (pickUp->GetType() == ItemType::AMMO) {
                     m_inventory.GiveAmmo(pickUp->GetName(), Bible::GetAmmoPickUpAmount(pickUp->GetName()));
                 }
-                if (pickUp->GetType() == PickUpType::UNDEFINED) {
+                if (pickUp->GetType() == ItemType::UNDEFINED) {
                     Logging::Warning() << "Player " << m_viewportIndex << " tried to pick up a PickUp with name '" << pickUp->GetName() << "' but type '" << Util::PickUpTypeToString(pickUp->GetType()) << "'";
                 }
 

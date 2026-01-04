@@ -33,13 +33,13 @@ void Player::UpdateShotgunGunLogic(float deltaTime) {
     if (Input::KeyPressed(HELL_KEY_I)) {
         AmmoState* ammoState = GetCurrentAmmoState();
         WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
         ammoState->ammoOnHand--;
     }
     if (Input::KeyPressed(HELL_KEY_O)) {
         AmmoState* ammoState = GetCurrentAmmoState();
         WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
         ammoState->ammoOnHand++;
     }
 
@@ -89,8 +89,7 @@ void Player::ToggleAutoShotgun() {
 void Player::FireShotgun() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    AmmoInfo* ammoInfo = GetCurrentAmmoInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
 
     m_weaponAction = WeaponAction::FIRE;
     weaponState->ammoInMag--;
@@ -107,7 +106,7 @@ void Player::FireShotgun() {
         viewWeapon->PlayAnimation("MainLayer", weaponInfo->animationNames.shotgunFireNoPump, 1.0f);
     }
     SpawnMuzzleFlash(55.0f, 0.3f);
-    SpawnCasing(ammoInfo, weaponState->shotgunSlug);
+    SpawnCasing();
     Audio::PlayAudio(weaponInfo->audioFiles.fire[0], 1.0f, GetWeaponAudioFrequency());
 
     for (int i = 0; i < 12; i++) {
@@ -151,7 +150,7 @@ void Player::DryFireShotgun() {
 void Player::ReloadShotgun() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
 
     viewWeapon->PlayAnimation("MainLayer", weaponInfo->animationNames.shotgunReloadStart, 1.0f);
     m_weaponAction = SHOTGUN_RELOAD_BEGIN;
@@ -163,7 +162,7 @@ void Player::UnloadShotgun() {
     std::cout << "UnloadShotgun()\n";
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
 
     viewWeapon->PlayAnimation("MainLayer", weaponInfo->animationNames.shotgunUnloadStart, weaponInfo->animationSpeeds.shotgunUnloadStart);
     m_weaponAction = SHOTGUN_UNLOAD_BEGIN;
@@ -177,8 +176,8 @@ void Player::UpdateShotgunUnloadLogic() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponAction weaponAction = GetCurrentWeaponAction();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
-    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoType);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
+    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoInfoName);
 
     if (ViewModelAnimationsCompleted() && weaponAction == WeaponAction::SHOTGUN_UNLOAD_BEGIN ||
         ViewModelAnimationsCompleted() && weaponAction == WeaponAction::SHOTGUN_UNLOAD_SINGLE_SHELL ||
@@ -251,8 +250,8 @@ void Player::UpdateShotgunReloadLogic() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponAction weaponAction = GetCurrentWeaponAction();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
-    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoType);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
+    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoInfoName);
 
     // Begin loading anim has complete, time to reload!
     if (ViewModelAnimationsCompleted() && weaponAction == WeaponAction::SHOTGUN_RELOAD_BEGIN ||
@@ -339,7 +338,7 @@ void Player::UpdateShotgunReloadLogic() {
 void Player::UpdatePumpAudio() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
 
     auto PlayPumpAudioIfNeeded = [&](WeaponAction action, int frame) {
         if (GetCurrentWeaponAction() == action &&
@@ -411,8 +410,8 @@ bool Player::CanToggleShotgunAuto() {
 bool Player::CanReloadShotgun() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoType);
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoInfoName);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
     WeaponAction weaponAction = GetCurrentWeaponAction();
     
     // If shotty aint full, and you have enough ammo
@@ -433,8 +432,8 @@ bool Player::CanReloadShotgun() {
 bool Player::CanUnloadShotgun() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoType);
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    AmmoState* ammoState = GetAmmoStateByName(weaponInfo->ammoInfoName);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
     WeaponAction weaponAction = GetCurrentWeaponAction();
 
     // If shotty aint full, and you have enough ammo

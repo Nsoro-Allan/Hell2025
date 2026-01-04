@@ -253,7 +253,7 @@ namespace Editor {
         createInfo.name = pickUpName;
         createInfo.respawn = true;
         createInfo.saveToFile = true;
-        createInfo.type = Bible::GetPickUpTypeByName(pickUpName);
+        createInfo.type = Bible::GetItemType(pickUpName);
         World::AddPickUp(createInfo, SpawnOffset());
         ExitObjectPlacement();
     }

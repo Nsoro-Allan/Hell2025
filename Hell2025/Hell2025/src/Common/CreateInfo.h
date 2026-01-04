@@ -256,7 +256,7 @@ struct PickUpCreateInfo {
     bool saveToFile = false;
     bool respawn = false;
     bool disablePhysicsAtSpawn = true;
-    PickUpType type = PickUpType::UNDEFINED;
+    ItemType type = ItemType::UNDEFINED;
     std::string parentObjectName = UNDEFINED_STRING;
     std::string parentMeshName = UNDEFINED_STRING;
 

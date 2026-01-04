@@ -14,7 +14,7 @@ namespace Bible {
         glockAmmo.casingModelName = "Casing9mm";
         glockAmmo.casingMaterialName = "Casing9mm";
         glockAmmo.pickupAmount = 50;
-
+        
         AmmoInfo& tokarevAmmo = CreateAmmoInfo("Tokarev");
         tokarevAmmo.modelName = "TokarevAmmoBox";
         tokarevAmmo.convexMeshModelName = "TokarevAmmoBox_ConvexMesh";
@@ -22,7 +22,7 @@ namespace Bible {
         tokarevAmmo.casingModelName = "Casing9mm";
         tokarevAmmo.casingMaterialName = "Casing9mm";
         tokarevAmmo.pickupAmount = 50;
-
+        
         AmmoInfo& smithAmmo = CreateAmmoInfo("Smith");
         smithAmmo.modelName = "YOU NEED THIS MODEL";
         smithAmmo.convexMeshModelName = "YOU NEED THIS MODEL";
@@ -30,7 +30,7 @@ namespace Bible {
         smithAmmo.casingModelName = "None";
         smithAmmo.casingMaterialName = "None";
         smithAmmo.pickupAmount = 50;
-
+        
         AmmoInfo& aks74uAmmo = CreateAmmoInfo("AKS74U");
         aks74uAmmo.modelName = "TODO!!!";
         aks74uAmmo.convexMeshModelName = "TODO!!!";
@@ -38,7 +38,7 @@ namespace Bible {
         aks74uAmmo.pickupAmount = 666;
         aks74uAmmo.casingModelName = "CasingAKS74U";
         aks74uAmmo.casingMaterialName = "Casing_AkS74U";
-
+        
         AmmoInfo& shotgunBuckShotAmmo = CreateAmmoInfo("12GaugeBuckShot");
         shotgunBuckShotAmmo.modelName = "TODO!!!";
         shotgunBuckShotAmmo.convexMeshModelName = "TODO!!!";
@@ -46,7 +46,7 @@ namespace Bible {
         shotgunBuckShotAmmo.pickupAmount = 666;
         shotgunBuckShotAmmo.casingModelName = "Shell";
         shotgunBuckShotAmmo.casingMaterialName = "Shell";
-
+        
         AmmoInfo& p90Ammo = CreateAmmoInfo("P90");
         p90Ammo.modelName = "TODO!!!";
         p90Ammo.convexMeshModelName = "TODO!!!";
@@ -57,9 +57,9 @@ namespace Bible {
     }
 
     int32_t GetAmmoPickUpAmount(const std::string& name) {
-        if (AmmoInfo* ammoInfo = GetAmmoInfoByName(name)) {
-            return ammoInfo->pickupAmount;
-        }
+        //if (AmmoInfo* ammoInfo = GetAmmoInfoByName(name)) {
+        //    return ammoInfo->pickupAmount;
+        //}
         return 0;
     }
 }

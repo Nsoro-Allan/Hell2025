@@ -78,13 +78,6 @@ void Player::SubmitAttachmentRenderItem(const std::string& weaponAttachmentName)
             }
         }
 
-        // Golden override
-        if (!meshIsGlass && weaponInfo->isGold) {
-            static Material* goldenMaterial = AssetManager::GetMaterialByName("Gold");
-            renderItem.baseColorTextureIndex = goldenMaterial->m_basecolor;
-            renderItem.rmaTextureIndex = goldenMaterial->m_rma;
-        }
-
         if (meshIsGlass) {
             RenderDataManager::SubmitGlassRenderItem(renderItem);
         }
@@ -96,7 +89,7 @@ void Player::SubmitAttachmentRenderItem(const std::string& weaponAttachmentName)
 
 void Player::SubmitRenderItems() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     Viewport* viewport = ViewportManager::GetViewportByIndex(m_viewportIndex);
 

@@ -51,17 +51,8 @@ void AnimatedGameObject::UpdateRenderItems() {
             RenderItem& renderItem = m_renderItems.emplace_back();
             SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(m_meshRenderingEntries[i].meshIndex);
             Material* material = AssetManager::GetMaterialByIndex(m_meshRenderingEntries[i].materialIndex);
-
-            if (m_isGold && mesh->name != "ArmsMale" && mesh->name!= "ArmsFemale") {
-                static Material* goldMaterial = AssetManager::GetMaterialByName("Gold");
-                renderItem.baseColorTextureIndex = goldMaterial->m_basecolor;
-                renderItem.rmaTextureIndex = goldMaterial->m_rma;
-            }
-            else {
-                renderItem.baseColorTextureIndex = material->m_basecolor;
-                renderItem.rmaTextureIndex = material->m_rma;
-            }
-
+            renderItem.baseColorTextureIndex = material->m_basecolor;
+            renderItem.rmaTextureIndex = material->m_rma;
             renderItem.normalMapTextureIndex = material->m_normal;
             renderItem.modelMatrix = GetModelMatrix();
             renderItem.inverseModelMatrix = glm::inverse(GetModelMatrix());
@@ -652,10 +643,6 @@ void AnimatedGameObject::SubmitForSkinning() {
 
 void AnimatedGameObject::SetBaseTransfromIndex(int index) {
     baseTransformIndex = index;
-}
-
-void AnimatedGameObject::SetGoldFlag(bool flag) {
-    m_isGold = flag;
 }
 
 void AnimatedGameObject::SetRagdollV2Id(uint64_t ragdollV2Id) {

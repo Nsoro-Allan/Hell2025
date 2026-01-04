@@ -298,9 +298,10 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\BackEnd\BackEnd.cpp" />
     <ClCompile Include="src\BackEnd\Integration\GLFW.cpp" />
     <ClCompile Include="src\BackEnd\Integration\SDL.cpp" />
+    <ClCompile Include="src\Bible\Bible_text.cpp" />
+    <ClCompile Include="src\Bible\Items\Bible_items.cpp" />
     <ClCompile Include="src\Bible\MeshNodesConfig\Bible_PickUps.cpp" />
     <ClCompile Include="src\Bible\MeshNodesConfig\Bible_Doors.cpp" />
-    <ClCompile Include="src\Bible\Info\Bible_PickUpInfo.cpp" />
     <ClCompile Include="src\Bible\Info\Bible_WeaponAttachmentInfo.cpp" />
     <ClCompile Include="src\Bible\Info\Bible_WeaponInfo.cpp" />
     <ClCompile Include="src\Bible\MeshNodesConfig\GenericObjects\Bathroom.cpp" />
@@ -680,6 +681,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClInclude Include="src\API\OpenGL\Types\GL_texture_3d.h" />
     <ClInclude Include="src\API\OpenGL\Types\GL_timer.h" />
     <ClInclude Include="src\BackEnd\Integration\SDL.h" />
+    <ClInclude Include="src\Types\Core\ItemInfo.h" />
     <ClInclude Include="src\Bvh\Gpu\Bvh.h" />
     <ClInclude Include="src\Common\CopyableAtomic.h" />
     <ClInclude Include="src\Common\HellGlm.h" />

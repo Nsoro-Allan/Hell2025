@@ -298,7 +298,8 @@ enum struct EditorViewportSplitMode {
     UNDEFINED
 };
 
-enum struct PickUpType {
+enum struct ItemType {
+    HEAL,
     WEAPON,
     KEY,
     AMMO,
@@ -484,14 +485,6 @@ enum class DebugTextMode{
     GLOBAL,
     PROFILING,
     DEBUG_TEXT_MODE_COUNT
-};
-
-enum struct InventoryItemType {
-    WEAPON,
-    AMMO,
-    KEY,
-    UESLESS,
-    UNDEFINED,
 };
 
 enum struct HouseType {

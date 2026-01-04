@@ -108,7 +108,7 @@ void Player::UpdateCamera(float deltaTime) {
     m_viewWeaponCameraMatrix = inverse(cameraBindMatrix) * cameraMatrix;
 
     // HACK!!!!!!!!!!!!!
-    if (GetCurrentWeaponInfo()->name == "AKS74U") {
+    if (GetCurrentWeaponInfo()->itemInfoName == "AKS74U") {
         glm::mat4 dmMaster = viewWeapon->GetAnimatedTransformByBoneName("Dm-Master");
         m_viewWeaponCameraMatrix = inverse(cameraBindMatrix) * inverse(dmMaster) * cameraMatrix;
     }

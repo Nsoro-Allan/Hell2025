@@ -25,8 +25,7 @@ void Player::UpdateGunLogic(float deltaTime) {
 void Player::FireGun() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
-    AmmoInfo* ammoInfo = GetCurrentAmmoInfo();
-    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+    WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
 
     if (weaponInfo->hasADS && IsInADS()) {
         viewWeapon->PlayAnimation("MainLayer", weaponInfo->animationNames.adsFire, weaponInfo->animationSpeeds.adsFire);
@@ -38,7 +37,7 @@ void Player::FireGun() {
     }
 
     SpawnMuzzleFlash(55.0f, 0.2f);
-    SpawnCasing(ammoInfo, weaponState->shotgunSlug);
+    SpawnCasing();
     SpawnBullet(0.05f);
 
     weaponState->ammoInMag--;

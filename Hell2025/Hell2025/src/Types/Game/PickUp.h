@@ -28,7 +28,7 @@ struct PickUp {
     const bool IsDirty() const                          { return m_meshNodes.IsDirty(); }
     const PickUpCreateInfo& GetCreateInfo() const       { return m_createInfo; }
     const std::string GetName() const                   { return m_createInfo.name; }
-    const PickUpType GetType() const                    { return m_createInfo.type; }
+    const ItemType GetType() const                    { return m_createInfo.type; }
     const std::vector<RenderItem>& GetRenderItems()     { return m_meshNodes.GetRenderItems(); }
     const glm::vec3 GetPosition()                       { return m_modelMatrix[3]; }
     const glm::vec3& GetRotation()                      { return m_initialTransform.rotation; }

@@ -61,7 +61,7 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
                 player->LeaveShop();
             }
             else {
-                player->m_typeWriter.DisplayText("Hold your seahorses");
+                player->m_typeWriter.DisplayText("Hold your seahorses.");
             }
             InputMulti::ClearKeyStates();
         }
@@ -74,7 +74,7 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
                 player->LeaveShop();
             }
             else {
-                player->m_typeWriter.DisplayText("Hold your seahorses");
+                player->m_typeWriter.DisplayText("Hold your seahorses.");
             }
             InputMulti::ClearKeyStates();
         }
@@ -87,7 +87,7 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
                 player->LeaveShop();
             }
             else {
-                player->m_typeWriter.DisplayText("Hold your seahorses");
+                player->m_typeWriter.DisplayText("Hold your seahorses.");
             }
             InputMulti::ClearKeyStates();
         }
@@ -95,40 +95,20 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
 }
 
 void Inventory::InitMeshNodesFromSelectedItem() {
-    InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(GetSelectedItemName());
+    ItemInfo* itemInfo = Bible::GetItemInfoByName(GetSelectedItemName());
     if (!itemInfo) return;
 
-    Bible::ConfigureMeshNodesByPickUpName(NO_ID, itemInfo->m_name, m_examineItemMeshNodes, false);
-
-    //std::vector<MeshNodeCreateInfo> emptyMeshNodeCreateInfoSet;
-    //m_examineItemMeshNodes.Init(NO_ID, itemInfo->m_examineModelName, emptyMeshNodeCreateInfoSet);
-    //
-    //std::cout << "You initialized the inventory mesh nodes object to: " << itemInfo->m_examineModelName << "\n";
-    //
-    //
-    //// Iterate through the mesh materials as defined in the bible and update the meshNodes them with them
-    //for (const auto& pair : itemInfo->m_meshMaterialNames) {
-    //    const std::string& meshName = pair.first;
-    //    const std::string& materialName = pair.second;
-    //    m_examineItemMeshNodes.SetMaterialByMeshName(meshName, materialName);
-    //}
-
-    // TODO: Use the bible properly for this!!!!!!!
-    // TODO: Use the bible properly for this!!!!!!!
-    // TODO: Use the bible properly for this!!!!!!!
-    // TODO: Use the bible properly for this!!!!!!!
+    Bible::ConfigureMeshNodesByItemName(NO_ID, itemInfo->m_name, m_examineItemMeshNodes, false);
 }
 
 void Inventory::UpdateExamineScreen(float deltaTime) {
-    InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(GetSelectedItemName());
-    PickUpInfo* pickUpInfo = Bible::GetPickUpInfoByName(GetSelectedItemName());
+    ItemInfo* itemInfo = Bible::GetItemInfoByName(GetSelectedItemName());
     Player* player = Game::GetLocalPlayerByIndex(m_localPlayerIndex);
 
     if (!itemInfo) return;
-    if (!pickUpInfo) return;
     if (!player) return;
 
-    Model* model = AssetManager::GetModelByName(pickUpInfo->modelName);
+    Model* model = AssetManager::GetModelByName(itemInfo->GetModelName());
     if (!model) {
         m_examineItemMeshNodes.CleanUp();
         return;
@@ -143,7 +123,7 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
     float verticalRotationLimit = HELL_PI * 0.75f;
 
     float zoomMinLimit = 1.0f;
-    float zoomMaxLimit = itemInfo->m_maxExamineZoom;
+    float zoomMaxLimit = itemInfo->m_examineInfo.maxZoom;
 
     // Rotate
     if (player->PressingFire()) {
@@ -180,9 +160,9 @@ void Inventory::UpdateExamineScreen(float deltaTime) {
     const glm::mat4 centeringMatrix = glm::translate(glm::mat4(1.0f), -center);
 
     Transform initialTransform;
-    initialTransform.position = itemInfo->m_examineModelTranslation;
-    initialTransform.rotation = itemInfo->m_examineModelRotation;
-    initialTransform.scale = itemInfo->m_examineModelScale;
+    initialTransform.position = itemInfo->m_examineInfo.translation;
+    initialTransform.rotation = itemInfo->m_examineInfo.rotation;
+    initialTransform.scale = itemInfo->m_examineInfo.scale;
 
     glm::mat4 modelMatrix = rotX.to_mat4() * rotY.to_mat4() * initialTransform.to_mat4() * zoomTransform.to_mat4() * centeringMatrix;
     

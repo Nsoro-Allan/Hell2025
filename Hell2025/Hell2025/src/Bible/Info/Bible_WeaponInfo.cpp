@@ -7,6 +7,7 @@ namespace Bible {
 
     void InitWeaponInfo() {
         WeaponInfo& aks74u = CreateWeaponInfo("AKS74U");
+        aks74u.itemInfoName = "AKS74U";
         aks74u.modelName = "AKS74U";
         aks74u.type = WeaponType::AUTOMATIC;
         aks74u.damage = 15;
@@ -38,7 +39,7 @@ namespace Bible {
         aks74u.hiddenMeshAtStart.push_back("ArmsFemale");
         aks74u.hiddenMeshAtStart.push_back("AKS74U_Lens");
         aks74u.hiddenMeshAtStart.push_back("AKS74U_RedDot");
-        aks74u.ammoType = "AKS74U";
+        aks74u.ammoInfoName = "AKS74U";
         aks74u.magSize = 30;
         aks74u.muzzleFlashBoneName = "Weapon";
         aks74u.muzzleFlashOffset = glm::vec3(0, 0.002, 0.02f);
@@ -71,7 +72,6 @@ namespace Bible {
         aks74u.animationNames.adsFire.push_back("AKS74U_ADS_Fire2");
         aks74u.reloadMagInFrameNumber = 23;
         aks74u.reloadEmptyMagInFrameNumber = 21;
-        aks74u.pickupName = "AKS74U";
         //aks74u.pickupConvexMeshModelName = "AKS74U_Carlos_ConvexMesh";
         //aks74u.pickUpMeshMaterials["FrontSight_low"] = "AKS74U_0";
         //aks74u.pickUpMeshMaterials["Receiver_low"] = "AKS74U_1";
@@ -84,6 +84,7 @@ namespace Bible {
         //aks74u.pickUpMeshMaterials["BarrelTip_low"] = "AKS74U_4";
 
         WeaponInfo& goldeneGlock = CreateWeaponInfo("GoldenGlock");
+        goldeneGlock.itemInfoName = "GlockGolden";
         goldeneGlock.modelName = "GlockGolden";
         goldeneGlock.meshMaterials["Glock"] = "GlockGold";
         goldeneGlock.meshMaterials["ArmsMale"] = "Hands";
@@ -117,7 +118,7 @@ namespace Bible {
         goldeneGlock.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         goldeneGlock.damage = 16;
         goldeneGlock.magSize = 80;
-        goldeneGlock.ammoType = "Glock";
+        goldeneGlock.ammoInfoName = "Glock";
         goldeneGlock.animationCancelFrames.draw = 50;
         goldeneGlock.animationCancelFrames.fire = 2;
         goldeneGlock.animationCancelFrames.adsFire = 2;
@@ -137,16 +138,14 @@ namespace Bible {
         goldeneGlock.reloadEmptyMagInFrameNumber = 20;
         goldeneGlock.emptyReloadRequiresSlideOffset = true;
         goldeneGlock.hasADS = true;
-        goldeneGlock.isGold = false;
         goldeneGlock.animationSpeeds.adsIn = 3.0f;
         goldeneGlock.animationSpeeds.adsOut = 3.0f;
         goldeneGlock.casingEjectionImpulse = 0.0175f;
-        goldeneGlock.pickupName = "GoldenGlock";
         goldeneGlock.silencerName = "GLOCK_SILENCER";
         goldeneGlock.sightName = "GLOCK_RED_DOT";
 
         WeaponInfo& knife = CreateWeaponInfo("Knife");
-        knife.name = "Knife";
+        knife.itemInfoName = "Knife";
         knife.modelName = "Knife";
         knife.type = WeaponType::MELEE;
         knife.damage = 20;
@@ -210,6 +209,7 @@ namespace Bible {
         //smith.casingEjectionImpulse = 0.0175f;
 
         WeaponInfo& tokarev = CreateWeaponInfo("Tokarev");
+        tokarev.itemInfoName = "Tokarev";
         tokarev.modelName = "Tokarev";
         tokarev.meshMaterials["ArmsMale"] = "Hands";
         tokarev.meshMaterials["ArmsFemale"] = "FemaleArms";
@@ -246,7 +246,7 @@ namespace Bible {
         tokarev.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         tokarev.damage = 25;
         tokarev.magSize = 15;
-        tokarev.ammoType = "Tokarev";
+        tokarev.ammoInfoName = "Tokarev";
         tokarev.animationCancelFrames.draw = 50.0f;
         tokarev.animationCancelFrames.fire = 5;
         tokarev.animationCancelFrames.adsFire = 6.0f;
@@ -260,9 +260,9 @@ namespace Bible {
         tokarev.emptyReloadRequiresSlideOffset = true;
         tokarev.hasADS = false;
         tokarev.casingEjectionImpulse = 0.0175f;
-        tokarev.pickupName = "Tokarev";
 
         WeaponInfo& glock = CreateWeaponInfo("Glock");
+        glock.itemInfoName = "Glock";
         glock.modelName = "Glock";
         glock.meshMaterials["Glock"] = "Glock";
         glock.meshMaterials["ArmsMale"] = "Hands";
@@ -296,7 +296,7 @@ namespace Bible {
         glock.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         glock.damage = 15;
         glock.magSize = 15;
-        glock.ammoType = "Glock";
+        glock.ammoInfoName = "Glock";
         glock.animationCancelFrames.draw = 50.0f;
         glock.animationCancelFrames.fire = 5;
         glock.animationCancelFrames.adsFire = 6.0f;
@@ -319,12 +319,11 @@ namespace Bible {
         glock.animationSpeeds.adsIn = 3.0f;
         glock.animationSpeeds.adsOut = 3.0f;
         glock.casingEjectionImpulse = 0.0175f;
-        glock.pickupName = "Glock";
         glock.silencerName = "GLOCK_SILENCER";
         glock.sightName = "GLOCK_RED_DOT";
-        glock.isGold = false;
 
         WeaponInfo& spas = CreateWeaponInfo("SPAS");
+        spas.itemInfoName = "SPAS";
         spas.modelName = "SPAS";
         spas.meshMaterials["ArmsMale"] = "Hands";
         spas.meshMaterials["ArmsFemale"] = "FemaleArms";
@@ -363,7 +362,7 @@ namespace Bible {
         spas.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         spas.damage = 15;
         spas.magSize = 8;
-        spas.ammoType = "12GaugeBuckShot";
+        spas.ammoInfoName = "12GaugeBuckShot";
         spas.hiddenMeshAtStart.push_back("ArmsFemale");
         spas.muzzleFlashBoneName = "Muzzle";
         spas.casingEjectionBoneName = "Shell_bone";
@@ -372,10 +371,10 @@ namespace Bible {
         spas.animationNames.dryFire = "SPAS_DryFire";
         spas.animationNames.toggleAutoShotgun = "SPAS_ToggleAuto";
         spas.hasAutoSwitch = true;
-        spas.pickupName = "SPAS";
         spas.animationSpeeds.melee = 1.25f;
 
         WeaponInfo& remington870 = CreateWeaponInfo("Remington870");
+        remington870.itemInfoName = "Remington870";
         remington870.modelName = "Remington870";
         remington870.meshMaterials["Shotgun"] = "Shotgun";
         remington870.meshMaterials["ArmsMale"] = "Hands";
@@ -407,7 +406,7 @@ namespace Bible {
         remington870.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         remington870.damage = 14;
         remington870.magSize = 8;
-        remington870.ammoType = "12GaugeBuckShot";
+        remington870.ammoInfoName = "12GaugeBuckShot";
         remington870.hiddenMeshAtStart.push_back("ArmsFemale");
         remington870.muzzleFlashBoneName = "Muzzle";
         remington870.casingEjectionBoneName = "Shell_bone";
@@ -416,11 +415,10 @@ namespace Bible {
         remington870.animationNames.dryFire = "SPAS_DryFire";
         remington870.animationNames.toggleAutoShotgun = "SPAS_ToggleAuto";
         remington870.hasAutoSwitch = false;
-        remington870.pickupName = "Remington870";
 
         WeaponInfo& p90 = CreateWeaponInfo("P90");
         p90.modelName = "P90";
-        p90.pickupName = "P90";
+        p90.itemInfoName = "P90";
         p90.type = WeaponType::AUTOMATIC;
         p90.damage = 15;
         p90.animationNames.idle = "P90_Idle";
@@ -499,7 +497,7 @@ namespace Bible {
         p90.meshMaterials["Revolved.051"] = "P90_Mag";
         p90.meshMaterials["Revolved.052"] = "P90_Mag";
         p90.meshMaterials["Revolved.053"] = "P90_Mag";
-        p90.ammoType = "AKS74U";
+        p90.ammoInfoName = "AKS74U";
         p90.magSize = 50;
         //p90.muzzleFlashBoneName = "Weapon";
         p90.muzzleFlashBoneName = "Muzzle";

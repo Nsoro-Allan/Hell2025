@@ -333,7 +333,7 @@ void Inventory::BlitItemGrid(glm::ivec2 origin) {
             continue;
         }
 
-        InventoryItemInfo* itemInfo = Bible::GetInventoryItemInfoByName(item.m_name);
+        ItemInfo* itemInfo = Bible::GetItemInfoByName(item.m_name);
         if (!itemInfo) continue;
 
         glm::ivec2 itemLocation;
@@ -514,7 +514,7 @@ void Inventory::BlitGenericText(const std::string& text, const glm::ivec2& origi
 }
 
 void Inventory::BlitItemButtons(glm::ivec2 origin) {
-    InventoryItemInfo* itemInfo = GetSelectedItemInfo();
+    ItemInfo* itemInfo = GetSelectedItemInfo();
     if (!itemInfo) return;
 
 
@@ -528,12 +528,12 @@ void Inventory::BlitItemButtons(glm::ivec2 origin) {
     }
 
 
-    if (itemInfo->m_equipable) {
+    if (itemInfo->IsEquipable()) {
         RenderButton(buttonLocation, "E", "Equip");
         buttonLocation.y += m_style.itemButtonLineHeight;
     }
 
-    if (itemInfo->m_combineable) {
+    if (itemInfo->IsCombineable()) {
         RenderButton(buttonLocation, "C", "Combine");
         buttonLocation.y += m_style.itemButtonLineHeight;
     }
@@ -548,7 +548,7 @@ void Inventory::BlitItemButtons(glm::ivec2 origin) {
         buttonLocation.y += m_style.itemButtonLineHeight;
     }
 
-    if (itemInfo->m_discardable) {
+    if (itemInfo->IsDiscardable()) {
         RenderButton(buttonLocation, "G", "Discard");
         buttonLocation.y += m_style.itemButtonLineHeight;
     }

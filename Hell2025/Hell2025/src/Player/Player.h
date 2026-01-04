@@ -106,6 +106,9 @@ struct Player {
     void GiveSilencer(const std::string& weaponName);
     void SwitchWeapon(const std::string& name, WeaponAction weaponAction);
     void DropWeapons();
+
+    const std::string& GetSelectedWeaponName();
+
     WeaponAction& GetWeaponAction();
     WeaponInfo* GetCurrentWeaponInfo();
     WeaponState* GetWeaponStateByName(const std::string &name);
@@ -194,8 +197,6 @@ struct Player {
     bool PressedFlashlight();
     bool PressedToggleInventory();
     bool PressedInventoryExamine();
-
-    void DebugWipeShit();
 
     const InventoryState& GetInvetoryState() { return m_inventory.GetInventoryState(); }
     Inventory& GetInventory() { return m_inventory; }
@@ -409,8 +410,7 @@ private:
 
         // Casings and Muzzle flash
         void SpawnMuzzleFlash(float speed, float scale);
-        void SpawnCasing(AmmoInfo* ammoInfo, bool alternateAmmo);
-
+        void SpawnCasing();
 
         bool ViewModelAnimationsCompleted();
         bool ViewportIsVisible();

@@ -169,10 +169,9 @@ void Player::SwitchWeapon(const std::string& name, WeaponAction weaponAction) {
             m_currentWeaponIndex = i;
         }
     }
-    viewWeapon->SetName(weaponInfo->name);
+    viewWeapon->SetName(weaponInfo->itemInfoName);
     viewWeapon->SetSkinnedModel(weaponInfo->modelName);
     viewWeapon->EnableDrawingForAllMesh();
-    viewWeapon->SetGoldFlag(weaponInfo->isGold);
 
     // Set materials
     for (auto& it : weaponInfo->meshMaterials) {
@@ -212,6 +211,15 @@ WeaponAction& Player::GetWeaponAction() {
 WeaponInfo* Player::GetCurrentWeaponInfo() {
     std::vector<WeaponState>& weaponStates = m_inventory.GetWeaponStates();
     return Bible::GetWeaponInfoByName(weaponStates[m_currentWeaponIndex].name);;
+}
+
+const std::string& Player::GetSelectedWeaponName() {
+    static const std::string invalid = UNDEFINED_STRING;
+
+    std::vector<WeaponState>& weaponStates = m_inventory.GetWeaponStates();
+    if (m_currentWeaponIndex < 0 || m_currentWeaponIndex >= weaponStates.size()) return invalid;
+   
+    return weaponStates[m_currentWeaponIndex].name;
 }
 
 void Player::GiveWeapon(const std::string& name) {
@@ -261,27 +269,27 @@ AmmoState* Player::GetCurrentAmmoState() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (!weaponInfo) return nullptr;
 
-    return GetAmmoStateByName(weaponInfo->ammoType);
+    return GetAmmoStateByName(weaponInfo->ammoInfoName);
 }
 
 AmmoInfo* Player::GetCurrentAmmoInfo() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (!weaponInfo) return nullptr;
 
-    return Bible::GetAmmoInfoByName(weaponInfo->ammoType);
+    return Bible::GetAmmoInfoByName(weaponInfo->ammoInfoName);
 }
 
 WeaponState* Player::GetCurrentWeaponState() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (!weaponInfo) return nullptr;
 
-    return GetWeaponStateByName(weaponInfo->name);
+    return GetWeaponStateByName(weaponInfo->itemInfoName);
 }
 
 int Player::GetCurrentWeaponMagAmmo() {
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     if (weaponInfo) {
-        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->name);
+        WeaponState* weaponState = GetWeaponStateByName(weaponInfo->itemInfoName);
         if (weaponState) {
             return weaponState->ammoInMag;
         }
@@ -304,14 +312,13 @@ void Player::SpawnMuzzleFlash(float speed, float scale) {
     m_muzzleFlash.SetRotation(glm::vec3(0.0f, 0.0f, Util::RandomFloat(0, HELL_PI * 2)));
 }
 
-void Player::SpawnCasing(AmmoInfo* ammoInfo, bool alternateAmmo) {
-    if (!ammoInfo) {
-        Logging::Error() << "Player::SpawnCasing(..) failed because ammoInfo was nullptr";
-        return;
-    }
-
+void Player::SpawnCasing() {
     AnimatedGameObject* viewWeapon = GetViewWeaponAnimatedGameObject();
+    
+    AmmoInfo* ammoInfo = GetCurrentAmmoInfo();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
+
+    if (!ammoInfo) return;
     if (!weaponInfo) return;
 
     if (!Util::StrCmp(ammoInfo->casingModelName, UNDEFINED_STRING)) {
@@ -328,9 +335,9 @@ void Player::SpawnCasing(AmmoInfo* ammoInfo, bool alternateAmmo) {
         createInfo.position += GetCameraRight() * glm::vec3(0.05f);
         createInfo.position += GetCameraUp() * glm::vec3(-0.025f);
 
-        if (alternateAmmo) {
-            createInfo.materialIndex = AssetManager::GetMaterialIndexByName("ShellGreen");
-        }
+        //if (alternateAmmo) {
+        //    createInfo.materialIndex = AssetManager::GetMaterialIndexByName("ShellGreen");
+        //}
 
         createInfo.mass = 0.008f;
 
@@ -356,7 +363,7 @@ void Player::SpawnBullet(float variance) {
     createInfo.origin = GetCameraPosition();
     createInfo.direction = bulletDirection;
     createInfo.damage = weaponInfo->damage;
-    createInfo.weaponIndex = Bible::GetWeaponIndexFromWeaponName(weaponInfo->name);
+    createInfo.weaponIndex = Bible::GetWeaponIndexFromWeaponName(weaponInfo->itemInfoName);
     createInfo.ownerObjectId = m_playerId;
 
     World::AddBullet(createInfo);
@@ -380,8 +387,11 @@ void Player::UpdateWeaponSlide() {
 }
 
 void Player::DropWeapons() {
-
     for (WeaponState& weaponState : m_inventory.GetWeaponStates()) {
+        // Skip the knife
+        if (weaponState.name == "Knife") 
+            continue;
+
         if (weaponState.has) {
             
             WeaponInfo* weaponInfo = Bible::GetWeaponInfoByName(weaponState.name);
@@ -390,17 +400,17 @@ void Player::DropWeapons() {
                 continue;
             }
 
-            if (weaponInfo->pickupName != "") {
+            if (weaponInfo->itemInfoName != "") {
                 PickUpCreateInfo createInfo;
                 createInfo.position = GetCameraPosition();
                 createInfo.rotation.x = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.y = Util::RandomFloat(-HELL_PI, HELL_PI);
                 createInfo.rotation.z = Util::RandomFloat(-HELL_PI, HELL_PI);
-                createInfo.name = weaponInfo->pickupName;
+                createInfo.name = weaponInfo->itemInfoName;
                 createInfo.saveToFile = false;
                 createInfo.disablePhysicsAtSpawn = false;
                 createInfo.respawn = false;
-                createInfo.type = Bible::GetPickUpTypeByName(weaponInfo->pickupName);
+                createInfo.type = Bible::GetItemType(weaponInfo->itemInfoName);
 
                 glm::vec3 force = glm::vec3(0.0f);
                 force.x = Util::RandomFloat(-HELL_PI * 0.5f, HELL_PI * 0.5f);
@@ -412,9 +422,8 @@ void Player::DropWeapons() {
                 uint64_t id = World::AddPickUp(createInfo);
                 if (PickUp* pickUp = World::GetPickUpByObjectId(id)) {
                     pickUp->GetMeshNodes().AddForceToPhsyics(force);
-                    std::cout << "tried to add force to " << weaponInfo->pickupName << "\n";
+                    //std::cout << "Tried to add force to " << weaponInfo->itemInfoName << "\n";
                 }
-                //std::cout << "Dropped weapon!  weapon name: '" << weaponState.name << "' pickup name: '" << weaponInfo->pickupName << "'\n";
             }
         }
     }

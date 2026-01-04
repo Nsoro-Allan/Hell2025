@@ -19,7 +19,7 @@ namespace Util {
     LightType StringToLightType(const std::string& str)                         { return magic_enum::enum_cast<LightType>(str).value_or(LightType::UNDEFINED); }
     ObjectType StringToObjectType(const std::string& str)                       { return magic_enum::enum_cast<ObjectType>(str).value_or(ObjectType::UNDEFINED); }
     OpenState StringToOpenState(const std::string& str)                         { return magic_enum::enum_cast<OpenState>(str).value_or(OpenState::UNDEFINED); }
-    PickUpType StringToPickUpType(const std::string& str)                       { return magic_enum::enum_cast<PickUpType>(str).value_or(PickUpType::UNDEFINED); }
+    ItemType StringToPickUpType(const std::string& str)                       { return magic_enum::enum_cast<ItemType>(str).value_or(ItemType::UNDEFINED); }
     PhysicsType StringToPhysicsType(const std::string& str)                     { return magic_enum::enum_cast<PhysicsType>(str).value_or(PhysicsType::UNDEFINED); }
     PictureFrameType StringToPictureFrameType(const std::string& str)           { return magic_enum::enum_cast<PictureFrameType>(str).value_or(PictureFrameType::UNDEFINED); }
     SharkHuntingState StringToSharkHuntingState(const std::string& str)         { return magic_enum::enum_cast<SharkHuntingState>(str).value_or(SharkHuntingState::UNDEFINED); }
@@ -48,7 +48,7 @@ namespace Util {
     std::string LightTypeToString(LightType type)                               { return std::string(magic_enum::enum_name(type)); }
     std::string ObjectTypeToString(ObjectType type)                             { return std::string(magic_enum::enum_name(type)); }
     std::string OpenStateToString(OpenState mode)                               { return std::string(magic_enum::enum_name(mode)); }
-    std::string PickUpTypeToString(PickUpType type)                             { return std::string(magic_enum::enum_name(type)); }
+    std::string PickUpTypeToString(ItemType type)                             { return std::string(magic_enum::enum_name(type)); }
     std::string PhysicsTypeToString(PhysicsType type)                           { return std::string(magic_enum::enum_name(type)); }
     std::string PictureFrameTypeToString(PictureFrameType type)                 { return std::string(magic_enum::enum_name(type)); }
     std::string SharkHuntingStateToString(SharkHuntingState state)              { return std::string(magic_enum::enum_name(state)); }
