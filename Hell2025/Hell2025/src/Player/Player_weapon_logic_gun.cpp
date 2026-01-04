@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Audio/Audio.h"
 #include "Viewport/ViewportManager.h"
+#include "HellLogging.h"
 
 void Player::UpdateGunLogic(float deltaTime) {
     if (InventoryIsClosed()) {
@@ -98,6 +99,17 @@ void Player::UpdateSlideLogic() {
     WeaponState* weaponState = GetCurrentWeaponState();
     WeaponInfo* weaponInfo = GetCurrentWeaponInfo();
     AmmoState* ammoState = GetCurrentAmmoState();
+
+    if (!weaponState) {
+        Logging::Error() << "weaponState was nullptr, failed calling GetCurrentWeaponState()";
+    }
+    if (!weaponInfo) {
+        Logging::Error() << "weaponState was nullptr, failed calling GetCurrentWeaponInfo()";
+    }
+    if (!ammoState) {
+        Logging::Error() << "weaponState was nullptr, failed calling GetCurrentAmmoState()";
+    }
+
     if (weaponInfo->emptyReloadRequiresSlideOffset && m_weaponAction != RELOAD_FROM_EMPTY && weaponState->ammoInMag == 0) {
         weaponState->requiresSlideOffset = true;
     }

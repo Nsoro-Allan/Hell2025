@@ -359,10 +359,10 @@ BoardVertexData Wall::CreateBoardVertexData(glm::vec3 begin, glm::vec3 end, glm:
 
 void Wall::CreateWeatherBoards() {
     Material* material = AssetManager::GetMaterialByName("WeatherBoards0");
-    Model* model = AssetManager::GetModelByName("WeatherboardStop");
+    Model* model = AssetManager::GetModelByName("WeatherBoard_Stop");
 
     if (!model) {
-        Logging::Error() << "Wall::CreateWeatherBoards() failed to load model 'WeatherboardStop'";
+        Logging::Error() << "Wall::CreateWeatherBoards() failed to load model 'WeatherBoard_Stop'";
         return;
     }
 

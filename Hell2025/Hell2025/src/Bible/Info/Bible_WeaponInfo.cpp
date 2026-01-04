@@ -84,7 +84,8 @@ namespace Bible {
         //aks74u.pickUpMeshMaterials["BarrelTip_low"] = "AKS74U_4";
 
         WeaponInfo& goldeneGlock = CreateWeaponInfo("GoldenGlock");
-        goldeneGlock.itemInfoName = "GlockGolden";
+        goldeneGlock.itemInfoName = "GoldenGlock";
+        goldeneGlock.ammoInfoName = "Glock";
         goldeneGlock.modelName = "GlockGolden";
         goldeneGlock.meshMaterials["Glock"] = "GlockGold";
         goldeneGlock.meshMaterials["ArmsMale"] = "Hands";
@@ -118,7 +119,6 @@ namespace Bible {
         goldeneGlock.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
         goldeneGlock.damage = 16;
         goldeneGlock.magSize = 80;
-        goldeneGlock.ammoInfoName = "Glock";
         goldeneGlock.animationCancelFrames.draw = 50;
         goldeneGlock.animationCancelFrames.fire = 2;
         goldeneGlock.animationCancelFrames.adsFire = 2;

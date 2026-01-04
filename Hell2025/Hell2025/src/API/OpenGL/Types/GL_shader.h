@@ -26,6 +26,10 @@ public:
     void Bind();
     bool Load(std::vector<std::string> shaderPaths);
     bool Hotload();
+
+    void BindImageTexture(uint32_t bindingIndex, uint32_t textureHandle, uint32_t  access, uint32_t  format);
+    void BindTextureUnit(uint32_t bindingIndex, uint32_t textureHandle);
+
     void SetInt(const std::string& name, int value);
     void SetBool(const std::string& name, bool value);
     void SetFloat(const std::string& name, float value);
@@ -43,6 +47,7 @@ public:
     void SetIVec2(const std::string& name, const glm::ivec2& value);
     void SetVec2Array(const std::string& name, const std::vector<glm::vec2>& data);
     void SetIVec2Array(const std::string& name, const std::vector<glm::ivec2>& data);
+
     int GetHandle();
 private:
     std::vector<std::string> m_shaderPaths;

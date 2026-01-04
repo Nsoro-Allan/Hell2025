@@ -112,6 +112,9 @@ namespace OpenGLRenderer {
         g_frameBuffers["QuarterSize"].Create("QuarterSize", resolutions.gBuffer.x / 4, resolutions.gBuffer.y / 4);
         g_frameBuffers["QuarterSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
 
+        g_frameBuffers["HalfSize"].Create("QuarterSize", resolutions.gBuffer.x / 2, resolutions.gBuffer.y / 2);
+        g_frameBuffers["HalfSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
+
         g_frameBuffers["MiscFullSize"].Create("FullSize", resolutions.gBuffer);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLightingIntermediate", GL_RGBA16F);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLighting", GL_RGBA16F);
@@ -210,7 +213,6 @@ namespace OpenGLRenderer {
         const std::vector<std::complex<float>>& h0Band1 = Ocean::GetH0(1);
         g_ssbos["ffth0Band0"].CopyFrom(h0Band0.data(), sizeof(std::complex<float>) * h0Band0.size());
         g_ssbos["ffth0Band1"].CopyFrom(h0Band1.data(), sizeof(std::complex<float>) * h0Band1.size());
-
 
         int tileXCount = g_frameBuffers["GBuffer"].GetWidth() / TILE_SIZE;
         int tileYCount = g_frameBuffers["GBuffer"].GetHeight() / TILE_SIZE;
@@ -347,9 +349,10 @@ namespace OpenGLRenderer {
         g_shaders["ShadowMap"] = OpenGLShader({ "GL_shadow_map.vert", "GL_shadow_map.frag" });
         g_shaders["ShadowCubeMap"] = OpenGLShader({ "GL_shadow_cube_map.vert", "GL_shadow_cube_map.frag" });
         g_shaders["SolidColor"] = OpenGLShader({ "GL_solid_color.vert", "GL_solid_color.frag" });
-        g_shaders["StainedGlass"] = OpenGLShader({ "GL_stained_glass.vert", "GL_stained_glass.frag" });
         g_shaders["Skybox"] = OpenGLShader({ "GL_skybox.vert", "GL_skybox.frag" });
         g_shaders["SpriteSheet"] = OpenGLShader({ "GL_sprite_sheet.vert", "GL_sprite_sheet.frag" });
+        g_shaders["ScreenspaceReflections"] = OpenGLShader({ "GL_screenspace_reflections.comp" });
+        g_shaders["StainedGlass"] = OpenGLShader({ "GL_stained_glass.vert", "GL_stained_glass.frag" });
         g_shaders["UI"] = OpenGLShader({ "GL_ui.vert", "GL_ui.frag" });
         g_shaders["Winston"] = OpenGLShader({ "GL_winston.vert", "GL_winston.frag" });
         g_shaders["CSMDepth"] = OpenGLShader({ "GL_csm_depth.vert", "GL_csm_depth.frag", "GL_csm_depth.geom" });
@@ -435,6 +438,7 @@ namespace OpenGLRenderer {
         TextureReadBackPass();
         LightCullingPass();
         LightingPass();
+        ScreenspaceReflectionsPass();
         //FurPass();
         OceanGeometryPass();
         OceanSurfaceCompositePass();

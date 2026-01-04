@@ -91,6 +91,14 @@ bool OpenGLShader::Hotload() {
     return Load(m_shaderPaths);
 }
 
+void OpenGLShader::BindImageTexture(uint32_t bindingIndex, uint32_t textureHandle, uint32_t  access, uint32_t  format) {
+    glBindImageTexture(static_cast<GLuint>(bindingIndex), static_cast<GLuint>(textureHandle), 0, GL_FALSE, 0, static_cast<GLenum>(access), static_cast<GLenum>(format));
+}
+
+void OpenGLShader::BindTextureUnit(uint32_t bindingIndex, uint32_t textureHandle) {
+    glBindTextureUnit(static_cast<GLuint>(bindingIndex), static_cast<GLuint>(textureHandle));
+}
+
 void OpenGLShader::SetBool(const std::string& name, bool value) {
     if (m_uniformLocations.find(name) == m_uniformLocations.end()) {
         m_uniformLocations[name] = glGetUniformLocation(m_handle, name.c_str());
