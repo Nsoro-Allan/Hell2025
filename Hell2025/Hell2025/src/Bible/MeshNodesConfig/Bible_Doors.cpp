@@ -296,50 +296,90 @@ namespace Bible {
 
             meshNodes.Init(id, "Door_StainedGlass2", meshNodeCreateInfoSet);
 
-            std::string front = "T_BlackDoor_Door";
-            std::string back = "T_BlackDoor_Door";
-            //front = "T_BlackDoorWP_Door";
-            //back = "T_BlackDoorWP_Door";
-
-            meshNodes.SetMaterialByMeshName("ChainLocker", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink1", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink2", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink3", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink4", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink5", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink6", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink7", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink8", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink9", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLink10", "T_BlackDoor_Metals");
-
-            meshNodes.SetMaterialByMeshName("DeadLockMain", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("BoltLockerHold", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("Plate", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("BoltLockerGuide", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("DeadLockVault", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("KeyHole", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("DeadLockSwitch", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLach", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("DeadLockCylinder", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("DoorBell", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("ChainLach", "T_BlackDoor_Metals");
-            meshNodes.SetMaterialByMeshName("BoltLockerSlide", "T_BlackDoor_Metals");
-
-            meshNodes.SetMaterialByMeshName("BlackDoor_Sides", front);
-            meshNodes.SetMaterialByMeshName("BlackDoor_Front", front);
-            meshNodes.SetMaterialByMeshName("BlackDoor_Back", back);
-
-            meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP"); // black missing?
-            meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP"); // black missing?
-            meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP"); // black missing?
-
-            meshNodes.SetMaterialByMeshName("Glass", "T_BlackDoor_Glass");
             
-            meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals"); // set later anyway
-            meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals"); // set later anyway
+
+        std::string front = "T_BlackDoor_Door";
+        std::string back = "T_BlackDoor_Door_BACK";
+        std::string metals = "T_BlackDoor_Metals";
+        
+        front = "T_BlackDoor_DoorWP";
+        back = "T_BlackDoor_DoorWP_BACK";
+
+        meshNodes.SetMaterialByMeshName("ChainLocker", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink1", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink2", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink3", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink4", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink5", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink6", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink7", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink8", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink9", metals);
+        meshNodes.SetMaterialByMeshName("ChainLink10", metals);
+        meshNodes.SetMaterialByMeshName("ChainLach", metals);
+
+        meshNodes.SetMaterialByMeshName("DeadLockMain", metals);
+        meshNodes.SetMaterialByMeshName("BoltLockerHold", metals);
+        meshNodes.SetMaterialByMeshName("Plate", metals);
+        meshNodes.SetMaterialByMeshName("BoltLockerGuide", metals);
+        meshNodes.SetMaterialByMeshName("DeadLockVault", metals);
+        meshNodes.SetMaterialByMeshName("KeyHole", metals);
+        meshNodes.SetMaterialByMeshName("DeadLockSwitch", metals);
+        meshNodes.SetMaterialByMeshName("DeadLockCylinder", metals);
+        meshNodes.SetMaterialByMeshName("DoorBell", metals);
+        meshNodes.SetMaterialByMeshName("BoltLockerSlide", metals);
+
+        meshNodes.SetMaterialByMeshName("BlackDoor_Sides", front);
+        meshNodes.SetMaterialByMeshName("BlackDoor_Front", front);
+        meshNodes.SetMaterialByMeshName("BlackDoor_Back", back);
+
+        meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
+        meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
+        meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
+
+        meshNodes.SetMaterialByMeshName("Glass", "T_BlackDoor_Glass");
+            
+        meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals"); // set later anyway
+        meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals"); // set later anyway
+
+        //meshNodes.SetBlendingModeByMeshName("KeyHole", BlendingMode::DO_NOT_RENDER);
+        //meshNodes.SetBlendingModeByMeshName("ChainLocker", BlendingMode::DO_NOT_RENDER);
+        //meshNodes.SetBlendingModeByMeshName("ChainLach", BlendingMode::DO_NOT_RENDER);
                 
-            meshNodes.PrintMeshNames();
+        meshNodes.PrintMeshNames();
+
+
+        // ChainLocker
+        // ChainLink1
+        // ChainLink2
+        // ChainLink3
+        // ChainLink4
+        // ChainLink5
+        // ChainLink6
+        // ChainLink7
+        // DoorFrame_Hinges
+        // BlackDoor_Front
+        // BlackDoor_Sides
+        // DeadLockMain
+        // BoltLockerHold
+        // DoorFrame_Back
+        // Glass
+        // ChainLink8
+        // ChainLink9
+        // ChainLink10
+        // Plate
+        // DoorFrame_Inner
+        // BoltLockerGuide
+        // DeadLockVault
+        // KeyHole
+        // Door_Hinges
+        // DeadLockSwitch
+        // ChainLach
+        // DeadLockCylinder
+        // DoorBell
+        // BoltLockerSlide
+        // DoorFrame_Front
+        // BlackDoor_Back
 
         }
 

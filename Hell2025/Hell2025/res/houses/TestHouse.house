@@ -873,7 +873,7 @@
         0.0,
         0.0
       ],
-      "Type": "STAINED_GLASS"
+      "Type": "STAINED_GLASS2"
     },
     {
       "DeadLockedAtStart": false,
@@ -900,10 +900,10 @@
       "DeadLockedAtStart": false,
       "EditorName": "Door Standard A 3",
       "HasDeadLock": false,
-      "MaterialTypeBack": "RESIDENT_EVIL",
-      "MaterialTypeFrameBack": "RESIDENT_EVIL",
-      "MaterialTypeFrameFront": "RESIDENT_EVIL",
-      "MaterialTypeFront": "RESIDENT_EVIL",
+      "MaterialTypeBack": "WHITE_PAINT",
+      "MaterialTypeFrameBack": "WHITE_PAINT",
+      "MaterialTypeFrameFront": "WHITE_PAINT",
+      "MaterialTypeFront": "WHITE_PAINT",
       "MaxOpenValue": 2.0999999046325684,
       "Position": [
         2.200000047683716,

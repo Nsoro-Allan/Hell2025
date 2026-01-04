@@ -69,6 +69,8 @@ float EdgeFade(vec2 uv) {
 }
 
 void main() {
+    return;
+
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 outputSize = imageSize(LightingImage);
 

@@ -114,7 +114,9 @@ namespace OpenGLRenderer {
 
         g_frameBuffers["HalfSize"].Create("QuarterSize", resolutions.gBuffer.x / 2, resolutions.gBuffer.y / 2);
         g_frameBuffers["HalfSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
-
+        g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryA", GL_RGBA16F);
+        g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryB", GL_RGBA16F);
+        
         g_frameBuffers["MiscFullSize"].Create("FullSize", resolutions.gBuffer);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLightingIntermediate", GL_RGBA16F);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLighting", GL_RGBA16F);
