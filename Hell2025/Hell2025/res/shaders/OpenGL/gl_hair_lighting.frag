@@ -46,7 +46,7 @@ in vec4 FlashlightPosition;
 in float FlashlightModifer;
 in vec3 CameraForward;
 
-uniform float u_alphaBoost = 1.5;
+uniform float u_alphaBoost = 1.0;
 uniform vec3 u_moonlightDir;
 
 void main() {
@@ -77,60 +77,77 @@ void main() {
     vec3 directLighting = vec3(0.0);
     
     // Point lights
-    for(uint i = 0; i < lightCount; ++i) {
-        uint lightIndex = tileData[tileIndex].lightIndices[i];
-        Light light = lights[lightIndex];
-        vec3 lightPosition = vec3(light.posX, light.posY, light.posZ);
-        vec3 lightColor = vec3(light.colorR, light.colorG, light.colorB);
-        float shadow = 1;//ShadowCalculation(int(lightIndex), lightPosition, light.radius, WorldPos.xyz, ViewPos, normal, highResShadowCubeMapArray);
-        directLighting += GetDirectLighting(lightPosition, lightColor, light.radius, light.strength, normal, WorldPos.xyz, baseColor.rgb, roughness, metallic, ViewPos) * shadow;
-    }
+    //for(uint i = 0; i < lightCount; ++i) {
+    //    uint lightIndex = tileData[tileIndex].lightIndices[i];
+    //    Light light = lights[lightIndex];
+    //    vec3 lightPosition = vec3(light.posX, light.posY, light.posZ);
+    //    vec3 lightColor = vec3(light.colorR, light.colorG, light.colorB);
+    //    float shadow = 1;//ShadowCalculation(int(lightIndex), lightPosition, light.radius, WorldPos.xyz, ViewPos, normal, highResShadowCubeMapArray);
+    //    directLighting += GetDirectLighting(lightPosition, lightColor, light.radius, light.strength, normal, WorldPos.xyz, baseColor.rgb, roughness, metallic, ViewPos) * shadow;
+    //}
 
+    
+    float sssRadius = 0.02;
+    float sssStrength = 5.0;
+    float fragDistance = distance(WorldPos.xyz, ViewPos); // is this right?
 
     // Flashlights
-   for (int i = 0; i < 4; i++) {
-       float flashlightModifer = viewportData[i].flashlightModifer;
-       if (flashlightModifer > 0.05) { 
-           mat4 flashlightProjectionView = viewportData[i].flashlightProjectionView;
-           vec4 flashlightDir = viewportData[i].flashlightDir;
-           vec4 flashlightPosition = viewportData[i].flashlightPosition;
-           vec3 flashlightViewPos = viewportData[i].inverseView[3].xyz;
-           vec3 playerForward = -normalize(viewportData[i].inverseView[2].xyz);
-           int layerIndex = i;			
-		    vec3 spotLightPos = flashlightPosition.xyz;
-           vec3 camightRight = normalize(viewportData[i].inverseView[0].xyz);
-		    vec3 spotLightDir = flashlightDir.xyz;
-           vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
-           float fresnelReflect = 0.9;
-           float spotLightRadius = 50.0;
-           float spotLightStregth = 3.0;        
-           float innerAngle = cos(radians(5.0 * flashlightModifer));
-           float outerAngle = cos(radians(25.0));         
-           mat4 lightProjectionView = flashlightProjectionView;
-           vec3 cookie = ApplyCookie(lightProjectionView, WorldPos.xyz, spotLightPos, spotLightColor, 10, FlashlightCookieTexture);
-           vec3 spotLighting = GetSpotlightLighting(spotLightPos, spotLightDir, spotLightColor, spotLightRadius, spotLightStregth, innerAngle, outerAngle, normal.xyz, WorldPos.xyz, baseColor.rgb, roughness, metallic, flashlightViewPos, lightProjectionView);
-           vec4 FragPosLightSpace = lightProjectionView * vec4(WorldPos.xyz, 1.0);
-           float shadow = 0;//SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, WorldPos.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
-   
-           spotLighting *= vec3(1 - shadow);
-           spotLighting *= spotLightColor;
-           spotLighting *= cookie;
-           directLighting += vec3(spotLighting) * flashlightModifer;
+    for (int i = 0; i < 2; i++) {
+        float flashlightModifer = viewportData[i].flashlightModifer;
+        if (flashlightModifer > 0.05) { 
+            mat4 flashlightProjectionView = viewportData[i].flashlightProjectionView;
+            vec4 flashlightDir = viewportData[i].flashlightDir;
+            vec4 flashlightPosition = viewportData[i].flashlightPosition;
+            vec3 flashlightViewPos = viewportData[i].inverseView[3].xyz;
+            vec3 playerForward = -normalize(viewportData[i].inverseView[2].xyz);
+            int layerIndex = i;			
+            vec3 spotLightPos = flashlightPosition.xyz;
+            vec3 camightRight = normalize(viewportData[i].inverseView[0].xyz);
+            vec3 spotLightDir = flashlightDir.xyz;
+            vec3 spotLightColor = GetFlashLightColor();
+            float spotLightRadius = 20.0;
+            float spotLightStregth = 3.5;     
+            float innerAngle = cos(radians(5.0 * flashlightModifer));
+            float outerAngle = cos(radians(25.0));         
+            mat4 lightProjectionView = flashlightProjectionView;
+            vec3 cookie = ApplyCookie(lightProjectionView, WorldPos.xyz, spotLightPos, spotLightColor, spotLightRadius, FlashlightCookieTexture);
+            vec3 spotLighting = GetSpotlightLighting(spotLightPos, spotLightDir, spotLightColor, spotLightRadius, spotLightStregth, innerAngle, outerAngle, normal.xyz, WorldPos.xyz, baseColor.rgb, roughness, metallic, flashlightViewPos, lightProjectionView);
+            vec4 FragPosLightSpace = lightProjectionView * vec4(WorldPos.xyz, 1.0);
+            float shadow = 0;//SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, WorldPos.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
+            
+            //spotLighting *= vec3(1 - shadow);
+            spotLighting *= spotLightColor;
+            spotLighting *= cookie;
+            directLighting += vec3(spotLighting) * flashlightModifer;
+           
+            // Subsurface scattering
+            vec3 radius = vec3(sssRadius);
+            vec3 subColor = Saturate(baseColor.rgb, 1.5);
+            vec3 L = spotLightDir;
+            float NdotL = max(dot(normal.xyz, L), 0.0);
+            vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
+            vec3 sssColor = subColor * radius * sss * sssStrength;
+            float lightAttenuation = smoothstep(spotLightRadius, 0.0, fragDistance) * spotLightStregth;
+            directLighting += sssColor * lightAttenuation * (1 - shadow) * cookie;
        }
    }
    
-    vec3 moonColor = vec3(1.0, 0.9, 0.9);
-    moonColor = vec3(1, 0.7799999713897705, 0.5289999842643738);
+    vec3 moonColor = GetMoonLightColor();
     float moonLightStrength = 0.05;
     vec3 moonLighting = GetDirectionalLighting(u_moonlightDir, moonColor, moonLightStrength, normal.xyz, WorldPos.xyz, baseColor.rgb, roughness, metallic, ViewPos);
     
+    vec3 radius = vec3(sssRadius);
+    vec3 subColor = Saturate(baseColor.rgb, 1.5);
+    vec3 L = u_moonlightDir;
+    float NdotL = max(dot(normal.xyz, L), 0.0);
+    vec3 sss = 0.2 * exp(-3.0 * abs(NdotL) / (radius + 0.001)); 
+    vec3 sssColor = subColor * radius * sss * sssStrength;
+    float csmShadow = 1.0;
+    //moonLighting += sssColor * csmShadow * 1.0; // OG
+
     // Ambient light
-    vec3 amibentLightColor = vec3(1, 0.98, 0.94);
-    float ambientIntensity = 0.0005;
-    vec3 ambientColor = baseColor.rgb * amibentLightColor;
-    vec3 ambientLighting = ambientColor * ambientIntensity;
-	float factor = min(1, 1 - metallic * 1.0); // Ambient hack
-	ambientLighting *= (1.0) * vec3(factor);
+    vec3 ambientTerm = baseColor.rgb * vec3(0.00125);
+    vec3 ambientLighting = ambientTerm;
     
     vec3 finalColor = directLighting.rgb + moonLighting + ambientLighting;
     

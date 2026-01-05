@@ -647,9 +647,6 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\OpenGL\GL_screenspace_decals.frag" />
     <None Include="res\shaders\OpenGL\GL_screenspace_decals.vert" />
     <None Include="res\shaders\OpenGL\GL_screenspace_reflections.comp" />
-    <None Include="res\shaders\OpenGL\GL_screenspace_reflections_pass1.comp" />
-    <None Include="res\shaders\OpenGL\GL_screenspace_reflections_pass2.comp" />
-    <None Include="res\shaders\OpenGL\GL_screenspace_reflections_pass3.comp" />
     <None Include="res\shaders\OpenGL\GL_shadow_cube_map.frag" />
     <None Include="res\shaders\OpenGL\GL_shadow_cube_map.vert" />
     <None Include="res\shaders\OpenGL\GL_shadow_map_flashlight.frag" />

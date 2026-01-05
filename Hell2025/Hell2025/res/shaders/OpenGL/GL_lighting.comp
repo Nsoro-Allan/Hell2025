@@ -288,18 +288,10 @@ void main() {
 		    vec3 spotLightPos = flashlightPosition.xyz;
             vec3 camightRight = normalize(viewportData[i].inverseView[0].xyz);
 		    vec3 spotLightDir = flashlightDir.xyz;
-            vec3 spotLightColor = vec3(0.9, 0.95, 1.1);
-            spotLightColor = vec3(0.7, 0.75, 1.0);
+            vec3 spotLightColor = GetFlashLightColor();
 
-            float fresnelReflect = 0.9;
             float spotLightRadius = 20.0;
-            float spotLightStregth = 4.5;
-
-            // EXPERIMENTAL NEW COLORS
-            vec3 defaultLightColor = vec3(1.0, 0.7799999713897705, 0.5289999842643738);
-            //spotLightColor = mix(defaultLightColor, spotLightColor, 0.95);
-            spotLightRadius = 20.0;
-            spotLightStregth = 3.5;
+            float spotLightStregth = 3.5;
             
             if (worldSpacePosition.y < u_oceanHeight - 0.1) {
                 spotLightStregth *= 2.0;
@@ -317,8 +309,8 @@ void main() {
             float outerAngle = cos(radians(25.0)); 
             
             if (playerIsInShop) {
-                spotLightRadius = 5;
-                outerAngle = cos(radians(45.0)); 
+                spotLightRadius = 8;
+                outerAngle = cos(radians(50.0));
             }
 
             //if (worldSpacePosition.y < 10) {
@@ -329,21 +321,25 @@ void main() {
             vec3 spotLighting = GetSpotlightLighting(spotLightPos, spotLightDir, spotLightColor, spotLightRadius, spotLightStregth, innerAngle, outerAngle, normal.xyz, worldSpacePosition.xyz, gammaBaseColor.rgb, roughness, metallic, flashlightViewPos, lightProjectionView);
             
             
-            if (baseColor.rgb == vec3(1, 0, 0)) {
-                vec3 L = normalize(spotLightPos - worldSpacePosition.xyz);
-                vec3 V = normalize(viewPos - worldSpacePosition.xyz); 
-                float mask = 1; // 0 or 1
-                float retroSharpness = 64; // 64 to 2048
-                float retroGain = 10; // 5 to 30
-                spotLighting = retroBRDF(baseColor.rgb, L, V, normal.xyz, mask, retroSharpness, retroGain);
-            }
+            //if (baseColor.rgb == vec3(1, 0, 0)) {
+            //    vec3 L = normalize(spotLightPos - worldSpacePosition.xyz);
+            //    vec3 V = normalize(viewPos - worldSpacePosition.xyz); 
+            //    float mask = 1; // 0 or 1
+            //    float retroSharpness = 64; // 64 to 2048
+            //    float retroGain = 10; // 5 to 30
+            //    spotLighting = retroBRDF(baseColor.rgb, L, V, normal.xyz, mask, retroSharpness, retroGain);
+            //}
             
             
             vec4 FragPosLightSpace = lightProjectionView * vec4(worldSpacePosition.xyz, 1.0);
             float shadow = 0;
             
-            if (i != viewportIndex || playerIsInShop) {
-                SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
+
+            if (i == viewportIndex && playerIsInShop) {
+                // do nothing
+            }
+            else {
+                shadow = SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
             }
             
             if (playerIsInShop) {
@@ -395,10 +391,11 @@ void main() {
     }
 
     // Moon light
-    vec3 moonColor = vec3(1.0, 0.9, 0.9);
-    vec3 moonColor2 = vec3(1, 0.7799999713897705, 0.5289999842643738);    
-    moonColor = mix(moonColor, moonColor2, 0.5);
-    moonColor = mix(moonColor, UNDER_WATER_TINT, 0.25);
+    //vec3 moonColor = vec3(1.0, 0.9, 0.9);
+    //vec3 moonColor2 = vec3(1, 0.7799999713897705, 0.5289999842643738);    
+    //moonColor = mix(moonColor, moonColor2, 0.5);
+    //moonColor = mix(moonColor, UNDER_WATER_TINT, 0.25);
+    vec3 moonColor = GetMoonLightColor();
     float moonLightStrength = 0.05;
        
     //float shadow = ShadowCalculation(lightIndex, lightPosition, lightRadius, worldSpacePosition.xyz, viewPos, normal.xyz, shadowMapArray);

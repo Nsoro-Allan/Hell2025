@@ -159,7 +159,8 @@ void main() {
 
     // Moon light (direct spec + IBL + SSS)
     {
-        vec3 moonColor = vec3(1.0, 0.9, 0.9);
+        //vec3 moonColor = vec3(1.0, 0.9, 0.9);
+        vec3 moonColor = GetMoonLightColor();
         vec3 L = vec3(-0.9284767, 0.3713907, 0.0); // pre-normalized
 
         if (!gl_FrontFacing) {

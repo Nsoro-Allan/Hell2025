@@ -67,7 +67,7 @@ Window::Window(uint64_t id, const WindowCreateInfo& createInfo, const SpawnOffse
     lock.meshName = "Lock";
     lock.materialName = "Window";
 
-    m_meshNodes.Init(m_objectId, "Window", meshNodeCreateInfoSet);
+    m_meshNodes.Init(m_objectId, "Window2", meshNodeCreateInfoSet);
     m_meshNodes.CastCSMShadows();
     m_meshNodes.Update(m_transform.to_mat4());
 

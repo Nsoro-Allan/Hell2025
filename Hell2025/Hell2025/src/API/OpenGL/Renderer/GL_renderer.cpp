@@ -357,9 +357,6 @@ namespace OpenGLRenderer {
         g_shaders["SpriteSheet"] = OpenGLShader({ "GL_sprite_sheet.vert", "GL_sprite_sheet.frag" });
         
         g_shaders["ScreenspaceReflections"] = OpenGLShader({ "GL_screenspace_reflections.comp" });
-        g_shaders["ScreenspaceReflections_Pass1"] = OpenGLShader({ "GL_screenspace_reflections_pass1.comp" });
-        g_shaders["ScreenspaceReflections_Pass2"] = OpenGLShader({ "GL_screenspace_reflections_pass2.comp" });
-        g_shaders["ScreenspaceReflections_Pass3"] = OpenGLShader({ "GL_screenspace_reflections_pass3.comp" });
 
         g_shaders["StainedGlass"] = OpenGLShader({ "GL_stained_glass.vert", "GL_stained_glass.frag" });
         g_shaders["UI"] = OpenGLShader({ "GL_ui.vert", "GL_ui.frag" });
