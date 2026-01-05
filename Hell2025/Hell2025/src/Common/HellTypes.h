@@ -295,7 +295,8 @@ struct ViewportData {
     glm::mat4 projectionView;
     glm::mat4 inverseProjectionView;
     glm::mat4 skyboxProjectionView;
-    glm::mat4 flashlightProjectionView; 
+    glm::mat4 flashlightProjectionView;
+    glm::mat4 previousProjectionView = glm::mat4(1.0f);
     
     glm::mat4 csmLightProjectionView[SHADOW_CASCADE_COUNT];
 

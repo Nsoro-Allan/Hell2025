@@ -1,0 +1,75 @@
+#version 460
+
+#include "../common/lighting.glsl"
+#include "../common/post_processing.glsl"
+#include "../common/types.glsl"
+#include "../common/util.glsl"
+
+layout(local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1) in;
+
+layout(rgba16f, binding = 0) writeonly uniform image2D SSRHistoryWriteImage;
+
+layout (binding = 1) uniform sampler2D SSRCurrentTexture;
+layout (binding = 2) uniform sampler2D SSRHistoryReadTexture;
+
+layout (binding = 3) uniform sampler2D RMATexture;
+layout (binding = 4) uniform sampler2D WorldPositionTexture;
+layout (binding = 5) uniform usampler2D ViewportIndexTexture;
+
+readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
+    ViewportData viewportData[];
+};
+
+uniform float u_temporalBlendMin = 0.10;
+uniform float u_temporalBlendMax = 0.90;
+
+bool InBounds(vec2 uv) {
+    return (uv.x > 0.0 && uv.x < 1.0 && uv.y > 0.0 && uv.y < 1.0);
+}
+
+void main() {
+    ivec2 halfPixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 halfSize = imageSize(SSRHistoryWriteImage);
+
+    if (halfPixelCoords.x >= halfSize.x || halfPixelCoords.y >= halfSize.y) {
+        return;
+    }
+
+    vec2 uv = (vec2(halfPixelCoords) + 0.5) / vec2(halfSize);
+
+    vec4 ssrCurrent = texture(SSRCurrentTexture, uv);  // rgb=color, a=weight
+
+    vec4 rma = texture(RMATexture, uv);
+    float roughness = rma.r;
+
+    uint viewportIndex = texture(ViewportIndexTexture, uv).r;
+
+    mat4 prevViewProjection = viewportData[viewportIndex].previousProjectionView;
+
+    vec3 worldPos = texture(WorldPositionTexture, uv).rgb;
+    vec4 prevClip = prevViewProjection * vec4(worldPos, 1.0);
+
+    vec2 prevUV = vec2(-1.0);
+    if (prevClip.w > 0.000001) {
+        prevUV = (prevClip.xy / prevClip.w) * 0.5 + 0.5;
+    }
+
+    vec4 ssrHistory = vec4(0.0);
+    float historyValid = 0.0;
+
+    if (InBounds(prevUV)) {
+        ssrHistory = texture(SSRHistoryReadTexture, prevUV);
+        historyValid = 1.0;
+    }
+
+    float temporalBlend = mix(u_temporalBlendMin, u_temporalBlendMax, clamp(roughness, 0.0, 1.0));
+
+    // If current has no weight, do not drag history forward hard
+    float currentHas = step(0.00001, ssrCurrent.a);
+    temporalBlend = mix(0.0, temporalBlend, currentHas * historyValid);
+
+    vec3 accumColor = mix(ssrCurrent.rgb, ssrHistory.rgb, temporalBlend);
+    float accumWeight = mix(ssrCurrent.a, ssrHistory.a, temporalBlend);
+
+    imageStore(SSRHistoryWriteImage, halfPixelCoords, vec4(accumColor, accumWeight));
+}

@@ -140,6 +140,14 @@ namespace RenderDataManager {
             glm::vec3 cameraUp = glm::vec3(inverseView[1]);
             glm::vec3 cameraForward = -glm::vec3(inverseView[2]);
 
+            // Is there any previous data?
+            bool previousDataExists = !Util::Mat4NearlyEqual(g_viewportData[i].previousProjectionView, glm::mat4(1.0f));
+
+            // Previous
+            if (previousDataExists) {
+                g_viewportData[i].previousProjectionView = g_viewportData[i].projectionView;
+            }
+
             // Store them (no need to normalize, they should already be unit vectors)
             g_viewportData[i].cameraForward = glm::vec4(cameraForward, 0.0f);
             g_viewportData[i].cameraRight = glm::vec4(cameraRight, 0.0f);
@@ -160,6 +168,11 @@ namespace RenderDataManager {
             g_viewportData[i].sizeX = viewport->GetSize().x;
             g_viewportData[i].sizeY = viewport->GetSize().y;
             g_viewportData[i].viewPos = g_viewportData[i].inverseView[3];
+
+            // If no previous then use current frame values
+            if (previousDataExists) {
+                g_viewportData[i].previousProjectionView = g_viewportData[i].projectionView;
+            }
 
             viewport->GetFrustum().Update(g_viewportData[i].projectionView);
 

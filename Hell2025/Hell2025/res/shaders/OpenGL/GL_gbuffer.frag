@@ -20,13 +20,13 @@
     layout (binding = 0) uniform sampler2D baseColorTexture;
     layout (binding = 1) uniform sampler2D normalTexture;
     layout (binding = 2) uniform sampler2D rmaTexture;
-    layout (binding = 3) uniform sampler2D woundBaseColorTexture;
-    layout (binding = 4) uniform sampler2D woundNormalTexture;
-    layout (binding = 5) uniform sampler2D woundRmaTexture;
+    layout (binding = 3) uniform sampler2D emissiveTexture;
+    layout (binding = 4) uniform sampler2D woundBaseColorTexture;
+    layout (binding = 5) uniform sampler2D woundNormalTexture;
+    layout (binding = 6) uniform sampler2D woundRmaTexture;
 #endif
 
-layout (binding = 6) uniform sampler2DArray woundMaskTextureArray;
-layout (binding = 7) uniform sampler2D WorldMirrorMaskTexture;
+layout (binding = 7) uniform sampler2DArray woundMaskTextureArray;
 
 #include "../common/lighting.glsl"
 #include "../common/post_processing.glsl"
@@ -61,10 +61,10 @@ void main() {
     vec3 rma = texture(sampler2D(textureSamplers[RMATextureIndex]), TexCoord).rgb;
     vec3 emissiveMapColor = texture(sampler2D(textureSamplers[EmissiveTextureIndex]), TexCoord).rgb;
 #else
-    vec4 baseColor = texture2D(baseColorTexture, TexCoord);
-    vec3 normalMap = texture2D(normalTexture, TexCoord).rgb;
-    vec3 rma = texture2D(rmaTexture, TexCoord).rgb;
-    vec3 emissiveMapColor = vec3(0, 0, 0); // This means no emissive colors in RenderDoc. Fix that!
+    vec4 baseColor = texture(baseColorTexture, TexCoord);
+    vec3 normalMap = texture(normalTexture, TexCoord).rgb;
+    vec3 rma = texture(rmaTexture, TexCoord).rgb;
+    vec3 emissiveMapColor = texture(emissiveTexture, TexCoord).rgb;
 #endif
 
     // Emissive
@@ -92,9 +92,9 @@ void main() {
             woundNormalMap = texture(sampler2D(textureSamplers[WoundNormalTextureIndex]), TexCoord).rgb;   
             woundRma = texture(sampler2D(textureSamplers[WoundRMATextureIndex]), TexCoord).rgb;
         #else
-            woundBaseColor = texture2D(woundBaseColorTexture, TexCoord);
-            woundNormalMap = texture2D(woundNormalTexture, TexCoord).rgb;
-            woundRma = texture2D(woundRmaTexture, TexCoord).rgb;
+            woundBaseColor = texture(woundBaseColorTexture, TexCoord);
+            woundNormalMap = texture(woundNormalTexture, TexCoord).rgb;
+            woundRma = texture(woundRmaTexture, TexCoord).rgb;
         #endif  
         woundMask  = texture(woundMaskTextureArray, vec3(TexCoord, WoundMaskTextureIndex)).r;        
 

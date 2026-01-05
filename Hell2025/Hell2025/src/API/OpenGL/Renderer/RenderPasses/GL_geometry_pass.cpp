@@ -90,7 +90,7 @@ namespace OpenGLRenderer {
         if (!woundMaskArray) return;
 
         glBindVertexArray(OpenGLBackEnd::GetVertexDataVAO());
-        glActiveTexture(GL_TEXTURE6);
+        glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D_ARRAY, woundMaskArray->GetHandle());
 
         gBuffer->Bind();

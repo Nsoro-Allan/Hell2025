@@ -8,6 +8,7 @@ struct ViewportData {
     mat4 inverseProjectionView;
     mat4 skyboxProjectionView;
     mat4 flashlightProjectionView;
+    mat4 previousProjectionView;
 
     mat4 csmLightProjectionView[5];
 

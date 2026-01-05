@@ -63,7 +63,8 @@ namespace BackEnd {
 
     bool Init(API api, WindowedMode windowMode) {
         g_api = api;
-        CheckForRenderDoc();
+        //CheckForRenderDoc();      // <--- COMMENT OUT THIS
+        g_renderDocFound = true;    // <--- ADD THIS
 
         Config::Init();
         if (!GLFW::Init(api, windowMode)) {

@@ -116,6 +116,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["HalfSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
         g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryA", GL_RGBA16F);
         g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryB", GL_RGBA16F);
+        g_frameBuffers["HalfSize"].CreateAttachment("SSRCurrent", GL_RGBA16F);
         
         g_frameBuffers["MiscFullSize"].Create("FullSize", resolutions.gBuffer);
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLightingIntermediate", GL_RGBA16F);
@@ -353,7 +354,12 @@ namespace OpenGLRenderer {
         g_shaders["SolidColor"] = OpenGLShader({ "GL_solid_color.vert", "GL_solid_color.frag" });
         g_shaders["Skybox"] = OpenGLShader({ "GL_skybox.vert", "GL_skybox.frag" });
         g_shaders["SpriteSheet"] = OpenGLShader({ "GL_sprite_sheet.vert", "GL_sprite_sheet.frag" });
+        
         g_shaders["ScreenspaceReflections"] = OpenGLShader({ "GL_screenspace_reflections.comp" });
+        g_shaders["ScreenspaceReflections_Pass1"] = OpenGLShader({ "GL_screenspace_reflections_pass1.comp" });
+        g_shaders["ScreenspaceReflections_Pass2"] = OpenGLShader({ "GL_screenspace_reflections_pass2.comp" });
+        g_shaders["ScreenspaceReflections_Pass3"] = OpenGLShader({ "GL_screenspace_reflections_pass3.comp" });
+
         g_shaders["StainedGlass"] = OpenGLShader({ "GL_stained_glass.vert", "GL_stained_glass.frag" });
         g_shaders["UI"] = OpenGLShader({ "GL_ui.vert", "GL_ui.frag" });
         g_shaders["Winston"] = OpenGLShader({ "GL_winston.vert", "GL_winston.frag" });
@@ -558,13 +564,25 @@ namespace OpenGLRenderer {
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.normalMapTextureIndex)->GetGLTexture().GetHandle());
                     glActiveTexture(GL_TEXTURE2);
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.rmaTextureIndex)->GetGLTexture().GetHandle());
+                    glActiveTexture(GL_TEXTURE3);
+
+                    // Try bind emissive texture
+                    if (renderItem.emissiveTextureIndex != -1) {
+                        if (Texture* texture = AssetManager::GetTextureByIndex(renderItem.emissiveTextureIndex)) {
+                            glBindTexture(GL_TEXTURE_2D, texture->GetGLTexture().GetHandle());
+                        }
+                    }
+                    // Fall back to black
+                    else if (Texture* blackTexture = AssetManager::GetTextureByName("Black")) {
+                        glBindTexture(GL_TEXTURE_2D, blackTexture->GetGLTexture().GetHandle());
+                    }
                 }
                 if (bindWoundMaterial) {
-                    glActiveTexture(GL_TEXTURE3);
-                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.woundBaseColorTextureIndex)->GetGLTexture().GetHandle());
                     glActiveTexture(GL_TEXTURE4);
-                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.woundNormalMapTextureIndex)->GetGLTexture().GetHandle());
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.woundBaseColorTextureIndex)->GetGLTexture().GetHandle());
                     glActiveTexture(GL_TEXTURE5);
+                    glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.woundNormalMapTextureIndex)->GetGLTexture().GetHandle());
+                    glActiveTexture(GL_TEXTURE6);
                     glBindTexture(GL_TEXTURE_2D, AssetManager::GetTextureByIndex(renderItem.woundRmaTextureIndex)->GetGLTexture().GetHandle());
                 }
 

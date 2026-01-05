@@ -26,7 +26,7 @@ uniform int u_maxSteps = 64;
 uniform float u_thickness = 0.12;
 uniform float u_stride = 0.25;
 
-// Overall SSR intensity scalar (easy tuning knob)
+// Overall SSR intensity scalar
 uniform float u_ssrIntensity = 0.35;
 
 // Edge fade distance in UV space
@@ -152,8 +152,7 @@ void main() {
         rayT += u_stride * (1.0 + rayT * 0.03);
     }
 
-    // Optional cheap denoise for rough surfaces: 5-tap cross blur on hitColor
-    // Uses DownsizedLightingTexture as the source (since that's what you reflect).
+    // Optional cheap denoise for rough surfaces: 5 tap cross blur on hitColor
     if (hit > 0.5) {
         float blurRadiusPixels = mix(0.0, 2.0, clamp(roughness, 0.0, 1.0));
         if (blurRadiusPixels > 0.01) {
@@ -200,4 +199,356 @@ void main() {
     vec3 composed = base.rgb + hitColor * weight;
 
     imageStore(LightingImage, pixelCoords, vec4(composed, base.a));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//#version 400 core
+//
+//uniform sampler2D gFinalImage;
+//uniform sampler2D gPosition;
+//uniform sampler2D gNormal;
+//uniform sampler2D gExtraComponents;
+//uniform sampler2D ColorBuffer; 
+//
+//uniform mat4 invView;
+//uniform mat4 projection;
+//uniform mat4 invprojection;
+//uniform mat4 view;
+//
+//noperspective in vec2 TexCoords;
+//
+//out vec4 outColor;
+
+float Metallic;
+
+const float step = 0.1;
+const float minRayStep = 0.1;
+const float maxSteps = 30;
+const int numBinarySearchSteps = 5;
+const float reflectionSpecularFalloffExponent = 3.0;
+
+#define Scale vec3(.8, .8, .8)
+#define K 19.19
+
+vec3 PositionFromDepth(float depth);
+
+//vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth);
+ 
+vec4 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth);
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0);
+
+vec3 hash(vec3 a);
+
+
+ivec2 ClampPixelCoords(ivec2 p, ivec2 size0)
+{
+    return clamp(p, ivec2(0), size0 - ivec2(1));
+}
+
+// Conservative (closest-surface) view-space Z from a 2x2 neighborhood.
+// This replaces their textureLod(gPosition, uv, 2).z when you have no mips.
+// For typical OpenGL view space, visible surfaces have z < 0 and "closer" means larger z (less negative),
+// so we take max() to get the closest surface in that 2x2 footprint.
+float FetchSceneViewZ_Conservative2x2(vec2 projectedUV, uint viewportIndex)
+{
+    ivec2 size0 = textureSize(WorldPositionTexture, 0);
+    vec2 pixel  = projectedUV * vec2(size0);
+    ivec2 p0    = ClampPixelCoords(ivec2(pixel), size0);
+
+    mat4 viewMatrix = viewportData[viewportIndex].view;
+
+    vec3 w0 = texelFetch(WorldPositionTexture, p0 + ivec2(0, 0), 0).xyz;
+    vec3 w1 = texelFetch(WorldPositionTexture, ClampPixelCoords(p0 + ivec2(1, 0), size0), 0).xyz;
+    vec3 w2 = texelFetch(WorldPositionTexture, ClampPixelCoords(p0 + ivec2(0, 1), size0), 0).xyz;
+    vec3 w3 = texelFetch(WorldPositionTexture, ClampPixelCoords(p0 + ivec2(1, 1), size0), 0).xyz;
+
+    float z0 = (viewMatrix * vec4(w0, 1.0)).z;
+    float z1 = (viewMatrix * vec4(w1, 1.0)).z;
+    float z2 = (viewMatrix * vec4(w2, 1.0)).z;
+    float z3 = (viewMatrix * vec4(w3, 1.0)).z;
+
+    return max(max(z0, z1), max(z2, z3));
+}
+
+
+vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth, mat4 projectionMatrix, uint viewportIndex)
+{
+    vec4 projectedCoord;
+    float sceneViewZ = 0.0;
+
+    for (int i = 0; i < numBinarySearchSteps; i++)
+    {
+        projectedCoord = projectionMatrix * vec4(hitCoord, 1.0);
+        projectedCoord.xy /= max(projectedCoord.w, 1e-6);
+        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+
+        sceneViewZ = FetchSceneViewZ_Conservative2x2(projectedCoord.xy, viewportIndex);
+        dDepth = hitCoord.z - sceneViewZ;
+
+        dir *= 0.5;
+        if (dDepth > 0.0) hitCoord += dir;
+        else              hitCoord -= dir;
+    }
+
+    projectedCoord = projectionMatrix * vec4(hitCoord, 1.0);
+    projectedCoord.xy /= max(projectedCoord.w, 1e-6);
+    projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+
+    sceneViewZ = FetchSceneViewZ_Conservative2x2(projectedCoord.xy, viewportIndex);
+
+    return vec3(projectedCoord.xy, sceneViewZ);
+}
+
+vec4 RayMarch(vec3 dir, inout vec3 hitCoord, out float dDepth, mat4 projectionMatrix, uint viewportIndex)
+{
+    dir *= step;
+
+    vec4 projectedCoord = vec4(0.0);
+    float sceneViewZ = 0.0;
+
+    for (int i = 0; i < maxSteps; i++)
+    {
+        hitCoord += dir;
+
+        projectedCoord = projectionMatrix * vec4(hitCoord, 1.0);
+        projectedCoord.xy /= max(projectedCoord.w, 1e-6);
+        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+
+        // If we marched off-screen, treat as miss.
+        if (projectedCoord.x < 0.0 || projectedCoord.x > 1.0 ||
+            projectedCoord.y < 0.0 || projectedCoord.y > 1.0)
+        {
+            return vec4(projectedCoord.xy, 0.0, 0.0);
+        }
+
+        sceneViewZ = FetchSceneViewZ_Conservative2x2(projectedCoord.xy, viewportIndex);
+        dDepth = hitCoord.z - sceneViewZ;
+
+        // Same "thickness" style test as the blog shader.
+        if ((dir.z - dDepth) < 1.2)
+        {
+            if (dDepth <= 0.0)
+            {
+                vec3 refined = BinarySearch(dir, hitCoord, dDepth, projectionMatrix, viewportIndex);
+                return vec4(refined, 1.0);
+            }
+        }
+    }
+
+    return vec4(projectedCoord.xy, sceneViewZ, 0.0);
+}
+
+
+
+void main2()
+{
+    ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 outputSize  = imageSize(LightingImage);
+
+    if (pixelCoords.x >= outputSize.x || pixelCoords.y >= outputSize.y) {
+        return;
+    }
+
+    vec2 uv = (vec2(pixelCoords) + 0.5) / vec2(outputSize);
+
+    // If your normal is stored 0..1, decode it first. Assuming it is already -1..1.
+    vec3 normalRaw = texelFetch(NormalTexture, pixelCoords, 0).xyz;
+    if (IsSky(normalRaw)) {
+        imageStore(LightingImage, pixelCoords, vec4(0.0));
+        return;
+    }
+
+    vec3 N_world = normalize(normalRaw);
+
+    vec4 rma = texelFetch(RMATexture, pixelCoords, 0);
+    float roughness = rma.r;
+    float metallic  = rma.g;
+
+    if (metallic < 0.01) {
+        imageStore(LightingImage, pixelCoords, vec4(0.0));
+        return;
+    }
+
+    uint viewportIndex = texelFetch(ViewportIndexTexture, pixelCoords, 0).r;
+
+    mat4 viewMatrix        = viewportData[viewportIndex].view;              // world -> view
+    mat4 inverseView       = viewportData[viewportIndex].inverseView;       // view  -> world
+    mat4 projectionMatrix  = viewportData[viewportIndex].projection;
+
+    vec3 worldPos = texelFetch(WorldPositionTexture, pixelCoords, 0).xyz;
+
+    // If WorldPositionTexture has invalid pixels (0,0,0) for sky, bail out.
+    if (dot(worldPos, worldPos) < 1e-10) {
+        imageStore(LightingImage, pixelCoords, vec4(0.0));
+        return;
+    }
+
+    vec3 viewPos    = (viewMatrix * vec4(worldPos, 1.0)).xyz;
+    vec3 viewNormal = normalize(mat3(viewMatrix) * N_world);
+
+    vec3 baseColor = texelFetch(BaseColorTexture, pixelCoords, 0).rgb;
+
+    // This is what we reflect (their gFinalImage). You chose a downsized lighting buffer.
+    vec3 litAtPixel = texture(DownsizedLightingTexture, uv).rgb;
+
+    float spec = clamp(1.0 - roughness, 0.0, 1.0);
+
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, baseColor, metallic);
+
+    vec3 V = normalize(-viewPos);
+
+    vec3 Fresnel = fresnelSchlick(max(dot(normalize(viewNormal), V), 0.0), F0);
+
+    vec3 reflected = normalize(reflect(-V, normalize(viewNormal)));
+
+    vec3 hitPos = viewPos;
+    float dDepth = 0.0;
+
+    vec3 jitt = mix(vec3(0.0), hash(worldPos), spec);
+
+    vec3 marchDir = jitt + reflected * max(minRayStep, -viewPos.z);
+
+    // Your RayMarch/BinarySearch must use FetchSceneViewZ_Conservative2x2(projectedUV, viewportIndex)
+    // when doing the depth test (hitCoord.z - sceneViewZ).
+    vec4 coords = RayMarch(marchDir, hitPos, dDepth, projectionMatrix, viewportIndex);
+
+    // If your RayMarch signals miss with coords.w == 0, respect it.
+    if (coords.w == 0.0) {
+        imageStore(LightingImage, pixelCoords, vec4(0.5));
+        return;
+    }
+
+    // Reject off-screen hits
+    if (coords.x <= 0.0 || coords.x >= 1.0 || coords.y <= 0.0 || coords.y >= 1.0) {
+        imageStore(LightingImage, pixelCoords, vec4(1.0));
+        return;
+    }
+
+    vec2 dCoords = smoothstep(0.2, 0.6, abs(vec2(0.5) - coords.xy));
+    float screenEdgefactor = clamp(1.0 - (dCoords.x + dCoords.y), 0.0, 1.0);
+
+    float ReflectionMultiplier =
+        pow(metallic, reflectionSpecularFalloffExponent) *
+        screenEdgefactor *
+        clamp(-reflected.z, 0.0, 1.0);
+
+    vec3 reflectionSample = texture(DownsizedLightingTexture, coords.xy).rgb;
+
+    vec3 SSR = reflectionSample * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
+
+    imageStore(LightingImage, pixelCoords, vec4(SSR, metallic));
+
+    
+    imageStore(LightingImage, pixelCoords, vec4(reflectionSample, 1.0));
+}
+
+
+
+
+
+
+
+
+
+
+//vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth)
+//{
+//    float depth;
+//
+//    vec4 projectedCoord;
+// 
+//    for(int i = 0; i < numBinarySearchSteps; i++)
+//    {
+//
+//        projectedCoord = projection * vec4(hitCoord, 1.0);
+//        projectedCoord.xy /= projectedCoord.w;
+//        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+// 
+//        depth = textureLod(gPosition, projectedCoord.xy, 2).z;
+//
+// 
+//        dDepth = hitCoord.z - depth;
+//
+//        dir *= 0.5;
+//        if(dDepth > 0.0)
+//            hitCoord += dir;
+//        else
+//            hitCoord -= dir;    
+//    }
+//
+//        projectedCoord = projection * vec4(hitCoord, 1.0);
+//        projectedCoord.xy /= projectedCoord.w;
+//        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+// 
+//    return vec3(projectedCoord.xy, depth);
+//}
+
+//vec4 RayMarch(vec3 dir, inout vec3 hitCoord, out float dDepth)
+//{
+//
+//    dir *= step;
+// 
+// 
+//    float depth;
+//    int steps;
+//    vec4 projectedCoord;
+//
+// 
+//    for(int i = 0; i < maxSteps; i++)
+//    {
+//        hitCoord += dir;
+// 
+//        projectedCoord = projection * vec4(hitCoord, 1.0);
+//        projectedCoord.xy /= projectedCoord.w;
+//        projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
+// 
+//        depth = textureLod(gPosition, projectedCoord.xy, 2).z;
+//        if(depth > 1000.0)
+//            continue;
+// 
+//        dDepth = hitCoord.z - depth;
+//
+//        if((dir.z - dDepth) < 1.2)
+//        {
+//            if(dDepth <= 0.0)
+//            {   
+//                vec4 Result;
+//                Result = vec4(BinarySearch(dir, hitCoord, dDepth), 1.0);
+//
+//                return Result;
+//            }
+//        }
+//        
+//        steps++;
+//    }
+// 
+//    
+//    return vec4(projectedCoord.xy, depth, 0.0);
+//}
+
+//vec3 fresnelSchlick(float cosTheta, vec3 F0)
+//{
+//    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+//}
+
+
+vec3 hash(vec3 a)
+{
+    a = fract(a * Scale);
+    a += dot(a, a.yxz + K);
+    return fract((a.xxy + a.yxx)*a.zyx);
 }

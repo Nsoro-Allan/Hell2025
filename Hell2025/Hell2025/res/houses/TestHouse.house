@@ -859,8 +859,8 @@
       "EditorName": "Door Standard A",
       "HasDeadLock": true,
       "MaterialTypeBack": "WHITE_PAINT",
-      "MaterialTypeFrameBack": "WHITE_PAINT",
-      "MaterialTypeFrameFront": "WHITE_PAINT",
+      "MaterialTypeFrameBack": "RESIDENT_EVIL",
+      "MaterialTypeFrameFront": "RESIDENT_EVIL",
       "MaterialTypeFront": "WHITE_PAINT",
       "MaxOpenValue": 2.0999999046325684,
       "Position": [

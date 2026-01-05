@@ -116,6 +116,36 @@ namespace OpenGLRenderer {
         glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
     }
 
+    void ScreenspaceReflectionsPassOLD() {
+        ProfilerOpenGLZoneFunction();
+
+        OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+        OpenGLFrameBuffer* halfSizeFbo = GetFrameBuffer("HalfSize");
+        OpenGLFrameBuffer* fullSizeFBO = GetFrameBuffer("MiscFullSize");
+        OpenGLShader* shader = GetShader("ScreenspaceReflections");
+
+        if (!gBuffer) return;
+        if (!shader) return;
+        if (!halfSizeFbo) return;
+        if (!fullSizeFBO) return;
+
+        // Down sample
+        BlitFrameBuffer(gBuffer, halfSizeFbo, "FinalLighting", "DownsampledFinalLighting", GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+
+        shader->Bind();
+        shader->BindImageTexture(0, gBuffer->GetColorAttachmentHandleByName("FinalLighting"), GL_READ_WRITE, GL_RGBA16F);
+        shader->BindTextureUnit(1, gBuffer->GetColorAttachmentHandleByName("BaseColor"));
+        shader->BindTextureUnit(2, gBuffer->GetColorAttachmentHandleByName("Normal"));
+        shader->BindTextureUnit(3, gBuffer->GetColorAttachmentHandleByName("RMA"));
+        shader->BindTextureUnit(4, gBuffer->GetDepthAttachmentHandle());
+        shader->BindTextureUnit(5, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
+        shader->BindTextureUnit(6, fullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
+        shader->BindTextureUnit(7, halfSizeFbo->GetColorAttachmentHandleByName("DownsampledFinalLighting"));
+
+        glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
+    }
+
     void ScreenspaceReflectionsPass() {
         ProfilerOpenGLZoneFunction();
 
@@ -144,5 +174,88 @@ namespace OpenGLRenderer {
         shader->BindTextureUnit(7, halfSizeFbo->GetColorAttachmentHandleByName("DownsampledFinalLighting"));
 
         glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
+    }
+
+    void ScreenspaceReflectionsPassTEMPORAL() {
+        ProfilerOpenGLZoneFunction();
+
+        static bool g_useSSRHistoryAAsRead = true;
+
+        OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+        OpenGLFrameBuffer* halfSizeFbo = GetFrameBuffer("HalfSize");
+
+        OpenGLShader* ssrPass1 = GetShader("ScreenspaceReflections_Pass1");
+        OpenGLShader* ssrPass2 = GetShader("ScreenspaceReflections_Pass2");
+
+        if (!gBuffer) return;
+        if (!halfSizeFbo) return;
+        if (!ssrPass1) return;
+        if (!ssrPass2) return;
+
+        // 0) Downsample lighting to half
+        BlitFrameBuffer(gBuffer, halfSizeFbo, "FinalLighting", "DownsampledFinalLighting", GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+
+        const uint32_t halfWidth = halfSizeFbo->GetWidth();
+        const uint32_t halfHeight = halfSizeFbo->GetHeight();
+
+        // Ping-pong history
+        uint32_t ssrHistoryReadHandle = g_useSSRHistoryAAsRead
+            ? halfSizeFbo->GetColorAttachmentHandleByName("SSRHistoryA")
+            : halfSizeFbo->GetColorAttachmentHandleByName("SSRHistoryB");
+
+        uint32_t ssrHistoryWriteHandle = g_useSSRHistoryAAsRead
+            ? halfSizeFbo->GetColorAttachmentHandleByName("SSRHistoryB")
+            : halfSizeFbo->GetColorAttachmentHandleByName("SSRHistoryA");
+
+        uint32_t ssrCurrentHandle = halfSizeFbo->GetColorAttachmentHandleByName("SSRCurrent");
+
+        // 1) Pass 1: raymarch SSR into SSRCurrent (half)
+        ssrPass1->Bind();
+        ssrPass1->BindImageTexture(0, ssrCurrentHandle, GL_WRITE_ONLY, GL_RGBA16F);
+
+        ssrPass1->BindTextureUnit(1, gBuffer->GetColorAttachmentHandleByName("Normal"));
+        ssrPass1->BindTextureUnit(2, gBuffer->GetColorAttachmentHandleByName("RMA"));
+        ssrPass1->BindTextureUnit(3, gBuffer->GetDepthAttachmentHandle());
+        ssrPass1->BindTextureUnit(4, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
+        ssrPass1->BindTextureUnit(5, GetFrameBuffer("MiscFullSize")->GetColorAttachmentHandleByName("ViewportIndex"));
+        ssrPass1->BindTextureUnit(6, halfSizeFbo->GetColorAttachmentHandleByName("DownsampledFinalLighting"));
+
+        glDispatchCompute((halfWidth + TILE_SIZE - 1) / TILE_SIZE, (halfHeight + TILE_SIZE - 1) / TILE_SIZE, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
+        // 2) Pass 2: temporal reprojection accumulate into SSRHistoryWrite
+        ssrPass2->Bind();
+        ssrPass2->BindImageTexture(0, ssrHistoryWriteHandle, GL_WRITE_ONLY, GL_RGBA16F);
+
+        ssrPass2->BindTextureUnit(1, ssrCurrentHandle);
+        ssrPass2->BindTextureUnit(2, ssrHistoryReadHandle);
+
+        ssrPass2->BindTextureUnit(3, gBuffer->GetColorAttachmentHandleByName("RMA"));
+        ssrPass2->BindTextureUnit(4, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
+        ssrPass2->BindTextureUnit(5, GetFrameBuffer("MiscFullSize")->GetColorAttachmentHandleByName("ViewportIndex"));
+
+        glDispatchCompute((halfWidth + TILE_SIZE - 1) / TILE_SIZE, (halfHeight + TILE_SIZE - 1) / TILE_SIZE, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
+
+        OpenGLShader* pass3 = GetShader("ScreenspaceReflections_Pass3");
+
+        pass3->Bind();
+        pass3->BindImageTexture(0, gBuffer->GetColorAttachmentHandleByName("FinalLighting"), GL_READ_WRITE, GL_RGBA16F);
+        pass3->BindTextureUnit(1, ssrHistoryReadHandle);
+
+        glDispatchCompute((gBuffer->GetWidth() + TILE_SIZE - 1) / TILE_SIZE,
+            (gBuffer->GetHeight() + TILE_SIZE - 1) / TILE_SIZE,
+            1);
+
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
+
+        // Swap history buffers for next frame
+        g_useSSRHistoryAAsRead = !g_useSSRHistoryAAsRead;
+
+
+
     }
 }

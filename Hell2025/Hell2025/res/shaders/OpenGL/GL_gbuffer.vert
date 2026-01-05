@@ -70,6 +70,7 @@ void main() {
 #else
     int globalInstanceIndex = u_globalInstanceIndex;
     int viewportIndex = u_viewportIndex;
+    EmissiveTextureIndex = renderItems[globalInstanceIndex].emissiveTextureIndex; // required for some hackery
 #endif
 
     RenderItem renderItem = renderItems[globalInstanceIndex]; 
@@ -107,5 +108,5 @@ void main() {
     //vec4 camRelativeWorldPos = vec4(WorldPos.xyz - ViewPos, 1.0);
     //gl_Position = projection * mat4(mat3(view)) * camRelativeWorldPos;
 
-
+    BlockScreenSpaceBloodDecalsFlag = 0; // rethink this?
 }

@@ -300,10 +300,13 @@ namespace Bible {
 
         std::string front = "T_BlackDoor_Door";
         std::string back = "T_BlackDoor_Door_BACK";
-        std::string metals = "T_BlackDoor_Metals";
+        std::string metals = "T_BlackDoor_MetalsV2";
         
         front = "T_BlackDoor_DoorWP";
         back = "T_BlackDoor_DoorWP_BACK";
+
+        front = "T_BlackDoor_DoorRE";
+        back = "T_BlackDoor_DoorRE_BACK";
 
         meshNodes.SetMaterialByMeshName("ChainLocker", metals);
         meshNodes.SetMaterialByMeshName("ChainLink1", metals);

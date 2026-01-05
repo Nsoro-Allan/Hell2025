@@ -11,7 +11,8 @@ int GetErrorLineNumber(const std::string& error);
 std::string GetErrorMessage(const std::string& line);
 std::string GetLinkingErrors(unsigned int shader);
 std::string GetShaderCompileErrors(unsigned int shader, const std::string& filename, const std::vector<std::string>& lineToFile);
-std::string StripBOM(const std::string& source);
+//std::string StripBOM(const std::string& source);
+void StripUTF8BOMFromLine(std::string& line);
 
 OpenGLShader::OpenGLShader(std::vector<std::string> shaderPaths) {
     m_shaderPaths = shaderPaths;
@@ -231,7 +232,7 @@ OpenGLShaderModule::OpenGLShaderModule(const std::string& filename) {
     ParseFile("res/shaders/OpenGL/" + filename, prasedShaderSource, lineMap, includedPaths);
 
     // Strip any BOM characters. Apparently older drivers don't handle BOM bytes properly when compiling GLSL shaders
-    prasedShaderSource = StripBOM(prasedShaderSource);
+    //prasedShaderSource = StripBOM(prasedShaderSource);
 
     // Get type based on extension
     std::string extension = std::filesystem::path(filename).extension().string(); 
@@ -279,9 +280,17 @@ void ParseFile(const std::string& filepath, std::string& outputString, std::vect
     std::string filename = std::filesystem::path(filepath).filename().string();
     std::ifstream file(filepath);
     std::string line;
+    bool versionInserted = false; 
+    bool firstLineOfThisFile = true;
     int lineNumber = 0;
-    bool versionInserted = false;
+
     while (std::getline(file, line)) {
+        // Strip BOM chars
+        if (firstLineOfThisFile) {
+            StripUTF8BOMFromLine(line);
+            firstLineOfThisFile = false;
+        }
+
         // Handle includes
         if (line.find("#include") != std::string::npos) {
             size_t start = line.find("\"") + 1;
@@ -422,9 +431,20 @@ std::string GetErrorMessage(const std::string& line) {
     return ""; // Return empty string if parsing fails
 }
 
-std::string StripBOM(const std::string& source) {
-    const std::string bom = "\xEF\xBB\xBF";
-    if (source.compare(0, bom.size(), bom) == 0)
-        return source.substr(bom.size());
-    return source;
+//std::string StripBOM(const std::string& source) {
+//    const std::string bom = "\xEF\xBB\xBF";
+//    if (source.compare(0, bom.size(), bom) == 0)
+//        return source.substr(bom.size());
+//    return source;
+//}
+
+void StripUTF8BOMFromLine(std::string& line) {
+    if (line.size() >= 3) {
+        const unsigned char b0 = (unsigned char)line[0];
+        const unsigned char b1 = (unsigned char)line[1];
+        const unsigned char b2 = (unsigned char)line[2];
+        if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
+            line.erase(0, 3);
+        }
+    }
 }
