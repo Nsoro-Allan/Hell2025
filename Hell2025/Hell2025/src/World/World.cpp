@@ -413,8 +413,6 @@ namespace World {
     void NewRun() {
         ResetWorld();
 
-        Game::RespawnPlayers();
-
         // Respawn roos
         for (Kangaroo& kangaroo : g_kangaroos) {
             kangaroo.Respawn();
@@ -437,6 +435,16 @@ namespace World {
         LoadMapInstances(mapInstanceCreateInfoSet);
 
         Editor::SetEditorMapName(UNDEFINED_STRING);
+
+        Update(0.0f);
+        Physics::ForceZeroStepUpdate();
+        Update(0.0f);
+        Physics::ForceZeroStepUpdate();
+        Game::RespawnPlayers();
+        Update(0.0f);
+        Physics::ForceZeroStepUpdate();
+        Update(0.0f);
+        Physics::ForceZeroStepUpdate();
     }
 
     void BeginFrame() {

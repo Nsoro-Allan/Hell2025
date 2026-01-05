@@ -9,7 +9,6 @@ namespace Math {
     inline glm::vec3 SnapVec3(const glm::vec3& v, int decimalPlaces);
     inline float TriArea2D(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c);
 
-
     inline float DistSquared(const glm::vec3& a, const glm::vec3& b) {
         glm::vec3 d = a - b;
         return glm::dot(d, d);

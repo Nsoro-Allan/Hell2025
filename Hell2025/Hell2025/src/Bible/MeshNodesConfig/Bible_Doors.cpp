@@ -300,7 +300,7 @@ namespace Bible {
 
         std::string front = "T_BlackDoor_Door";
         std::string back = "T_BlackDoor_Door_BACK";
-        std::string metals = "T_BlackDoor_MetalsV2";
+        std::string metals = "DoorMetals2";
         
         front = "T_BlackDoor_DoorWP";
         back = "T_BlackDoor_DoorWP_BACK";

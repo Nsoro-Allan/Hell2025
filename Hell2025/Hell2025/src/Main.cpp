@@ -41,7 +41,7 @@ int main() {
     Logging::EnableLevel(Logging::Level::FATAL);
     Logging::EnableLevel(Logging::Level::TODO);
     Logging::EnableLevel(Logging::Level::WARNING);
-    //Logging::EnableLevel(Logging::Level::FUNCTION);
+    Logging::EnableLevel(Logging::Level::FUNCTION);
 
     // Init the back-end, sub-systems, and the minimum to render loading screen
     if (!BackEnd::Init(API::OPENGL, WindowedMode::WINDOWED)) {

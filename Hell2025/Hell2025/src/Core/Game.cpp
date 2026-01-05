@@ -18,6 +18,7 @@
 #include "UI/UIBackEnd.h"
 #include "Viewport/ViewportManager.h"
 
+#include "HellLogging.h"
 #include "UniqueId.h"
 
 // Get me out of here
@@ -52,6 +53,7 @@ namespace Game {
     }
 
     void Create() {
+        Logging::Function() << "Game::Create()";
 
         //SectorCreateInfo sectorCreateInfo = JSON::LoadSector("res/sectors/TestSector.json");
         //World::LoadSingleSector(sectorCreateInfo);

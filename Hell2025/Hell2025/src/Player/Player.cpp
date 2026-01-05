@@ -318,8 +318,14 @@ void Player::Respawn() {
 
 
     //Logging::Debug() << "Player " << m_viewportIndex << " spawn: " << spawnPoint.m_position;
-    SetFootPosition(spawnPoint.GetPosition() - glm::vec3(0.0f, 1.60, 0.0f));
+
+    glm::vec3 spawnPosition = spawnPoint.GetPosition() - glm::vec3(0.0f, 1.60, 0.0f);
+
+    Logging::Debug() << "Player " << m_viewportIndex << " spawned at " << spawnPosition;
+    SetFootPosition(spawnPosition);
     m_camera.SetEulerRotation(spawnPoint.GetCamEuler());
+
+    
 
     //if (m_viewportIndex == 0) {
     //    SetFootPosition(glm::vec3(36.18, 31, 37.26));
