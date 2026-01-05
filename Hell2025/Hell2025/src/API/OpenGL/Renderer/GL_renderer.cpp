@@ -113,7 +113,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["QuarterSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
 
         g_frameBuffers["HalfSize"].Create("QuarterSize", resolutions.gBuffer.x / 2, resolutions.gBuffer.y / 2);
-        g_frameBuffers["HalfSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F);
+        g_frameBuffers["HalfSize"].CreateAttachment("DownsampledFinalLighting", GL_RGBA16F, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, GL_CLAMP_TO_EDGE, true);
         g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryA", GL_RGBA16F);
         g_frameBuffers["HalfSize"].CreateAttachment("SSRHistoryB", GL_RGBA16F);
         g_frameBuffers["HalfSize"].CreateAttachment("SSRCurrent", GL_RGBA16F);
@@ -123,6 +123,7 @@ namespace OpenGLRenderer {
         g_frameBuffers["MiscFullSize"].CreateAttachment("GaussianFinalLighting", GL_RGBA16F);
         g_frameBuffers["MiscFullSize"].CreateAttachment("ScreenSpaceBloodDecalMask", GL_R8);
         g_frameBuffers["MiscFullSize"].CreateAttachment("ViewportIndex", GL_R8UI, GL_NEAREST, GL_NEAREST);
+        g_frameBuffers["MiscFullSize"].CreateAttachment("ViewspaceDepth", GL_R32F, GL_NEAREST, GL_NEAREST);
 
         g_frameBuffers["Water"] = OpenGLFrameBuffer("Water", resolutions.gBuffer);
         g_frameBuffers["Water"].CreateAttachment("Color", GL_RGBA16F);
@@ -368,6 +369,7 @@ namespace OpenGLRenderer {
         g_shaders["VatBlood"] = OpenGLShader({ "GL_vat_blood.vert", "GL_vat_blood.frag" });
 
         g_shaders["ScreenSpaceDecals"] = OpenGLShader({ "GL_screenspace_decals.vert", "GL_screenspace_decals.frag" });
+        g_shaders["ViewspaceDepth"] = OpenGLShader({ "GL_viewspace_depth.comp" });
     }
 
     void UpdateSSBOS() {
@@ -443,16 +445,17 @@ namespace OpenGLRenderer {
         WeatherBoardsPass();
         VatBloodPass();
         ScreenSpaceDecalsPass();
+        ComputeViewspaceDepth();
         TextureReadBackPass();
         LightCullingPass();
         LightingPass();
-        ScreenspaceReflectionsPass();
         //FurPass();
         OceanGeometryPass();
         OceanSurfaceCompositePass();
         GlassPass();
         DecalPass();
         EmissivePass();
+        ScreenspaceReflectionsPass();
         HairPass();
         RayMarchFog();
         OceanUnderwaterCompositePass();

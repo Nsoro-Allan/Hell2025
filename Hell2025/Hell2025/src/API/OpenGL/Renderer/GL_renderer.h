@@ -46,6 +46,7 @@ namespace OpenGLRenderer {
     void PaintHeightMap();
     void UpdateGlobalIllumintation();
     void PointCloudDirectLighting();
+    void ComputeViewspaceDepth();
 
     // Init passes
     void InitGrass();

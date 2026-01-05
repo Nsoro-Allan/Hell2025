@@ -31,6 +31,24 @@ namespace OpenGLRenderer {
         glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
     }
 
+    void ComputeViewspaceDepth() {
+        OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
+        OpenGLFrameBuffer* fullSizeFBO = GetFrameBuffer("MiscFullSize");
+        OpenGLShader* shader = GetShader("ViewspaceDepth");
+
+        if (!gBuffer) return;
+        if (!fullSizeFBO) return;
+        if (!shader) return;
+
+        shader->Bind();
+        shader->BindImageTexture(0, fullSizeFBO->GetColorAttachmentHandleByName("ViewspaceDepth"), GL_WRITE_ONLY, GL_R32F);
+        shader->BindTextureUnit(1, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
+        shader->BindTextureUnit(2, fullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
+
+        glDispatchCompute((gBuffer->GetWidth() + 7) / 8, (gBuffer->GetHeight() + 7) / 8, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+    }
+
     void LightingPass() {
         ProfilerOpenGLZoneFunction();
 
@@ -161,6 +179,10 @@ namespace OpenGLRenderer {
 
         // Down sample
         BlitFrameBuffer(gBuffer, halfSizeFbo, "FinalLighting", "DownsampledFinalLighting", GL_COLOR_BUFFER_BIT, GL_LINEAR);
+        glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
+
+        // Generate mips
+        glGenerateTextureMipmap(halfSizeFbo->GetColorAttachmentHandleByName("DownsampledFinalLighting"));
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
 
         shader->Bind();
@@ -172,6 +194,9 @@ namespace OpenGLRenderer {
         shader->BindTextureUnit(5, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
         shader->BindTextureUnit(6, fullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
         shader->BindTextureUnit(7, halfSizeFbo->GetColorAttachmentHandleByName("DownsampledFinalLighting"));
+        shader->BindTextureUnit(8, fullSizeFBO->GetColorAttachmentHandleByName("ViewspaceDepth"));
+
+        
 
         glDispatchCompute(gBuffer->GetWidth() / TILE_SIZE, gBuffer->GetHeight() / TILE_SIZE, 1);
     }
@@ -195,6 +220,7 @@ namespace OpenGLRenderer {
         // 0) Downsample lighting to half
         BlitFrameBuffer(gBuffer, halfSizeFbo, "FinalLighting", "DownsampledFinalLighting", GL_COLOR_BUFFER_BIT, GL_LINEAR);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+
 
         const uint32_t halfWidth = halfSizeFbo->GetWidth();
         const uint32_t halfHeight = halfSizeFbo->GetHeight();

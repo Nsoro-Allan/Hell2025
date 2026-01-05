@@ -668,6 +668,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <None Include="res\shaders\common\pbr_functions.glsl" />
     <None Include="res\shaders\OpenGL\GL_vat_blood.frag" />
     <None Include="res\shaders\OpenGL\GL_vat_blood.vert" />
+    <None Include="res\shaders\OpenGL\GL_viewspace_depth.comp" />
     <None Include="res\shaders\OpenGL\GL_zero_out.comp" />
     <None Include="res\shaders\terrain.frag" />
     <None Include="res\shaders\terrain.vert" />

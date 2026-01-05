@@ -1,0 +1,28 @@
+#version 450
+#include "../common/types.glsl"
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(r32f, binding = 0) uniform image2D ViewZImage;
+layout(binding = 1) uniform sampler2D WorldPositionTexture;
+layout(binding = 2) uniform usampler2D ViewportIndexTexture;
+
+readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
+    ViewportData viewportData[];
+};
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size0 = imageSize(ViewZImage);
+    if (p.x >= size0.x || p.y >= size0.y) return;
+
+    uint viewportIndex = texelFetch(ViewportIndexTexture, p, 0).r;
+
+    mat4 viewMatrix = viewportData[viewportIndex].view;
+
+    vec3 worldPos = texelFetch(WorldPositionTexture, p, 0).xyz;
+
+    float viewZ = (viewMatrix * vec4(worldPos, 1.0)).z;
+
+    imageStore(ViewZImage, p, vec4(viewZ, 0.0, 0.0, 1.0));
+}
