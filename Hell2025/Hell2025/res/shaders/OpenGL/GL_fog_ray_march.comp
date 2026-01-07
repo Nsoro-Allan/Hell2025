@@ -7,16 +7,16 @@ layout(local_size_x = 16, local_size_y = 16) in;
 
 layout (binding = 1) uniform sampler2D uDepth;
 layout (binding = 2) uniform sampler3D uNoiseVol;
-layout (binding = 3) uniform usampler2D ViewportIndexTexture;
+layout (binding = 3) uniform sampler2D ViewSpaceDepthTexture;
+layout (binding = 4) uniform sampler2D WorldPositionTexture;
 layout (binding = 4, rgba16f) uniform image2D OutputFogImage;
 
+readonly restrict layout(std430, binding = 1) buffer rendererDataBuffer { RendererData rendererData; };
 readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer { ViewportData viewportData[]; };
 
 uniform int u_noiseSeed;
 
-uniform bool u_isSplitscreen;
-
-uniform float u_time;
+//uniform float u_time;
 
 const vec3 fogSpeed = vec3(0.10, 0.02, 0.10);
 vec3 fogColor = vec3(0.222, 0.233, 0.260) * 0.5325 * 0.35;
@@ -33,8 +33,12 @@ const float farFadeFlashlight = 5;
 const float noiseScaleXZ = 1.0 / 8.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
 const float noiseScaleY = 1.0 / 4.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
 
-
 float dt = MAX_FOG_DIST / float(NUM_STEPS); 
+
+
+float u_densityBias = 0.05;
+float u_densityScale = 1.5;
+
 
 // Random sampling functions
 uint seed = 0u;
@@ -53,57 +57,112 @@ float random(){
     return float(seed)/4294967295.0;
 }
 
-void main() {
-    ivec2 px   = ivec2(gl_GlobalInvocationID.xy);
+
+ivec2 ViewportUVToAtlasPixel(vec2 viewportUV, ViewportData v) {
+    ivec2 localPx = ivec2(viewportUV * vec2(float(v.width), float(v.height)));
+    return ivec2(v.xOffset, v.yOffset) + localPx;
+}
+
+// World position reconstruction from depth (ZERO_TO_ONE)
+vec3 ReconstructWorldPosFromViewportUVDepth(vec2 viewportUV, float depth, mat4 inverseProjectionView) {
+    vec4 clip = vec4(viewportUV * 2.0 - 1.0, depth, 1.0);
+    vec4 worldH = inverseProjectionView * clip;
+    return worldH.xyz / max(worldH.w, 1e-6);
+}
+
+vec3 ReconstructWorldPosFromDepth01_ZeroToOne(
+    vec2 viewportUV,
+    float depth01,
+    mat4 inverseProjection,
+    mat4 inverseView)
+{
+    vec2 ndcXY = viewportUV * 2.0 - 1.0;
+    float ndcZ = depth01; // already 0..1
+
+    vec4 viewH = inverseProjection * vec4(ndcXY, ndcZ, 1.0);
+    vec3 viewPos = viewH.xyz / max(viewH.w, 1e-6);
+
+    vec4 worldH = inverseView * vec4(viewPos, 1.0);
+    return worldH.xyz;
+}
+
+// viewport-local UV (0..1) from atlas pixel coords
+vec2 GlobalPixelToViewportUV(ivec2 px, ViewportData v) {
+    ivec2 localPx = px - ivec2(v.xOffset, v.yOffset);
+    return (vec2(localPx) + 0.5) / vec2(float(v.width), float(v.height));
+}
+
+
+vec2 ViewportUVToGlobalUV(vec2 viewportUV, ViewportData v) {
+    return vec2(v.posX, v.posY) + viewportUV * vec2(v.sizeX, v.sizeY);
+}
+
+vec2 GlobalUVToViewportUV(vec2 globalUV, ViewportData v) {
+    return (globalUV - vec2(v.posX, v.posY)) / vec2(v.sizeX, v.sizeY);
+}
+
+void main2() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy);
     ivec2 resolution = imageSize(OutputFogImage);
     if (px.x >= resolution.x || px.y >= resolution.y) return;
 
-    vec2 uv_screenspace = (vec2(px) + 0.5) / vec2(resolution);
-        
-    uint viewportIndex = texture(ViewportIndexTexture, uv_screenspace).r;
+    uint viewportIndex = ComputeViewportIndexFromSplitscreenMode(px, resolution, rendererData.splitscreenMode);
+    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView; 
 
-    mat4 projection = viewportData[viewportIndex].projection; 
-    mat4 view = viewportData[viewportIndex].view;  
-    mat4 invViewProj = inverse(projection * view);
+    ivec2 depthSize = textureSize(uDepth, 0);
+    ivec2 depthPx = ivec2((vec2(px) + 0.5) * vec2(depthSize) / vec2(resolution));
+    float depth = texelFetch(uDepth, depthPx, 0).r;
+    vec2 globalUV = (vec2(depthPx) + 0.5) / vec2(depthSize);
+    vec2 viewportUV = GlobalUVToViewportUV(globalUV, viewportData[viewportIndex]);
+    vec4 clip = vec4(viewportUV * 2.0 - 1.0, depth, 1.0);
+    vec4 worldH = inverseProjectionView * clip;
+    vec3 worldPosition = worldH.xyz / max(worldH.w, 1e-6);
+    
+    imageStore(OutputFogImage, px, vec4(worldPosition, 1.0));
+}
+
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 resolution = imageSize(OutputFogImage);
+    if (px.x >= resolution.x || px.y >= resolution.y) return;
+
+    uint viewportIndex = ComputeViewportIndexFromSplitscreenMode(px, resolution, rendererData.splitscreenMode);
+    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView; 
+    mat4 inverseProjection = viewportData[viewportIndex].inverseProjection;
+    mat4 inverseView = viewportData[viewportIndex].inverseView;
     vec3 viewPos = viewportData[viewportIndex].viewPos.xyz;
 
-    invViewProj = viewportData[viewportIndex].inverseProjectionView;
+    float u_time = 0;
 
-    float depth = texture(uDepth, uv_screenspace).r;
+    // Ray origin
+    vec3 origin = viewPos;
+
+    // Ray direction
+    vec2 globalUV = (vec2(px) + 0.5) / vec2(resolution);
+    vec2 viewportUV = GlobalUVToViewportUV(globalUV, viewportData[viewportIndex]);
+    vec4 clipFar = vec4(viewportUV * 2.0 - 1.0, 1.0, 1.0); // ZERO_TO_ONE
+    vec4 viewFarH = inverseProjection * clipFar;
+    vec3 viewFar = viewFarH.xyz / max(viewFarH.w, 0.000001);
+    vec3 dir_view = viewFarH.xyz / max(viewFarH.w, 1e-6);
+    vec3 dir = normalize(dir_view.x * inverseView[0].xyz +
+                         dir_view.y * inverseView[1].xyz +
+                         dir_view.z * inverseView[2].xyz);
+
+    // World position (reconstruction from depth)
+    ivec2 depthSize = textureSize(uDepth, 0);
+    ivec2 depthPx = ivec2((vec2(px) + 0.5) * vec2(depthSize) / vec2(resolution));
+    float depth = texelFetch(uDepth, depthPx, 0).r;
+    vec4 clip = vec4(viewportUV * 2.0 - 1.0, depth, 1.0);
+    vec4 worldH = inverseProjectionView * clip;
+    vec3 worldPosition = worldH.xyz / max(worldH.w, 1e-6);
     
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
-    //vec4 clip = vec4(uv_screenspace * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
-    // THIS WAS HOW YOU WERE DOING IT. FIND OUT FOR SURE IF THIS IS NOT ACTUALLY CORRECT
+    // Scene distance
+    float sceneDist = length(worldPosition - viewPos);
 
-    vec4 clip = vec4(uv_screenspace * 2.0 - 1.0, depth, 1.0);
-
-    if (u_isSplitscreen) {
-        if (viewportIndex == 0) {
-            clip = vec4(vec2(uv_screenspace.x * 2.0 - 1.0, ((uv_screenspace.y * 2 - 1) * 2.0 - 1.0) ), depth, 1.0);
-        }
-        if (viewportIndex == 1) {
-            clip = vec4(vec2(uv_screenspace.x * 2.0 - 1.0, ((uv_screenspace.y * 2 - 0) * 2.0 - 1.0) ), depth, 1.0);
-        }
-    }
-
-    vec4 viewH = invViewProj * clip;
-    viewH.xyz /= viewH.w;
-    vec3 origin= viewPos;
-    vec3 dir = normalize(viewH.xyz - viewPos);
-    
-    float sceneDist = length(viewH.xyz - viewPos);
-
-    float t = 0.0;
     vec3 accCol = vec3(0.0);
     float accAlpha = 0.0;
 
-    ivec3 texSize = textureSize(uNoiseVol, 0);
-    int fogTextureSize = texSize.x;
-    
     // Offset starting distance (to hide banding)
     seed = uint(px.y * resolution.x + px.x) + uint(u_noiseSeed) * uint(px.x) * uint(px.y);
     float rand = random();
@@ -113,108 +172,114 @@ void main() {
     const float xMorphSpeed = 5.0;
     const float zMorphSpeed = 5.0;
     const float yScrollSpeed = 1;
-
+    
+    int fogTextureSize = textureSize(uNoiseVol, 0).x;
     float timeScroll = fract(u_time * timeScrollSpeed / float(fogTextureSize));
     float xMorph = fract(u_time * xMorphSpeed / float(fogTextureSize));
     float zMorph = fract(u_time * zMorphSpeed / float(fogTextureSize));
     float yScroll = fract(u_time * yScrollSpeed / float(fogTextureSize));
 
-    for (int i = 0; i < NUM_STEPS + 0; ++i) {
-    float t = dt * float(i) + t0;
-
-    if (t >= sceneDist) break;
-
-    vec3 raySampleWorldPos = origin + dir * t;
+    // Misc constants
     vec3 dynamicOffset = fogSpeed * u_time;
-
     vec3 uvScale = vec3(noiseScaleXZ, noiseScaleY, noiseScaleXZ);
-    vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
+    float flashlightRadius = 10.0;
+    float flashlightStrength = 0.5;
+    float flashhlightOuterAngle = cos(radians(25.0));
 
-    vec3 nuv1 = baseUV;
-    nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
-    nuv1.z = fract(nuv1.z + zMorph + 0.1 + timeScroll);
-    nuv1.y = fract(nuv1.y + yScroll);
-    float d1 = texture(uNoiseVol, nuv1).r;
+    for (int i = 0; i < NUM_STEPS + 0; ++i) {
+        float t = dt * float(i) + t0;
 
-    vec3 nuv2 = baseUV;
-    nuv2.x = fract(nuv2.x + xMorph);
-    nuv2.z = fract(nuv2.z - zMorph);
-    nuv2.y = fract(nuv1.y - yScroll);
-    float d2 = texture(uNoiseVol, nuv2).r;
+        if (t >= sceneDist) break;
 
-    float dens = mix(d1, d2, 0.5);
-    float ext = exp(-dens * dt);
+        vec3 raySampleWorldPos = origin + dir * t;
+        vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
 
-    // Fade in the fog
-    float fadeAmbient    = clamp((t - nearFadeAmbient) / (farFadeAmbient - nearFadeAmbient), 0.0, 1.0);
-    float fadeFlashlight = clamp((t - nearFadeFlashlight) / (farFadeFlashlight - nearFadeFlashlight), 0.0, 1.0);
+        vec3 nuv1 = baseUV;
+        nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
+        nuv1.z = fract(nuv1.z + zMorph + 0.1 + timeScroll);
+        nuv1.y = fract(nuv1.y + yScroll);
+        float d1 = texture(uNoiseVol, nuv1).r;
 
-    // Ambient fog
-    vec3 ambientFogColor = vec3(dens * dt * fadeAmbient);
+        vec3 nuv2 = baseUV;
+        nuv2.x = fract(nuv2.x + xMorph);
+        nuv2.z = fract(nuv2.z - zMorph);
+        nuv2.y = fract(nuv1.y - yScroll);
+        float d2 = texture(uNoiseVol, nuv2).r;
 
-    // Flashlight term (sum 2 flashlights: player 0 and 1)
-    vec3 flashlightLightingSum = vec3(0.0);
+        //float dens = mix(d1, d2, 0.5);
+        //float ext = exp(-dens * dt);
+        
+        float dens = mix(d1, d2, 0.5);
+        dens = max(dens - u_densityBias, 0.0) * u_densityScale;  // bias cuts low fog
+        float ext = exp(-dens * dt);
 
-    for (int flashlightPlayerIndex = 0; flashlightPlayerIndex < 2; ++flashlightPlayerIndex) {
+        // Ambient fog
+        float fadeAmbient    = clamp((t - nearFadeAmbient) / (farFadeAmbient - nearFadeAmbient), 0.0, 1.0);
+        vec3 ambientFogColor = vec3(dens * dt * fadeAmbient);
+        
+        // Flashlight fog
+        float fadeFlashlight = clamp((t - nearFadeFlashlight) / (farFadeFlashlight - nearFadeFlashlight), 0.0, 1.0);
+        vec3 flashlightLightingSum = vec3(0.0);
 
-        vec3 flashlightPosition = viewportData[flashlightPlayerIndex].flashlightPosition.xyz;
-        vec3 flashLightDir      = viewportData[flashlightPlayerIndex].flashlightDir.xyz;
+        if (fadeFlashlight > 0.0) {
+            // Flashlight term (sum 2 flashlights: player 0 and 1)
 
-        // Lower for non-current player flash light
-        if (flashlightPlayerIndex != viewportIndex) {
-            flashlightPosition.y -= 0.4;
+            for (int flashlightPlayerIndex = 0; flashlightPlayerIndex < 2; ++flashlightPlayerIndex) {
+
+                vec3 flashlightPosition = viewportData[flashlightPlayerIndex].flashlightPosition.xyz;
+                vec3 flashLightDir      = viewportData[flashlightPlayerIndex].flashlightDir.xyz;
+
+                // Lower for non-current player flash light
+                if (flashlightPlayerIndex != viewportIndex) {
+                    flashlightPosition.y -= 0.4;
+                }
+
+                float flashlightModifer  = viewportData[flashlightPlayerIndex].flashlightModifer;
+
+                // experimental new flashlight colors
+                vec3 flashlightColor = GetFlashLightColor();
+
+                float innerAngle = cos(radians(5.0 * flashlightModifer));
+            
+                vec3 d = flashlightPosition - raySampleWorldPos;
+                float dist2 = dot(d, d);
+                float invDist = inversesqrt(max(dist2, 1e-12));
+                float dist = dist2 * invDist;
+                vec3 toLight = d * invDist;
+
+                // distance fall-off + strength
+                float lightAttenuation = smoothstep(flashlightRadius, 0.0, dist) * flashlightStrength;
+
+                // cone fall-off
+                float spotFactor = smoothstep(flashhlightOuterAngle, innerAngle, dot(toLight, -flashLightDir));
+
+                // extra smooth fade by distance
+                float distanceFactor = clamp(1.0 - dist / flashlightRadius, 0.0, 1.0);
+                spotFactor *= distanceFactor * distanceFactor;
+
+                vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
+
+                // Hack
+                flashlightLighting *= 0.5;
+                if (flashlightPlayerIndex != viewportIndex) {
+                    flashlightLighting *= 5;
+                }
+
+                flashlightLightingSum += flashlightLighting;
+            }
         }
 
-        float flashlightModifer  = viewportData[flashlightPlayerIndex].flashlightModifer;
-        float flashlightRadius   = 10.0;
-        float flashlightStrength = 0.5;
+        // Total in scattering at this step
+        vec3 insc = (ambientFogColor + flashlightLightingSum);
 
-        // experimental new flashlight colors
-        vec3 flashlightColor   = vec3(0.9, 0.95, 1.1);
-        vec3 defaultLightColor = vec3(1.0, 0.7799999713897705, 0.6289999842643738);
-        flashlightColor = mix(defaultLightColor, flashlightColor, 0.95);
-        flashlightColor = vec3(0.7, 0.75, 1.0);;
+        // front-to-back composite
+        accCol += (1.0 - accAlpha) * insc;
+        accAlpha += (1.0 - accAlpha) * (1.0 - ext);
 
-        float innerAngle = cos(radians(5.0 * flashlightModifer));
-        float outerAngle = cos(radians(25.0));
+        t += dt;
 
-        vec3 d = flashlightPosition - raySampleWorldPos;
-        float dist = length(d);
-        vec3 toLight = d / max(dist, 1e-6);
-
-        // distance fall-off + strength
-        float lightAttenuation = smoothstep(flashlightRadius, 0.0, dist) * flashlightStrength;
-
-        // cone fall-off
-        float spotFactor = smoothstep(outerAngle, innerAngle, dot(toLight, -flashLightDir));
-
-        // extra smooth fade by distance
-        float distanceFactor = clamp(1.0 - dist / flashlightRadius, 0.0, 1.0);
-        spotFactor *= distanceFactor * distanceFactor;
-
-        vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
-
-        // Hack
-        flashlightLighting *= 0.5;
-        if (flashlightPlayerIndex != viewportIndex) {
-            flashlightLighting *= 5;
-        }
-
-        flashlightLightingSum += flashlightLighting;
+        if (accAlpha >= 0.99) break;
     }
-
-    // Total in scattering at this step
-    float fogStrength = 0.5;
-    vec3 insc = (ambientFogColor + flashlightLightingSum) * fogStrength;
-
-    // front-to-back composite
-    accCol += (1.0 - accAlpha) * insc;
-    accAlpha += (1.0 - accAlpha) * (1.0 - ext);
-
-    t += dt;
-
-    if (accAlpha >= 0.99) break;
-}
 
     //accCol *= 0.25;
     
@@ -223,6 +288,7 @@ void main() {
 
     // Tone it down a bit
     accCol *= 0.45;
+    //accCol *= 15.45;
     
     //accCol *= 0.0;
 

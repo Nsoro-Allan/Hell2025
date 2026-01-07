@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Physics/Physics.h"
 
-void Player::CreateCharacterController(glm::vec3 position) {
+void Player::CreateCharacterController(const glm::vec3& position) {
 
     float capsuleHeight = PLAYER_CAPSULE_HEIGHT;
     capsuleHeight = m_viewHeightStanding - PLAYER_CAPSULE_RADIUS - PLAYER_CAPSULE_RADIUS;

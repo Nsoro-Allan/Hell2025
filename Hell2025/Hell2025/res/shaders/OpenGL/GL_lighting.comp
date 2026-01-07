@@ -219,7 +219,7 @@ void main() {
     mat4 inverseView = viewportData[viewportIndex].inverseView;
     mat4 viewMatrix = viewportData[viewportIndex].view;
     vec3 viewPos = inverseView[3].xyz;
-    bool playerIsInShop = bool(viewportData[viewportIndex].isInShop);
+    bool thisViewportIsInShop = bool(viewportData[viewportIndex].isInShop);
 
     // Position from depth reconstruction
     //float z = texture(DepthTexture, uv_screenspace).r;
@@ -307,8 +307,10 @@ void main() {
 
             float innerAngle = cos(radians(5.0 * flashlightModifer));
             float outerAngle = cos(radians(25.0)); 
+
+            bool thisFlashlightIsInShop = bool(viewportData[i].isInShop);
             
-            if (playerIsInShop) {
+            if (thisFlashlightIsInShop) {
                 spotLightRadius = 8;
                 outerAngle = cos(radians(50.0));
             }
@@ -335,17 +337,14 @@ void main() {
             float shadow = 0;
             
 
-            if (i == viewportIndex && playerIsInShop) {
+            // If this flashlight is in the shop AND this flashlight belongs to the current viewport
+            if (i == viewportIndex && thisFlashlightIsInShop) {
                 // do nothing
             }
             else {
                 shadow = SpotlightShadowCalculation(FragPosLightSpace, normal.xyz, spotLightDir, worldSpacePosition.xyz, spotLightPos, flashlightViewPos, FlashlighShadowMapArrayTexture, layerIndex);  
             }
             
-            if (playerIsInShop) {
-
-            }
-
             //shadow = 0;
             
             // Subsurface scattering
@@ -382,7 +381,7 @@ void main() {
 
             spotLighting *= vec3(1 - shadow);
             
-            if (!playerIsInShop) {
+            if (!thisFlashlightIsInShop) {
                 spotLighting *= cookie;
             }
 

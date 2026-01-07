@@ -305,8 +305,8 @@ namespace Bible {
         front = "T_BlackDoor_DoorWP";
         back = "T_BlackDoor_DoorWP_BACK";
 
-        front = "T_BlackDoor_DoorRE";
-        back = "T_BlackDoor_DoorRE_BACK";
+        front = "Door2_RE";
+        back = "Door2Back_RE";
 
         meshNodes.SetMaterialByMeshName("ChainLocker", metals);
         meshNodes.SetMaterialByMeshName("ChainLink1", metals);

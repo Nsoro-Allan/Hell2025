@@ -17,7 +17,7 @@ layout (binding = 5) uniform sampler2D DownsizedLightingTexture;
 layout (binding = 6) uniform sampler2D ViewSpaceDepthTexture;
 
 readonly restrict layout(std430, binding = 1) buffer rendererDataBuffer {
-	RendererData rendererData;
+    RendererData rendererData;
 };
 
 readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
@@ -25,13 +25,13 @@ readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
 };
 
 uniform float u_maxRayDistance = 10.0;
-uniform int u_minSteps = 24;            // The higher the floor, the better the result
-uniform int u_maxSteps = 100;           // The higher the upper, the better the result
+uniform int u_minSteps = 24; // The higher the floor, the better the result
+uniform int u_maxSteps = 100; // The higher the upper, the better the result
 uniform float u_thickness = 0.01;
-uniform float u_stride = 0.5;           // Lower means better quality, but more steps along the ray, aka worse performance
+uniform float u_stride = 0.5; // Lower means better quality, but more steps along the ray, aka worse performance
 
 uniform float u_ssrIntensity = 0.125;
-uniform float u_edgeFade = 0.01;        // Larger values mean more aggressive fade out
+uniform float u_edgeFade = 0.01; // Larger values mean more aggressive fade out
 uniform int u_debugMode = 0;
 
 float Hash12(vec2 p) {
@@ -42,14 +42,6 @@ float Hash12(vec2 p) {
 
 bool IsSky(vec3 n) {
     return (n.x == 0.0 && n.y == 0.0 && n.z == 0.0);
-}
-
-vec3 ReconstructViewPosFromDepth(vec2 uv, float depth01, mat4 inverseProjection) {
-    //float zNdc = depth01 * 2.0 - 1.0;
-    float zNdc = depth01; // for ZERO_TO_ONE
-    vec4 clip = vec4(uv * 2.0 - 1.0, zNdc, 1.0);
-    vec4 viewH = inverseProjection * clip;
-    return viewH.xyz / max(viewH.w, 0.000001);
 }
 
 vec3 FresnelSchlick2(float cosTheta, vec3 F0) {
@@ -70,8 +62,13 @@ vec2 ViewportUVToGlobalUV(vec2 viewportUV, ViewportData v) {
 // Atlas/global UV -> texelFetch
 float FetchViewZ_GlobalUV(vec2 globalUV, ivec2 viewZSize) {
     ivec2 p = ivec2(globalUV * vec2(viewZSize));
-    p = clamp(p, ivec2(0), viewZSize - ivec2(1));
     return texelFetch(ViewSpaceDepthTexture, p, 0).r;
+}
+
+// viewport-local UV (0..1) from atlas pixel coords
+vec2 GlobalPixelToViewportUV(ivec2 px, ViewportData v) {
+    ivec2 localPx = px - ivec2(v.xOffset, v.yOffset);
+    return (vec2(localPx) + 0.5) / vec2(float(v.width), float(v.height));
 }
 
 // Refine an intersection between [tA, tB] where dz(tA) <= 0 and dz(tB) > 0.
@@ -149,26 +146,28 @@ bool BinaryRefineHit(
 }
 
 void main() {
+    //return; // REMOVE ME!
+
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 outputSize = imageSize(LightingImage);
 
     if (pixelCoords.x >= outputSize.x || pixelCoords.y >= outputSize.y) {
         return;
     }
-    
+
     uint viewportIndex = ComputeViewportIndexFromSplitscreenMode(pixelCoords, outputSize, rendererData.splitscreenMode);
     ViewportData v = viewportData[viewportIndex];
 
     vec2 uv = (vec2(pixelCoords) + 0.5) / vec2(outputSize);
 
-    vec3 normalRaw = texture(NormalTexture, uv).xyz;
+    vec3 normalRaw = texelFetch(NormalTexture, pixelCoords, 0).xyz;
     if (IsSky(normalRaw)) {
         return;
     }
 
     vec3 N_world = normalize(normalRaw);
 
-    vec4 rma = texture(RMATexture, uv);
+    vec4 rma = texelFetch(RMATexture, pixelCoords, 0);
     float roughness = rma.r;
     float metallic  = rma.g;
     float gloss = 1 - roughness;
@@ -181,14 +180,15 @@ void main() {
     mat4 inverseView = v.inverseView;
 
     vec3 viewPosWorld = inverseView[3].xyz;
-    vec3 worldPos = texture(WorldPositionTexture, uv).rgb;
+    vec3 worldPos = texelFetch(WorldPositionTexture, pixelCoords, 0).rgb;
 
-    float viewspaceDepth =  texture(ViewSpaceDepthTexture, uv).r;
+    ivec2 viewZSize = textureSize(ViewSpaceDepthTexture, 0);
+    float viewspaceDepth = texelFetch(ViewSpaceDepthTexture, pixelCoords, 0).r;
 
     vec3 V_world = normalize(viewPosWorld - worldPos);
     vec3 R_world = normalize(reflect(-V_world, N_world));
 
-    vec3 baseColor = texture(BaseColorTexture, uv).rgb;
+    vec3 baseColor = texelFetch(BaseColorTexture, pixelCoords, 0).rgb;
     vec3 gammaBaseColor = pow(baseColor, vec3(2.2));
     vec3 F0 = mix(vec3(0.04), gammaBaseColor, metallic);
 
@@ -219,8 +219,6 @@ void main() {
 
     //float steps = mix(u_minSteps, u_maxSteps, gloss * gloss);
     int steps = int(mix(float(u_minSteps), float(u_maxSteps), gloss * gloss));
-    
-    ivec2 viewZSize = textureSize(ViewSpaceDepthTexture, 0);
 
     for (int i = 0; i < steps; ++i) {
         if (rayT > maxT) break;
@@ -297,6 +295,15 @@ void main() {
 
     float edgeW = (hit > 0.5) ? EdgeFade(hitViewportUV) : 0.0;
 
+    if (u_debugMode == 1) {
+        imageStore(LightingImage, pixelCoords, vec4(vec3(hit), 1.0));
+        return;
+    }
+    if (u_debugMode == 2) {
+        imageStore(LightingImage, pixelCoords, vec4(hitColor, 1.0));
+        return;
+    }
+
     float roughW = clamp((1.0 - roughness) * 2.5, 0.0, 1.0);
     //roughW = gloss * gloss;  // smoother falloff
     roughW = roughW * roughW;
@@ -306,19 +313,6 @@ void main() {
     // (fast, but can overbright)
     vec3 reflection = hitColor * weight * F;
     vec3 composed = base.rgb + reflection;
-
-    if (u_debugMode == 1) {
-        imageStore(LightingImage, pixelCoords, vec4(vec3(hit), 1.0));
-        return;
-    }
-    if (u_debugMode == 2) {
-        imageStore(LightingImage, pixelCoords, vec4(hitColor, 1.0));
-        return;
-    }
-    if (u_debugMode == 3) {
-        imageStore(LightingImage, pixelCoords, vec4(reflection, 1.0));
-        return;
-    }
 
     imageStore(LightingImage, pixelCoords, vec4(composed, base.a));
     //imageStore(LightingImage, pixelCoords, vec4(reflection, base.a));

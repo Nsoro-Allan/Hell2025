@@ -24,11 +24,12 @@ void main() {
     vec3 grassColor3 = vec3(175.0, 166.0, 92.0)  / 255.0; // scorched ochre
     vec3 grassColor4 = vec3(124.0, 139.0, 74.0)  / 255.0; // shadowed sage
     vec3 grassColor5 = vec3(157.0, 177.0, 118.0) / 255.0; // fading emerald memory
-    vec3 grassColor6= vec3(165.0, 167.0, 100.0) / 255.0; // sun-bleached olive
+    vec3 grassColor6 = vec3(165.0, 167.0, 100.0) / 255.0; // sun-bleached olive
     vec3 grassColor7 = vec3(183.0, 185.0, 110.0) / 255.0; // dry summer straw
     vec3 grassColor8 = vec3(142.0, 158.0, 94.0)  / 255.0; // cracked khaki earth
+    vec3 grassColor9 = vec3(175.0, 200.0, 92.0)  / 255.0; 
 
-    vec3 color = mix(grassColor2, grassColor3, noiseValue);
+    vec3 color = mix(grassColor2, grassColor9, noiseValue);
     color = mix(color, vec3(noiseSq), 0.3);
     
     BaseColorOut = vec4(color * 0.6, 1.0);

@@ -192,7 +192,7 @@ const std::string& Inventory::GetSelectedItemHeading() {
     ItemInfo* itemInfo = GetSelectedItemInfo();
     if (!itemInfo) return noItem;
 
-    return itemInfo->m_inventoryInfo.description;
+    return itemInfo->m_inventoryInfo.heading;
 }
 
 const std::string& Inventory::GetSelectedItemDescription() {

@@ -20,7 +20,7 @@
 #include "World/World.h"
 // Get me out of here
 
-void Player::Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex) {
+void Player::Init(const glm::vec3& position, const glm::vec3& rotation, int32_t viewportIndex) {
     m_playerId = UniqueID::GetNextObjectId(ObjectType::PLAYER);
 
     m_camera.SetPosition(position + glm::vec3(0.0f, m_viewHeightStanding, 0.0f));

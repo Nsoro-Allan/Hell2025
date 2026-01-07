@@ -120,18 +120,32 @@ vec3 GetMoonLightColor() {
 uint ComputeViewportIndexFromSplitscreenMode(ivec2 pixelCoords, ivec2 outputSize, int splitscreenMode) {
     int halfW = outputSize.x >> 1;
     int halfH = outputSize.y >> 1;
-
+    
     if (splitscreenMode == 0) {
         return 0u;
     }
-
+    
     uint iy = uint(pixelCoords.y < halfH);  // NOTE: flipped
     uint ix = uint(pixelCoords.x >= halfW);
-
+    
     if (splitscreenMode == 1) {
         return iy;
     }
-
-    // 4-player: 0 BL, 1 BR, 2 TL, 3 TR (if iy is flipped)
+    
+    // 4-player: 0 TL, 1 TR, 2 BL, 3 BR
     return ix + (iy << 1);
+
+    //int halfW = outputSize.x >> 1;
+    //int halfH = outputSize.y >> 1;
+    //
+    //uint ix = uint(pixelCoords.x >= halfW);
+    //uint iy = uint(pixelCoords.y <  halfH);
+    //
+    //uint idx2 = iy;
+    //uint idx4 = ix + (iy << 1);
+    //
+    //uint is2 = uint(splitscreenMode == 1);
+    //uint is4 = uint(splitscreenMode == 2);
+    //
+    //return is2 * idx2 + is4 * idx4; // fullscreen returns 0
 }

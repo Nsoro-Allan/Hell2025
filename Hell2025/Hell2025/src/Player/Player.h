@@ -11,7 +11,7 @@
 #include "Weapon/WeaponManager.h"
 
 struct Player {
-    void Init(glm::vec3 position, glm::vec3 rotation, int32_t viewportIndex);
+    void Init(const glm::vec3& position, const glm::vec3& rotation, int32_t viewportIndex);
     void BeginFrame();
     void Update(float deltaTime);
     void UpdateCharacterModelHacks();
@@ -21,7 +21,7 @@ struct Player {
     void InitRagdoll();
     void InitCharacterModel();
     void GiveDamage(int damage, uint64_t enemyId);
-    void CreateCharacterController(glm::vec3 position);
+    void CreateCharacterController(const glm::vec3& position);
     //void MoveCharacterController(glm::vec3 displacement);
     const bool IsAwaitingSpawn();
     const bool HasControl();

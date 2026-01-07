@@ -40,20 +40,15 @@ namespace OpenGLRenderer {
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* fogFbo = GetFrameBuffer("Fog");
         OpenGLTexture3D* perlinNoiseTexture = GetTexture3D("PerlinNoise");
-        OpenGLFrameBuffer* miscFullSizeFBO = GetFrameBuffer("MiscFullSize");
+        OpenGLFrameBuffer* fullSizeFBO = GetFrameBuffer("MiscFullSize");
 
-        if (!miscFullSizeFBO) return;
+        if (!fullSizeFBO) return;
         if (!rayMarchShader) return;
         if (!compositeShader) return;
         if (!gBuffer) return;
         if (!fogFbo) return;
         if (!perlinNoiseTexture) return;
 
-        // ATTENTIOMN!!! this only works for 1 player. FIX IT IMMEIDATELY!!
-        // ATTENTIOMN!!! this only works for 1 player. FIX IT IMMEIDATELY!!
-        // ATTENTIOMN!!! this only works for 1 player. FIX IT IMMEIDATELY!!
-        // ATTENTIOMN!!! this only works for 1 player. FIX IT IMMEIDATELY!!
-        
         glm::mat4 projection = viewportData[0].projection;
         glm::mat4 view = viewportData[0].view;
         glm::mat4 invViewProj = glm::inverse(projection * view);
@@ -74,7 +69,10 @@ namespace OpenGLRenderer {
         SplitscreenMode splitscreenMode = Game::GetSplitscreenMode();
         bool isSplitscreen = splitscreenMode == SplitscreenMode::TWO_PLAYER;
         rayMarchShader->SetInt("u_isSplitscreen", isSplitscreen);
-               
+
+
+        rayMarchShader->BindTextureUnit(3, fullSizeFBO->GetColorAttachmentHandleByName("ViewspaceDepth"));
+        rayMarchShader->BindTextureUnit(4, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
 
         glBindImageTexture(4, fogFbo->GetColorAttachmentHandleByName("Color"), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
 
@@ -84,9 +82,6 @@ namespace OpenGLRenderer {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_3D, perlinNoiseTexture->GetHandle());
 
-
-        glBindTextureUnit(3, miscFullSizeFBO->GetColorAttachmentHandleByName("ViewportIndex"));
-        //glBindTextureUnit(3, gBuffer->GetColorAttachmentHandleByName("WorldPosition"));
 
         glDispatchCompute((fogFbo->GetWidth() + 15) / 16, (fogFbo->GetHeight() + 15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);

@@ -227,6 +227,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_glass_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_ocean_passes.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_post_processing.cpp" />
+    <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_screenspace_reflections.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_stained_glass_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_vat_blood_pass.cpp" />
     <ClCompile Include="src\API\OpenGL\Renderer\RenderPasses\GL_weatherboards_pass.cpp" />

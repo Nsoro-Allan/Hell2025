@@ -78,6 +78,11 @@ namespace World {
     uint32_t g_worldMapChunkCountX = 0;
     uint32_t g_worldMapChunkCountZ = 0;
 
+    // HACK!
+    float g_runTime = 0.0f;
+    bool g_playersAwaitingRespawn = false;
+    // HACK!
+
     std::vector<SpawnPoint> g_fallbackSpawnPoints = {
         SpawnPoint(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0)),
         SpawnPoint(glm::vec3(1.5f, 0.0f, 2.0f), glm::vec3(-0.162, -HELL_PI * 0.5f, 0)),
@@ -436,19 +441,29 @@ namespace World {
 
         Editor::SetEditorMapName(UNDEFINED_STRING);
 
-        Update(0.0f);
-        Physics::ForceZeroStepUpdate();
-        Update(0.0f);
-        Physics::ForceZeroStepUpdate();
-        Game::RespawnPlayers();
-        Update(0.0f);
-        Physics::ForceZeroStepUpdate();
-        Update(0.0f);
-        Physics::ForceZeroStepUpdate();
+        g_runTime = 0.0f;
+        g_playersAwaitingRespawn = true;
+
+        //Update(0.0f);
+        //Physics::ForceZeroStepUpdate();
+        //Update(0.0f);
+        //Physics::ForceZeroStepUpdate();
+        //Game::RespawnPlayers();
+        //Update(0.0f);
+        //Physics::ForceZeroStepUpdate();
+        //Update(0.0f);
+        //Physics::ForceZeroStepUpdate();
     }
 
     void BeginFrame() {
-        //RemoveAnyObjectMarkedForRemoval();
+
+        // HACK!!!
+        g_runTime += Game::GetDeltaTime();
+        if (g_runTime > 0.2f && g_playersAwaitingRespawn) {
+            Game::RespawnPlayers();
+            g_playersAwaitingRespawn = false;
+        }
+        // HACK!!!
 
         for (GameObject& gameObject : g_gameObjects) {
             gameObject.BeginFrame();
@@ -460,15 +475,6 @@ namespace World {
 
     void EndFrame() {
         // Nothing as of yet
-
-        //if (Input::KeyPressed(HELL_KEY_PAGE_UP)) {
-        //    g_spawnCampaignPoints.clear();
-        //}
-        //if (Input::KeyPressed(HELL_KEY_PAGE_DOWN)) {
-        //    Player* player = Game::GetLocalPlayerByIndex(0);            
-        //    SpawnPoint spawnPoint(player->GetFootPosition(), player->GetCameraRotation());
-        //    g_spawnCampaignPoints.push_back(spawnPoint);
-        //}
     }
 
 
