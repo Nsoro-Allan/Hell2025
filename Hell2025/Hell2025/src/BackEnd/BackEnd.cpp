@@ -362,6 +362,11 @@ namespace BackEnd {
         if (Input::KeyPressed(HELL_KEY_F5)) {
             Callbacks::OpenMapObjectEditor();
         }
+        if (Input::KeyPressed(HELL_KEY_PERIOD)) {
+            Audio::PlayAudio(AUDIO_SELECT, 1.00f);
+            Renderer::GetCurrentRendererSettings().screenspaceReflections = !Renderer::GetCurrentRendererSettings().screenspaceReflections;
+        }
+
 
         if (Input::KeyPressed(HELL_KEY_K)) {
             Game::RespawnPlayers();

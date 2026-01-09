@@ -498,6 +498,7 @@ struct MeshRenderingInfo {
 struct RendererSettings {
     int depthPeelCount = 4;
     bool drawGrass = true;
+    bool screenspaceReflections = true;
     RendererOverrideState rendererOverrideState = RendererOverrideState::NONE;
 };
 

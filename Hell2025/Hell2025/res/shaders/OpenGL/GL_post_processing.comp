@@ -199,7 +199,7 @@ vec3 OG() {
 	float noiseSpeed = 15.0;
 	float x = Rand(uv + Rand(vec2(int(time * noiseSpeed), int(-time * noiseSpeed))));
 	float noiseFactor = 0.035;
-	finalColor = finalColor + (x * -noiseFactor) + (noiseFactor / 2);
+	//finalColor = finalColor + (x * -noiseFactor) + (noiseFactor / 2);
     
     // Saturation
     float saturationAmount = 1.0;

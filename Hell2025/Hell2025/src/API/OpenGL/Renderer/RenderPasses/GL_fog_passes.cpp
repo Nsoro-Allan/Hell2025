@@ -25,6 +25,9 @@ namespace OpenGLRenderer {
         
         glDispatchCompute((size + 7) / 8, (size + 7) / 8, (size + 7) / 8);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+        perlinNoiseTexture->GenerateMipmaps();
+
         Logging::Init() << "Initialized the BERLIN NOISE";
     }
 

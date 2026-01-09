@@ -1,4 +1,5 @@
-﻿
+﻿#include "types.glsl"
+
 mat4 ToMat4(vec3 position, vec3 rotation, vec3 scale) {
     // Translation matrix
     mat4 translationMatrix = mat4(1.0);
@@ -148,4 +149,22 @@ uint ComputeViewportIndexFromSplitscreenMode(ivec2 pixelCoords, ivec2 outputSize
     //uint is4 = uint(splitscreenMode == 2);
     //
     //return is2 * idx2 + is4 * idx4; // fullscreen returns 0
+}
+
+//vec2 GlobalPixelToViewportUV(ivec2 pixelCoords, vec2 viewportOffset, vec2 viewportSize) {
+//    ivec2 localPx = pixelCoords - ivec2(viewportOffset.x, viewportOffset.y);
+//    return (vec2(localPx) + 0.5) / vec2(float(viewportSize.x), float(viewportSize.y));
+//}
+
+vec2 GlobalPixelToViewportUV(ivec2 px, ViewportData v) {
+    ivec2 localPx = px - ivec2(v.xOffset, v.yOffset);
+    return (vec2(localPx) + 0.5) / vec2(float(v.width), float(v.height));
+}
+
+vec2 GlobalUVToViewportUV(vec2 globalUV, ViewportData v) {
+    return (globalUV - vec2(v.posX, v.posY)) / vec2(v.sizeX, v.sizeY);
+}
+
+vec2 ViewportUVToGlobalUV(vec2 viewportUV, ViewportData v) {
+    return vec2(v.posX, v.posY) + viewportUV * vec2(v.sizeX, v.sizeY);
 }

@@ -1,17 +1,14 @@
 #include "../GL_renderer.h"
 #include "Audio/Audio.h"
 #include "Input/Input.h"
+#include "Renderer/Renderer.h"
 
 namespace OpenGLRenderer {
     void ScreenspaceReflectionsPass() {
-        ProfilerOpenGLZoneFunction();
+        if (!Renderer::GetCurrentRendererSettings().screenspaceReflections) 
+            return;
 
-        static bool doMe = true;
-        if (Input::KeyPressed(HELL_KEY_PERIOD)) {
-            Audio::PlayAudio(AUDIO_SELECT, 1.00f);
-            doMe = !doMe;
-        }
-        if (!doMe) return;
+        ProfilerOpenGLZoneFunction();
 
         OpenGLFrameBuffer* gBuffer = GetFrameBuffer("GBuffer");
         OpenGLFrameBuffer* halfSizeFbo = GetFrameBuffer("HalfSize");

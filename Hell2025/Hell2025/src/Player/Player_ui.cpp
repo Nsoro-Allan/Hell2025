@@ -163,7 +163,15 @@ void Player::UpdateUI(float deltaTime) {
             text += "Cash: " + std::to_string(m_cash) + "\n";
             text += "Kills: " + std::to_string(m_killCount) + "\n";
 
-            
+            text += "\n";
+
+            if (Renderer::GetCurrentRendererSettings().screenspaceReflections) {
+                text += "Screenspace Reflections: ON\n";
+            }
+            else {
+                text += "Screenspace Reflections: OFF\n";
+            }
+                
             
             //if (World::GetSharks().size()) {
             //    Shark& shark = World::GetSharks()[0];

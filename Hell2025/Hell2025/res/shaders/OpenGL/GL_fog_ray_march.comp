@@ -16,29 +16,47 @@ readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer { Viewpo
 
 uniform int u_noiseSeed;
 
-//uniform float u_time;
+uniform float u_time;
 
 const vec3 fogSpeed = vec3(0.10, 0.02, 0.10);
-vec3 fogColor = vec3(0.222, 0.233, 0.260) * 0.5325 * 0.35;
+vec3 fogColor = vec3(0.222, 0.233, 0.260);// * 0.5325 * 0.35;
+float u_finalDampingFactor = 0.125;
 
-const float MAX_FOG_DIST = 20.0;      
-const int NUM_STEPS = 24;     
+const float MAX_FOG_DIST = 30.0;
+const int NUM_STEPS = 64;
 
-const float nearFadeAmbient = 1.0;
-const float farFadeAmbient = MAX_FOG_DIST;
+const float nearFadeAmbient = 0.0;
+const float farFadeAmbient = 5;
 
-const float nearFadeFlashlight = 0.05;
+const float nearFadeFlashlight = 0.025;
 const float farFadeFlashlight = 5;
 
-const float noiseScaleXZ = 1.0 / 8.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
-const float noiseScaleY = 1.0 / 4.0 * 0.5;// * 0.75; // repeat every x metres and x == (1 / y)
+const float noiseScaleXZ = 1.0 / 8.0 * 0.25;// * 0.75; // repeat every x metres and x == (1 / y)
+const float noiseScaleY = 1.0 / 6.0 * 0.25;// * 0.75; // repeat every x metres and x == (1 / y)
 
-float dt = MAX_FOG_DIST / float(NUM_STEPS); 
+float dt = MAX_FOG_DIST / float(NUM_STEPS);
 
+//float u_densityBias = 0.05;
+//float u_densityScale = 1.5;
 
-float u_densityBias = 0.05;
-float u_densityScale = 1.5;
+float u_densityBias = 0.007;
+float u_densityScale = 0.95;
 
+// Mip selection tweakables
+uniform float u_noiseMipBias = 0.0;        // start neutral
+uniform float u_noiseMipScale = 1.0;       // start neutral
+uniform float u_noiseMinMip = 0.0;         // allow full detail up close
+uniform float u_noiseMaxMip = 1.0;         // do not go too blurry or you'll see voxel grid in high mips
+
+// Distance mip ramp tweakables (sharp near, blur far)
+uniform float u_noiseMipNear = 0.0;        // sharp near camera
+uniform float u_noiseMipFar = 1.0;         // blur at distance (try 2.5..4.0)
+uniform float u_noiseMipNearDist = 0.175;   // metres (push noise away from the camera a bit)
+uniform float u_noiseMipFarDist = 5.0;    // metres (where it reaches far mip)
+uniform float u_noiseMipCurve = 5.6;       // pushes the blur transition farther out (less mush close)
+
+// How much to respect dt-driven mip (helps avoid aliasing if dt is large)
+uniform float u_noiseMipRespectDt;      // 0 = ignore dt mip, 1 = force at least dt mip
 
 // Random sampling functions
 uint seed = 0u;
@@ -56,7 +74,6 @@ float random(){
     hash();
     return float(seed)/4294967295.0;
 }
-
 
 ivec2 ViewportUVToAtlasPixel(vec2 viewportUV, ViewportData v) {
     ivec2 localPx = ivec2(viewportUV * vec2(float(v.width), float(v.height)));
@@ -86,19 +103,30 @@ vec3 ReconstructWorldPosFromDepth01_ZeroToOne(
     return worldH.xyz;
 }
 
-// viewport-local UV (0..1) from atlas pixel coords
-vec2 GlobalPixelToViewportUV(ivec2 px, ViewportData v) {
-    ivec2 localPx = px - ivec2(v.xOffset, v.yOffset);
-    return (vec2(localPx) + 0.5) / vec2(float(v.width), float(v.height));
+// Compute a mip level that matches the current step length dt to the world-space texel size of mip 0.
+// This helps prevent undersampling when NUM_STEPS is low.
+float ComputeNoiseMipFromDt(float stepLengthWorld, int baseDim, float periodXZ, float periodY) {
+    float worldTexelXZ = periodXZ / float(baseDim);
+    float worldTexelY  = periodY  / float(baseDim);
+    float worldTexel   = max(worldTexelXZ, worldTexelY);
+
+    float lod = log2(max(stepLengthWorld / max(worldTexel, 1e-6), 1e-6));
+    lod = lod * u_noiseMipScale + u_noiseMipBias;
+
+    float maxLevel = float(textureQueryLevels(uNoiseVol) - 1);
+    lod = clamp(lod, max(u_noiseMinMip, 0.0), min(u_noiseMaxMip, maxLevel));
+    return lod;
 }
 
+float ComputeNoiseMipFromDistance(float t) {
+    float k = clamp((t - u_noiseMipNearDist) / max(u_noiseMipFarDist - u_noiseMipNearDist, 1e-6), 0.0, 1.0);
+    k = pow(k, max(u_noiseMipCurve, 1e-6));
+    float lod = mix(u_noiseMipNear, u_noiseMipFar, k);
 
-vec2 ViewportUVToGlobalUV(vec2 viewportUV, ViewportData v) {
-    return vec2(v.posX, v.posY) + viewportUV * vec2(v.sizeX, v.sizeY);
-}
-
-vec2 GlobalUVToViewportUV(vec2 globalUV, ViewportData v) {
-    return (globalUV - vec2(v.posX, v.posY)) / vec2(v.sizeX, v.sizeY);
+    float maxLevel = float(textureQueryLevels(uNoiseVol) - 1);
+    lod = lod * u_noiseMipScale + u_noiseMipBias;
+    lod = clamp(lod, max(u_noiseMinMip, 0.0), min(u_noiseMaxMip, maxLevel));
+    return lod;
 }
 
 void main2() {
@@ -107,7 +135,7 @@ void main2() {
     if (px.x >= resolution.x || px.y >= resolution.y) return;
 
     uint viewportIndex = ComputeViewportIndexFromSplitscreenMode(px, resolution, rendererData.splitscreenMode);
-    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView; 
+    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView;
 
     ivec2 depthSize = textureSize(uDepth, 0);
     ivec2 depthPx = ivec2((vec2(px) + 0.5) * vec2(depthSize) / vec2(resolution));
@@ -117,10 +145,9 @@ void main2() {
     vec4 clip = vec4(viewportUV * 2.0 - 1.0, depth, 1.0);
     vec4 worldH = inverseProjectionView * clip;
     vec3 worldPosition = worldH.xyz / max(worldH.w, 1e-6);
-    
+
     imageStore(OutputFogImage, px, vec4(worldPosition, 1.0));
 }
-
 
 void main() {
     ivec2 px = ivec2(gl_GlobalInvocationID.xy);
@@ -128,12 +155,12 @@ void main() {
     if (px.x >= resolution.x || px.y >= resolution.y) return;
 
     uint viewportIndex = ComputeViewportIndexFromSplitscreenMode(px, resolution, rendererData.splitscreenMode);
-    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView; 
+    mat4 inverseProjectionView = viewportData[viewportIndex].inverseProjectionView;
     mat4 inverseProjection = viewportData[viewportIndex].inverseProjection;
     mat4 inverseView = viewportData[viewportIndex].inverseView;
     vec3 viewPos = viewportData[viewportIndex].viewPos.xyz;
 
-    float u_time = 0;
+    //float u_time = 0;
 
     // Ray origin
     vec3 origin = viewPos;
@@ -156,9 +183,12 @@ void main() {
     vec4 clip = vec4(viewportUV * 2.0 - 1.0, depth, 1.0);
     vec4 worldH = inverseProjectionView * clip;
     vec3 worldPosition = worldH.xyz / max(worldH.w, 1e-6);
-    
+
     // Scene distance
-    float sceneDist = length(worldPosition - viewPos);
+    //float sceneDist = length(worldPosition - viewPos);
+    float sceneDist = dot(worldPosition - origin, dir);
+    sceneDist = max(sceneDist, 0.0);
+    sceneDist = min(sceneDist, MAX_FOG_DIST);
 
     vec3 accCol = vec3(0.0);
     float accAlpha = 0.0;
@@ -167,12 +197,12 @@ void main() {
     seed = uint(px.y * resolution.x + px.x) + uint(u_noiseSeed) * uint(px.x) * uint(px.y);
     float rand = random();
     float t0 = rand * dt;
-    
+
     const float timeScrollSpeed = 2;
     const float xMorphSpeed = 5.0;
     const float zMorphSpeed = 5.0;
     const float yScrollSpeed = 1;
-    
+
     int fogTextureSize = textureSize(uNoiseVol, 0).x;
     float timeScroll = fract(u_time * timeScrollSpeed / float(fogTextureSize));
     float xMorph = fract(u_time * xMorphSpeed / float(fogTextureSize));
@@ -186,10 +216,21 @@ void main() {
     float flashlightStrength = 0.5;
     float flashhlightOuterAngle = cos(radians(25.0));
 
+    // Precompute dt-based mip (constant for the whole ray)
+    float noisePeriodXZ = 1.0 / noiseScaleXZ;
+    float noisePeriodY  = 1.0 / noiseScaleY;
+    float noiseMipFromDt = ComputeNoiseMipFromDt(dt, fogTextureSize, noisePeriodXZ, noisePeriodY);
+
     for (int i = 0; i < NUM_STEPS + 0; ++i) {
         float t = dt * float(i) + t0;
 
         if (t >= sceneDist) break;
+
+        // Distance-based mip: sharp near camera, blur far away
+        float noiseMipFromDistance = ComputeNoiseMipFromDistance(t);
+
+        // Optionally enforce at least the dt-driven mip to avoid aliasing
+        float noiseMip = mix(noiseMipFromDistance, max(noiseMipFromDistance, noiseMipFromDt), clamp(u_noiseMipRespectDt, 0.0, 1.0));
 
         vec3 raySampleWorldPos = origin + dir * t;
         vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
@@ -198,25 +239,26 @@ void main() {
         nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
         nuv1.z = fract(nuv1.z + zMorph + 0.1 + timeScroll);
         nuv1.y = fract(nuv1.y + yScroll);
-        float d1 = texture(uNoiseVol, nuv1).r;
+        float d1 = textureLod(uNoiseVol, nuv1, noiseMip).r;
 
         vec3 nuv2 = baseUV;
         nuv2.x = fract(nuv2.x + xMorph);
         nuv2.z = fract(nuv2.z - zMorph);
-        nuv2.y = fract(nuv1.y - yScroll);
-        float d2 = texture(uNoiseVol, nuv2).r;
+        //nuv2.y = fract(nuv1.y - yScroll);
+        nuv2.y = fract(baseUV.y - yScroll);
+        float d2 = textureLod(uNoiseVol, nuv2, noiseMip).r;
 
         //float dens = mix(d1, d2, 0.5);
         //float ext = exp(-dens * dt);
-        
+
         float dens = mix(d1, d2, 0.5);
         dens = max(dens - u_densityBias, 0.0) * u_densityScale;  // bias cuts low fog
         float ext = exp(-dens * dt);
 
         // Ambient fog
         float fadeAmbient    = clamp((t - nearFadeAmbient) / (farFadeAmbient - nearFadeAmbient), 0.0, 1.0);
-        vec3 ambientFogColor = vec3(dens * dt * fadeAmbient);
-        
+        vec3 ambientFogColor = vec3(fadeAmbient);
+
         // Flashlight fog
         float fadeFlashlight = clamp((t - nearFadeFlashlight) / (farFadeFlashlight - nearFadeFlashlight), 0.0, 1.0);
         vec3 flashlightLightingSum = vec3(0.0);
@@ -240,7 +282,7 @@ void main() {
                 vec3 flashlightColor = GetFlashLightColor();
 
                 float innerAngle = cos(radians(5.0 * flashlightModifer));
-            
+
                 vec3 d = flashlightPosition - raySampleWorldPos;
                 float dist2 = dot(d, d);
                 float invDist = inversesqrt(max(dist2, 1e-12));
@@ -260,9 +302,9 @@ void main() {
                 vec3 flashlightLighting = spotFactor * lightAttenuation * fadeFlashlight * flashlightModifer * flashlightColor;
 
                 // Hack
-                flashlightLighting *= 0.5;
+                flashlightLighting *= 0.75;
                 if (flashlightPlayerIndex != viewportIndex) {
-                    flashlightLighting *= 5;
+                    flashlightLighting *= 20;
                 }
 
                 flashlightLightingSum += flashlightLighting;
@@ -270,10 +312,17 @@ void main() {
         }
 
         // Total in scattering at this step
-        vec3 insc = (ambientFogColor + flashlightLightingSum);
+        //vec3 insc = (ambientFogColor + flashlightLightingSum);
+        //
+        //// front-to-back composite
+        //accCol += (1.0 - accAlpha) * insc;
+        //accAlpha += (1.0 - accAlpha) * (1.0 - ext);
+
+        // Total in scattering at this step
+        vec3 stepScatter = (ambientFogColor + flashlightLightingSum) * (1.0 - ext);
 
         // front-to-back composite
-        accCol += (1.0 - accAlpha) * insc;
+        accCol += (1.0 - accAlpha) * stepScatter;
         accAlpha += (1.0 - accAlpha) * (1.0 - ext);
 
         t += dt;
@@ -282,18 +331,18 @@ void main() {
     }
 
     //accCol *= 0.25;
-    
+
     // Factor in fog color
     accCol *= fogColor;
 
     // Tone it down a bit
-    accCol *= 0.45;
+    //accCol *= 0.45;
     //accCol *= 15.45;
-    
-    //accCol *= 0.0;
+
+    accCol *= u_finalDampingFactor;
 
     //accCol *= 20;
-    
+
     // Store it
     imageStore(OutputFogImage, px, vec4(accCol, accAlpha));
 }

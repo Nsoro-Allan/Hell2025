@@ -4,15 +4,50 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_set>
+#include <algorithm>
 #include "BackEnd/BackEnd.h"
 
-void ParseFile(const std::string& filepath, std::string& outputString, std::vector<std::string>& lineToFile, std::vector<std::string>& includedPaths);
+struct ShaderParseContext {
+    std::unordered_set<std::string> includedPaths;
+    bool versionInserted = false;
+    bool rootVersionSeen = false;
+};
+
+static void ParseFile(const std::string& filepath, std::string& outputString, std::vector<std::string>& lineToFile, ShaderParseContext& context, const std::string& rootFilepath);
 int GetErrorLineNumber(const std::string& error);
 std::string GetErrorMessage(const std::string& line);
 std::string GetLinkingErrors(unsigned int shader);
 std::string GetShaderCompileErrors(unsigned int shader, const std::string& filename, const std::vector<std::string>& lineToFile);
 //std::string StripBOM(const std::string& source);
 void StripUTF8BOMFromLine(std::string& line);
+
+static std::string LTrimCopy(const std::string& s) {
+    size_t i = 0;
+    while (i < s.size() && (s[i] == ' ' || s[i] == '\t' || s[i] == '\r')) {
+        i++;
+    }
+    return s.substr(i);
+}
+
+static bool StartsWith(const std::string& s, const char* prefix) {
+    const size_t n = std::char_traits<char>::length(prefix);
+    if (s.size() < n) return false;
+    return s.compare(0, n, prefix) == 0;
+}
+
+static bool TryParseInclude(const std::string& line, std::string& outIncludeFile) {
+    std::string trimmed = LTrimCopy(line);
+    if (!StartsWith(trimmed, "#include")) {
+        return false;
+    }
+    size_t firstQuote = trimmed.find('"');
+    if (firstQuote == std::string::npos) return false;
+    size_t secondQuote = trimmed.find('"', firstQuote + 1);
+    if (secondQuote == std::string::npos) return false;
+    outIncludeFile = trimmed.substr(firstQuote + 1, secondQuote - firstQuote - 1);
+    return !outIncludeFile.empty();
+}
 
 OpenGLShader::OpenGLShader(std::vector<std::string> shaderPaths) {
     m_shaderPaths = shaderPaths;
@@ -227,15 +262,15 @@ int OpenGLShader::GetHandle() {
 OpenGLShaderModule::OpenGLShaderModule(const std::string& filename) {
     // Parse the source code
     std::vector<std::string> lineMap;
-    std::vector<std::string> includedPaths;
     std::string prasedShaderSource = "";
-    ParseFile("res/shaders/OpenGL/" + filename, prasedShaderSource, lineMap, includedPaths);
+    ShaderParseContext context;
+    ParseFile("res/shaders/OpenGL/" + filename, prasedShaderSource, lineMap, context, "res/shaders/OpenGL/" + filename);
 
     // Strip any BOM characters. Apparently older drivers don't handle BOM bytes properly when compiling GLSL shaders
     //prasedShaderSource = StripBOM(prasedShaderSource);
 
     // Get type based on extension
-    std::string extension = std::filesystem::path(filename).extension().string(); 
+    std::string extension = std::filesystem::path(filename).extension().string();
     static const std::unordered_map<std::string, int> shaderTypeMap = {
         {".vert", GL_VERTEX_SHADER},
         {".frag", GL_FRAGMENT_SHADER},
@@ -253,6 +288,9 @@ OpenGLShaderModule::OpenGLShaderModule(const std::string& filename) {
     glCompileShader(m_handle);
     m_errors = GetShaderCompileErrors(m_handle, filename, lineMap);
     m_filename = filename;
+
+    // Keep the line map (your GetLineMap() currently returned an uninitialized member)
+    m_lineMap = lineMap;
 }
 
 int OpenGLShaderModule::GetHandle() {
@@ -275,14 +313,20 @@ std::vector<std::string>& OpenGLShaderModule::GetLineMap() {
     return m_lineMap;
 }
 
-void ParseFile(const std::string& filepath, std::string& outputString, std::vector<std::string>& lineToFile, std::vector<std::string>& includedPaths) {
+static void ParseFile(const std::string& filepath, std::string& outputString, std::vector<std::string>& lineToFile, ShaderParseContext& context, const std::string& rootFilepath) {
     std::string baseDir = std::filesystem::path(filepath).parent_path().string();
     std::string filename = std::filesystem::path(filepath).filename().string();
     std::ifstream file(filepath);
     std::string line;
-    bool versionInserted = false; 
     bool firstLineOfThisFile = true;
-    int lineNumber = 0;
+    int fileLineNumber = 1;
+
+    if (!file.is_open()) {
+        std::cout << "\n-------------------------------------------------------------------------\n\n";
+        std::cout << " SHADER PARSE ERROR: failed to open file: " << filepath << "\n";
+        std::cout << "-------------------------------------------------------------------------\n";
+        return;
+    }
 
     while (std::getline(file, line)) {
         // Strip BOM chars
@@ -292,28 +336,44 @@ void ParseFile(const std::string& filepath, std::string& outputString, std::vect
         }
 
         // Handle includes
-        if (line.find("#include") != std::string::npos) {
-            size_t start = line.find("\"") + 1;
-            size_t end = line.find("\"", start);
-            std::string includeFile = line.substr(start, end - start);
+        std::string includeFile;
+        if (TryParseInclude(line, includeFile)) {
             std::string includePath = std::filesystem::weakly_canonical(baseDir + "/" + includeFile).string();
-            // Check if the included file is already in includedPaths
-            if (std::find(includedPaths.begin(), includedPaths.end(), includePath) == includedPaths.end()) {
-                includedPaths.push_back(includePath);
-                ParseFile(includePath, outputString, lineToFile, includedPaths);
-            }
-        }
-        else {
-            outputString += line + "\n";
-            lineToFile.emplace_back(filename + " (line " + std::to_string(lineNumber++) + ")");
 
-            // Insert the define after the first #version directive
-            if (BackEnd::RenderDocFound() && !versionInserted && line.rfind("#version", 0) == 0) {
-                outputString += "#define ENABLE_BINDLESS 0\n";
-                lineToFile.emplace_back(filename + " (line " + std::to_string(lineNumber++) + ")");
-                versionInserted = true;
+            // Check if the included file is already in includedPaths
+            if (context.includedPaths.insert(includePath).second) {
+                ParseFile(includePath, outputString, lineToFile, context, rootFilepath);
             }
+
+            fileLineNumber++;
+            continue;
         }
+
+        // Protect the output from accidental #version in includes.
+        // (This is the "version thing": previously versionInserted was per-file, and accidental include versions could duplicate logic.)
+        std::string trimmed = LTrimCopy(line);
+        if (StartsWith(trimmed, "#version")) {
+            if (filepath != rootFilepath) {
+                std::cout << "\n-------------------------------------------------------------------------\n\n";
+                std::cout << " SHADER PARSE WARNING: #version found in an included file, skipping it: " << filepath << " (line " << fileLineNumber << ")\n";
+                std::cout << "-------------------------------------------------------------------------\n";
+                fileLineNumber++;
+                continue;
+            }
+            context.rootVersionSeen = true;
+        }
+
+        outputString += line + "\n";
+        lineToFile.emplace_back(filename + " (line " + std::to_string(fileLineNumber) + ")");
+
+        // Insert the define after the first #version directive
+        if (BackEnd::RenderDocFound() && !context.versionInserted && StartsWith(trimmed, "#version")) {
+            outputString += "#define ENABLE_BINDLESS 0\n";
+            lineToFile.emplace_back(filename + " (line " + std::to_string(fileLineNumber) + ")");
+            context.versionInserted = true;
+        }
+
+        fileLineNumber++;
     }
 }
 
@@ -330,7 +390,7 @@ std::string GetShaderCompileErrors(unsigned int shader, const std::string& /*fil
         while (std::getline(logStream, line)) {
             if ((line.substr(0, 7) == "ERROR: ")) {
                 int lineNumber = GetErrorLineNumber(line);
-                if (lineNumber >= 0 && lineNumber < lineToFile.size()) {
+                if (lineNumber >= 0 && lineNumber < (int)lineToFile.size()) {
                     result += "  " + lineToFile[lineNumber] + ": " + GetErrorMessage(line) + "\n";
                 }
             }
