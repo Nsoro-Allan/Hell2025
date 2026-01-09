@@ -19,44 +19,55 @@ uniform int u_noiseSeed;
 uniform float u_time;
 
 const vec3 fogSpeed = vec3(0.10, 0.02, 0.10);
-vec3 fogColor = vec3(0.222, 0.233, 0.260);// * 0.5325 * 0.35;
-float u_finalDampingFactor = 0.125;
+float u_finalDampingFactor = 0.02;
 
 const float MAX_FOG_DIST = 30.0;
-const int NUM_STEPS = 64;
+const int NUM_STEPS = 48;
 
-const float nearFadeAmbient = 0.0;
+const float nearFadeAmbient = 1.0;
 const float farFadeAmbient = 5;
 
 const float nearFadeFlashlight = 0.025;
 const float farFadeFlashlight = 5;
 
-const float noiseScaleXZ = 1.0 / 8.0 * 0.25;// * 0.75; // repeat every x metres and x == (1 / y)
-const float noiseScaleY = 1.0 / 6.0 * 0.25;// * 0.75; // repeat every x metres and x == (1 / y)
+const float noiseScaleXZ = 1.0 / 8.0 * 0.75;// * 0.75; // repeat every x metres and x == (1 / y)
+const float noiseScaleY = 1.0 / 6.0 * 0.75;// * 0.75; // repeat every x metres and x == (1 / y)
 
 float dt = MAX_FOG_DIST / float(NUM_STEPS);
 
 //float u_densityBias = 0.05;
 //float u_densityScale = 1.5;
 
-float u_densityBias = 0.007;
-float u_densityScale = 0.95;
+float u_densityBias = 0.005;
+float u_densityScale = 1.250;
 
 // Mip selection tweakables
 uniform float u_noiseMipBias = 0.0;        // start neutral
 uniform float u_noiseMipScale = 1.0;       // start neutral
 uniform float u_noiseMinMip = 0.0;         // allow full detail up close
-uniform float u_noiseMaxMip = 1.0;         // do not go too blurry or you'll see voxel grid in high mips
+uniform float u_noiseMaxMip = 2.0;         // do not go too blurry voxel grid in high mips appears
 
 // Distance mip ramp tweakables (sharp near, blur far)
 uniform float u_noiseMipNear = 0.0;        // sharp near camera
-uniform float u_noiseMipFar = 1.0;         // blur at distance (try 2.5..4.0)
-uniform float u_noiseMipNearDist = 0.175;   // metres (push noise away from the camera a bit)
+uniform float u_noiseMipFar = 2.0;         // blur at distance (try 2.5..4.0)
+uniform float u_noiseMipNearDist = 1.175;   // metres (push noise away from the camera a bit)
 uniform float u_noiseMipFarDist = 5.0;    // metres (where it reaches far mip)
 uniform float u_noiseMipCurve = 5.6;       // pushes the blur transition farther out (less mush close)
 
+// fog speeds
+const float timeScrollSpeed = 4 * 1.1;
+const float xMorphSpeed = 5.0 * 1.1;
+const float zMorphSpeed = 5.0 * 1.1;
+const float yScrollSpeed = 2 * 1.1;
+
 // How much to respect dt-driven mip (helps avoid aliasing if dt is large)
 uniform float u_noiseMipRespectDt;      // 0 = ignore dt mip, 1 = force at least dt mip
+
+uniform float u_noiseScaleNearMult = 1.0;
+uniform float u_noiseScaleFarMult = 1.0;
+uniform float u_noiseScaleStartDist = 6.0;
+uniform float u_noiseScaleEndDist = 22.0;
+uniform float u_noiseScaleCurve = 2.0;
 
 // Random sampling functions
 uint seed = 0u;
@@ -129,6 +140,12 @@ float ComputeNoiseMipFromDistance(float t) {
     return lod;
 }
 
+float ComputeNoiseScaleMultiplier(float t) {
+    float k = clamp((t - u_noiseScaleStartDist) / max(u_noiseScaleEndDist - u_noiseScaleStartDist, 1e-6), 0.0, 1.0);
+    k = pow(k, max(u_noiseScaleCurve, 1e-6));
+    return mix(u_noiseScaleNearMult, u_noiseScaleFarMult, k);
+}
+
 void main2() {
     ivec2 px = ivec2(gl_GlobalInvocationID.xy);
     ivec2 resolution = imageSize(OutputFogImage);
@@ -168,13 +185,7 @@ void main() {
     // Ray direction
     vec2 globalUV = (vec2(px) + 0.5) / vec2(resolution);
     vec2 viewportUV = GlobalUVToViewportUV(globalUV, viewportData[viewportIndex]);
-    vec4 clipFar = vec4(viewportUV * 2.0 - 1.0, 1.0, 1.0); // ZERO_TO_ONE
-    vec4 viewFarH = inverseProjection * clipFar;
-    vec3 viewFar = viewFarH.xyz / max(viewFarH.w, 0.000001);
-    vec3 dir_view = viewFarH.xyz / max(viewFarH.w, 1e-6);
-    vec3 dir = normalize(dir_view.x * inverseView[0].xyz +
-                         dir_view.y * inverseView[1].xyz +
-                         dir_view.z * inverseView[2].xyz);
+    vec3 dir = RayDirectionFromViewportUV(viewportUV, inverseProjection, inverseView);
 
     // World position (reconstruction from depth)
     ivec2 depthSize = textureSize(uDepth, 0);
@@ -197,11 +208,6 @@ void main() {
     seed = uint(px.y * resolution.x + px.x) + uint(u_noiseSeed) * uint(px.x) * uint(px.y);
     float rand = random();
     float t0 = rand * dt;
-
-    const float timeScrollSpeed = 2;
-    const float xMorphSpeed = 5.0;
-    const float zMorphSpeed = 5.0;
-    const float yScrollSpeed = 1;
 
     int fogTextureSize = textureSize(uNoiseVol, 0).x;
     float timeScroll = fract(u_time * timeScrollSpeed / float(fogTextureSize));
@@ -232,8 +238,16 @@ void main() {
         // Optionally enforce at least the dt-driven mip to avoid aliasing
         float noiseMip = mix(noiseMipFromDistance, max(noiseMipFromDistance, noiseMipFromDt), clamp(u_noiseMipRespectDt, 0.0, 1.0));
 
+        float noiseScaleMult = ComputeNoiseScaleMultiplier(t);
+        vec3 uvScaleDynamic = uvScale / max(noiseScaleMult, 1e-6);
+
+        float scaleMipBias = -log2(max(noiseScaleMult, 1e-6));
+        noiseMip += scaleMipBias;
+        float maxLevel2 = float(textureQueryLevels(uNoiseVol) - 1);
+        noiseMip = clamp(noiseMip, max(u_noiseMinMip, 0.0), min(u_noiseMaxMip, maxLevel2));
+
         vec3 raySampleWorldPos = origin + dir * t;
-        vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScale);
+        vec3 baseUV = fract((raySampleWorldPos + dynamicOffset) * uvScaleDynamic);
 
         vec3 nuv1 = baseUV;
         nuv1.x = fract(nuv1.x - xMorph + 0.1 + timeScroll);
@@ -304,7 +318,7 @@ void main() {
                 // Hack
                 flashlightLighting *= 0.75;
                 if (flashlightPlayerIndex != viewportIndex) {
-                    flashlightLighting *= 20;
+                    flashlightLighting *= 50;
                 }
 
                 flashlightLightingSum += flashlightLighting;
@@ -333,7 +347,7 @@ void main() {
     //accCol *= 0.25;
 
     // Factor in fog color
-    accCol *= fogColor;
+    accCol *= FOG_COLOR;
 
     // Tone it down a bit
     //accCol *= 0.45;

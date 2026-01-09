@@ -436,8 +436,8 @@ namespace OpenGLRenderer {
         HeightMapPass();
         DecalPaintingPass();
         HouseGeometryPass();
-        GrassPass();
         GeometryPass();
+        GrassPass();
         MirrorGeometryPass();
         WeatherBoardsPass();
         VatBloodPass();

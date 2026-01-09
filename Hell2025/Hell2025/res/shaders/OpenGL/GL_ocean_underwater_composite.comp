@@ -40,14 +40,10 @@ void main() {
     float underwaterMask = texture(UnderwaterMaskTexture, uv_screenspace).r;
 
     // Non water
-    if (underwaterMask == 0.0) {
-        return;
-    }
+    if (underwaterMask < 0.001) return;
 
     // Ocean surface
-    if (underwaterMask > 0.75) {
-        return;
-    }
+    if (underwaterMask > 0.75) return;
 
 
     vec3 waterColor = texture(WaterColorTexture, uv_screenspace).rgb;

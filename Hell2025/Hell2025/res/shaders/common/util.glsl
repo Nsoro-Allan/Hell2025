@@ -168,3 +168,11 @@ vec2 GlobalUVToViewportUV(vec2 globalUV, ViewportData v) {
 vec2 ViewportUVToGlobalUV(vec2 viewportUV, ViewportData v) {
     return vec2(v.posX, v.posY) + viewportUV * vec2(v.sizeX, v.sizeY);
 }
+
+vec3 RayDirectionFromViewportUV(vec2 viewportUV, mat4 inverseProjection, mat4 inverseView) {
+    vec4 clipFar = vec4(viewportUV * 2.0 - 1.0, 1.0, 1.0); // ZERO_TO_ONE
+    vec4 viewFarH = inverseProjection * clipFar;
+    vec3 viewFar = viewFarH.xyz / max(viewFarH.w, 0.000001);
+    vec3 dir_view = viewFarH.xyz / max(viewFarH.w, 1e-6);
+    return normalize(dir_view.x * inverseView[0].xyz + dir_view.y * inverseView[1].xyz + dir_view.z * inverseView[2].xyz);
+}

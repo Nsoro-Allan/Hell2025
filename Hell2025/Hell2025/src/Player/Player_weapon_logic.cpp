@@ -107,16 +107,16 @@ void Player::GiveDefaultLoadout() {
 
     // Dev load out
     m_inventory.GiveWeapon("Glock");
-    m_inventory.GiveWeapon("GoldenGlock");
-    m_inventory.GiveWeapon("Tokarev");
-    m_inventory.GiveWeapon("Remington870");
-    m_inventory.GiveWeapon("SPAS");
-    m_inventory.GiveWeapon("AKS74U");
+    //m_inventory.GiveWeapon("GoldenGlock");
+    //m_inventory.GiveWeapon("Tokarev");
+    //m_inventory.GiveWeapon("Remington870");
+    //m_inventory.GiveWeapon("SPAS");
+    //m_inventory.GiveWeapon("AKS74U");
 
-    m_inventory.GiveAmmo("12GaugeBuckShot", 80);
-    m_inventory.GiveAmmo("Glock", 200);
-    m_inventory.GiveAmmo("Tokarev", 200);
-    m_inventory.GiveAmmo("AKS74U", 200);
+    //m_inventory.GiveAmmo("12GaugeBuckShot", 80);
+    //m_inventory.GiveAmmo("Glock", 200);
+    //m_inventory.GiveAmmo("Tokarev", 200);
+    //m_inventory.GiveAmmo("AKS74U", 200);
 
     //m_inventory.AddInventoryItem("BlackSkull");
     //m_inventory.AddInventoryItem("SmallKey");

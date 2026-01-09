@@ -269,6 +269,7 @@ namespace RenderDataManager {
                 for (const RenderItem& renderItem : g_renderItems) {
                     if (renderItem.castCSMShadows && frustum.IntersectsAABBFast(renderItem)) {
                         g_instanceData.push_back(renderItem);
+                        //Renderer::DrawAABB(AABB(renderItem.aabbMin, renderItem.aabbMax), YELLOW);
                     }
                 }
 

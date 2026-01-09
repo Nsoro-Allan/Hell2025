@@ -24,9 +24,9 @@ readonly restrict layout(std430, binding = 2) buffer viewportDataBuffer {
     ViewportData viewportData[];
 };
 
-uniform float u_maxRayDistance = 10.0;
+uniform float u_maxRayDistance = 8.0;
 uniform int u_minSteps = 24; // The higher the floor, the better the result
-uniform int u_maxSteps = 100; // The higher the upper, the better the result
+uniform int u_maxSteps = 50; // The higher the upper, the better the result
 uniform float u_thickness = 0.01;
 uniform float u_stride = 0.5; // Lower means better quality, but more steps along the ray, aka worse performance
 
