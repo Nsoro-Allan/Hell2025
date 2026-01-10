@@ -8,37 +8,47 @@ layout(rgba16f, binding = 0) uniform image2D lightingImage;
 layout(binding = 1) uniform sampler2D fogTexture;
 
 readonly restrict layout(std430, binding = 1) buffer rendererDataBuffer {
-	RendererData rendererData;
+    RendererData rendererData;
 };
+
+// 0..1 hash, decent for dithering tests (not true blue noise but might be enough to kill banding)
+float InterleavedGradientNoise(vec2 p) {
+    return fract(52.9829189 * fract(dot(p, vec2(0.06711056, 0.00583715))));
+}
+
+// zero-mean triangular-ish noise in [-1, 1]
+float DitherTri(ivec2 px) {
+    float a = InterleavedGradientNoise(vec2(px));
+    float b = InterleavedGradientNoise(vec2(px) + vec2(17.0, 9.0));
+    return (a + b) - 1.0;
+}
 
 void main() {
 
-   if (rendererData.rendererOverrideState == 4) {
+    if (rendererData.rendererOverrideState == 4) {
         return;
-   }
-    //return;
+    }
 
-	ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);   
+    ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 resolution = imageSize(lightingImage);
-    ivec2 fogTextureSize = textureSize(fogTexture, 0);
 
-    // Don't process out of bounds pixels
     if (pixelCoords.x >= resolution.x || pixelCoords.y >= resolution.y) {
         return;
-    }    
-    
+    }
+
     vec2 uv_screenspace = (vec2(pixelCoords) + 0.5) / vec2(resolution);
- 
+
     vec4 fogColor = texture(fogTexture, uv_screenspace);
     vec4 lightingColor = imageLoad(lightingImage, pixelCoords);
 
     // Composite
-    //vec3 outRGB = lightingColor.rgb * (1.0 - fogColor.a) + fogColor.rgb;
     vec3 outRGB = mix(lightingColor.rgb, fogColor.rgb + lightingColor.rgb * fogColor.a, fogColor.a);
+
+    // Dither test hack: add tiny noise after composite
+    // Start with 1/255.0, try 2/255, 4/255 if you need more.
+    //float ditherStrength = 2.0 / 255.0;
+    //outRGB += DitherTri(pixelCoords) * ditherStrength; // DOES NOT WORK
+
     vec4 finalColor = vec4(outRGB, lightingColor.a);
-
-    //finalColor = lightingColor;
-    //finalColor = fogColor;
-
     imageStore(lightingImage, pixelCoords, finalColor);
 }

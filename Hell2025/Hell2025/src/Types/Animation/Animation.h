@@ -35,6 +35,8 @@ struct Animation {
     float GetTicksPerSecond();
     const std::string& GetName();
 
+    void PrintNodeNames();
+
 private:
     FileInfo m_fileInfo;
     LoadingState m_loadingState { LoadingState::Value::AWAITING_LOADING_FROM_DISK };

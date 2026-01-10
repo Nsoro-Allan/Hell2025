@@ -24,3 +24,10 @@ void Animation::SetLoadingState(LoadingState loadingState) {
 const std::string& Animation::GetName() {
     return m_fileInfo.name;
 }
+
+void Animation::PrintNodeNames() {
+    std::cout << m_fileInfo.name << "\n";
+    for (AnimatedNode& node : m_animatedNodes) {
+        std::cout << " - " << node.m_nodeName << "\n";
+    }
+}

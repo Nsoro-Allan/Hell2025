@@ -335,6 +335,11 @@ void main() {
         // Total in scattering at this step
         vec3 stepScatter = (ambientFogColor + flashlightLightingSum) * (1.0 - ext);
 
+        float oceanOriginY = 30.0;
+        if (raySampleWorldPos.y < oceanOriginY) {
+            stepScatter *= 3.0;
+        }
+
         // front-to-back composite
         accCol += (1.0 - accAlpha) * stepScatter;
         accAlpha += (1.0 - accAlpha) * (1.0 - ext);
