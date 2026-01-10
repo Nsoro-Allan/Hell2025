@@ -238,6 +238,16 @@ namespace Audio {
         return (g_playingAudio.find(audioId) != g_playingAudio.end());
     }
 
+    bool AudioIsPlaying(const std::string& filename) {
+        for (auto& [key, val] : g_playingAudio) {
+            AudioHandle& handle = val;
+            if (handle.filename == filename) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void FadeOut(uint64_t audioId, float duration) {
         if (!AudioIsPlaying(audioId)) return;
 

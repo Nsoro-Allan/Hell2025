@@ -260,6 +260,31 @@ namespace Game {
         Audio::PlayAudio(indoorFootstepFilenames[random], 0.5f);
     }
 
+    void PlayFleshImpactAudio() {
+        const std::vector<std::string> filenames = {
+                "FLY_Bullet_Impact_Flesh_00.wav",
+                "FLY_Bullet_Impact_Flesh_01.wav",
+                "FLY_Bullet_Impact_Flesh_02.wav",
+                "FLY_Bullet_Impact_Flesh_03.wav",
+                "FLY_Bullet_Impact_Flesh_04.wav",
+                "FLY_Bullet_Impact_Flesh_05.wav",
+                "FLY_Bullet_Impact_Flesh_06.wav",
+                "FLY_Bullet_Impact_Flesh_07.wav"
+        };
+
+        // Do not play any flesh sound if any other flesh sound is already playing
+        // This is because the way your knife is written in launches a whole bunch
+        // of bullets over a few frames and the sound stacks and sounds like shit
+        //for (const std::string& filename : filenames) {
+        //    if (Audio::AudioIsPlaying(filename)) {
+        //        return;
+        //    }
+        //}
+
+        int random = rand() % filenames.size();
+        Audio::PlayAudio(filenames[random], 1.0f);
+    }
+
     void UpdateAudioLoops() {
         bool playersUnderWater = false;
         bool playersWading = false;

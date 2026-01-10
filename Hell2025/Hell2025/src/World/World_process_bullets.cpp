@@ -11,7 +11,19 @@
 #include "BVH/Cpu/CpuBvh.h"
 
 namespace World {
+    float g_fleshHitHitTimer = 0.0f; // sound can only play if this is less or equal to 0.0f
+    constexpr float g_flashHitAudioDelay = 0.2f; // sound can only play if this is less or equal to 0.0f
+    bool g_awaitingFleshAudio = false;
+
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction);
+
+    void TriggerFleshHit() {
+        if (g_fleshHitHitTimer <= 0.0f) {
+            g_fleshHitHitTimer = g_flashHitAudioDelay;
+            Game::PlayFleshImpactAudio();
+        }
+    }
+
 
     void ProcessBullets() {
 
@@ -19,6 +31,8 @@ namespace World {
             std::cout << "Light count: " << World::GetLights().size() << "\n";
         }
 
+        g_fleshHitHitTimer -= Game::GetDeltaTime();
+        g_fleshHitHitTimer = std::max(g_fleshHitHitTimer, 0.0f);
 
         std::vector<Bullet>& bullets = GetBullets();
         std::vector<Bullet> newBullets;
@@ -141,6 +155,7 @@ namespace World {
                     if (objectId == dobermann.GetRagdollV2Id()) {
                         dobermann.TakeDamage(bullet.GetDamage());
                         SpawnBlood(hitPosition, -bullet.GetDirection());
+                        TriggerFleshHit();
                     }
 
                     //if (objectType == ObjectType::RAGDOLL_V2) {
@@ -157,7 +172,7 @@ namespace World {
                         for (Kangaroo& kangaroo : GetKangaroos()) {
                             if (kangaroo.GetAnimatedGameObject() == &animatedGameObject) {
                                 SpawnBlood(hitPosition, -bullet.GetDirection());
-                                //kangaroo.GiveDamage(bullet.GetDamage());
+                                TriggerFleshHit();
                             }
                         }
                     }
@@ -167,6 +182,7 @@ namespace World {
                 if (Shark* shark = World::GetSharkByObjectId(objectId)) {
                     shark->GiveDamage(bullet.GetOwnerObjectId(), bullet.GetDamage());
                     SpawnBlood(hitPosition, -bullet.GetDirection());
+                    TriggerFleshHit();
                 }
 
                 // Apply physics force      (THIS DOES NOT WORK FOR BVH PHYSICS HITS YOU THINK?????)
@@ -200,6 +216,7 @@ namespace World {
                         }
 
                         player->GiveDamage(bullet.GetDamage(), bullet.GetOwnerObjectId());
+                        TriggerFleshHit();
 
                         // REMOVE ME!!!! you are already doing this below. figure out better force system
                         float strength = 1000.0f;
@@ -275,7 +292,7 @@ namespace World {
         }
 
         // Wipe old bullets, and replace with any new ones that got spawned from glass hits
-        bullets = newBullets;;
+        bullets = newBullets;
     }
 
     void SpawnBlood(const glm::vec3& position, const glm::vec3& direction) {

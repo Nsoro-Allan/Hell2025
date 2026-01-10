@@ -32,9 +32,9 @@ std::vector<glm::vec3> GetCirclePoints(const glm::vec3& center, int segments, fl
     return pts;
 }
 
-void Shark::Init(glm::vec3 initialPosition) {
+void Shark::Init(const glm::vec3& initialPosition) {
     m_objectId = UniqueID::GetNextObjectId(ObjectType::SHARK);
-
+    m_yHeight = Ocean::GetOceanOriginY();
 
     g_animatedGameObjectObjectId = World::CreateAnimatedGameObject();
 
@@ -140,7 +140,7 @@ void Shark::Init(glm::vec3 initialPosition) {
     ragdoll->SetPhysicsData(m_objectId, ObjectType::SHARK);
 
     // Hack in a path
-    glm::vec3 center(13.0f, 28.85, 36.0f);
+    glm::vec3 center(13.0f, 24.85, 36.0f);
     float radius = 10;
     int segments = 9;
     m_path = GetCirclePoints(center, segments, radius);
@@ -360,7 +360,28 @@ void Shark::Update(float deltaTime) {
         float yRotation = rot0;
 
         if (IsAlive()) {
-            animatedGameObject->SetPosition(rootPosition);
+            float magicNumber = 0.73f;
+            float lerpSpeed = 1.0f;
+
+            // Start with the target at the ocean surface
+            float targetHeight = Ocean::GetOceanOriginY() - magicNumber;
+
+            // But if hunting a player overwrite it with their height
+            if (m_movementState == SharkMovementState::HUNT_PLAYER) {
+                if (Player* player = Game::GetPlayerByPlayerId(m_huntedPlayerId)) {
+                    targetHeight = std::min(targetHeight, player->GetCameraPosition().y) - (magicNumber * 0.5f);
+                }
+            }
+             
+            // Lerp to target
+            m_yHeight = Util::FInterpTo(m_yHeight, targetHeight, deltaTime, lerpSpeed);
+
+            // Calculate new position. Which is the spine pos plus the hacked in y height
+            glm::vec3 position = rootPosition;
+            position.y = m_yHeight;
+
+            // Set it
+            animatedGameObject->SetPosition(position);
         }
 
         animatedGameObject->SetRotationY(yRotation);
@@ -566,7 +587,7 @@ void Shark::SetMovementState(SharkMovementState movementState) {
     m_movementState = movementState;
 }
 
-void Shark::SetPosition(glm::vec3 position) {
+void Shark::SetPosition(const glm::vec3& position) {
     m_spinePositions[0] = position;
     for (int i = 1; i < SHARK_SPINE_SEGMENT_COUNT; i++) {
         m_spinePositions[i].x = m_spinePositions[0].x;

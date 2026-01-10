@@ -72,16 +72,6 @@ namespace Bible {
         aks74u.animationNames.adsFire.push_back("AKS74U_ADS_Fire2");
         aks74u.reloadMagInFrameNumber = 23;
         aks74u.reloadEmptyMagInFrameNumber = 21;
-        //aks74u.pickupConvexMeshModelName = "AKS74U_Carlos_ConvexMesh";
-        //aks74u.pickUpMeshMaterials["FrontSight_low"] = "AKS74U_0";
-        //aks74u.pickUpMeshMaterials["Receiver_low"] = "AKS74U_1";
-        //aks74u.pickUpMeshMaterials["BoltCarrier_low"] = "AKS74U_1";
-        //aks74u.pickUpMeshMaterials["SafetySwitch_low"] = "AKS74U_1";
-        //aks74u.pickUpMeshMaterials["Pistol_low"] = "AKS74U_2";
-        //aks74u.pickUpMeshMaterials["Trigger_low"] = "AKS74U_2";
-        //aks74u.pickUpMeshMaterials["MagRelease_low"] = "AKS74U_2";
-        //aks74u.pickUpMeshMaterials["Magazine_Housing_low"] = "AKS74U_3";
-        //aks74u.pickUpMeshMaterials["BarrelTip_low"] = "AKS74U_4";
 
         WeaponInfo& goldeneGlock = CreateWeaponInfo("GoldenGlock");
         goldeneGlock.itemInfoName = "GoldenGlock";
@@ -105,6 +95,7 @@ namespace Bible {
         goldeneGlock.animationNames.draw = "Glock_Draw";
         goldeneGlock.animationNames.drawFirst = "Glock_DrawFirst";
         goldeneGlock.animationSpeeds.fire = 1.5f;
+        goldeneGlock.animationSpeeds.adsFire = 1.5f;
         goldeneGlock.audioFiles.fire.push_back("Glock_Fire0.wav");
         goldeneGlock.audioFiles.fire.push_back("Glock_Fire1.wav");
         goldeneGlock.audioFiles.fire.push_back("Glock_Fire2.wav");
@@ -282,6 +273,7 @@ namespace Bible {
         glock.animationNames.draw = "Glock_Draw";
         glock.animationNames.drawFirst = "Glock_DrawFirst";
         glock.animationSpeeds.fire = 1.5f;
+        glock.animationSpeeds.adsFire = 1.5f;
         glock.audioFiles.fire.push_back("Glock_Fire0.wav");
         glock.audioFiles.fire.push_back("Glock_Fire1.wav");
         glock.audioFiles.fire.push_back("Glock_Fire2.wav");

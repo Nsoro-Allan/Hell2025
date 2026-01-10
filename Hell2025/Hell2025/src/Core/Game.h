@@ -30,4 +30,5 @@ namespace Game {
     void PlayGlassHitAudio();
     void PlayFootstepIndoorAudio();
     void PlayFootstepOutdoorAudio();
+    void PlayFleshImpactAudio();
 }

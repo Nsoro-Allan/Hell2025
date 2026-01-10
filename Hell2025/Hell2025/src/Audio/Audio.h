@@ -39,6 +39,7 @@ namespace Audio {
 
     void StopAudio(uint64_t audioId); 
     bool AudioIsPlaying(uint64_t audioId);
+    bool AudioIsPlaying(const std::string& filename);
     void FadeOut(uint64_t audioId, float duration);
 
     float GetVolume(uint64_t audioId);

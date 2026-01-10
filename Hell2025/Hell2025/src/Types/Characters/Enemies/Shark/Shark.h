@@ -9,9 +9,9 @@
 #define SHARK_HEALTH_MAX 1000
 
 struct Shark {
-    void Init(glm::vec3 initialPosition);
+    void Init(const glm::vec3& initialPosition);
     void Update(float deltaTime);
-    void SetPosition(glm::vec3 position);
+    void SetPosition(const glm::vec3& position);
     void CleanUp();
     void DrawSpinePoints();
     void HuntPlayer(uint64_t playerId);
@@ -83,6 +83,7 @@ private:
     bool m_hasBitPlayer = false;
     bool m_alive = false; 
     bool m_playerSafe = false;
+    float m_yHeight = 0.0f;
 
     SharkHuntingState m_huntingState = SharkHuntingState::UNDEFINED;
     SharkMovementState m_movementState = SharkMovementState::FOLLOWING_PATH;
