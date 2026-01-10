@@ -157,6 +157,8 @@ namespace InputMulti {
         // Key press/down/repeat
         for (KeyboardState& state : g_keyboardStates) {
             for (int i = 0; i < 350; ++i) {
+                state.consumed[i] = false;
+
                 if (state.keyDown[i]) {
                     if (!state.keyDownLastFrame[i]) {
                         state.keyPressed[i] = true;
@@ -272,29 +274,50 @@ namespace InputMulti {
 
     bool KeyDown(int keyboardIndex, int mouseIndex, unsigned int keyCode) {
         // Mouse
-        if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4)
+        if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4 && !g_mouseStates[mouseIndex].leftMouseConsumed)
             return g_mouseStates[mouseIndex].leftMouseDown;
-        else if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4)
+        else if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4 && !g_mouseStates[mouseIndex].rightMouseConsumed)
             return g_mouseStates[mouseIndex].rightMouseDown;
 
         // Keyboard
         if (keyboardIndex >= 0 && keyboardIndex < 4 && keyCode >= 0 && keyCode < 350) {
-            return g_keyboardStates[keyboardIndex].keyDown[keyCode];
+            return g_keyboardStates[keyboardIndex].keyDown[keyCode] && !g_keyboardStates[keyboardIndex].consumed[keyCode];
         }
 
         return false;
     }
 
+    void ConsumeKey(int keyboardIndex, int mouseIndex, unsigned int keyCode) {
+        // Mouse
+        if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4) {
+            g_mouseStates[mouseIndex].leftMouseConsumed = true;
+            return;
+        }
+        else if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4) {
+            g_mouseStates[mouseIndex].rightMouseConsumed = true;
+            return;
+        }
+
+        // Keyboard
+        if (keyboardIndex >= 0 && keyboardIndex < 4 && keyCode >= 0 && keyCode < 350) {
+            g_keyboardStates[keyboardIndex].consumed[keyCode] = true;
+            return;
+        }
+    }
+
     bool KeyPressed(int keyboardIndex, int mouseIndex, unsigned int keyCode, bool allowKeyRepeat) {
         // Mouse
         if (keyCode == HELL_MOUSE_LEFT && mouseIndex >= 0 && mouseIndex < 4)
-            return g_mouseStates[mouseIndex].leftMousePressed;
+            return g_mouseStates[mouseIndex].leftMousePressed && !g_mouseStates[mouseIndex].leftMouseConsumed;
         if (keyCode == HELL_MOUSE_RIGHT && mouseIndex >= 0 && mouseIndex < 4)
-            return g_mouseStates[mouseIndex].rightMousePressed;
+            return g_mouseStates[mouseIndex].rightMousePressed && !g_mouseStates[mouseIndex].rightMouseConsumed;
 
         // Keyboard
         if (keyboardIndex >= 0 && keyboardIndex < 4 && keyCode >= 0 && keyCode < 350) {
             const KeyboardState& state = g_keyboardStates[keyboardIndex];
+            if (state.consumed[keyCode]) {
+                return false;
+            }
             return allowKeyRepeat ? state.keyRepeat[keyCode] : state.keyPressed[keyCode];
         }
 

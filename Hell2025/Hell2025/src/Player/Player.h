@@ -166,6 +166,7 @@ struct Player {
     int32_t GetMouseIndex();
     void SetKeyboardIndex(int32_t index);
     void SetMouseIndex(int32_t index);
+    void ConsumeInteract();
     bool PressingWalkForward();
     bool PressingWalkBackward();
     bool PressingWalkLeft();

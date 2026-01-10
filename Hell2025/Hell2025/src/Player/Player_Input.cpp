@@ -91,6 +91,15 @@ bool Player::PressedWalkRight(bool allowKeyRepeat) {
     }
 }
 
+void Player::ConsumeInteract() {
+    if (m_inputType == InputType::KEYBOARD_AND_MOUSE) {
+        InputMulti::ConsumeKey(m_keyboardIndex, m_mouseIndex, m_controls.INTERACT);
+    }
+    else {
+        //return InputMulti::ConsumeButton(_controllerIndex, m_controls.INTERACT);
+    }
+}
+
 bool Player::PressedInteract() {
     if (m_inputType == InputType::KEYBOARD_AND_MOUSE) {
         return InputMulti::KeyPressed(m_keyboardIndex, m_mouseIndex, m_controls.INTERACT);

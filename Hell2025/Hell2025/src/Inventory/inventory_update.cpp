@@ -53,16 +53,8 @@ void Inventory::UpdateItemViewScreen(float deltaTime) {
 
     if (m_state == InventoryState::SHOP) {
         if (player->PressedInteract()) {
-            // Can you afford it?
-            if (player->PurchaseItem(GetSelectedItemName())) {
-                InputMulti::ClearKeyStates();
-
-                // GetWeaponPurchaseConfirmationText
-            }
-            // Guess not..
-            else {
-                InputMulti::ClearKeyStates();
-            }
+            player->PurchaseItem(GetSelectedItemName());
+            player->ConsumeInteract();
         }
     }
 }
