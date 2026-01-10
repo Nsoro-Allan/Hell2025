@@ -272,15 +272,6 @@ namespace Game {
                 "FLY_Bullet_Impact_Flesh_07.wav"
         };
 
-        // Do not play any flesh sound if any other flesh sound is already playing
-        // This is because the way your knife is written in launches a whole bunch
-        // of bullets over a few frames and the sound stacks and sounds like shit
-        //for (const std::string& filename : filenames) {
-        //    if (Audio::AudioIsPlaying(filename)) {
-        //        return;
-        //    }
-        //}
-
         int random = rand() % filenames.size();
         Audio::PlayAudio(filenames[random], 1.0f);
     }

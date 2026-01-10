@@ -151,6 +151,7 @@ void File::ExportSkinnedModel(const SkinnedModelData& skinnedModelData) {
         skinnedMeshHeader.localBaseVertex = skinnedMeshData.localBaseVertex;
         skinnedMeshHeader.aabbMin = skinnedMeshData.aabbMin;
         skinnedMeshHeader.aabbMax = skinnedMeshData.aabbMax;
+        skinnedMeshHeader.requiresSkinning = skinnedMeshData.requiresSkinning;
 
         file.write((char*)&skinnedMeshHeader.nameLength, sizeof(skinnedMeshHeader.nameLength));
         file.write((char*)&skinnedMeshHeader.vertexCount, sizeof(skinnedMeshHeader.vertexCount));
@@ -159,8 +160,12 @@ void File::ExportSkinnedModel(const SkinnedModelData& skinnedModelData) {
         file.write(skinnedMeshData.name.data(), skinnedMeshHeader.nameLength);
         file.write(reinterpret_cast<const char*>(&skinnedMeshHeader.aabbMin), sizeof(glm::vec3));
         file.write(reinterpret_cast<const char*>(&skinnedMeshHeader.aabbMax), sizeof(glm::vec3));
+        file.write(reinterpret_cast<const char*>(&skinnedMeshHeader.requiresSkinning), sizeof(bool));
         file.write(reinterpret_cast<const char*>(skinnedMeshData.vertices.data()), skinnedMeshData.vertices.size() * sizeof(WeightedVertex));
         file.write(reinterpret_cast<const char*>(skinnedMeshData.indices.data()), skinnedMeshData.indices.size() * sizeof(uint32_t));
+
+        //file.write((char*)&skinnedMeshHeader.requiresSkinning, sizeof(skinnedMeshHeader.requiresSkinning));
+
         #if PRINT_SKINNED_MESH_HEADERS_ON_WRITE
             PrintSkinnedMeshHeader(skinnedMeshHeader, "Wrote skinned mesh: " + skinnedMeshData.name);
         #endif
@@ -273,6 +278,7 @@ SkinnedModelData File::ImportSkinnedModel(const std::string& filepath) {
         uint32_t vertexCount = 0;
         uint32_t indexCount = 0;
         uint32_t localBaseVertex = 0;
+        bool requiresSkinning = false;
 
         file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));
         file.read(reinterpret_cast<char*>(&vertexCount), sizeof(vertexCount));
@@ -289,6 +295,9 @@ SkinnedModelData File::ImportSkinnedModel(const std::string& filepath) {
         file.read(reinterpret_cast<char*>(&aabbMin), sizeof(glm::vec3));
         file.read(reinterpret_cast<char*>(&aabbMax), sizeof(glm::vec3));
 
+        // Read the "requiresSkinning" value
+        file.read(reinterpret_cast<char*>(&requiresSkinning), sizeof(bool));
+        
         // Now set up the mesh data.
         SkinnedMeshData& meshData = skinnedModelData.meshes[i];
         meshData.name = meshName;
@@ -317,8 +326,6 @@ SkinnedModelData File::ImportSkinnedModel(const std::string& filepath) {
         //    PrintSkinnedMeshHeader(meshData, "Read skinned mesh: " + meshData.name);
         //#endif
     }
-
-
 
     return skinnedModelData;
 }

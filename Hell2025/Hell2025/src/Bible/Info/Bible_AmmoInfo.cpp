@@ -43,7 +43,7 @@ namespace Bible {
         shotgunBuckShotAmmo.modelName = "TODO!!!";
         shotgunBuckShotAmmo.convexMeshModelName = "TODO!!!";
         shotgunBuckShotAmmo.materialName = "TODO!!!";
-        shotgunBuckShotAmmo.pickupAmount = 666;
+        shotgunBuckShotAmmo.pickupAmount = 20;
         shotgunBuckShotAmmo.casingModelName = "Shell";
         shotgunBuckShotAmmo.casingMaterialName = "Shell";
         
@@ -57,9 +57,9 @@ namespace Bible {
     }
 
     int32_t GetAmmoPickUpAmount(const std::string& name) {
-        //if (AmmoInfo* ammoInfo = GetAmmoInfoByName(name)) {
-        //    return ammoInfo->pickupAmount;
-        //}
+        if (AmmoInfo* ammoInfo = GetAmmoInfoByName(name)) {
+            return ammoInfo->pickupAmount;
+        }
         return 0;
     }
 }

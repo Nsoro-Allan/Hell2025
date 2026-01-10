@@ -264,6 +264,43 @@ namespace AssimpImporter {
                     }
                 }
             }
+
+
+            // Check if all vertices have only one weight
+            bool allVerticeHaveOnlyOneWeight = true;
+
+            for (WeightedVertex& vertex : meshData.vertices) {
+                if (vertex.weight.y != 0 &&
+                    vertex.weight.z != 0 &&
+                    vertex.weight.w != 0) {
+                    allVerticeHaveOnlyOneWeight = false;
+                }
+            }
+
+            // If they do, now check they all reference the same bone
+            int foundBoneIndex = meshData.vertices[0].boneID[0];
+            bool allVerticesAlsoOnlyReferenceTheSameBone = true;
+
+            if (allVerticeHaveOnlyOneWeight) {
+                for (int i = 1; i < meshData.vertices.size(); i++) {
+                    WeightedVertex& vertex = meshData.vertices[i];
+                    if (vertex.boneID.x != foundBoneIndex) {
+                        allVerticesAlsoOnlyReferenceTheSameBone = false;
+                        break;
+                    }
+                }
+            }
+
+            // SET THE BOOLEAN
+            if (allVerticeHaveOnlyOneWeight && allVerticesAlsoOnlyReferenceTheSameBone) {
+                meshData.requiresSkinning = false;
+            }
+            else {
+                meshData.requiresSkinning = true;
+            }
+
+            std::cout << modelData.name << " [" << meshData.name << "]: " << Util::BoolToString(meshData.requiresSkinning) << " " << meshData.vertexCount << " verts \n";
+
             localBaseVertex += (uint32_t)meshData.vertices.size();
             modelData.vertexCount += (uint32_t)meshData.vertices.size();
             modelData.indexCount += (uint32_t)meshData.indices.size();

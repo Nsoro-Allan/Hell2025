@@ -34,10 +34,6 @@ void PickUp::Update(float deltaTime) {
 
     m_respawnCounter += deltaTime;
 
-    if (m_despawned) {
-        std::cout << "m_respawnCounter: " << m_respawnCounter << "\n";
-    }
-
     if (m_despawned && m_respawnCounter >= 0.0f) {
         m_despawned = false;
         m_meshNodes.ForceDirty();
