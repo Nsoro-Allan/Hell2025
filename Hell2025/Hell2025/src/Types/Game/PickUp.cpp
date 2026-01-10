@@ -19,7 +19,7 @@ PickUp::PickUp(uint64_t id, const PickUpCreateInfo& createInfo, const SpawnOffse
     m_initialTransform.position = createInfo.position + spawnOffset.translation;
     m_initialTransform.rotation = createInfo.rotation + glm::vec3(0.0f, spawnOffset.yRotation, 0.0f);
 
-    Bible::ConfigureMeshNodesByItemName(id, inventoryItemInfo->GetName(), m_meshNodes, true);
+    Bible::ConfigureMeshNodesByItemName(id, inventoryItemInfo->GetName(), &m_meshNodes, true);
 }
 
 void PickUp::Update(float deltaTime) {

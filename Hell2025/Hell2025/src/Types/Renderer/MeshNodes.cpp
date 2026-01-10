@@ -654,9 +654,27 @@ void MeshNodes::AddForceToPhsyics(const glm::vec3 force) {
     }
 }
 
-void MeshNodes::CastCSMShadows() {
+void MeshNodes::EnableCSMShadows() {
     for (MeshNode& meshNode : m_meshNodes) {
         meshNode.castCSMShadows = true;
+    }
+}
+
+void MeshNodes::EnablePointLightShadows() {
+    for (MeshNode& meshNode : m_meshNodes) {
+        meshNode.castShadows = true;
+    }
+}
+
+void MeshNodes::DisablePointLightShadows() {
+    for (MeshNode& meshNode : m_meshNodes) {
+        meshNode.castShadows = false;
+    }
+}
+
+void MeshNodes::DisableCSMShadows() {
+    for (MeshNode& meshNode : m_meshNodes) {
+        meshNode.castCSMShadows = false;
     }
 }
 

@@ -1,8 +1,9 @@
 #include "Bible/Bible.h"
 #include "AssetManagement/AssetManager.h"
+#include "HellLogging.h"
 
 namespace Bible {
-    void ConfigureMeshNodesPlantBlackBerries(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesPlantBlackBerries(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         glm::vec3 scale = glm::vec3(1.25f);
@@ -23,11 +24,15 @@ namespace Bible {
         trunk1.materialName = "TreeLarge_0";
         trunk1.scale = scale;
 
-        meshNodes.Init(id, "BlackBerries", meshNodeCreateInfoSet);
-        meshNodes.CastCSMShadows();
+        meshNodes->Init(id, "BlackBerries", meshNodeCreateInfoSet);
+        //meshNodes->EnableCSMShadows();
+        meshNodes->DisablePointLightShadows();
+        meshNodes->DisableCSMShadows();
     }
 
-    void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes* meshNodes, MeshNodes* shadowCasterMeshNodes) {
+        if (!meshNodes) return;
+
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& tree = meshNodeCreateInfoSet.emplace_back();
@@ -41,13 +46,22 @@ namespace Bible {
         tree.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
         tree.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
-        meshNodes.Init(id, "TreeLarge_0", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "TreeLarge_0", meshNodeCreateInfoSet);
 
-        meshNodes.SetMaterialByMeshName("Tree", "TreeLarge_0");
-        meshNodes.CastCSMShadows();
+        meshNodes->SetMaterialByMeshName("Tree", "TreeLarge_0");
+        meshNodes->DisablePointLightShadows();
+        meshNodes->DisableCSMShadows();
+
+        if (shadowCasterMeshNodes) {
+            std::vector<MeshNodeCreateInfo> empty;
+
+            shadowCasterMeshNodes->Init(id, "TreeLarge_0_ShadowCaster", empty);
+            shadowCasterMeshNodes->EnableCSMShadows();
+            shadowCasterMeshNodes->EnablePointLightShadows();
+        }
     }
 
-    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& tree = meshNodeCreateInfoSet.emplace_back();
@@ -61,8 +75,7 @@ namespace Bible {
         tree.rigidDynamic.filterData.collisionGroup = CollisionGroup::ENVIROMENT_OBSTACLE;
         tree.rigidDynamic.filterData.collidesWith = (CollisionGroup)(GENERIC_BOUNCEABLE | ITEM_PICK_UP | BULLET_CASING | RAGDOLL_PLAYER | RAGDOLL_ENEMY);
 
-        meshNodes.Init(id, "Rock2", meshNodeCreateInfoSet);
-
-        meshNodes.CastCSMShadows();
+        meshNodes->Init(id, "Rock2", meshNodeCreateInfoSet);
+        meshNodes->EnableCSMShadows();
     }
 }

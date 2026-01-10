@@ -68,7 +68,10 @@ struct MeshNodes {
     void SleepAllPhysics();
     void WakeAllPhysics();
     void AddForceToPhsyics(const glm::vec3 force);
-    void CastCSMShadows();
+    void EnableCSMShadows();
+    void EnablePointLightShadows();
+    void DisablePointLightShadows();
+    void DisableCSMShadows();
     
     const void SubmitRenderItems() const;
     const void SubmitOutlineRenderItems() const;

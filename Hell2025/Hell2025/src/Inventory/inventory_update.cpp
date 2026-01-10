@@ -63,7 +63,7 @@ void Inventory::InitMeshNodesFromSelectedItem() {
     ItemInfo* itemInfo = Bible::GetItemInfoByName(GetSelectedItemName());
     if (!itemInfo) return;
 
-    Bible::ConfigureMeshNodesByItemName(NO_ID, itemInfo->m_name, m_examineItemMeshNodes, false);
+    Bible::ConfigureMeshNodesByItemName(NO_ID, itemInfo->m_name, &m_examineItemMeshNodes, false);
 }
 
 void Inventory::UpdateExamineScreen(float deltaTime) {

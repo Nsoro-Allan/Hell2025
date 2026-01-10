@@ -41,6 +41,8 @@ namespace RenderDataManager {
     void SubmitRenderItemsMirror(const std::vector<RenderItem>& renderItems);
     void SubmitRenderItemsStainedGlass(const std::vector<RenderItem>& renderItems);
 
+    void SubmitShadowCasterRenderItems(const std::vector<RenderItem>& renderItems);
+
     void SubmitOutlineRenderItem(const RenderItem& renderItem);
     void SubmitOutlineRenderItems(const std::vector<RenderItem>& renderItems);
 

@@ -9,7 +9,7 @@
 
 namespace Bible {
     void Init();
-    void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes);
+    void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes* meshNodes, MeshNodes* shadowCasterMeshNodes = nullptr);
 
     AmmoInfo& CreateAmmoInfo(const std::string& name);
     ItemInfo& CreateInventoryItemInfo(const std::string& name);
@@ -29,26 +29,26 @@ namespace Bible {
     // Misc
     void PrintDebugInfo();
 
-    void ConfigureMeshNodesByItemName(uint64_t id, const std::string& itemName, MeshNodes& meshNodes, bool createPhysicsObjects);
-    void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes& meshNodes);
+    void ConfigureMeshNodesByItemName(uint64_t id, const std::string& itemName, MeshNodes* meshNodes, bool createPhysicsObjects);
+    void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes* meshNodes);
 
-    void ConfigureTestModel(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureTestModel2(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureTestModel3(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureTestModel4(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureTestModel(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureTestModel2(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureTestModel3(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureTestModel4(uint64_t id, MeshNodes* meshNodes);
 
-    void ConfigureMeshNodesChristmasPresentSmall(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesChristmasPresentLarge(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesChristmasTree(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesCouch(uint64_t, MeshNodes& meshNodes);
-    void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesPlantBlackBerries(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesBathroomBasin(uint64_t id, MeshNodes& meshNodes);
-    void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes& meshNodes);
+    void ConfigureMeshNodesChristmasPresentSmall(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesChristmasPresentLarge(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesChristmasTree(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesCouch(uint64_t, MeshNodes* meshNodes);
+    void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesMermaidRock(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesPlantBlackBerries(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesPlantTree(uint64_t id, MeshNodes* meshNodes, MeshNodes* shadowCasterMeshNodes);
+    void ConfigureMeshNodesToilet(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesBathroomBasin(uint64_t id, MeshNodes* meshNodes);
+    void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes* meshNodes);
 
     const std::vector<std::string>& GetAmmoNameList();
     const std::vector<std::string>& GetWeaponNameList();

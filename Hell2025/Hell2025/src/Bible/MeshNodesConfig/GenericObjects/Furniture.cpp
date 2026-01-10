@@ -2,7 +2,7 @@
 #include "AssetManagement/AssetManager.h"
 
 namespace Bible {
-    void ConfigureMeshNodesCouch(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesCouch(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
@@ -42,6 +42,6 @@ namespace Bible {
         cushion4.meshName = "Cushion4";
         cushion4.materialName = "Couch";
 
-        meshNodes.Init(id, "Couch", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "Couch", meshNodeCreateInfoSet);
     }
 }

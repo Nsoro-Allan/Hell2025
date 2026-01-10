@@ -3,7 +3,7 @@
 
 namespace Bible {
 
-    void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes& meshNodes) {
+    void ConfigureDoorMeshNodes(uint64_t id, DoorCreateInfo& createInfo, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         // Deadlock stuff
@@ -57,24 +57,24 @@ namespace Bible {
             hinges.openable.closingAudio = "Door_Open.wav";
             hinges.openable.isDeadLock = true;
 
-            meshNodes.Init(id, "Door_StandardA", meshNodeCreateInfoSet);
+            meshNodes->Init(id, "Door_StandardA", meshNodeCreateInfoSet);
 
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("DoorOld_Front", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorOld_Front", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("DoorOld_Front", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorOld_Front", "Door_RE");
             }
 
             // Back
             if (createInfo.materialTypeBack == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("DoorOld_Back", "Door_WP");
-                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorOld_Back", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorOld_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("DoorOld_Back", "Door_RE");
-                meshNodes.SetMaterialByMeshName("DoorOld_Sides", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorOld_Back", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorOld_Sides", "Door_RE");
             }
         }
 
@@ -111,24 +111,24 @@ namespace Bible {
             hinges.openable.closingAudio = "Door_Open.wav";
             hinges.openable.isDeadLock = true;
 
-            meshNodes.Init(id, "Door_StandardB", meshNodeCreateInfoSet);
+            meshNodes->Init(id, "Door_StandardB", meshNodeCreateInfoSet);
 
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("Door_Front", "Door_WP");
+                meshNodes->SetMaterialByMeshName("Door_Front", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("Door_Front", "Door_RE");
-                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_WP");
+                meshNodes->SetMaterialByMeshName("Door_Front", "Door_RE");
+                meshNodes->SetMaterialByMeshName("Door_Sides", "Door_WP");
             }
 
             // Back
             if (createInfo.materialTypeBack == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("Door_Back", "Door_WP");
+                meshNodes->SetMaterialByMeshName("Door_Back", "Door_WP");
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("Door_Back", "Door_RE");
-                meshNodes.SetMaterialByMeshName("Door_Sides", "Door_RE");
+                meshNodes->SetMaterialByMeshName("Door_Back", "Door_RE");
+                meshNodes->SetMaterialByMeshName("Door_Sides", "Door_RE");
             }
         }
 
@@ -229,28 +229,28 @@ namespace Bible {
             glassCenterCircle.decalType = DecalType::GLASS;
             glassCenterCircle.tintColor = glm::vec3(0.5f, 0.35f, 0.0f);
 
-            meshNodes.Init(id, "Door_StainedGlass", meshNodeCreateInfoSet);
+            meshNodes->Init(id, "Door_StainedGlass", meshNodeCreateInfoSet);
 
             // Front
             if (createInfo.materialTypeFront == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("DoorGlass_Front", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Front", "Door_WP");
             }
             else if (createInfo.materialTypeFront == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("DoorGlass_Front", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Front", "Door_RE");
             }
 
             // Back
             if (createInfo.materialTypeBack == DoorMaterialType::WHITE_PAINT) {
-                meshNodes.SetMaterialByMeshName("DoorGlass_Back", "Door_WP");
-                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Back", "Door_WP");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Sides", "Door_WP");
             }
             else if (createInfo.materialTypeBack == DoorMaterialType::RESIDENT_EVIL) {
-                meshNodes.SetMaterialByMeshName("DoorGlass_Back", "Door_RE");
-                meshNodes.SetMaterialByMeshName("DoorGlass_Sides", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Back", "Door_RE");
+                meshNodes->SetMaterialByMeshName("DoorGlass_Sides", "Door_RE");
             }
 
             // Glass frame
-            meshNodes.SetMaterialByMeshName("DoorGlassArtFrame", "DoorGlassFrame");
+            meshNodes->SetMaterialByMeshName("DoorGlassArtFrame", "DoorGlassFrame");
         }
 
         if (createInfo.type == DoorType::STAINED_GLASS2) {
@@ -294,7 +294,7 @@ namespace Bible {
             glass.decalType = DecalType::GLASS;
             glass.tintColor = glm::vec3(1.0f);
 
-            meshNodes.Init(id, "Door_StainedGlass2", meshNodeCreateInfoSet);
+            meshNodes->Init(id, "Door_StainedGlass2", meshNodeCreateInfoSet);
 
             
 
@@ -308,48 +308,48 @@ namespace Bible {
         front = "Door2_RE";
         back = "Door2Back_RE";
 
-        meshNodes.SetMaterialByMeshName("ChainLocker", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink1", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink2", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink3", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink4", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink5", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink6", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink7", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink8", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink9", metals);
-        meshNodes.SetMaterialByMeshName("ChainLink10", metals);
-        meshNodes.SetMaterialByMeshName("ChainLach", metals);
+        meshNodes->SetMaterialByMeshName("ChainLocker", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink1", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink2", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink3", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink4", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink5", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink6", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink7", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink8", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink9", metals);
+        meshNodes->SetMaterialByMeshName("ChainLink10", metals);
+        meshNodes->SetMaterialByMeshName("ChainLach", metals);
 
-        meshNodes.SetMaterialByMeshName("DeadLockMain", metals);
-        meshNodes.SetMaterialByMeshName("BoltLockerHold", metals);
-        meshNodes.SetMaterialByMeshName("Plate", metals);
-        meshNodes.SetMaterialByMeshName("BoltLockerGuide", metals);
-        meshNodes.SetMaterialByMeshName("DeadLockVault", metals);
-        meshNodes.SetMaterialByMeshName("KeyHole", metals);
-        meshNodes.SetMaterialByMeshName("DeadLockSwitch", metals);
-        meshNodes.SetMaterialByMeshName("DeadLockCylinder", metals);
-        meshNodes.SetMaterialByMeshName("DoorBell", metals);
-        meshNodes.SetMaterialByMeshName("BoltLockerSlide", metals);
+        meshNodes->SetMaterialByMeshName("DeadLockMain", metals);
+        meshNodes->SetMaterialByMeshName("BoltLockerHold", metals);
+        meshNodes->SetMaterialByMeshName("Plate", metals);
+        meshNodes->SetMaterialByMeshName("BoltLockerGuide", metals);
+        meshNodes->SetMaterialByMeshName("DeadLockVault", metals);
+        meshNodes->SetMaterialByMeshName("KeyHole", metals);
+        meshNodes->SetMaterialByMeshName("DeadLockSwitch", metals);
+        meshNodes->SetMaterialByMeshName("DeadLockCylinder", metals);
+        meshNodes->SetMaterialByMeshName("DoorBell", metals);
+        meshNodes->SetMaterialByMeshName("BoltLockerSlide", metals);
 
-        meshNodes.SetMaterialByMeshName("BlackDoor_Sides", front);
-        meshNodes.SetMaterialByMeshName("BlackDoor_Front", front);
-        meshNodes.SetMaterialByMeshName("BlackDoor_Back", back);
+        meshNodes->SetMaterialByMeshName("BlackDoor_Sides", front);
+        meshNodes->SetMaterialByMeshName("BlackDoor_Front", front);
+        meshNodes->SetMaterialByMeshName("BlackDoor_Back", back);
 
-        meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
-        meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
-        meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
+        meshNodes->SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
+        meshNodes->SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
+        meshNodes->SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
 
-        meshNodes.SetMaterialByMeshName("Glass", "T_BlackDoor_Glass");
+        meshNodes->SetMaterialByMeshName("Glass", "T_BlackDoor_Glass");
             
-        meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals"); // set later anyway
-        meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals"); // set later anyway
+        meshNodes->SetMaterialByMeshName("Door_Hinges", "DoorMetals"); // set later anyway
+        meshNodes->SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals"); // set later anyway
 
-        //meshNodes.SetBlendingModeByMeshName("KeyHole", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("ChainLocker", BlendingMode::DO_NOT_RENDER);
-        //meshNodes.SetBlendingModeByMeshName("ChainLach", BlendingMode::DO_NOT_RENDER);
+        //meshNodes->SetBlendingModeByMeshName("KeyHole", BlendingMode::DO_NOT_RENDER);
+        //meshNodes->SetBlendingModeByMeshName("ChainLocker", BlendingMode::DO_NOT_RENDER);
+        //meshNodes->SetBlendingModeByMeshName("ChainLach", BlendingMode::DO_NOT_RENDER);
                 
-        meshNodes.PrintMeshNames();
+        meshNodes->PrintMeshNames();
 
 
         // ChainLocker
@@ -388,25 +388,25 @@ namespace Bible {
 
         // Frame material
         if (createInfo.materialTypeFrameFront == DoorMaterialType::RESIDENT_EVIL) {
-            meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_RE");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_RE");
         }
         if (createInfo.materialTypeFrameFront == DoorMaterialType::WHITE_PAINT) {
-            meshNodes.SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Front", "DoorFrame_WP");
         }
         if (createInfo.materialTypeFrameBack == DoorMaterialType::RESIDENT_EVIL) {
-            meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_RE");
-            meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_RE");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_RE");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_RE");
         }
         if (createInfo.materialTypeFrameBack == DoorMaterialType::WHITE_PAINT) {
-            meshNodes.SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
-            meshNodes.SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Back", "DoorFrame_WP");
+            meshNodes->SetMaterialByMeshName("DoorFrame_Inner", "DoorFrame_WP");
         }
 
         // Same for all combinations
-        meshNodes.SetMaterialByMeshName("Door_Knob", "DoorOldKnob");
-        meshNodes.SetMaterialByMeshName("Door_Hinges", "DoorMetals");
-        meshNodes.SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals");
-        meshNodes.SetMaterialByMeshName("DoorFrame_KnobLatch", "DoorOldKnob");
-        meshNodes.CastCSMShadows();
+        meshNodes->SetMaterialByMeshName("Door_Knob", "DoorOldKnob");
+        meshNodes->SetMaterialByMeshName("Door_Hinges", "DoorMetals");
+        meshNodes->SetMaterialByMeshName("DoorFrame_Hinges", "DoorMetals");
+        meshNodes->SetMaterialByMeshName("DoorFrame_KnobLatch", "DoorOldKnob");
+        meshNodes->EnableCSMShadows();
     }
 }

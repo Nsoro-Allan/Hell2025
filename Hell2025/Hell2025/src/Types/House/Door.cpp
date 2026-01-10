@@ -29,7 +29,7 @@ Door::Door(uint64_t id, DoorCreateInfo& createInfo, SpawnOffset& spawnOffset) {
     if (m_createInfo.materialTypeFrameFront == DoorMaterialType::UNDEFINED) m_createInfo.materialTypeFrameFront = DoorMaterialType::RESIDENT_EVIL;
     if (m_createInfo.materialTypeFrameBack == DoorMaterialType::UNDEFINED)  m_createInfo.materialTypeFrameBack = DoorMaterialType::RESIDENT_EVIL;
 
-    Bible::ConfigureDoorMeshNodes(id, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(id, m_createInfo, &m_meshNodes);
 
     if (m_createInfo.deadLockedAtInit) {
         m_deadLocked = true;
@@ -168,40 +168,40 @@ void Door::SetRotationY(float value) {
 
 void Door::SetEditorName(const std::string& name) {
     m_createInfo.editorName = name;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetType(DoorType type) {
     m_createInfo.type = type;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetFrontMaterial(DoorMaterialType type) {
     m_createInfo.materialTypeFront = type;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetBackMaterial(DoorMaterialType type) {
     m_createInfo.materialTypeBack = type;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetFrameFrontMaterial(DoorMaterialType type) {
     m_createInfo.materialTypeFrameFront = type;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetFrameBackMaterial(DoorMaterialType type) {
     m_createInfo.materialTypeFrameBack = type;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetDeadLockState(bool value) {
     m_createInfo.hasDeadLock = value;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }
 
 void Door::SetDeadLockedAtInitState(bool value) {
     m_createInfo.deadLockedAtInit = value;
-    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, m_meshNodes);
+    Bible::ConfigureDoorMeshNodes(m_objectId, m_createInfo, &m_meshNodes);
 }

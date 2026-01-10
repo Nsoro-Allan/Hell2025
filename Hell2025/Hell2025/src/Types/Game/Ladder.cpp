@@ -22,7 +22,7 @@ Ladder::Ladder(uint64_t id, LadderCreateInfo& createInfo, SpawnOffset& spawnOffs
     ladder.addtoNavMesh = true;
 
     m_meshNodes.Init(id, "Ladder", meshNodeCreateInfoSet);
-    m_meshNodes.CastCSMShadows();
+    m_meshNodes.EnableCSMShadows();
 
     RecomputeModelMatrix();
 }

@@ -7,7 +7,7 @@ namespace Bible {
     // This whole file is pretty messy now that you merged all the inventory item/pickup item stuff
     // This whole file is pretty messy now that you merged all the inventory item/pickup item stuff
 
-    void ConfigureMeshNodesByItemName(uint64_t id, const std::string& itemName, MeshNodes& meshNodes, bool createPhysicsObjects) {
+    void ConfigureMeshNodesByItemName(uint64_t id, const std::string& itemName, MeshNodes* meshNodes, bool createPhysicsObjects) {
         ItemInfo* inventoryItemInfo = Bible::GetItemInfoByName(itemName);
         if (!inventoryItemInfo) {
             Logging::Error() << "Bible::ConfigureMeshNodesByitemName(..) failed: '" << itemName << "' InventoryItemInfo not found in Bible\n";
@@ -56,7 +56,7 @@ namespace Bible {
             pistolGrip.meshName = "AKS74UPistolGrip";
             pistolGrip.materialName = "AKS74U_2";
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -75,7 +75,7 @@ namespace Bible {
                 blackSkull.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -95,7 +95,7 @@ namespace Bible {
                 glock.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -114,7 +114,7 @@ namespace Bible {
                 knife.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -133,7 +133,7 @@ namespace Bible {
                 glock.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -152,7 +152,7 @@ namespace Bible {
                 shotgun.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -171,7 +171,7 @@ namespace Bible {
                 smallKey.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -190,7 +190,7 @@ namespace Bible {
                 smallKey.rigidDynamic.convexMeshModelName = inventoryItemInfo->GetCollisionModelName();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -217,7 +217,7 @@ namespace Bible {
             stamped.meshName = "SPAS12_Stamped";
             stamped.materialName = "SPAS2_Stamped";
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -235,7 +235,7 @@ namespace Bible {
                 ammo.rigidDynamic.shapeType = inventoryItemInfo->GetPhysicsShapeType();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -253,7 +253,7 @@ namespace Bible {
                 ammo.rigidDynamic.shapeType = inventoryItemInfo->GetPhysicsShapeType();
             }
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 
@@ -276,7 +276,7 @@ namespace Bible {
             grip.meshName = "TokarevGripPolymer";
             grip.materialName = "TokarevGrip";
 
-            meshNodes.Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
+            meshNodes->Init(id, inventoryItemInfo->GetModelName(), meshNodeCreateInfoSet);
             return;
         }
 

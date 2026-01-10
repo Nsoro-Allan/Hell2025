@@ -21,16 +21,17 @@ GenericObject::GenericObject(uint64_t id, const GenericObjectCreateInfo& createI
     m_transform.scale = m_createInfo.scale;
     m_objectId = id;
 
-    Bible::ConfigureMeshNodes(id, m_createInfo.type, m_meshNodes);
-
+    Bible::ConfigureMeshNodes(id, m_createInfo.type, &m_meshNodes, &m_shadowCasterMeshNodes);
 }
 
 void GenericObject::Update(float deltaTime) {
     m_meshNodes.Update(m_transform.to_mat4());
+    m_shadowCasterMeshNodes.Update(m_transform.to_mat4());
 }
 
 void GenericObject::CleanUp() {
     m_meshNodes.CleanUp();
+    m_shadowCasterMeshNodes.CleanUp();
 }
 
 void GenericObject::SetPosition(const glm::vec3& position) {

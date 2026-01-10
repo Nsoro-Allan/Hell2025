@@ -2,7 +2,7 @@
 #include "AssetManagement/AssetManager.h"
 
 namespace Bible {
-    void ConfigureMeshNodesToilet(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesToilet(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
@@ -39,10 +39,10 @@ namespace Bible {
         seat.openable.audioVolume = 0.75f;
         seat.openable.prerequisiteOpenMeshName = "Lid";
 
-        meshNodes.Init(id, "Toilet", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "Toilet", meshNodeCreateInfoSet);
     }
 
-    void ConfigureMeshNodesBathroomBasin(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesBathroomBasin(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& basin = meshNodeCreateInfoSet.emplace_back();
@@ -57,12 +57,12 @@ namespace Bible {
         tapCold.meshName = "BathroomBasinTapCold";
         tapCold.materialName = "BathroomBasin";
 
-        meshNodes.Init(id, "BathroomBasin", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "BathroomBasin", meshNodeCreateInfoSet);
 
-        Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
+        Model* model = AssetManager::GetModelByName(meshNodes->GetModelName());
     }
 
-    void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesBathroomCabinet(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& body = meshNodeCreateInfoSet.emplace_back();
@@ -89,9 +89,9 @@ namespace Bible {
         mirror.blendingMode = BlendingMode::MIRROR;
         mirror.decalType = DecalType::GLASS;
 
-        meshNodes.Init(id, "BathroomCabinet", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "BathroomCabinet", meshNodeCreateInfoSet);
 
-        Model* model = AssetManager::GetModelByName(meshNodes.GetModelName());
+        Model* model = AssetManager::GetModelByName(meshNodes->GetModelName());
     }
 
     

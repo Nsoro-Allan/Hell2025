@@ -1,7 +1,7 @@
 #include "Bible/Bible.h"
 
 namespace Bible {
-    void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesDrawersSmall(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
@@ -91,10 +91,10 @@ namespace Bible {
         handle4th.materialName = "Drawers_Handles";
         handle4th.meshName = "Handle4th";
 
-        meshNodes.Init(id, "DrawersSmall", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "DrawersSmall", meshNodeCreateInfoSet);
     }
 
-    void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesDrawersLarge(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& frame = meshNodeCreateInfoSet.emplace_back();
@@ -210,7 +210,7 @@ namespace Bible {
         handle4th.materialName = "Drawers_Handles";
         handle4th.meshName = "Handle_4th";
 
-        meshNodes.Init(id, "DrawersLarge", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "DrawersLarge", meshNodeCreateInfoSet);
 
         //struct MeshNodePickUpCreateInfo {
         //    glm::vec3 offsetPosition = glm::vec3(0.0f);

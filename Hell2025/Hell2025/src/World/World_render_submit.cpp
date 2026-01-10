@@ -90,6 +90,8 @@ namespace World {
                 genericGameObject.GetMeshNodes().SubmitOutlineRenderItems();
             }
             genericGameObject.GetMeshNodes().SubmitRenderItems();
+            RenderDataManager::SubmitShadowCasterRenderItems(genericGameObject.GetShadowCasterRenderItems());
+            //RenderDataManager::SubmitRenderItems(genericGameObject.GetShadowCasterRenderItems());
         }
 
         // Window
@@ -101,18 +103,20 @@ namespace World {
         }
 
         // Trees
-        for (Tree& tree : GetTrees()) {
-            RenderDataManager::SubmitRenderItems(tree.GetRenderItems());
-            RenderDataManager::SubmitRenderItemsBlended(tree.GetRenderItemsBlended());
-            RenderDataManager::SubmitRenderItemsAlphaDiscard(tree.GetRenderItemsAlphaDiscarded());
-            RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(tree.GetRenderItemsHairTopLayer());
-            RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(tree.GetRenderItemsHairBottomLayer());
-            if (Editor::GetSelectedObjectId() == tree.GetObjectId()) {
-                RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItems());
-                RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsAlphaDiscarded());
-                RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsBlended());
-            }
-        }
+        //for (Tree& tree : GetTrees()) {
+        //    RenderDataManager::SubmitRenderItems(tree.GetRenderItems());
+        //    RenderDataManager::SubmitRenderItemsBlended(tree.GetRenderItemsBlended());
+        //    RenderDataManager::SubmitRenderItemsAlphaDiscard(tree.GetRenderItemsAlphaDiscarded());
+        //    RenderDataManager::SubmitRenderItemsAlphaHairTopLayer(tree.GetRenderItemsHairTopLayer());
+        //    RenderDataManager::SubmitRenderItemsAlphaHairBottomLayer(tree.GetRenderItemsHairBottomLayer());
+        //    if (Editor::GetSelectedObjectId() == tree.GetObjectId()) {
+        //        RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItems());
+        //        RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsAlphaDiscarded());
+        //        RenderDataManager::SubmitOutlineRenderItems(tree.GetRenderItemsBlended());
+        //    }
+        //
+        //    RenderDataManager::SubmitShadowCasterRenderItems(tree.get());
+        //}
 
         // Lights
         for (Light& light : GetLights()) {

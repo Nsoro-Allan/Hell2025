@@ -43,7 +43,9 @@ namespace Bible {
         Logging::Init() << "The Bible has been read";
     }
 
-    void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes) {
+    void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes* meshNodes, MeshNodes* shadowCasterMeshNodes) {
+        if (!meshNodes || !shadowCasterMeshNodes) return;
+
         switch (type) {
             case GenericObjectType::CHRISTMAS_PRESENT_SMALL:    return ConfigureMeshNodesChristmasPresentSmall(id, meshNodes);
             case GenericObjectType::CHRISTMAS_PRESENT_LARGE:    return ConfigureMeshNodesChristmasPresentLarge(id, meshNodes);
@@ -56,7 +58,7 @@ namespace Bible {
             case GenericObjectType::TOILET:                     return ConfigureMeshNodesToilet(id, meshNodes);
             case GenericObjectType::COUCH:                      return ConfigureMeshNodesCouch(id, meshNodes);
             case GenericObjectType::PLANT_BLACKBERRIES:         return ConfigureMeshNodesPlantBlackBerries(id, meshNodes);
-            case GenericObjectType::PLANT_TREE:                 return ConfigureMeshNodesPlantTree(id, meshNodes);
+            case GenericObjectType::PLANT_TREE:                 return ConfigureMeshNodesPlantTree(id, meshNodes, shadowCasterMeshNodes);
             case GenericObjectType::TEST_MODEL:                 return ConfigureTestModel(id, meshNodes);
             case GenericObjectType::TEST_MODEL2:                return ConfigureTestModel2(id, meshNodes);
             case GenericObjectType::TEST_MODEL3:                return ConfigureTestModel3(id, meshNodes);
@@ -64,6 +66,10 @@ namespace Bible {
 
             default: Logging::Error() << "Bible::ConfigureMeshNodes(...) failed: non-implemented GenericObjectType: '" << Util::GenericObjectTypeToString(type) << "'";
         }
+    }
+
+    void ConfigureMeshNodes(uint64_t id, GenericObjectType type, MeshNodes& meshNodes) {
+
     }
 
     void CreateSortedAmmoNameList() {

@@ -4,7 +4,7 @@
 #include "Util.h"
 
 namespace Bible {
-    void ConfigureMeshNodesChristmasPresentSmall(uint64_t id, MeshNodes& meshNodes) {
+  void ConfigureMeshNodesChristmasPresentSmall(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         std::string materialName = UNDEFINED_STRING;
@@ -32,11 +32,11 @@ namespace Bible {
         present.rigidDynamic.mass = 1.0;
         present.rigidDynamic.shapeType = PhysicsShapeType::BOX;
 
-        meshNodes.Init(id, "ChristmasPresentSmall", meshNodeCreateInfoSet);
-        meshNodes.PrintMeshNames();
+        meshNodes->Init(id, "ChristmasPresentSmall", meshNodeCreateInfoSet);
+        meshNodes->PrintMeshNames();
     }
 
-    void ConfigureMeshNodesChristmasPresentLarge(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesChristmasPresentLarge(uint64_t id, MeshNodes* meshNodes) {
         Logging::Error() << "You still need to export your large Christmas present model";
         
         return;
@@ -67,11 +67,11 @@ namespace Bible {
         present.rigidDynamic.mass = 1.0;
         present.rigidDynamic.shapeType = PhysicsShapeType::BOX;
 
-        meshNodes.Init(id, "ChristmasPresentLarge", meshNodeCreateInfoSet);
-        meshNodes.PrintMeshNames();
+        meshNodes->Init(id, "ChristmasPresentLarge", meshNodeCreateInfoSet);
+        meshNodes->PrintMeshNames();
     }
 
-    void ConfigureMeshNodesChristmasTree(uint64_t id, MeshNodes& meshNodes) {
+    void ConfigureMeshNodesChristmasTree(uint64_t id, MeshNodes* meshNodes) {
         std::vector<MeshNodeCreateInfo> meshNodeCreateInfoSet;
 
         MeshNodeCreateInfo& tree = meshNodeCreateInfoSet.emplace_back();
@@ -80,6 +80,6 @@ namespace Bible {
         tree.blendingMode = BlendingMode::ALPHA_DISCARD;
         tree.scale = glm::vec3(1.4f);
 
-        meshNodes.Init(id, "ChristmasTree", meshNodeCreateInfoSet);
+        meshNodes->Init(id, "ChristmasTree", meshNodeCreateInfoSet);
     }
 }

@@ -41,6 +41,8 @@ namespace RenderDataManager {
     std::vector<RenderItem> g_renderItemsMirror;
     std::vector<RenderItem> g_stainedGlassRenderItems;
 
+    std::vector<RenderItem> g_shadowCasterRenderItems;
+
     std::vector<RenderItem> g_outlineRenderItems;
     std::vector<RenderItem> g_shadowMapRenderItems;
 
@@ -88,6 +90,7 @@ namespace RenderDataManager {
         g_outlineRenderItems.clear();
         g_gpuLightsHighRes.clear();
         g_decalPaintingInfo.clear();
+        g_shadowCasterRenderItems.clear();
     }
 
     void Update() {
@@ -250,6 +253,9 @@ namespace RenderDataManager {
             }
         }
 
+        std::vector<RenderItem> potentialRenderItems = g_renderItems; // First start with everything in the scene
+        potentialRenderItems.insert(potentialRenderItems.end(), g_shadowCasterRenderItems.begin(), g_shadowCasterRenderItems.end());
+
         Frustum frustum;
 
         for (int i = 0; i < viewportCount; i++) {
@@ -263,10 +269,10 @@ namespace RenderDataManager {
                 int instanceStart = g_instanceData.size();
 
                 // Preallocate an estimate
-                g_instanceData.reserve(g_instanceData.size() + g_renderItems.size());
+                g_instanceData.reserve(g_instanceData.size() + potentialRenderItems.size());
 
                 // Append new render items to the global instance data if its within this cascade's frustum
-                for (const RenderItem& renderItem : g_renderItems) {
+                for (const RenderItem& renderItem : potentialRenderItems) {
                     if (renderItem.castCSMShadows && frustum.IntersectsAABBFast(renderItem)) {
                         g_instanceData.push_back(renderItem);
                         //Renderer::DrawAABB(AABB(renderItem.aabbMin, renderItem.aabbMax), YELLOW);
@@ -735,6 +741,10 @@ namespace RenderDataManager {
 
     void SubmitRenderItems(const std::vector<RenderItem>& renderItems) {
         g_renderItems.insert(g_renderItems.begin(), renderItems.begin(), renderItems.end());
+    }
+
+    void SubmitShadowCasterRenderItems(const std::vector<RenderItem>& renderItems) {
+        g_shadowCasterRenderItems.insert(g_shadowCasterRenderItems.begin(), renderItems.begin(), renderItems.end());
     }
 
     void SubmitRenderItemsMirror(const std::vector<RenderItem>& renderItems) {
