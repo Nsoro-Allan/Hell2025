@@ -51,14 +51,18 @@ void Player::BeginFrame() {
     m_interactFound = false;
     m_interactObjectId = 0;
     m_interactOpenableId = 0;
+
+    if (Input::KeyPressed(HELL_KEY_Q)) {
+        m_cash += 100;
+    }
 }
 
 void Player::EnterShop() {
-    m_isInShop = true;
+    m_isInShop = true;  
     m_shopInventory.OpenAsShop();
     m_inventory.CloseInventory();
 
-    const std::string& text = Bible::RandomMermaidGreeting();
+    const std::string& text = Bible::MermaidShopGreeting();
     m_typeWriter.DisplayText(text);
 
     m_flashlightOn = true;
@@ -71,7 +75,6 @@ void Player::LeaveShop() {
     m_isInShop = false;
     m_inventory.CloseInventory();
     m_shopInventory.CloseInventory();
-    m_typeWriter.ClearText();
 }
 
 static float WrapPi(float a) {
@@ -188,7 +191,6 @@ void Player::Update(float deltaTime) {
     // Running
     m_running = PressingRun() && !m_crouching;
     m_runningSpeed = 20;
-    m_running = false;
 
     // Respawn
     if (IsAwaitingSpawn()) Respawn();
@@ -302,6 +304,38 @@ void Player::Update(float deltaTime) {
 
 
         }
+    }
+}
+
+bool Player::PurchaseItem(const std::string& itemName) {
+    ItemInfo* itemInfo = Bible::GetItemInfoByName(itemName);
+    if (!itemInfo) return false;
+
+    const ItemType& itemType = itemInfo->GetType();
+    const int itemCost = itemInfo->GetCost();
+
+    // Can you afford it?
+    if (m_cash >= itemCost) {
+        if (itemType == ItemType::WEAPON) {
+            m_inventory.GiveWeapon(itemName);
+            m_inventory.GiveAmmo(itemName, itemCost);
+            SwitchWeapon(itemName, DRAW_BEGIN);
+            SubtractCash(itemCost);
+        }
+        else {
+            Logging::ToDo() << "Bro, Player::PurchaseItem(...) is missing this item type's implementation";
+        }
+
+        m_typeWriter.DisplayText(Bible::MermaidShopWeaponPurchaseConfirmationText());
+        Audio::PlayAudio("ShopPurchase2.wav", 1.0f);
+        LeaveShop();
+
+        return true;
+    }
+    else {
+        m_typeWriter.DisplayText(Bible::MermaidShopFailedPurchaseText());
+        Audio::PlayAudio("ShopDenied.wav", 1.0f);
+        return false;
     }
 }
 
@@ -524,7 +558,7 @@ void Player::GiveDamage(int damage, uint64_t enemyId) {
     m_health -= damage;
     if (m_health <= 0) {
         m_health = 0;
-        Kill();
+        Kill(false);
     }
 }
 
@@ -566,7 +600,7 @@ bool Player::IsFacingClosestMermaid() {
     return !(cameraOnFrontSide && mermaidInFrontOfCamera);
 }
 
-void Player::Kill() {
+void Player::Kill(bool wasHeadShot) {
     if (m_alive) {
         m_flashlightOn = false;
         m_deathCount++;
@@ -582,8 +616,13 @@ void Player::Kill() {
         for (int i = 0; i < Game::GetLocalPlayerCount(); i++) {
             if (i != m_viewportIndex) {
                 if (Player* player = Game::GetLocalPlayerByIndex(i)) {
-                    player->GiveCash(100);
                     player->m_killCount++;
+                    if (wasHeadShot) {
+                        player->GiveCash(Bible::GetPlayerHeadShotCashReward());
+                    }
+                    else {
+                        player->GiveCash(Bible::GetPlayerKillCashReward());
+                    }
                 }
             }
         }

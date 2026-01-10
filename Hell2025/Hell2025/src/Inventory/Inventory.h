@@ -103,6 +103,9 @@ private:
     // Updates
     void UpdateItemViewScreen(float deltaTime);
     void UpdateExamineScreen(float deltaTime);
+    //void UpdateShopScreen(float deltaTime);
+
+    int GetSelectedItemCost();
 
     // Getters
     InventoryItem* GetItemAtIndex(int index);

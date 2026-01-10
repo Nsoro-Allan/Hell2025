@@ -107,9 +107,10 @@ void Inventory::SubmitRenderItems() {
             int coinMargin = 13;
             glm::ivec2 coinIconLocation = m_locations.itemHeading + glm::ivec2(GetSelectedItemHeadingSize().x + coinMargin, 16);
             glm::ivec2 priceLocation = coinIconLocation + glm::ivec2(22, 0);
+            std::string cost = std::to_string(GetSelectedItemCost());
 
             BlitCoinIcon(coinIconLocation);
-            BlitGenericText("100", priceLocation, Alignment::TOP_LEFT);
+            BlitGenericText(cost, priceLocation, Alignment::TOP_LEFT);
         }
     }
 

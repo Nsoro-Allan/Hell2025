@@ -79,7 +79,7 @@ struct Player {
     void SubtractCash(int amount);
 
 
-    void Kill();
+    void Kill(bool wasHeadShot);
     Ragdoll* GetRagdoll();
     glm::mat4 m_deathCamViewMatrix = glm::mat4(1.0f);
 
@@ -197,6 +197,8 @@ struct Player {
     bool PressedFlashlight();
     bool PressedToggleInventory();
     bool PressedInventoryExamine();
+
+    bool PurchaseItem(const std::string& itemName);
 
     const InventoryState& GetInvetoryState() { return m_inventory.GetInventoryState(); }
     Inventory& GetInventory() { return m_inventory; }

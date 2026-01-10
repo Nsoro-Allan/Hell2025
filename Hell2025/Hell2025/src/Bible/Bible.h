@@ -22,7 +22,9 @@ namespace Bible {
     bool WeaponInfoExists(const std::string& name);
 
     // Text
-    const std::string& RandomMermaidGreeting();
+    const std::string& MermaidShopGreeting();
+    const std::string& MermaidShopWeaponPurchaseConfirmationText();
+    const std::string& MermaidShopFailedPurchaseText();
 
     // Misc
     void PrintDebugInfo();
@@ -63,4 +65,8 @@ namespace Bible {
     float GetItemMass(const std::string& name);
     ItemType GetItemType(const std::string& name);
 
+    int GetPlayerKillCashReward();
+    int GetPlayerHeadShotCashReward();
+
+    int GetItemCost(const std::string& name);
 }

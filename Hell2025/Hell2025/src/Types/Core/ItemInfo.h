@@ -9,6 +9,7 @@ struct ItemInfo {
     PhysicsShapeType m_physicsShapeType = PhysicsShapeType::BOX;
     ItemType m_type = ItemType::USELESS;
     float m_mass = 1.0f;
+    int m_cost = 1;
 
     struct ExamineInfo {
         glm::vec3 translation = glm::vec3(0.0f);
@@ -35,10 +36,6 @@ struct ItemInfo {
         std::string subName = UNDEFINED_STRING;
     } m_pickUpInfo;
 
-    struct ShopInfo {
-        int cost = 0;
-    } m_shopInfo;
-
     struct WeaponInfo {
         std::string casingModelName = UNDEFINED_STRING;
         std::string casingMaterialName = UNDEFINED_STRING;
@@ -50,6 +47,7 @@ struct ItemInfo {
     bool IsDiscardable() const                          { return m_inventoryInfo.discardable; }
     bool IsEquipable() const                            { return m_inventoryInfo.equipable; }
     int GetCellSize() const                             { return m_inventoryInfo.cellSize; }
+    int GetCost() const                                 { return m_cost; }
     float GetMass() const                               { return m_mass; }
     const std::string& GetCasingModelName() const       { return m_weaponInfo.casingModelName; }
     const std::string& GetCasingMaterialName() const    { return m_weaponInfo.casingMaterialName; }

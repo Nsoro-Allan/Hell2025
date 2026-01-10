@@ -111,6 +111,11 @@ void Inventory::ClearInventory() {
     UpdateOccupiedSlotsArray();
 }
 
+int Inventory::GetSelectedItemCost() {
+    if (!ItemSelected()) return 0;
+    return Bible::GetItemCost(GetSelectedItemName());
+}
+
 glm::ivec2 Inventory::GetSelectedItemHeadingSize() {
     if (!ItemSelected()) return glm::ivec2(0, 0);
     return TextBlitter::GetBlitTextSize(GetSelectedItemHeading(), m_style.itemHeadingFont, 1.0f);

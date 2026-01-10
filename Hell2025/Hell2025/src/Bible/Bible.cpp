@@ -194,6 +194,13 @@ namespace Bible {
         return g_weaponsInfos.find(name) != g_weaponsInfos.end();
     }
 
+    int GetItemCost(const std::string& name) {
+        ItemInfo* itemInfo = GetItemInfoByName(name);
+        if (!itemInfo) return 0;
+
+        return itemInfo->GetCost();
+    }
+
     AmmoInfo* GetAmmoInfoByName(const std::string& name) {
         if (AmmoInfoExists(name))
             return &g_ammoInfos[name];

@@ -142,7 +142,7 @@ void Shark::UpdateHuntingLogic(float deltaTime) {
                 //std::cout << "perpendicularDistance:  " << perpendicularDistance << "\n";
 
                 m_hasBitPlayer = true;
-                player->Kill();
+                player->Kill(false);
                 //Game::g_sharkKills++; 
                 //std::ofstream out("SharkKills.txt");
                 //out << Game::g_sharkKills;

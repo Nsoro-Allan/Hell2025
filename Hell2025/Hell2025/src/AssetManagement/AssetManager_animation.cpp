@@ -94,8 +94,8 @@ namespace AssetManager {
         m_AnimationImporter.FreeScene();
 
         animation->SetLoadingState(LoadingState::Value::LOADING_COMPLETE);
-        animation->PrintNodeNames();
-        std::cout << "\n";
+        //animation->PrintNodeNames();
+        //std::cout << "\n";
     }
 
     Animation* AssetManager::GetAnimationByName(const std::string& name) {

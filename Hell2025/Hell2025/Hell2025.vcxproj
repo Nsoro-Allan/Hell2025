@@ -300,6 +300,7 @@ xcopy /Y /I "$(ProjectDir)vendor\DLLs\*.dll" "$(TargetDir)"
     <ClCompile Include="src\BackEnd\Integration\GLFW.cpp" />
     <ClCompile Include="src\BackEnd\Integration\SDL.cpp" />
     <ClCompile Include="src\Bible\Bible_text.cpp" />
+    <ClCompile Include="src\Bible\Misc\CashRewards.cpp" />
     <ClCompile Include="src\Bible\Items\Bible_items.cpp" />
     <ClCompile Include="src\Bible\MeshNodesConfig\Bible_PickUps.cpp" />
     <ClCompile Include="src\Bible\MeshNodesConfig\Bible_Doors.cpp" />

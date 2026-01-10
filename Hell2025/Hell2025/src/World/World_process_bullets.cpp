@@ -193,7 +193,7 @@ namespace World {
                             for (int i = 0; i < max; i++) {
                                 if (ragdoll->m_rigidDynamicIds[i] == physXRayResult.userData.physicsId) {
                                     if (ragdoll->m_correspondingBoneNames[i] == "CC_Base_Head") {
-                                        player->Kill();
+                                        player->Kill(true);
                                     }
                                 }
                             }
