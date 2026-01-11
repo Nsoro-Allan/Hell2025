@@ -45,11 +45,12 @@ void AnimatedGameObject::UpdateRenderItems() {
     if (!m_skinnedModel) return;
 
     int meshCount = m_meshRenderingEntries.size();
-    m_renderItems.clear();
+    m_dynamicRenderItems.clear();
     for (int i = 0; i < meshCount; i++) {
         if (m_meshRenderingEntries[i].drawingEnabled) {
-            RenderItem& renderItem = m_renderItems.emplace_back();
+            RenderItem renderItem;
             SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(m_meshRenderingEntries[i].meshIndex);
+
             Material* material = AssetManager::GetMaterialByIndex(m_meshRenderingEntries[i].materialIndex);
             renderItem.baseColorTextureIndex = material->m_basecolor;
             renderItem.rmaTextureIndex = material->m_rma;
@@ -72,6 +73,16 @@ void AnimatedGameObject::UpdateRenderItems() {
                 renderItem.woundNormalMapTextureIndex = wouldMaterial->m_normal;
                 renderItem.woundRmaTextureIndex = wouldMaterial->m_rma;
             }
+
+            // Put it where it belongs
+            if (mesh->requiresSkinning) {
+                m_dynamicRenderItems.push_back(renderItem);
+            }
+            else {
+                m_staticRenderItems.push_back(renderItem);
+            }
+
+
         }
     }
     RenderDataManager::IncrementBaseSkinnedVertex(m_skinnedModel->GetVertexCount());

@@ -10,7 +10,7 @@ namespace Bible {
         aks74u.itemInfoName = "AKS74U";
         aks74u.modelName = "AKS74U";
         aks74u.type = WeaponType::AUTOMATIC;
-        aks74u.damage = 15;
+        aks74u.damage = 25;
         aks74u.animationNames.idle = "AKS74U_Idle";
         aks74u.animationNames.walk = "AKS74U_Walk";
         aks74u.animationNames.draw = "AKS74U_Draw";
@@ -235,7 +235,7 @@ namespace Bible {
         tokarev.casingEjectionBoneName = "Ejection";
         tokarev.muzzleFlashOffset = glm::vec3(0, 0.002, 0.005f);
         tokarev.casingEjectionOffset = glm::vec3(-0.098, -0.033, 0.238);
-        tokarev.damage = 25;
+        tokarev.damage = 35;
         tokarev.magSize = 15;
         tokarev.ammoInfoName = "Tokarev";
         tokarev.animationCancelFrames.draw = 50.0f;

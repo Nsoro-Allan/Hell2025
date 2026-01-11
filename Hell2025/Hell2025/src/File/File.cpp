@@ -306,6 +306,7 @@ SkinnedModelData File::ImportSkinnedModel(const std::string& filepath) {
         meshData.localBaseVertex = localBaseVertex;
         meshData.aabbMin = aabbMin;
         meshData.aabbMax = aabbMax;
+        meshData.requiresSkinning = requiresSkinning;
 
         // Allocate space for vertices and indices.
         meshData.vertices.resize(vertexCount);

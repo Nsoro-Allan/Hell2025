@@ -1,11 +1,12 @@
 #include "AssetManager.h"
+#include "HellLogging.h"
 
 namespace AssetManager {
 
     int g_nextWeightedVertexInsert = 0;
     int g_nextWeightedIndexInsert = 0;
 
-    int AssetManager::CreateSkinnedMesh(const std::string& name, std::vector<WeightedVertex>& vertices, std::vector<uint32_t>& indices, uint32_t baseVertexLocal, glm::vec3 aabbMin, glm::vec3 aabbMax) {
+    int AssetManager::CreateSkinnedMesh(const std::string& name, std::vector<WeightedVertex>& vertices, std::vector<uint32_t>& indices, uint32_t baseVertexLocal, const glm::vec3& aabbMin, const glm::vec3& aabbMax, bool requiresSkinning) {
         std::vector<SkinnedMesh>& skinnedMeshes = GetSkinnedMeshes();
         std::vector<WeightedVertex>& allVertices = GetWeightedVertices();
         std::vector<uint32_t>& allIndices = GetWeightedIndies();
@@ -19,6 +20,10 @@ namespace AssetManager {
         mesh.name = name;
         mesh.aabbMin = aabbMin;
         mesh.aabbMax = aabbMax;
+        mesh.requiresSkinning = requiresSkinning;
+
+        Logging::ToDo() << "Change this line when you work on your skinning optimization again.";
+        mesh.requiresSkinning = true;
 
         allVertices.reserve(allVertices.size() + vertices.size());
         allVertices.insert(std::end(allVertices), std::begin(vertices), std::end(vertices));

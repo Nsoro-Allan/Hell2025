@@ -42,6 +42,12 @@ Door::Door(uint64_t id, DoorCreateInfo& createInfo, SpawnOffset& spawnOffset) {
         }
     }
 
+   // DeadLock& deadLock = m_deadLocks.emplace_back();
+   // deadLock.Init(m_objectId, glm::vec3(0.0f, 0.131056f, 0.0f), DeadLockType::BOLT);
+   //
+   // DeadLock& deadLock2 = m_deadLocks.emplace_back();
+   // deadLock2.Init(m_objectId, glm::vec3(0.0f, 1.95425f, 0.0f), DeadLockType::BOLT);
+
     UpdateFloor();
     UpdateWorldForward();
 }
@@ -80,7 +86,20 @@ void Door::Update(float deltaTime) {
     transform.position = m_position;
     transform.rotation = m_rotation;
 
-    m_meshNodes.Update(transform.to_mat4());
+    // Store it, this is used by the deadlocks
+    m_doorModelMatrix = transform.to_mat4();
+
+    m_meshNodes.Update(m_doorModelMatrix);
+
+    m_renderItems = m_meshNodes.GetRenderItems();
+
+    for (DeadLock& deadLock : m_deadLocks) {
+        deadLock.Update(deltaTime);
+        const std::vector<RenderItem>& deadLockRenderItems = deadLock.m_meshNodes.GetRenderItems();
+        m_renderItems.insert(m_renderItems.end(), deadLockRenderItems.begin(), deadLockRenderItems.end());
+    }
+
+
 
     // DebugDraw();
 

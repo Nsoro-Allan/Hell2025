@@ -1,6 +1,7 @@
 #pragma once
 #include "HellTypes.h"
 #include "CreateInfo.h"
+#include "DeadLock.h"
 #include "Types/Renderer/MeshNodes.h"
 #include "Types/Renderer/Model.h"
 
@@ -41,7 +42,7 @@ struct Door {
     const Model* GetDoorFrameModel() const                              { return m_frameModel; }
     const OpeningState& GetOpeningState() const                         { return m_openingState; }
     const DoorCreateInfo& GetCreateInfo() const                         { return m_createInfo; }
-    const std::vector<RenderItem>& GetRenderItems() const               { return m_meshNodes.GetRenderItems(); }
+    const std::vector<RenderItem>& GetRenderItems() const               { return m_renderItems; } // This includes main MeshNods render items plus any deadlocks renderitems
     const std::vector<RenderItem>& GetRenderItemsGlass() const          { return m_meshNodes.GetRenderItemsGlass(); }
     const std::vector<RenderItem>& GetRenderItemsStainedGlass() const   { return m_meshNodes.GetRenderItemsStainedGlass(); }
     const std::string& GetEditorName() const                            { return m_createInfo.editorName; }
@@ -60,6 +61,10 @@ private:
 	MeshNodes m_meshNodes;
     SpawnOffset m_spawnOffset;
 
+    std::vector<DeadLock> m_deadLocks;
+
+    std::vector<RenderItem> m_renderItems; // This contains main MeshNods render items plus any deadlocks renderitems
+
     //bool m_movedThisFrame = true;
     bool m_deadLocked = false;
     uint64_t m_lifeTime = 0;
@@ -68,7 +73,6 @@ private:
     Model * m_frameModel = nullptr;
     Material* m_material = nullptr;
     OpeningState m_openingState = OpeningState::CLOSED;
-    std::vector<RenderItem> m_renderItems;
     glm::vec3 m_position;
     glm::vec3 m_rotation;
     glm::vec3 m_interactPosition;

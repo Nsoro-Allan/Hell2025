@@ -18,7 +18,7 @@ void SkinnedModel::BakeToAssetManager() {
         std::vector<WeightedVertex>& vertices = skinnedMeshData.vertices;
         std::vector<uint32_t>& indices = skinnedMeshData.indices;
     
-        AddMeshIndex(AssetManager::CreateSkinnedMesh(meshName, vertices, indices, baseVertexLocal, aabbMin, aabbMax));
+        AddMeshIndex(AssetManager::CreateSkinnedMesh(meshName, vertices, indices, baseVertexLocal, aabbMin, aabbMax, skinnedMeshData.requiresSkinning));
     }
 
     // Store bone node indices

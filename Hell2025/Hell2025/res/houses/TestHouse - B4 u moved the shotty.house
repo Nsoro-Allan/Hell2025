@@ -1890,22 +1890,22 @@
       "Type": "WEAPON"
     },
     {
-      "DisablePhysicsAtSpawn": false,
+      "DisablePhysicsAtSpawn": true,
       "EditorName": "UNDEFINED_STRING",
-      "Name": "12GaugeBuckShot",
+      "Name": "Remington870",
       "Position": [
-        2.4755239486694336,
-        0.5,
-        -1.0227279663085938
+        10.040288925170898,
+        0.5587310791015625,
+        0.9474515914916992
       ],
       "Respawn": true,
       "Rotation": [
-        0.0,
-        0.0,
-        0.0
+        -1.515903353691101,
+        0.06235416233539581,
+        1.4955534934997559
       ],
       "SaveToFile": true,
-      "Type": "AMMO"
+      "Type": "WEAPON"
     },
     {
       "DisablePhysicsAtSpawn": false,
@@ -1933,6 +1933,24 @@
         0.3825710415840149,
         0.41773390769958496,
         0.034005194902420044
+      ],
+      "Respawn": true,
+      "Rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "SaveToFile": true,
+      "Type": "AMMO"
+    },
+    {
+      "DisablePhysicsAtSpawn": false,
+      "EditorName": "UNDEFINED_STRING",
+      "Name": "12GaugeBuckShot",
+      "Position": [
+        2.4755239486694336,
+        0.5,
+        -1.0227279663085938
       ],
       "Respawn": true,
       "Rotation": [

@@ -34,6 +34,12 @@ namespace OpenGLRenderer {
             for (uint32_t i = 0; i < skinnedModel->GetMeshCount(); i++) {
                 int meshindex = skinnedModel->GetMeshIndices()[i];
                 SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(meshindex);
+
+                // Skip this mesh if it does not require skinning
+                if (!mesh->requiresSkinning) {
+                    continue;
+                }
+
                 totalVertexCount += mesh->vertexCount;
             }
         }
@@ -56,18 +62,23 @@ namespace OpenGLRenderer {
             for (uint32_t i = 0; i < skinnedModel->GetMeshCount(); i++) {
                 uint32_t meshindex = skinnedModel->GetMeshIndices()[i];
                 SkinnedMesh* mesh = AssetManager::GetSkinnedMeshByIndex(meshindex);
-                shader->SetInt("vertexCount", mesh->vertexCount);
-                shader->SetInt("baseInputVertex", mesh->baseVertexGlobal);
-                shader->SetInt("baseOutputVertex", baseOutputVertex);
-                shader->SetInt("baseTransformIndex", baseTransformIndex);
-                shader->SetInt("vertexCount", mesh->vertexCount);
 
-                GLuint workgroupSize = 128;
-                GLuint groupCountX = (mesh->vertexCount + workgroupSize - 1) / workgroupSize;
-                glDispatchCompute(groupCountX, 1, 1);
+                // Skin this mesh if required
+                if (mesh->requiresSkinning) {
+                    shader->SetInt("vertexCount", mesh->vertexCount);
+                    shader->SetInt("baseInputVertex", mesh->baseVertexGlobal);
+                    shader->SetInt("baseOutputVertex", baseOutputVertex);
+                    shader->SetInt("baseTransformIndex", baseTransformIndex);
+                    shader->SetInt("vertexCount", mesh->vertexCount);
+
+                    GLuint workgroupSize = 128;
+                    GLuint groupCountX = (mesh->vertexCount + workgroupSize - 1) / workgroupSize;
+                    glDispatchCompute(groupCountX, 1, 1);;
+                }
 
                 baseOutputVertex += mesh->vertexCount;
             }
+
             baseTransformIndex += (uint32_t)animatedGameObject->GetBoneSkinningMatrices().size();
             j++;
         }

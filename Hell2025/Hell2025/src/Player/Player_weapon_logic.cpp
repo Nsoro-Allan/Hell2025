@@ -114,7 +114,7 @@ void Player::GiveDefaultLoadout() {
     //m_inventory.GiveWeapon("AKS74U");
 
     //m_inventory.GiveAmmo("12GaugeBuckShot", 80);
-    //m_inventory.GiveAmmo("Glock", 200);
+    m_inventory.GiveAmmo("Glock", 40);
     //m_inventory.GiveAmmo("Tokarev", 200);
     //m_inventory.GiveAmmo("AKS74U", 200);
 

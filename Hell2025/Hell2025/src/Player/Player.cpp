@@ -51,10 +51,6 @@ void Player::BeginFrame() {
     m_interactFound = false;
     m_interactObjectId = 0;
     m_interactOpenableId = 0;
-
-    if (Input::KeyPressed(HELL_KEY_Q)) {
-        m_cash += 100;
-    }
 }
 
 void Player::EnterShop() {
@@ -191,6 +187,8 @@ void Player::Update(float deltaTime) {
     // Running
     m_running = PressingRun() && !m_crouching;
     m_runningSpeed = 20;
+
+    m_running = false; // REMOVE ME TO ENABLE SPRINTING
 
     // Respawn
     if (IsAwaitingSpawn()) Respawn();

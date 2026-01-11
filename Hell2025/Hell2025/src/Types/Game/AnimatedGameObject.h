@@ -95,7 +95,7 @@ public:
     const uint32_t& GetIgnoredViewportIndex() const                 { return m_ignoredViewportIndex; };
     const uint32_t& GetExclusiveViewportIndex() const               { return m_exclusiveViewportIndex; };
     const glm::vec3 GetScale() const                                { return m_transform.scale; }
-    const std::vector<RenderItem>& GetRenderItems()                 { return m_renderItems; }
+    const std::vector<RenderItem>& GetRenderItems()                 { return m_dynamicRenderItems; }
     const std::vector<glm::mat4>& GetGlobalBlendedNodeTransforms()  { return m_animator.m_globalBlendedNodeTransforms; }
     const std::vector<glm::mat4>& GetBoneSkinningMatrices()         { return m_boneSkinningMatrices; }
     const std::string& GetName() const                              { return m_name; }
@@ -111,7 +111,8 @@ private:
     glm::mat4 m_cameraMatrix = glm::mat4(1);
     std::string m_name = "";
     std::vector<MeshRenderingEntry> m_meshRenderingEntries;
-    std::vector<RenderItem> m_renderItems;
+    std::vector<RenderItem> m_dynamicRenderItems;
+    std::vector<RenderItem> m_staticRenderItems;
     std::vector<glm::mat4> m_boneSkinningMatrices;
     std::vector<uint32_t> m_skinnedBufferIndices;
     std::vector<int32_t> m_woundMaskTextureIndices;

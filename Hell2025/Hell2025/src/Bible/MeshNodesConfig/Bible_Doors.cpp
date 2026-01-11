@@ -296,7 +296,9 @@ namespace Bible {
 
             meshNodes->Init(id, "Door_StainedGlass2", meshNodeCreateInfoSet);
 
-            
+           //meshNodes->SetBlendingModeByMeshName("BoltLockerGuide", BlendingMode::DO_NOT_RENDER);
+           //meshNodes->SetBlendingModeByMeshName("BoltLockerSlide", BlendingMode::DO_NOT_RENDER);
+           //meshNodes->SetBlendingModeByMeshName("BoltLockerHold", BlendingMode::DO_NOT_RENDER);
 
         std::string front = "T_BlackDoor_Door";
         std::string back = "T_BlackDoor_Door_BACK";
